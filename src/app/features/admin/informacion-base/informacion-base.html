@@ -1,0 +1,326 @@
+<!-- HU-009 — PF-012: ver Figma EP02-PF-012-Informacion-base. -->
+<div class="infobase-cabecera">
+  <h1 class="infobase-titulo">Información base</h1>
+  <p class="infobase-subtitulo">
+    Valores que después se seleccionan al crear o editar un curso. Solo una sección visible a la vez.
+  </p>
+</div>
+
+<div class="infobase-tabs" role="tablist">
+  @for (pestana of pestanas; track pestana.id) {
+    <button
+      type="button"
+      role="tab"
+      class="infobase-tab"
+      [class.infobase-tab--activa]="tabActiva() === pestana.id"
+      [attr.aria-selected]="tabActiva() === pestana.id"
+      (click)="cambiarPestana(pestana.id)"
+    >
+      {{ pestana.etiqueta }}
+    </button>
+  }
+</div>
+
+<div class="card infobase-card">
+  <div class="infobase-card__cabecera">
+    <h2 class="infobase-card__titulo">{{ tituloPestanaActiva }}</h2>
+    <div class="infobase-card__acciones">
+      <label class="infobase-interruptor">
+        <input type="checkbox" class="infobase-interruptor__entrada" [checked]="mostrarTodos()" (change)="alternarMostrarTodos()" />
+        <span class="infobase-interruptor__pista"><span class="infobase-interruptor__perilla"></span></span>
+        <span class="infobase-interruptor__texto">Mostrar todos</span>
+      </label>
+      @if (modoFormulario() === null) {
+        <button type="button" class="btn btn--secundario" (click)="abrirCrear()">Agregar valor</button>
+      }
+    </div>
+  </div>
+
+  @if (modoFormulario() !== null) {
+    <form class="infobase-formulario" (ngSubmit)="guardar()">
+      @if (errorFormulario()) {
+        <div class="alerta alerta--error infobase-alerta">
+          <span class="alerta__icono">!</span>
+          <div class="alerta__titulo">{{ errorFormulario() }}</div>
+        </div>
+      }
+
+      @switch (tabActiva()) {
+        @case ('tipoCurso') {
+          <div [formGroup]="formTipoCurso" class="infobase-campos infobase-campos--3">
+            <div>
+              <label class="label" for="tc-codigo">Código</label>
+              <input id="tc-codigo" class="input" formControlName="codigo" placeholder="DIPLOMADO" />
+            </div>
+            <div>
+              <label class="label" for="tc-nombre">Nombre</label>
+              <input id="tc-nombre" class="input" formControlName="nombre" placeholder="Diplomado" />
+            </div>
+            <div>
+              <label class="label" for="tc-orden">Orden</label>
+              <input id="tc-orden" type="number" class="input" formControlName="orden" />
+            </div>
+          </div>
+        }
+        @case ('categoria') {
+          <div [formGroup]="formCategoria" class="infobase-campos infobase-campos--3">
+            <div>
+              <label class="label" for="cat-codigo">Código</label>
+              <input id="cat-codigo" class="input" formControlName="codigo" placeholder="DERECHO_REGISTRAL" />
+            </div>
+            <div>
+              <label class="label" for="cat-nombre">Nombre</label>
+              <input id="cat-nombre" class="input" formControlName="nombre" placeholder="Derecho Registral" />
+            </div>
+            <div>
+              <label class="label" for="cat-orden">Orden</label>
+              <input id="cat-orden" type="number" class="input" formControlName="orden" />
+            </div>
+          </div>
+        }
+        @case ('docente') {
+          <div [formGroup]="formDocente" class="infobase-campos infobase-campos--2">
+            <div>
+              <label class="label" for="doc-nombres">Nombres</label>
+              <input id="doc-nombres" class="input" formControlName="nombres" [class.input--error]="campoDocenteInvalido('nombres')" />
+              @if (campoDocenteInvalido('nombres')) {
+                <div class="campo-error">Ingresa los nombres (solo letras).</div>
+              }
+            </div>
+            <div>
+              <label class="label" for="doc-paterno">Apellido paterno</label>
+              <input id="doc-paterno" class="input" formControlName="apellidoPaterno" [class.input--error]="campoDocenteInvalido('apellidoPaterno')" />
+              @if (campoDocenteInvalido('apellidoPaterno')) {
+                <div class="campo-error">Ingresa el apellido paterno (solo letras).</div>
+              }
+            </div>
+            <div>
+              <label class="label"><span>Apellido materno</span><span class="nota-pill">Opcional</span></label>
+              <input class="input" formControlName="apellidoMaterno" [class.input--error]="campoDocenteInvalido('apellidoMaterno')" />
+              @if (campoDocenteInvalido('apellidoMaterno')) {
+                <div class="campo-error">Solo letras, espacios, apóstrofe y guion.</div>
+              }
+            </div>
+            <div>
+              <label class="label" for="doc-cargo">Cargo profesional</label>
+              <input id="doc-cargo" class="input" formControlName="cargoProfesional" placeholder="Docente especialista en..." />
+            </div>
+            <div>
+              <label class="label"><span>Foto</span><span class="nota-pill">Opcional</span></label>
+              <input class="input" formControlName="fotoUrl" placeholder="img/instructores/..." />
+            </div>
+            <div class="infobase-campo--ancho">
+              <label class="label"><span>Biografía profesional</span><span class="nota-pill">Opcional</span></label>
+              <textarea class="input" rows="3" formControlName="biografiaProfesional"></textarea>
+            </div>
+          </div>
+        }
+        @case ('entidad') {
+          <div [formGroup]="formEntidad" class="infobase-campos infobase-campos--2">
+            <div>
+              <label class="label" for="ent-nombre">Nombre</label>
+              <input id="ent-nombre" class="input" formControlName="nombre" placeholder="Colegio de Abogados de Lima" />
+            </div>
+            <div>
+              <label class="label"><span>Logo</span><span class="nota-pill">Opcional</span></label>
+              <input class="input" formControlName="logoUrl" placeholder="img/entidades/..." />
+            </div>
+          </div>
+        }
+        @case ('firmante') {
+          <div [formGroup]="formFirmante" class="infobase-campos infobase-campos--2">
+            <div>
+              <label class="label" for="fir-nombres">Nombres</label>
+              <input id="fir-nombres" class="input" formControlName="nombres" [class.input--error]="campoFirmanteInvalido('nombres')" />
+              @if (campoFirmanteInvalido('nombres')) {
+                <div class="campo-error">Ingresa los nombres (solo letras).</div>
+              }
+            </div>
+            <div>
+              <label class="label" for="fir-paterno">Apellido paterno</label>
+              <input id="fir-paterno" class="input" formControlName="apellidoPaterno" [class.input--error]="campoFirmanteInvalido('apellidoPaterno')" />
+              @if (campoFirmanteInvalido('apellidoPaterno')) {
+                <div class="campo-error">Ingresa el apellido paterno (solo letras).</div>
+              }
+            </div>
+            <div>
+              <label class="label"><span>Apellido materno</span><span class="nota-pill">Opcional</span></label>
+              <input class="input" formControlName="apellidoMaterno" [class.input--error]="campoFirmanteInvalido('apellidoMaterno')" />
+              @if (campoFirmanteInvalido('apellidoMaterno')) {
+                <div class="campo-error">Solo letras, espacios, apóstrofe y guion.</div>
+              }
+            </div>
+            <div>
+              <label class="label" for="fir-cargo">Cargo que firma</label>
+              <input id="fir-cargo" class="input" formControlName="cargoFirma" placeholder="Directora Ejecutiva" />
+            </div>
+            <div class="infobase-campo--ancho">
+              <label class="label"><span>Imagen de firma</span><span class="nota-pill">Opcional</span></label>
+              <input class="input" formControlName="imagenFirmaUrl" placeholder="img/firmas/..." />
+            </div>
+          </div>
+        }
+        @case ('tipoMaterial') {
+          <div [formGroup]="formTipoMaterial" class="infobase-campos infobase-campos--2">
+            <div>
+              <label class="label" for="tm-codigo">Código</label>
+              <input id="tm-codigo" class="input" formControlName="codigo" placeholder="PDF" />
+            </div>
+            <div>
+              <label class="label" for="tm-nombre">Nombre</label>
+              <input id="tm-nombre" class="input" formControlName="nombre" placeholder="Documento PDF" />
+            </div>
+            <div class="infobase-campo--ancho">
+              <label class="label"><span>Descripción</span><span class="nota-pill">Opcional</span></label>
+              <textarea class="input" rows="2" formControlName="descripcion"></textarea>
+            </div>
+          </div>
+        }
+      }
+
+      <div class="infobase-formulario__acciones">
+        <button type="submit" class="btn btn--primario" [disabled]="guardando()">
+          {{ guardando() ? 'Guardando…' : 'Guardar' }}
+        </button>
+        <button type="button" class="btn btn--secundario" (click)="cerrarFormulario()">Cancelar</button>
+      </div>
+    </form>
+  } @else if (cargando()) {
+    <p class="infobase-estado">Cargando…</p>
+  } @else if (error()) {
+    <div class="alerta alerta--error infobase-alerta">
+      <span class="alerta__icono">!</span>
+      <div class="alerta__titulo">{{ error() }}</div>
+    </div>
+  } @else {
+    @switch (tabActiva()) {
+      @case ('tipoCurso') {
+        @if (tiposCurso().length === 0) {
+          <p class="infobase-estado">Todavía no hay valores en esta sección.</p>
+        }
+        @for (item of tiposCurso(); track item.id) {
+          <div class="infobase-fila">
+            <button type="button" class="infobase-fila__principal" (click)="abrirEditar(item.id)">
+              <span class="infobase-fila__nombre">{{ item.nombre }}</span>
+            </button>
+            <span class="badge" [class.badge--disp-inmediato]="item.activo" [class.badge--disp-cerrado]="!item.activo">
+              {{ item.activo ? 'Activo' : 'Inactivo' }}
+            </span>
+            <button type="button" class="btn btn--neutro infobase-fila__accion" (click)="cambiarActivo(item.id, !item.activo)">
+              {{ item.activo ? 'Desactivar' : 'Activar' }}
+            </button>
+          </div>
+        }
+      }
+      @case ('categoria') {
+        @if (categorias().length === 0) {
+          <p class="infobase-estado">Todavía no hay valores en esta sección.</p>
+        }
+        @for (item of categorias(); track item.id) {
+          <div class="infobase-fila">
+            <button type="button" class="infobase-fila__principal" (click)="abrirEditar(item.id)">
+              <span class="infobase-fila__nombre">{{ item.nombre }}</span>
+            </button>
+            <span class="badge" [class.badge--disp-inmediato]="item.activo" [class.badge--disp-cerrado]="!item.activo">
+              {{ item.activo ? 'Activo' : 'Inactivo' }}
+            </span>
+            <button type="button" class="btn btn--neutro infobase-fila__accion" (click)="cambiarActivo(item.id, !item.activo)">
+              {{ item.activo ? 'Desactivar' : 'Activar' }}
+            </button>
+          </div>
+        }
+      }
+      @case ('docente') {
+        @if (docentes().length === 0) {
+          <p class="infobase-estado">Todavía no hay valores en esta sección.</p>
+        }
+        @for (item of docentes(); track item.personaId) {
+          <div class="infobase-fila">
+            <button type="button" class="infobase-fila__principal" (click)="abrirEditar(item.personaId)">
+              <span class="infobase-fila__nombre">{{ item.nombreCompleto }}</span>
+              <span class="infobase-fila__subtitulo">{{ item.cargoProfesional }}</span>
+            </button>
+            <span class="badge" [class.badge--disp-inmediato]="item.activo" [class.badge--disp-cerrado]="!item.activo">
+              {{ item.activo ? 'Activo' : 'Inactivo' }}
+            </span>
+            <button type="button" class="btn btn--neutro infobase-fila__accion" (click)="cambiarActivo(item.personaId, !item.activo)">
+              {{ item.activo ? 'Desactivar' : 'Activar' }}
+            </button>
+          </div>
+        }
+      }
+      @case ('entidad') {
+        @if (entidades().length === 0) {
+          <p class="infobase-estado">Todavía no hay valores en esta sección.</p>
+        }
+        @for (item of entidades(); track item.id) {
+          <div class="infobase-fila">
+            <button type="button" class="infobase-fila__principal" (click)="abrirEditar(item.id)">
+              <span class="infobase-fila__nombre">{{ item.nombre }}</span>
+            </button>
+            <span class="badge" [class.badge--disp-inmediato]="item.activo" [class.badge--disp-cerrado]="!item.activo">
+              {{ item.activo ? 'Activo' : 'Inactivo' }}
+            </span>
+            <button type="button" class="btn btn--neutro infobase-fila__accion" (click)="cambiarActivo(item.id, !item.activo)">
+              {{ item.activo ? 'Desactivar' : 'Activar' }}
+            </button>
+          </div>
+        }
+      }
+      @case ('firmante') {
+        @if (firmantes().length === 0) {
+          <p class="infobase-estado">Todavía no hay valores en esta sección.</p>
+        }
+        @for (item of firmantes(); track item.id) {
+          <div class="infobase-fila">
+            <button type="button" class="infobase-fila__principal" (click)="abrirEditar(item.id)">
+              <span class="infobase-fila__nombre">{{ item.nombreCompleto }}</span>
+              <span class="infobase-fila__subtitulo">{{ item.cargoFirma }}</span>
+            </button>
+            <span class="badge" [class.badge--disp-inmediato]="item.activo" [class.badge--disp-cerrado]="!item.activo">
+              {{ item.activo ? 'Activo' : 'Inactivo' }}
+            </span>
+            <button type="button" class="btn btn--neutro infobase-fila__accion" (click)="cambiarActivo(item.id, !item.activo)">
+              {{ item.activo ? 'Desactivar' : 'Activar' }}
+            </button>
+          </div>
+        }
+      }
+      @case ('tipoMaterial') {
+        @if (tiposMaterial().length === 0) {
+          <p class="infobase-estado">Todavía no hay valores en esta sección.</p>
+        }
+        @for (item of tiposMaterial(); track item.id) {
+          <div class="infobase-fila">
+            <button type="button" class="infobase-fila__principal" (click)="abrirEditar(item.id)">
+              <span class="infobase-fila__nombre">{{ item.nombre }}</span>
+            </button>
+            <span class="badge" [class.badge--disp-inmediato]="item.activo" [class.badge--disp-cerrado]="!item.activo">
+              {{ item.activo ? 'Activo' : 'Inactivo' }}
+            </span>
+            <button type="button" class="btn btn--neutro infobase-fila__accion" (click)="cambiarActivo(item.id, !item.activo)">
+              {{ item.activo ? 'Desactivar' : 'Activar' }}
+            </button>
+          </div>
+        }
+      }
+    }
+
+    @if (totalPaginas() > 1) {
+      <div class="infobase-paginacion">
+        <button type="button" class="btn btn--secundario" [disabled]="pagina() === 0" (click)="irAPagina(pagina() - 1)">
+          Anterior
+        </button>
+        <span>Página {{ pagina() + 1 }} de {{ totalPaginas() }}</span>
+        <button
+          type="button"
+          class="btn btn--secundario"
+          [disabled]="pagina() + 1 >= totalPaginas()"
+          (click)="irAPagina(pagina() + 1)"
+        >
+          Siguiente
+        </button>
+      </div>
+    }
+  }
+</div>

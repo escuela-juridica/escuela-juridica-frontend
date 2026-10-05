@@ -1,5 +1,4 @@
 export type RolUsuarioAdmin = 'ALUMNO' | 'ADMINISTRADOR';
-export type OrigenUsuarioAdmin = 'FORMULARIO' | 'GOOGLE' | 'ADMINISTRATIVO';
 
 /** CAMBIO_PENDIENTE: falta reemplazar la contraseña temporal. PENDIENTE_VERIFICACION: falta
  * verificar el correo. AMBAS_PENDIENTES: recién creada, faltan las dos. NINGUNA: cuenta operativa. */
@@ -9,31 +8,33 @@ export type CondicionCuentaAdmin =
   | 'CAMBIO_PENDIENTE'
   | 'AMBAS_PENDIENTES';
 
-/** Columna "Perfil concedido por" del Figma (EP02-PF-010): quién/qué otorgó la cuenta, para
- * cualquier rol — no solo administradores. */
-export type OtorgadoPorAdmin = 'AUTOSERVICIO' | 'EQUIPO_ADMINISTRACION' | 'ADMINISTRADOR_INICIAL';
-
-export interface UsuarioAdminResumen {
+export interface UsuarioAdminRespuesta {
   usuarioId: number;
-  nombreCompleto: string;
-  correo: string;
-  rolPrincipal: RolUsuarioAdmin;
-  origenRegistro: OrigenUsuarioAdmin;
-  activo: boolean;
-  condicion: CondicionCuentaAdmin;
-  otorgadoPor: OtorgadoPorAdmin;
-}
-
-export interface UsuarioAdminDetalle extends UsuarioAdminResumen {
   nombres: string;
   apellidoPaterno: string;
   apellidoMaterno: string | null;
+  nombreCompleto: string;
+  correo: string;
   telefono: string | null;
   documentoIdentidad: string | null;
+  origenRegistro: string;
+  activo: boolean;
+  condicion: CondicionCuentaAdmin;
+  rolPrincipal: RolUsuarioAdmin | null;
+  roles: RolUsuarioAdmin[];
   creadoEn: string;
-  /** Solo aplica a rolPrincipal === 'ADMINISTRADOR' creado desde este panel; complementa
-   * `otorgadoPor` con el nombre concreto de quién le dio el rol. */
+  /** Nombre de quién concedió el rol ADMINISTRADOR; null si no tiene ese rol o se desconoce. */
   concedidoPorNombre: string | null;
+}
+
+export interface PageResponse<T> {
+  items: T[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+  first: boolean;
+  last: boolean;
 }
 
 export interface CrearUsuarioAdminPeticion {
@@ -47,15 +48,22 @@ export interface CrearUsuarioAdminPeticion {
 }
 
 export interface CrearUsuarioAdminRespuesta {
-  usuario: UsuarioAdminDetalle;
-  /** true si el correo ya existía: se reutilizó la cuenta y no se generó contraseña temporal. */
+  usuario: UsuarioAdminRespuesta;
+  /** true si el correo ya existía: se conservó la cuenta y no se generó contraseña temporal. */
   reutilizada: boolean;
   contrasenaTemporal: string | null;
 }
 
-/** No incluye correo, rol ni estado: eso no se edita desde aquí (correo es la identidad de la
- * cuenta, el rol y el estado tienen sus propias acciones dedicadas). */
-export interface ActualizarUsuarioAdminPeticion {
+export interface ConcederRolPeticion {
+  rol: RolUsuarioAdmin;
+}
+
+export interface CambiarActivoPeticion {
+  activo: boolean;
+  motivo: string | null;
+}
+
+export interface ActualizarDatosPersonalesPeticion {
   nombres: string;
   apellidoPaterno: string;
   apellidoMaterno: string | null;

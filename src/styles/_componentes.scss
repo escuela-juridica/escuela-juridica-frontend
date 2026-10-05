@@ -7,6 +7,62 @@
 //   >= 1280px escritorio amplio · 1024-1279 escritorio compacto
 //   768-1023 tableta · < 768 movil · < 480 movil estrecho
 
+// -------------------------------------------------------------- Interruptor --
+// Switch on/off reutilizable (HU-008 detalle de usuario, HU-009 informacion base).
+.interruptor {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--neutral-700);
+  cursor: pointer;
+  user-select: none;
+}
+
+.interruptor__entrada {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.interruptor__pista {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  border-radius: var(--radio-completo);
+  background: var(--neutral-200);
+  transition: background-color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.interruptor__perilla {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radio-completo);
+  background: var(--blanco);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.2);
+  transition: transform 0.15s ease;
+}
+
+.interruptor__entrada:checked + .interruptor__pista {
+  background: var(--acento-700);
+}
+
+.interruptor__entrada:checked + .interruptor__pista .interruptor__perilla {
+  transform: translateX(16px);
+}
+
+.interruptor__entrada:focus-visible + .interruptor__pista {
+  outline: 2px solid var(--input-anillo-foco);
+  outline-offset: 2px;
+}
+
 // -------------------------------------------------------------- Contenedor --
 .contenedor {
   max-width: 1200px;

@@ -8,8 +8,8 @@
 }
 
 .usuarios-admin-titulo {
-  font-size: 28px;
-  line-height: 36px;
+  font-size: 22px;
+  line-height: 30px;
   font-weight: 700;
   color: var(--neutral-950);
   margin: 0;
@@ -38,13 +38,12 @@
 
 .usuarios-admin-fila {
   display: grid;
-  grid-template-columns: 1.4fr 1.6fr 0.9fr 1fr 1.2fr 1.3fr;
+  grid-template-columns: 1.4fr 1.6fr 0.9fr 1fr 1.3fr 84px;
   gap: 12px;
   align-items: center;
   padding: 14px 20px;
   border-bottom: 1px solid var(--neutral-100);
   color: inherit;
-  text-decoration: none;
   font-size: 14px;
 }
 
@@ -52,9 +51,35 @@
   border-bottom: none;
 }
 
-a.usuarios-admin-fila:hover {
+.usuarios-admin-fila:not(.usuarios-admin-fila--cabecera):hover {
   background: var(--neutral-050);
-  text-decoration: none;
+}
+
+.usuarios-admin-fila__ver {
+  appearance: none;
+  border: none;
+  background: var(--acento-700);
+  color: var(--blanco);
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--radio-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.usuarios-admin-fila__ver:hover {
+  background: var(--marca-900);
+}
+
+.usuarios-admin-fila__ver:focus-visible {
+  outline: 2px solid var(--acento-500);
+  outline-offset: 2px;
 }
 
 .usuarios-admin-fila--cabecera {
@@ -75,6 +100,16 @@ a.usuarios-admin-fila:hover {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.usuarios-admin-paginacion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+  font-size: 14px;
+  color: var(--neutral-600);
 }
 
 @media (max-width: 900px) {

@@ -1,32 +1,39 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectorRef, Component, DestroyRef, inject, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, inject, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
 import { AdminUsuariosApiService } from '../admin-usuarios-api.service';
 import { CrearUsuarioAdminRespuesta, RolUsuarioAdmin } from '../usuario-admin.model';
+import {
+  documentoOpcionalValidator,
+  nombrePropioValidator,
+  telefonoOpcionalValidator,
+} from '../../../cuenta/mi-perfil/mi-perfil.validators';
 
 interface ErrorApiAdmin {
   code?: string;
   message?: string;
 }
 
-/** ⚠️ NO ES LA VERSIÓN FINAL: guarda contra `/api/admin/usuarios`, una API REST real pero sin
- * base de datos; no envía ningún correo de verdad. Ver el comentario de AdminUsuariosApiService. */
+/** HU-008 — Crear usuario administrativamente, como contenido de un modal (ver
+ * usuarios-listado). Si el correo ya existe, conserva la cuenta y solo concede el rol faltante;
+ * no genera contraseña temporal ni duplica la identidad. */
 @Component({
   selector: 'app-usuario-crear',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule],
   templateUrl: './usuario-crear.html',
   styleUrl: './usuario-crear.scss',
 })
 export class UsuarioCrear {
   private readonly api = inject(AdminUsuariosApiService);
   private readonly fb = inject(NonNullableFormBuilder);
-  private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly detector = inject(ChangeDetectorRef);
+
+  readonly cerrar = output<void>();
+  readonly creado = output<CrearUsuarioAdminRespuesta>();
 
   protected readonly intentoGuardar = signal(false);
   protected readonly guardando = signal(false);
@@ -34,12 +41,12 @@ export class UsuarioCrear {
   protected readonly resultado = signal<CrearUsuarioAdminRespuesta | null>(null);
 
   protected readonly formulario = this.fb.group({
-    nombres: ['', [Validators.required, Validators.maxLength(120)]],
-    apellidoPaterno: ['', [Validators.required, Validators.maxLength(80)]],
-    apellidoMaterno: ['', [Validators.maxLength(80)]],
+    nombres: ['', [Validators.required, Validators.maxLength(120), nombrePropioValidator]],
+    apellidoPaterno: ['', [Validators.required, Validators.maxLength(80), nombrePropioValidator]],
+    apellidoMaterno: ['', [Validators.maxLength(80), nombrePropioValidator]],
     correo: ['', [Validators.required, Validators.email, Validators.maxLength(254)]],
-    telefono: ['', [Validators.maxLength(30)]],
-    documentoIdentidad: ['', [Validators.maxLength(30)]],
+    telefono: ['', [Validators.maxLength(30), telefonoOpcionalValidator]],
+    documentoIdentidad: ['', [Validators.maxLength(30), documentoOpcionalValidator]],
     rol: this.fb.control<RolUsuarioAdmin>('ALUMNO'),
   });
 
@@ -84,7 +91,7 @@ export class UsuarioCrear {
         apellidoPaterno: valores.apellidoPaterno.trim(),
         apellidoMaterno: this.textoOpcional(valores.apellidoMaterno),
         correo: valores.correo.trim(),
-        telefono: this.textoOpcional(valores.telefono),
+        telefono: this.textoOpcional(valores.telefono)?.replace(/[\s-]/g, '') ?? null,
         documentoIdentidad: this.textoOpcional(valores.documentoIdentidad),
         rol: valores.rol,
       })
@@ -96,7 +103,10 @@ export class UsuarioCrear {
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
-        next: (respuesta) => this.resultado.set(respuesta),
+        next: (respuesta) => {
+          this.resultado.set(respuesta);
+          this.creado.emit(respuesta);
+        },
         error: (error: HttpErrorResponse) => {
           const respuesta = typeof error.error === 'object' && error.error !== null
             ? (error.error as ErrorApiAdmin)
@@ -104,13 +114,6 @@ export class UsuarioCrear {
           this.errorCrear.set(respuesta?.message ?? 'No pudimos crear el usuario. Inténtalo nuevamente.');
         },
       });
-  }
-
-  protected verDetalle(): void {
-    const usuarioId = this.resultado()?.usuario.usuarioId;
-    if (usuarioId != null) {
-      void this.router.navigate(['/admin/usuarios', usuarioId]);
-    }
   }
 
   private textoOpcional(valor: string): string | null {
