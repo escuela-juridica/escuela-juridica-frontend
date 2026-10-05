@@ -3,7 +3,17 @@ import { ChangeDetectorRef, Component, DestroyRef, OnInit, inject, signal } from
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { Observable, finalize, forkJoin, switchMap } from 'rxjs';
+import {
+  Observable,
+  Subject,
+  catchError,
+  debounceTime,
+  distinctUntilChanged,
+  finalize,
+  forkJoin,
+  of,
+  switchMap,
+} from 'rxjs';
 
 import { InformacionBaseApiService } from '../../informacion-base/informacion-base-api.service';
 import {
@@ -76,6 +86,10 @@ export class CursoEditor implements OnInit {
 
   protected readonly beneficios = signal<string[]>([]);
   protected readonly nuevoBeneficio = signal('');
+  protected readonly sugerenciasBeneficio = signal<string[]>([]);
+  private readonly busquedaBeneficio$ = new Subject<string>();
+  protected readonly beneficiosMaximo = 10;
+  protected readonly beneficioLongitudMaxima = 150;
 
   protected readonly formInformacion = this.fb.group({
     titulo: ['', [Validators.required, Validators.maxLength(220)]],
@@ -104,6 +118,23 @@ export class CursoEditor implements OnInit {
     this.formInformacion.controls.modalidad.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((modalidad) => this.actualizarValidadoresPorModalidad(modalidad));
+
+    this.busquedaBeneficio$
+      .pipe(
+        debounceTime(250),
+        distinctUntilChanged(),
+        switchMap((texto) => {
+          if (texto.trim().length < 2) {
+            return of<string[]>([]);
+          }
+          return this.api.sugerirBeneficios(texto).pipe(catchError(() => of<string[]>([])));
+        }),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((sugerencias) => {
+        this.sugerenciasBeneficio.set(sugerencias.filter((s) => !this.beneficios().includes(s)));
+        this.detector.markForCheck();
+      });
   }
 
   ngOnInit(): void {
@@ -133,17 +164,40 @@ export class CursoEditor implements OnInit {
     }
   }
 
+  protected actualizarBusquedaBeneficio(valor: string): void {
+    this.nuevoBeneficio.set(valor);
+    this.busquedaBeneficio$.next(valor);
+  }
+
   protected agregarBeneficio(): void {
-    const valor = this.nuevoBeneficio().trim();
-    if (!valor) {
-      return;
-    }
-    this.beneficios.update((lista) => [...lista, valor]);
-    this.nuevoBeneficio.set('');
+    this.agregarBeneficioTexto(this.nuevoBeneficio());
+  }
+
+  protected elegirSugerenciaBeneficio(texto: string): void {
+    this.agregarBeneficioTexto(texto);
   }
 
   protected quitarBeneficio(indice: number): void {
     this.beneficios.update((lista) => lista.filter((_, i) => i !== indice));
+  }
+
+  private agregarBeneficioTexto(valor: string): void {
+    const limpio = valor.trim();
+    if (!limpio) {
+      return;
+    }
+    if (this.beneficios().length >= this.beneficiosMaximo) {
+      this.mostrarMensaje('error', `No puedes agregar más de ${this.beneficiosMaximo} beneficios.`);
+      return;
+    }
+    const yaExiste = this.beneficios().some((b) => b.toLowerCase() === limpio.toLowerCase());
+    if (yaExiste) {
+      this.mostrarMensaje('error', 'Ese beneficio ya está en la lista.');
+      return;
+    }
+    this.beneficios.update((lista) => [...lista, limpio.slice(0, this.beneficioLongitudMaxima)]);
+    this.nuevoBeneficio.set('');
+    this.sugerenciasBeneficio.set([]);
   }
 
   protected datosDocente(personaId: number): DocenteRespuesta | undefined {
@@ -279,6 +333,7 @@ export class CursoEditor implements OnInit {
         },
         error: (error: HttpErrorResponse) => {
           this.errorInformacion.set(this.mensajeError(error) ?? 'No pudimos guardar los cambios.');
+          this.scrollArriba();
         },
       });
   }
@@ -390,11 +445,20 @@ export class CursoEditor implements OnInit {
   private mostrarMensaje(tipo: 'error' | 'exito', texto: string): void {
     this.limpiarTimeoutMensaje();
     this.mensaje.set({ tipo, texto });
+    this.scrollArriba();
     this.mensajeTimeout = setTimeout(() => {
       this.mensaje.set(null);
       this.mensajeTimeout = null;
       this.detector.markForCheck();
     }, 5000);
+  }
+
+  /** La pestaña puede ser larga (varias tarjetas); sin esto, el mensaje de confirmación queda
+   * arriba, fuera de vista, si guardaste con la página desplazada hacia abajo. */
+  private scrollArriba(): void {
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 
   private limpiarTimeoutMensaje(): void {

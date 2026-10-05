@@ -214,15 +214,36 @@
 
         <div class="card editor-card">
           <h2 class="editor-card__titulo">Beneficios</h2>
-          <p class="editor-card__ayuda">Se muestran en la ficha pública del curso.</p>
-          <div class="editor-beneficio-agregar">
+          <p class="editor-card__ayuda">
+            Se muestran en la ficha pública del curso. Máximo {{ beneficiosMaximo }}
+            ({{ beneficios().length }}/{{ beneficiosMaximo }}).
+          </p>
+          <div class="editor-beneficio-agregar editor-buscador">
             <input
               class="input"
               [value]="nuevoBeneficio()"
-              (input)="nuevoBeneficio.set($any($event.target).value)"
+              [attr.maxlength]="beneficioLongitudMaxima"
+              (input)="actualizarBusquedaBeneficio($any($event.target).value)"
               placeholder="Certificado digital incluido"
             />
-            <button type="button" class="btn btn--secundario" (click)="agregarBeneficio()">Agregar</button>
+            <button
+              type="button"
+              class="btn btn--secundario"
+              [disabled]="beneficios().length >= beneficiosMaximo"
+              (click)="agregarBeneficio()"
+            >
+              Agregar
+            </button>
+            @if (sugerenciasBeneficio().length > 0) {
+              <div class="editor-sugerencias">
+                @for (sugerencia of sugerenciasBeneficio(); track sugerencia) {
+                  <button type="button" class="editor-sugerencia" (click)="elegirSugerenciaBeneficio(sugerencia)">
+                    <span class="editor-sugerencia__texto">{{ sugerencia }}</span>
+                    <span class="editor-sugerencia__agregar">Usar</span>
+                  </button>
+                }
+              </div>
+            }
           </div>
           @if (beneficios().length > 0) {
             <ul class="editor-beneficios">
@@ -233,6 +254,8 @@
                 </li>
               }
             </ul>
+          } @else {
+            <p class="editor-vacio-seleccion">Todavía no agregaste ningún beneficio.</p>
           }
         </div>
 

@@ -49,4 +49,9 @@ export class CursoAdminApiService {
   actualizarFirmantes(cursoId: number, peticion: AsignarFirmantesPeticion): Observable<CursoEditorRespuesta> {
     return this.http.put<CursoEditorRespuesta>(`${this.url}/${cursoId}/firmantes`, peticion);
   }
+
+  sugerirBeneficios(texto: string): Observable<string[]> {
+    const params = new HttpParams().set('texto', texto.trim());
+    return this.http.get<string[]>(`${this.url}/beneficios-sugeridos`, { params });
+  }
 }
