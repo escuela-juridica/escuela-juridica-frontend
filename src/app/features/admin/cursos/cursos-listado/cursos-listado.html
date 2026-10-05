@@ -1,0 +1,102 @@
+<div class="cursos-admin-cabecera">
+  <div>
+    <h1 class="cursos-admin-titulo">Cursos</h1>
+    <p class="cursos-admin-subtitulo">Convocatorias de curso, desde borrador hasta publicación.</p>
+  </div>
+  <button type="button" class="btn btn--primario" (click)="abrirCrear()">Crear curso</button>
+</div>
+
+<div class="cursos-admin-filtros">
+  <input
+    class="input"
+    [ngModel]="texto()"
+    (ngModelChange)="onBusquedaInput($event)"
+    placeholder="Buscar por título"
+  />
+</div>
+
+@if (cargando()) {
+  <p>Cargando…</p>
+} @else if (error()) {
+  <div class="alerta alerta--error">
+    <span class="alerta__icono">!</span>
+    <div class="alerta__titulo">{{ error() }}</div>
+  </div>
+} @else if (cursos().length === 0) {
+  <div class="estado-vacio">
+    <h3 class="estado-vacio__titulo">Sin resultados</h3>
+    <p class="estado-vacio__texto">Ningún curso coincide con esa búsqueda.</p>
+  </div>
+} @else {
+  <div class="cursos-admin-tabla">
+    <div class="cursos-admin-fila cursos-admin-fila--cabecera">
+      <span>Título</span>
+      <span>Tipo</span>
+      <span>Modalidad</span>
+      <span>Precio</span>
+      <span>Estado</span>
+      <span></span>
+    </div>
+    @for (curso of cursos(); track curso.id) {
+      <div class="cursos-admin-fila">
+        <span class="cursos-admin-fila__titulo">{{ curso.titulo }}</span>
+        <span>{{ curso.tipoCursoNombre || '—' }}</span>
+        <span>{{ etiquetaModalidad(curso.modalidad) }}</span>
+        <span>{{ curso.precioRegular === 0 ? 'Gratis' : ('S/ ' + curso.precioRegular.toFixed(2)) }}</span>
+        <span>
+          <span class="badge" [class]="claseEstado(curso.estadoCodigo)">{{ curso.estadoNombre }}</span>
+        </span>
+        <button type="button" class="btn btn--acento cursos-admin-fila__accion" (click)="abrirEditor(curso.id)">
+          Editar
+        </button>
+      </div>
+    }
+  </div>
+
+  @if (totalPaginas() > 1) {
+    <div class="cursos-admin-paginacion">
+      <button type="button" class="btn btn--secundario" [disabled]="pagina() === 0" (click)="irAPagina(pagina() - 1)">
+        Anterior
+      </button>
+      <span>Página {{ pagina() + 1 }} de {{ totalPaginas() }}</span>
+      <button
+        type="button"
+        class="btn btn--secundario"
+        [disabled]="pagina() + 1 >= totalPaginas()"
+        (click)="irAPagina(pagina() + 1)"
+      >
+        Siguiente
+      </button>
+    </div>
+  }
+}
+
+@if (modalAbierto()) {
+  <app-modal titulo="Crear curso" (cerrar)="cerrarCrear()">
+    <p class="cursos-admin-modal-texto">Solo el título; el resto se completa en el editor.</p>
+    @if (errorCrear()) {
+      <div class="alerta alerta--error cursos-admin-modal-alerta">
+        <span class="alerta__icono">!</span>
+        <div class="alerta__titulo">{{ errorCrear() }}</div>
+      </div>
+    }
+    <label class="label" for="nuevo-titulo">Título del curso</label>
+    <input
+      id="nuevo-titulo"
+      class="input"
+      [class.input--error]="tituloInvalido"
+      [ngModel]="tituloNuevo()"
+      (ngModelChange)="tituloNuevo.set($event)"
+      placeholder="Diplomado en Derecho Registral y Notarial"
+    />
+    @if (tituloInvalido) {
+      <div class="campo-error">Ingresa el título del curso.</div>
+    }
+    <div class="cursos-admin-modal-acciones">
+      <button type="button" class="btn btn--primario" [disabled]="creando()" (click)="crear()">
+        {{ creando() ? 'Creando…' : 'Crear y editar' }}
+      </button>
+      <button type="button" class="btn btn--secundario" (click)="cerrarCrear()">Cancelar</button>
+    </div>
+  </app-modal>
+}

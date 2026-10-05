@@ -4,7 +4,12 @@
 
     <nav class="admin-sidebar__nav">
       <span class="admin-sidebar__item admin-sidebar__item--deshabilitado">Dashboard</span>
-      <span class="admin-sidebar__item admin-sidebar__item--deshabilitado">Cursos</span>
+      <a
+        routerLink="/admin/cursos"
+        routerLinkActive="admin-sidebar__item--activo"
+        class="admin-sidebar__item"
+        >Cursos</a
+      >
       <a
         routerLink="/admin/usuarios"
         routerLinkActive="admin-sidebar__item--activo"

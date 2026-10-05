@@ -1,0 +1,356 @@
+@if (curso() === undefined) {
+  <p class="editor-estado">Cargando…</p>
+} @else if (curso() === null) {
+  <div class="alerta alerta--error">
+    <span class="alerta__icono">!</span>
+    <div class="alerta__titulo">No encontramos ese curso.</div>
+  </div>
+} @else {
+  @let c = curso()!;
+
+  <div class="editor-migas">
+    <a routerLink="/admin/cursos" class="editor-migas__enlace">Cursos</a>
+    <span>/</span>
+    <span>Editor</span>
+  </div>
+  <div class="editor-titulo-fila">
+    <button type="button" class="editor-volver" (click)="volverAlListado()" aria-label="Volver a cursos">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5" />
+        <path d="M12 19l-7-7 7-7" />
+      </svg>
+      Volver
+    </button>
+    <h1 class="editor-titulo">{{ c.titulo }}</h1>
+  </div>
+
+  @if (mensaje(); as m) {
+    <div class="alerta editor-alerta" [class.alerta--error]="m.tipo === 'error'" [class.alerta--exito]="m.tipo === 'exito'">
+      <span class="alerta__icono">{{ m.tipo === 'error' ? '!' : '✓' }}</span>
+      <div class="alerta__titulo">{{ m.texto }}</div>
+      <button type="button" class="alerta__cerrar" (click)="cerrarMensaje()" aria-label="Cerrar">✕</button>
+    </div>
+  }
+
+  <div class="editor-tabs" role="tablist">
+    @for (pestana of pestanas; track pestana.id) {
+      <button
+        type="button"
+        role="tab"
+        class="editor-tab"
+        [class.editor-tab--activa]="tabActiva() === pestana.id"
+        [attr.aria-selected]="tabActiva() === pestana.id"
+        (click)="cambiarPestana(pestana.id)"
+      >
+        {{ pestana.etiqueta }}
+      </button>
+    }
+  </div>
+
+  @switch (tabActiva()) {
+    @case ('informacion') {
+      <form class="editor-form" [formGroup]="formInformacion" (ngSubmit)="guardarTodo()">
+        @if (errorInformacion()) {
+          <div class="alerta alerta--error editor-card__alerta">
+            <span class="alerta__icono">!</span>
+            <div class="alerta__titulo">{{ errorInformacion() }}</div>
+          </div>
+        }
+
+        <div class="card editor-card">
+          <h2 class="editor-card__titulo">Datos generales</h2>
+          <div class="editor-campos editor-campos--2">
+            <div class="editor-campo--ancho">
+              <label class="label" for="ed-titulo">Título del curso</label>
+              <input id="ed-titulo" class="input" formControlName="titulo" [class.input--error]="campoInvalido('titulo')" />
+              @if (campoInvalido('titulo')) {
+                <div class="campo-error">Ingresa el título del curso.</div>
+              }
+            </div>
+            <div>
+              <label class="label"><span>URL amigable</span><span class="nota-pill">Opcional</span></label>
+              <input class="input" formControlName="urlAmigable" placeholder="diplomado-derecho-registral" />
+            </div>
+            <div>
+              <label class="label">Tipo de programa</label>
+              <select class="input" formControlName="tipoCursoId">
+                <option [ngValue]="null">Sin tipo</option>
+                @for (tipo of tiposCurso(); track tipo.id) {
+                  <option [ngValue]="tipo.id">{{ tipo.nombre }}</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label class="label">Categoría temática</label>
+              <select class="input" formControlName="categoriaTematicaId">
+                <option [ngValue]="null">Sin categoría</option>
+                @for (categoria of categorias(); track categoria.id) {
+                  <option [ngValue]="categoria.id">{{ categoria.nombre }}</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label class="label">Entidad certificadora</label>
+              <select class="input" formControlName="entidadCertificadoraId">
+                <option [ngValue]="null">Sin entidad</option>
+                @for (entidad of entidades(); track entidad.id) {
+                  <option [ngValue]="entidad.id">{{ entidad.nombre }}</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label class="label"><span>Portada</span><span class="nota-pill">Opcional</span></label>
+              <input class="input" formControlName="imagenPortadaUrl" placeholder="img/cursos/..." />
+            </div>
+            <div class="editor-campo--ancho">
+              <label class="label"><span>Descripción</span><span class="nota-pill">Opcional</span></label>
+              <textarea class="input" rows="3" formControlName="descripcion"></textarea>
+            </div>
+            <div>
+              <label class="interruptor">
+                <input type="checkbox" class="interruptor__entrada" formControlName="destacado" />
+                <span class="interruptor__pista"><span class="interruptor__perilla"></span></span>
+                <span class="interruptor__texto">Destacado en el catálogo</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="card editor-card">
+          <h2 class="editor-card__titulo">Condición comercial</h2>
+          <div class="editor-campos editor-campos--3">
+            <div>
+              <label class="label">Condición</label>
+              <select class="input" formControlName="tipoVenta">
+                <option value="GRATUITO">Gratuito</option>
+                <option value="PAGADO">Pagado</option>
+              </select>
+            </div>
+            <div>
+              <label class="label">Precio regular (S/)</label>
+              <input class="input" type="number" min="0" step="0.01" formControlName="precioRegular" [class.input--error]="campoInvalido('precioRegular')" />
+              @if (campoInvalido('precioRegular')) {
+                <div class="campo-error">El precio no puede ser negativo.</div>
+              }
+            </div>
+            <div>
+              <label class="label"><span>Precio promocional (S/)</span><span class="nota-pill">Opcional</span></label>
+              <input class="input" type="number" min="0" step="0.01" formControlName="precioPromocional" />
+            </div>
+            <div>
+              <label class="label"><span>Promoción desde</span><span class="nota-pill">Opcional</span></label>
+              <input class="input" type="datetime-local" formControlName="promocionInicioEn" />
+            </div>
+            <div>
+              <label class="label"><span>Promoción hasta</span><span class="nota-pill">Opcional</span></label>
+              <input class="input" type="datetime-local" formControlName="promocionFinEn" />
+            </div>
+            <div></div>
+            <div>
+              <label class="label"><span>Capacidad (cupos)</span><span class="nota-pill">Opcional</span></label>
+              <input class="input" type="number" min="1" formControlName="cupoMaximo" placeholder="Sin límite" [class.input--error]="campoInvalido('cupoMaximo')" />
+              @if (campoInvalido('cupoMaximo')) {
+                <div class="campo-error">Debe ser mayor que cero.</div>
+              }
+            </div>
+            <div>
+              <label class="label"><span>Vigencia de acceso (días)</span><span class="nota-pill">Opcional</span></label>
+              <input class="input" type="number" min="1" formControlName="vigenciaAccesoDias" placeholder="Permanente" [class.input--error]="campoInvalido('vigenciaAccesoDias')" />
+              @if (campoInvalido('vigenciaAccesoDias')) {
+                <div class="campo-error">Debe ser mayor que cero.</div>
+              }
+            </div>
+            <div>
+              <label class="label"><span>Horas académicas</span><span class="nota-pill">Opcional</span></label>
+              <input class="input" type="number" min="0" step="0.5" formControlName="horasAcademicas" />
+            </div>
+          </div>
+        </div>
+
+        <div class="card editor-card">
+          <h2 class="editor-card__titulo">Modalidad y fechas</h2>
+          <div class="editor-campos editor-campos--3">
+            <div>
+              <label class="label">Modalidad</label>
+              <select class="input" formControlName="modalidad">
+                <option value="VIRTUAL">Virtual</option>
+                <option value="EN_VIVO">En vivo</option>
+                <option value="HIBRIDO">Híbrido</option>
+              </select>
+            </div>
+            <div>
+              <label class="label">{{ esVirtual ? 'Inicio (opcional)' : 'Fecha de inicio' }}</label>
+              <input class="input" type="date" formControlName="fechaInicio" [class.input--error]="campoInvalido('fechaInicio')" />
+              @if (campoInvalido('fechaInicio')) {
+                <div class="campo-error">Obligatoria para esta modalidad.</div>
+              }
+            </div>
+            @if (!esVirtual) {
+              <div>
+                <label class="label">Fecha de fin</label>
+                <input class="input" type="date" formControlName="fechaFin" [class.input--error]="campoInvalido('fechaFin')" />
+                @if (campoInvalido('fechaFin')) {
+                  <div class="campo-error">Obligatoria para esta modalidad.</div>
+                }
+              </div>
+              <div>
+                <label class="label"><span>Cierre de matrícula</span><span class="nota-pill">Opcional</span></label>
+                <input class="input" type="date" formControlName="fechaCierreMatricula" />
+              </div>
+            }
+          </div>
+          <div class="alerta alerta--info editor-nota">
+            <span class="alerta__icono">i</span>
+            <div class="alerta__texto">
+              @if (esVirtual) {
+                Un curso virtual no exige fecha de fin. El inicio es opcional.
+              } @else {
+                Las modalidades en vivo o híbridas exigen inicio y fin. El cierre de matrícula se puede
+                dejar vacío por ahora; más adelante se ajusta según la asistencia obligatoria.
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="card editor-card">
+          <h2 class="editor-card__titulo">Beneficios</h2>
+          <p class="editor-card__ayuda">Se muestran en la ficha pública del curso.</p>
+          <div class="editor-beneficio-agregar">
+            <input
+              class="input"
+              [value]="nuevoBeneficio()"
+              (input)="nuevoBeneficio.set($any($event.target).value)"
+              placeholder="Certificado digital incluido"
+            />
+            <button type="button" class="btn btn--secundario" (click)="agregarBeneficio()">Agregar</button>
+          </div>
+          @if (beneficios().length > 0) {
+            <ul class="editor-beneficios">
+              @for (beneficio of beneficios(); track beneficio; let i = $index) {
+                <li class="editor-beneficios__item">
+                  <span>{{ beneficio }}</span>
+                  <button type="button" class="editor-beneficios__quitar" (click)="quitarBeneficio(i)" aria-label="Quitar">✕</button>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+
+        <div class="card editor-card">
+          <h2 class="editor-card__titulo">Docentes</h2>
+          <p class="editor-card__ayuda">Busca y agrega los docentes; el orden de la lista es el de presentación.</p>
+
+          <div class="editor-buscador">
+            <input
+              class="input"
+              [value]="busquedaDocente()"
+              (input)="busquedaDocente.set($any($event.target).value)"
+              placeholder="Buscar docente por nombre…"
+            />
+            @if (mostrarSugerenciasDocente()) {
+              <div class="editor-sugerencias">
+                @if (docentesFiltrados().length === 0) {
+                  <p class="editor-sugerencias__vacio">Sin coincidencias.</p>
+                } @else {
+                  @for (docente of docentesFiltrados(); track docente.personaId) {
+                    <button type="button" class="editor-sugerencia" (click)="agregarDocente(docente.personaId)">
+                      <span class="editor-sugerencia__texto">
+                        <span>{{ docente.nombreCompleto }}</span>
+                        <span class="editor-fila-seleccion__cargo">{{ docente.cargoProfesional }}</span>
+                      </span>
+                      <span class="editor-sugerencia__agregar">Agregar</span>
+                    </button>
+                  }
+                }
+              </div>
+            }
+          </div>
+
+          @if (docentesSeleccionados().length > 0) {
+            <div class="editor-lista">
+              @for (id of docentesSeleccionados(); track id; let i = $index) {
+                <div class="editor-fila-seleccion">
+                  <span class="editor-fila-seleccion__principal">
+                    <span class="editor-fila-seleccion__numero">{{ i + 1 }}</span>
+                    <span>{{ datosDocente(id)?.nombreCompleto }}</span>
+                    <span class="editor-fila-seleccion__cargo">{{ datosDocente(id)?.cargoProfesional }}</span>
+                  </span>
+                  <span class="editor-fila-seleccion__orden">
+                    <button type="button" class="editor-orden-boton" [disabled]="i === 0" (click)="moverDocente(i, -1)" aria-label="Subir">↑</button>
+                    <button type="button" class="editor-orden-boton" [disabled]="i === docentesSeleccionados().length - 1" (click)="moverDocente(i, 1)" aria-label="Bajar">↓</button>
+                    <button type="button" class="editor-orden-boton editor-orden-boton--quitar" (click)="quitarDocente(id)" aria-label="Quitar">✕</button>
+                  </span>
+                </div>
+              }
+            </div>
+          } @else {
+            <p class="editor-vacio-seleccion">Todavía no agregaste ningún docente.</p>
+          }
+        </div>
+
+        <div class="card editor-card">
+          <h2 class="editor-card__titulo">Firmantes</h2>
+          <p class="editor-card__ayuda">Personas autorizadas para firmar el certificado de este curso.</p>
+
+          <div class="editor-buscador">
+            <input
+              class="input"
+              [value]="busquedaFirmante()"
+              (input)="busquedaFirmante.set($any($event.target).value)"
+              placeholder="Buscar firmante por nombre…"
+            />
+            @if (mostrarSugerenciasFirmante()) {
+              <div class="editor-sugerencias">
+                @if (firmantesFiltrados().length === 0) {
+                  <p class="editor-sugerencias__vacio">Sin coincidencias.</p>
+                } @else {
+                  @for (firmante of firmantesFiltrados(); track firmante.id) {
+                    <button type="button" class="editor-sugerencia" (click)="agregarFirmante(firmante.id)">
+                      <span class="editor-sugerencia__texto">
+                        <span>{{ firmante.nombreCompleto }}</span>
+                        <span class="editor-fila-seleccion__cargo">{{ firmante.cargoFirma }}</span>
+                      </span>
+                      <span class="editor-sugerencia__agregar">Agregar</span>
+                    </button>
+                  }
+                }
+              </div>
+            }
+          </div>
+
+          @if (firmantesSeleccionados().length > 0) {
+            <div class="editor-lista">
+              @for (id of firmantesSeleccionados(); track id; let i = $index) {
+                <div class="editor-fila-seleccion">
+                  <span class="editor-fila-seleccion__principal">
+                    <span class="editor-fila-seleccion__numero">{{ i + 1 }}</span>
+                    <span>{{ datosFirmante(id)?.nombreCompleto }}</span>
+                    <span class="editor-fila-seleccion__cargo">{{ datosFirmante(id)?.cargoFirma }}</span>
+                  </span>
+                  <span class="editor-fila-seleccion__orden">
+                    <button type="button" class="editor-orden-boton" [disabled]="i === 0" (click)="moverFirmante(i, -1)" aria-label="Subir">↑</button>
+                    <button type="button" class="editor-orden-boton" [disabled]="i === firmantesSeleccionados().length - 1" (click)="moverFirmante(i, 1)" aria-label="Bajar">↓</button>
+                    <button type="button" class="editor-orden-boton editor-orden-boton--quitar" (click)="quitarFirmante(id)" aria-label="Quitar">✕</button>
+                  </span>
+                </div>
+              }
+            </div>
+          } @else {
+            <p class="editor-vacio-seleccion">Todavía no agregaste ningún firmante.</p>
+          }
+        </div>
+
+        <div class="editor-form__acciones">
+          <button type="submit" class="btn btn--primario btn--grande" [disabled]="guardando()">
+            {{ guardando() ? 'Guardando…' : 'Guardar cambios' }}
+          </button>
+        </div>
+      </form>
+    }
+    @default {
+      <div class="card editor-card">
+        <p class="editor-pendiente">Esta pestaña se habilita en una historia aparte.</p>
+      </div>
+    }
+  }
+}

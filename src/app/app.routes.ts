@@ -88,7 +88,7 @@ export const routes: Routes = [
       }, // PF-009
     ],
   },
-  // EP02: HU-008 (usuarios) y HU-009 (información base, bajo "Configuración" en el sidebar).
+  // EP02: HU-008 (usuarios), HU-009 (información base, bajo "Configuración") y HU-010 (cursos).
   // El resto del panel administrativo queda pendiente.
   {
     path: 'admin',
@@ -111,6 +111,18 @@ export const routes: Routes = [
           import('./features/admin/informacion-base/informacion-base').then(
             (m) => m.InformacionBase,
           ),
+      },
+      {
+        path: 'cursos',
+        loadComponent: () =>
+          import('./features/admin/cursos/cursos-listado/cursos-listado').then(
+            (m) => m.CursosListado,
+          ),
+      },
+      {
+        path: 'cursos/:id',
+        loadComponent: () =>
+          import('./features/admin/cursos/curso-editor/curso-editor').then((m) => m.CursoEditor),
       },
     ],
   },
