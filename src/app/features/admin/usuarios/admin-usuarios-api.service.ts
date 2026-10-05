@@ -10,6 +10,7 @@ import {
   CrearUsuarioAdminPeticion,
   CrearUsuarioAdminRespuesta,
   PageResponse,
+  ResetearContrasenaRespuesta,
   RolUsuarioAdmin,
   UsuarioAdminRespuesta,
 } from './usuario-admin.model';
@@ -71,5 +72,9 @@ export class AdminUsuariosApiService {
 
   reenviarHabilitacion(usuarioId: number): Observable<void> {
     return this.http.post<void>(`${this.url}/${usuarioId}/reenviar-habilitacion`, {});
+  }
+
+  resetearContrasena(usuarioId: number): Observable<ResetearContrasenaRespuesta> {
+    return this.http.post<ResetearContrasenaRespuesta>(`${this.url}/${usuarioId}/resetear-contrasena`, {});
   }
 }

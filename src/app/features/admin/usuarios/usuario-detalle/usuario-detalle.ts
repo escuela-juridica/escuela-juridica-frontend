@@ -45,6 +45,10 @@ export class UsuarioDetalle implements OnChanges {
   protected readonly cambiandoEstado = signal(false);
   protected readonly concediendoRol = signal<RolUsuarioAdmin | null>(null);
   protected readonly reenviando = signal(false);
+  protected readonly reseteandoContrasena = signal(false);
+  /** Se muestra hasta que el admin la cierra a propósito: a diferencia de `mensaje`, no
+   * desaparece sola, porque hay que poder copiarla. */
+  protected readonly contrasenaTemporal = signal<string | null>(null);
 
   /** Un único slot de alerta: evita que un error de una acción quede "pegado" en pantalla
    * mientras otra acción distinta se completa con éxito. */
@@ -178,6 +182,41 @@ export class UsuarioDetalle implements OnChanges {
       });
   }
 
+  protected resetearContrasena(): void {
+    const usuario = this.usuario();
+    if (!usuario || this.reseteandoContrasena()) {
+      return;
+    }
+    this.reseteandoContrasena.set(true);
+    this.contrasenaTemporal.set(null);
+    this.api
+      .resetearContrasena(usuario.usuarioId)
+      .pipe(
+        finalize(() => {
+          this.reseteandoContrasena.set(false);
+          this.detector.markForCheck();
+        }),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (respuesta) => {
+          this.usuario.set(respuesta.usuario);
+          this.actualizado.emit(respuesta.usuario);
+          this.contrasenaTemporal.set(respuesta.contrasenaTemporal);
+        },
+        error: (error: HttpErrorResponse) => {
+          this.mostrarMensaje(
+            'error',
+            this.obtenerErrorApi(error)?.message ?? 'No pudimos resetear la contraseña.',
+          );
+        },
+      });
+  }
+
+  protected cerrarContrasenaTemporal(): void {
+    this.contrasenaTemporal.set(null);
+  }
+
   protected campoDatosInvalido(
     nombre: 'nombres' | 'apellidoPaterno' | 'apellidoMaterno' | 'telefono' | 'documentoIdentidad',
   ): boolean {
@@ -257,6 +296,7 @@ export class UsuarioDetalle implements OnChanges {
     this.usuario.set(undefined);
     this.editando.set(false);
     this.mensaje.set(null);
+    this.contrasenaTemporal.set(null);
     this.limpiarTimeoutMensaje();
     this.api
       .obtener(usuarioId)

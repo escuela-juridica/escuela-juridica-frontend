@@ -6,6 +6,14 @@
   </p>
 </div>
 
+@if (mensaje(); as m) {
+  <div class="alerta infobase-alerta infobase-alerta--pagina" [class.alerta--error]="m.tipo === 'error'" [class.alerta--exito]="m.tipo === 'exito'">
+    <span class="alerta__icono">{{ m.tipo === 'error' ? '!' : '✓' }}</span>
+    <div class="alerta__titulo">{{ m.texto }}</div>
+    <button type="button" class="alerta__cerrar" (click)="cerrarMensaje()" aria-label="Cerrar">✕</button>
+  </div>
+}
+
 <div class="infobase-tabs" role="tablist">
   @for (pestana of pestanas; track pestana.id) {
     <button
@@ -36,8 +44,9 @@
     </div>
   </div>
 
+
   @if (modoFormulario() !== null) {
-    <form class="infobase-formulario" (ngSubmit)="guardar()">
+    <form class="infobase-formulario" [formGroup]="formularioActivo" (ngSubmit)="guardar()">
       @if (errorFormulario()) {
         <div class="alerta alerta--error infobase-alerta">
           <span class="alerta__icono">!</span>
@@ -47,7 +56,7 @@
 
       @switch (tabActiva()) {
         @case ('tipoCurso') {
-          <div [formGroup]="formTipoCurso" class="infobase-campos infobase-campos--3">
+          <div class="infobase-campos infobase-campos--3">
             <div>
               <label class="label" for="tc-codigo">Código</label>
               <input id="tc-codigo" class="input" formControlName="codigo" placeholder="DIPLOMADO" />
@@ -63,7 +72,7 @@
           </div>
         }
         @case ('categoria') {
-          <div [formGroup]="formCategoria" class="infobase-campos infobase-campos--3">
+          <div class="infobase-campos infobase-campos--3">
             <div>
               <label class="label" for="cat-codigo">Código</label>
               <input id="cat-codigo" class="input" formControlName="codigo" placeholder="DERECHO_REGISTRAL" />
@@ -79,7 +88,7 @@
           </div>
         }
         @case ('docente') {
-          <div [formGroup]="formDocente" class="infobase-campos infobase-campos--2">
+          <div class="infobase-campos infobase-campos--2">
             <div>
               <label class="label" for="doc-nombres">Nombres</label>
               <input id="doc-nombres" class="input" formControlName="nombres" [class.input--error]="campoDocenteInvalido('nombres')" />
@@ -116,7 +125,7 @@
           </div>
         }
         @case ('entidad') {
-          <div [formGroup]="formEntidad" class="infobase-campos infobase-campos--2">
+          <div class="infobase-campos infobase-campos--2">
             <div>
               <label class="label" for="ent-nombre">Nombre</label>
               <input id="ent-nombre" class="input" formControlName="nombre" placeholder="Colegio de Abogados de Lima" />
@@ -128,7 +137,7 @@
           </div>
         }
         @case ('firmante') {
-          <div [formGroup]="formFirmante" class="infobase-campos infobase-campos--2">
+          <div class="infobase-campos infobase-campos--2">
             <div>
               <label class="label" for="fir-nombres">Nombres</label>
               <input id="fir-nombres" class="input" formControlName="nombres" [class.input--error]="campoFirmanteInvalido('nombres')" />
@@ -161,7 +170,7 @@
           </div>
         }
         @case ('tipoMaterial') {
-          <div [formGroup]="formTipoMaterial" class="infobase-campos infobase-campos--2">
+          <div class="infobase-campos infobase-campos--2">
             <div>
               <label class="label" for="tm-codigo">Código</label>
               <input id="tm-codigo" class="input" formControlName="codigo" placeholder="PDF" />
@@ -200,15 +209,24 @@
         }
         @for (item of tiposCurso(); track item.id) {
           <div class="infobase-fila">
-            <button type="button" class="infobase-fila__principal" (click)="abrirEditar(item.id)">
+            <div class="infobase-fila__principal">
               <span class="infobase-fila__nombre">{{ item.nombre }}</span>
-            </button>
+            </div>
             <span class="badge" [class.badge--disp-inmediato]="item.activo" [class.badge--disp-cerrado]="!item.activo">
               {{ item.activo ? 'Activo' : 'Inactivo' }}
             </span>
-            <button type="button" class="btn btn--neutro infobase-fila__accion" (click)="cambiarActivo(item.id, !item.activo)">
-              {{ item.activo ? 'Desactivar' : 'Activar' }}
-            </button>
+            <div class="infobase-fila__acciones">
+              <button type="button" class="btn btn--acento infobase-fila__accion" (click)="abrirEditar(item.id)">Editar</button>
+              <button
+                type="button"
+                class="btn infobase-fila__accion"
+                [class.btn--exito]="!item.activo"
+                [class.btn--peligro]="item.activo"
+                (click)="cambiarActivo(item.id, !item.activo)"
+              >
+                {{ item.activo ? 'Desactivar' : 'Activar' }}
+              </button>
+            </div>
           </div>
         }
       }
@@ -218,15 +236,24 @@
         }
         @for (item of categorias(); track item.id) {
           <div class="infobase-fila">
-            <button type="button" class="infobase-fila__principal" (click)="abrirEditar(item.id)">
+            <div class="infobase-fila__principal">
               <span class="infobase-fila__nombre">{{ item.nombre }}</span>
-            </button>
+            </div>
             <span class="badge" [class.badge--disp-inmediato]="item.activo" [class.badge--disp-cerrado]="!item.activo">
               {{ item.activo ? 'Activo' : 'Inactivo' }}
             </span>
-            <button type="button" class="btn btn--neutro infobase-fila__accion" (click)="cambiarActivo(item.id, !item.activo)">
-              {{ item.activo ? 'Desactivar' : 'Activar' }}
-            </button>
+            <div class="infobase-fila__acciones">
+              <button type="button" class="btn btn--acento infobase-fila__accion" (click)="abrirEditar(item.id)">Editar</button>
+              <button
+                type="button"
+                class="btn infobase-fila__accion"
+                [class.btn--exito]="!item.activo"
+                [class.btn--peligro]="item.activo"
+                (click)="cambiarActivo(item.id, !item.activo)"
+              >
+                {{ item.activo ? 'Desactivar' : 'Activar' }}
+              </button>
+            </div>
           </div>
         }
       }
@@ -236,16 +263,25 @@
         }
         @for (item of docentes(); track item.personaId) {
           <div class="infobase-fila">
-            <button type="button" class="infobase-fila__principal" (click)="abrirEditar(item.personaId)">
+            <div class="infobase-fila__principal">
               <span class="infobase-fila__nombre">{{ item.nombreCompleto }}</span>
               <span class="infobase-fila__subtitulo">{{ item.cargoProfesional }}</span>
-            </button>
+            </div>
             <span class="badge" [class.badge--disp-inmediato]="item.activo" [class.badge--disp-cerrado]="!item.activo">
               {{ item.activo ? 'Activo' : 'Inactivo' }}
             </span>
-            <button type="button" class="btn btn--neutro infobase-fila__accion" (click)="cambiarActivo(item.personaId, !item.activo)">
-              {{ item.activo ? 'Desactivar' : 'Activar' }}
-            </button>
+            <div class="infobase-fila__acciones">
+              <button type="button" class="btn btn--acento infobase-fila__accion" (click)="abrirEditar(item.personaId)">Editar</button>
+              <button
+                type="button"
+                class="btn infobase-fila__accion"
+                [class.btn--exito]="!item.activo"
+                [class.btn--peligro]="item.activo"
+                (click)="cambiarActivo(item.personaId, !item.activo)"
+              >
+                {{ item.activo ? 'Desactivar' : 'Activar' }}
+              </button>
+            </div>
           </div>
         }
       }
@@ -255,15 +291,24 @@
         }
         @for (item of entidades(); track item.id) {
           <div class="infobase-fila">
-            <button type="button" class="infobase-fila__principal" (click)="abrirEditar(item.id)">
+            <div class="infobase-fila__principal">
               <span class="infobase-fila__nombre">{{ item.nombre }}</span>
-            </button>
+            </div>
             <span class="badge" [class.badge--disp-inmediato]="item.activo" [class.badge--disp-cerrado]="!item.activo">
               {{ item.activo ? 'Activo' : 'Inactivo' }}
             </span>
-            <button type="button" class="btn btn--neutro infobase-fila__accion" (click)="cambiarActivo(item.id, !item.activo)">
-              {{ item.activo ? 'Desactivar' : 'Activar' }}
-            </button>
+            <div class="infobase-fila__acciones">
+              <button type="button" class="btn btn--acento infobase-fila__accion" (click)="abrirEditar(item.id)">Editar</button>
+              <button
+                type="button"
+                class="btn infobase-fila__accion"
+                [class.btn--exito]="!item.activo"
+                [class.btn--peligro]="item.activo"
+                (click)="cambiarActivo(item.id, !item.activo)"
+              >
+                {{ item.activo ? 'Desactivar' : 'Activar' }}
+              </button>
+            </div>
           </div>
         }
       }
@@ -273,16 +318,25 @@
         }
         @for (item of firmantes(); track item.id) {
           <div class="infobase-fila">
-            <button type="button" class="infobase-fila__principal" (click)="abrirEditar(item.id)">
+            <div class="infobase-fila__principal">
               <span class="infobase-fila__nombre">{{ item.nombreCompleto }}</span>
               <span class="infobase-fila__subtitulo">{{ item.cargoFirma }}</span>
-            </button>
+            </div>
             <span class="badge" [class.badge--disp-inmediato]="item.activo" [class.badge--disp-cerrado]="!item.activo">
               {{ item.activo ? 'Activo' : 'Inactivo' }}
             </span>
-            <button type="button" class="btn btn--neutro infobase-fila__accion" (click)="cambiarActivo(item.id, !item.activo)">
-              {{ item.activo ? 'Desactivar' : 'Activar' }}
-            </button>
+            <div class="infobase-fila__acciones">
+              <button type="button" class="btn btn--acento infobase-fila__accion" (click)="abrirEditar(item.id)">Editar</button>
+              <button
+                type="button"
+                class="btn infobase-fila__accion"
+                [class.btn--exito]="!item.activo"
+                [class.btn--peligro]="item.activo"
+                (click)="cambiarActivo(item.id, !item.activo)"
+              >
+                {{ item.activo ? 'Desactivar' : 'Activar' }}
+              </button>
+            </div>
           </div>
         }
       }
@@ -292,15 +346,24 @@
         }
         @for (item of tiposMaterial(); track item.id) {
           <div class="infobase-fila">
-            <button type="button" class="infobase-fila__principal" (click)="abrirEditar(item.id)">
+            <div class="infobase-fila__principal">
               <span class="infobase-fila__nombre">{{ item.nombre }}</span>
-            </button>
+            </div>
             <span class="badge" [class.badge--disp-inmediato]="item.activo" [class.badge--disp-cerrado]="!item.activo">
               {{ item.activo ? 'Activo' : 'Inactivo' }}
             </span>
-            <button type="button" class="btn btn--neutro infobase-fila__accion" (click)="cambiarActivo(item.id, !item.activo)">
-              {{ item.activo ? 'Desactivar' : 'Activar' }}
-            </button>
+            <div class="infobase-fila__acciones">
+              <button type="button" class="btn btn--acento infobase-fila__accion" (click)="abrirEditar(item.id)">Editar</button>
+              <button
+                type="button"
+                class="btn infobase-fila__accion"
+                [class.btn--exito]="!item.activo"
+                [class.btn--peligro]="item.activo"
+                (click)="cambiarActivo(item.id, !item.activo)"
+              >
+                {{ item.activo ? 'Desactivar' : 'Activar' }}
+              </button>
+            </div>
           </div>
         }
       }

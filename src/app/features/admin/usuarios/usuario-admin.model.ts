@@ -44,7 +44,9 @@ export interface CrearUsuarioAdminPeticion {
   correo: string;
   telefono: string | null;
   documentoIdentidad: string | null;
-  rol: RolUsuarioAdmin;
+  /** El rol principal no se elige: con un único rol, ese es el principal; con ambos,
+   * Administrador siempre gana. */
+  roles: RolUsuarioAdmin[];
 }
 
 export interface CrearUsuarioAdminRespuesta {
@@ -61,6 +63,12 @@ export interface ConcederRolPeticion {
 export interface CambiarActivoPeticion {
   activo: boolean;
   motivo: string | null;
+}
+
+export interface ResetearContrasenaRespuesta {
+  usuario: UsuarioAdminRespuesta;
+  /** Solo viene en esta respuesta puntual; no se puede volver a consultar después. */
+  contrasenaTemporal: string;
 }
 
 export interface ActualizarDatosPersonalesPeticion {

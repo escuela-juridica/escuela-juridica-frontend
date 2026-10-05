@@ -1,8 +1,9 @@
 .usuario-crear-campos {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
-  gap: 16px;
-  margin-bottom: 20px;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: 24px;
+  row-gap: 22px;
+  margin-bottom: 28px;
 }
 
 .usuario-crear-campo--ancho {
@@ -10,11 +11,46 @@
 }
 
 .usuario-crear-alerta {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+}
+
+.usuario-crear-roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 4px;
+}
+
+.usuario-crear-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--neutral-950);
+  cursor: pointer;
+}
+
+.usuario-crear-check input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--acento-700);
+}
+
+.usuario-crear-nota {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--neutral-500);
 }
 
 .usuario-crear-acciones {
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
+  padding-top: 4px;
+}
+
+@media (max-width: 560px) {
+  .usuario-crear-campos {
+    grid-template-columns: 1fr;
+  }
 }

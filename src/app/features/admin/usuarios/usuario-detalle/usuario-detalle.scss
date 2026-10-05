@@ -39,6 +39,19 @@
   grid-column: 1 / -1;
 }
 
+.usuario-detalle-campos--formulario {
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: 24px;
+  row-gap: 22px;
+  margin-bottom: 28px;
+}
+
+@media (max-width: 560px) {
+  .usuario-detalle-campos--formulario {
+    grid-template-columns: 1fr;
+  }
+}
+
 .usuario-detalle-etiqueta {
   font-size: 12px;
   font-weight: 600;

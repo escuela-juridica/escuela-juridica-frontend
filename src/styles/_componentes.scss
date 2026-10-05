@@ -251,6 +251,33 @@
   background: var(--boton-neutro-bg-hover);
 }
 
+.btn--exito {
+  background: var(--exito);
+  color: var(--blanco);
+}
+
+.btn--exito:hover {
+  background: #016139;
+}
+
+.btn--peligro {
+  background: var(--error);
+  color: var(--blanco);
+}
+
+.btn--peligro:hover {
+  background: #8f1b13;
+}
+
+.btn--info {
+  background: var(--informacion);
+  color: var(--blanco);
+}
+
+.btn--info:hover {
+  background: #0e4694;
+}
+
 .btn--google {
   background: var(--blanco);
   color: var(--neutral-800);
@@ -595,6 +622,27 @@
 .alerta__texto {
   font-size: 14px;
   line-height: 20px;
+}
+
+.alerta__cerrar {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: inherit;
+  opacity: 0.6;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  margin-left: auto;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  border-radius: var(--radio-completo);
+}
+
+.alerta__cerrar:hover {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.06);
 }
 
 .alerta--error {

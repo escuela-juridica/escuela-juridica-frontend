@@ -40,6 +40,9 @@ export class UsuarioCrear {
   protected readonly errorCrear = signal<string | null>(null);
   protected readonly resultado = signal<CrearUsuarioAdminRespuesta | null>(null);
 
+  protected readonly todosLosRoles: RolUsuarioAdmin[] = ['ALUMNO', 'ADMINISTRADOR'];
+  protected readonly rolesSeleccionados = signal<RolUsuarioAdmin[]>(['ALUMNO']);
+
   protected readonly formulario = this.fb.group({
     nombres: ['', [Validators.required, Validators.maxLength(120), nombrePropioValidator]],
     apellidoPaterno: ['', [Validators.required, Validators.maxLength(80), nombrePropioValidator]],
@@ -47,7 +50,6 @@ export class UsuarioCrear {
     correo: ['', [Validators.required, Validators.email, Validators.maxLength(254)]],
     telefono: ['', [Validators.maxLength(30), telefonoOpcionalValidator]],
     documentoIdentidad: ['', [Validators.maxLength(30), documentoOpcionalValidator]],
-    rol: this.fb.control<RolUsuarioAdmin>('ALUMNO'),
   });
 
   constructor() {
@@ -67,6 +69,28 @@ export class UsuarioCrear {
   ): boolean {
     const control = this.formulario.controls[nombre];
     return control.invalid && (control.touched || this.intentoGuardar());
+  }
+
+  protected etiquetaRol(rol: RolUsuarioAdmin): string {
+    return rol === 'ADMINISTRADOR' ? 'Administrador' : 'Alumno';
+  }
+
+  protected tieneRol(rol: RolUsuarioAdmin): boolean {
+    return this.rolesSeleccionados().includes(rol);
+  }
+
+  /** No se puede dejar la cuenta sin ningún rol: el último marcado no se puede desmarcar. El rol
+   * principal no se pregunta: si incluye Administrador, ese es el principal; si no, Alumno. */
+  protected alternarRol(rol: RolUsuarioAdmin): void {
+    const actuales = this.rolesSeleccionados();
+    if (actuales.includes(rol)) {
+      if (actuales.length === 1) {
+        return;
+      }
+      this.rolesSeleccionados.set(actuales.filter((r) => r !== rol));
+    } else {
+      this.rolesSeleccionados.set([...actuales, rol]);
+    }
   }
 
   protected crear(): void {
@@ -93,7 +117,7 @@ export class UsuarioCrear {
         correo: valores.correo.trim(),
         telefono: this.textoOpcional(valores.telefono)?.replace(/[\s-]/g, '') ?? null,
         documentoIdentidad: this.textoOpcional(valores.documentoIdentidad),
-        rol: valores.rol,
+        roles: this.rolesSeleccionados(),
       })
       .pipe(
         finalize(() => {

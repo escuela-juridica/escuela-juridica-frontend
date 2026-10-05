@@ -33,7 +33,7 @@
 
     @if (editando()) {
       <form [formGroup]="formDatos" (ngSubmit)="guardarDatos()" class="usuario-detalle-form">
-        <div class="usuario-detalle-campos">
+        <div class="usuario-detalle-campos usuario-detalle-campos--formulario">
           <div>
             <label class="label" for="ud-nombres">Nombres</label>
             <input
@@ -189,6 +189,23 @@
           Reenviar código de verificación
         </button>
       }
+      <button type="button" class="btn btn--secundario" [disabled]="reseteandoContrasena()" (click)="resetearContrasena()">
+        {{ reseteandoContrasena() ? 'Reseteando…' : 'Resetear contraseña' }}
+      </button>
     </div>
+
+    @if (contrasenaTemporal(); as temporal) {
+      <div class="alerta alerta--exito usuario-detalle-alerta">
+        <span class="alerta__icono">✓</span>
+        <div>
+          <div class="alerta__titulo">Contraseña reseteada</div>
+          <div class="alerta__texto">
+            Nueva contraseña temporal: <strong>{{ temporal }}</strong>. Se envió por correo y se
+            pedirá cambiarla en el próximo ingreso. No vuelve a mostrarse después de cerrar esto.
+          </div>
+        </div>
+        <button type="button" class="alerta__cerrar" (click)="cerrarContrasenaTemporal()" aria-label="Cerrar">✕</button>
+      </div>
+    }
   </div>
 }

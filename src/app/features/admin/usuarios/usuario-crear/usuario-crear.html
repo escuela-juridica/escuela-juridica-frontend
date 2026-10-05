@@ -27,6 +27,14 @@
   </div>
 } @else {
   <form [formGroup]="formulario" (ngSubmit)="crear()">
+    <div class="alerta alerta--info usuario-crear-alerta">
+      <span class="alerta__icono">i</span>
+      <div class="alerta__texto">
+        No defines usuario ni contraseña aquí: el correo que pongas abajo es el usuario. El sistema
+        genera una contraseña temporal aleatoria que verás una sola vez al crear la cuenta y que
+        también se envía por correo junto con el código de verificación.
+      </div>
+    </div>
     @if (errorCrear()) {
       <div class="alerta alerta--error usuario-crear-alerta">
         <span class="alerta__icono">!</span>
@@ -116,11 +124,20 @@
       </div>
 
       <div class="usuario-crear-campo--ancho">
-        <label class="label" for="rol">Rol</label>
-        <select id="rol" class="input" formControlName="rol">
-          <option value="ALUMNO">Alumno</option>
-          <option value="ADMINISTRADOR">Administrador</option>
-        </select>
+        <label class="label">Rol</label>
+        <div class="usuario-crear-roles">
+          @for (rol of todosLosRoles; track rol) {
+            <label class="usuario-crear-check">
+              <input type="checkbox" [checked]="tieneRol(rol)" (change)="alternarRol(rol)" />
+              <span>{{ etiquetaRol(rol) }}</span>
+            </label>
+          }
+        </div>
+        @if (rolesSeleccionados().length > 1) {
+          <p class="usuario-crear-nota">
+            Con ambos roles, Administrador queda como rol principal.
+          </p>
+        }
       </div>
     </div>
 

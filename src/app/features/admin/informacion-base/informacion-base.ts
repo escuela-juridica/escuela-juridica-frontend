@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectorRef, Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 
 import { PageResponse } from '../../../core/api/page-response.model';
@@ -26,6 +26,9 @@ interface DefinicionPestana {
   id: TabInformacionBase;
   etiqueta: string;
 }
+
+/** Cuánto tiempo queda visible la alerta de confirmación antes de desaparecer sola. */
+const DURACION_MENSAJE_MS = 5000;
 
 const PESTANAS: DefinicionPestana[] = [
   { id: 'tipoCurso', etiqueta: 'Tipos de curso' },
@@ -60,6 +63,10 @@ export class InformacionBase {
   protected readonly errorFormulario = signal<string | null>(null);
   /** null: formulario cerrado. 'nuevo': creando. número: editando ese id. */
   protected readonly modoFormulario = signal<'nuevo' | number | null>(null);
+
+  /** Confirmación tras guardar o cambiar el estado de un elemento: desaparece sola o con la X. */
+  protected readonly mensaje = signal<{ tipo: 'error' | 'exito'; texto: string } | null>(null);
+  private mensajeTimeout: ReturnType<typeof setTimeout> | null = null;
 
   protected readonly tiposCurso = signal<TipoCursoRespuesta[]>([]);
   protected readonly categorias = signal<CategoriaRespuesta[]>([]);
@@ -128,10 +135,26 @@ export class InformacionBase {
         });
       }
     }
+
+    this.destroyRef.onDestroy(() => this.limpiarTimeoutMensaje());
   }
 
   protected get tituloPestanaActiva(): string {
     return this.pestanas.find((p) => p.id === this.tabActiva())?.etiqueta ?? '';
+  }
+
+  /** El `<form>` solo tiene un `[formGroup]` a la vez, según la pestaña activa: sin esto,
+   * `(ngSubmit)` no se enlaza a ningún control de Angular y el navegador hace un submit nativo
+   * (recarga completa de la página, nada se guarda). */
+  protected get formularioActivo(): FormGroup {
+    switch (this.tabActiva()) {
+      case 'tipoCurso': return this.formTipoCurso;
+      case 'categoria': return this.formCategoria;
+      case 'docente': return this.formDocente;
+      case 'entidad': return this.formEntidad;
+      case 'firmante': return this.formFirmante;
+      case 'tipoMaterial': return this.formTipoMaterial;
+    }
   }
 
   protected cambiarPestana(id: TabInformacionBase): void {
@@ -141,6 +164,7 @@ export class InformacionBase {
     this.tabActiva.set(id);
     this.pagina.set(0);
     this.cerrarFormulario();
+    this.cerrarMensaje();
     this.cargarPestanaActiva();
   }
 
@@ -260,10 +284,12 @@ export class InformacionBase {
       ? this.api.crearTipoCurso(valores)
       : this.api.actualizarTipoCurso(modo, valores);
     peticion.subscribe({
-      next: () => {
+      next: (item) => {
         this.guardando.set(false);
+        this.tiposCurso.update((lista) => this.upsert(lista, item, (x) => x.id));
         this.cerrarFormulario();
-        this.cargarPestanaActiva(true);
+        this.mostrarMensaje('exito', 'Guardado.');
+        this.detector.markForCheck();
       },
       error: (e: HttpErrorResponse) => this.manejarErrorFormulario(e),
     });
@@ -280,10 +306,12 @@ export class InformacionBase {
       ? this.api.crearCategoria(valores)
       : this.api.actualizarCategoria(modo, valores);
     peticion.subscribe({
-      next: () => {
+      next: (item) => {
         this.guardando.set(false);
+        this.categorias.update((lista) => this.upsert(lista, item, (x) => x.id));
         this.cerrarFormulario();
-        this.cargarPestanaActiva(true);
+        this.mostrarMensaje('exito', 'Guardado.');
+        this.detector.markForCheck();
       },
       error: (e: HttpErrorResponse) => this.manejarErrorFormulario(e),
     });
@@ -306,10 +334,12 @@ export class InformacionBase {
     this.guardando.set(true);
     const obs = modo === 'nuevo' ? this.api.crearDocente(peticion) : this.api.actualizarDocente(modo, peticion);
     obs.subscribe({
-      next: () => {
+      next: (item) => {
         this.guardando.set(false);
+        this.docentes.update((lista) => this.upsert(lista, item, (x) => x.personaId));
         this.cerrarFormulario();
-        this.cargarPestanaActiva(true);
+        this.mostrarMensaje('exito', 'Guardado.');
+        this.detector.markForCheck();
       },
       error: (e: HttpErrorResponse) => this.manejarErrorFormulario(e),
     });
@@ -325,10 +355,12 @@ export class InformacionBase {
     this.guardando.set(true);
     const obs = modo === 'nuevo' ? this.api.crearEntidad(peticion) : this.api.actualizarEntidad(modo, peticion);
     obs.subscribe({
-      next: () => {
+      next: (item) => {
         this.guardando.set(false);
+        this.entidades.update((lista) => this.upsert(lista, item, (x) => x.id));
         this.cerrarFormulario();
-        this.cargarPestanaActiva(true);
+        this.mostrarMensaje('exito', 'Guardado.');
+        this.detector.markForCheck();
       },
       error: (e: HttpErrorResponse) => this.manejarErrorFormulario(e),
     });
@@ -350,10 +382,12 @@ export class InformacionBase {
     this.guardando.set(true);
     const obs = modo === 'nuevo' ? this.api.crearFirmante(peticion) : this.api.actualizarFirmante(modo, peticion);
     obs.subscribe({
-      next: () => {
+      next: (item) => {
         this.guardando.set(false);
+        this.firmantes.update((lista) => this.upsert(lista, item, (x) => x.id));
         this.cerrarFormulario();
-        this.cargarPestanaActiva(true);
+        this.mostrarMensaje('exito', 'Guardado.');
+        this.detector.markForCheck();
       },
       error: (e: HttpErrorResponse) => this.manejarErrorFormulario(e),
     });
@@ -369,10 +403,12 @@ export class InformacionBase {
     this.guardando.set(true);
     const obs = modo === 'nuevo' ? this.api.crearTipoMaterial(peticion) : this.api.actualizarTipoMaterial(modo, peticion);
     obs.subscribe({
-      next: () => {
+      next: (item) => {
         this.guardando.set(false);
+        this.tiposMaterial.update((lista) => this.upsert(lista, item, (x) => x.id));
         this.cerrarFormulario();
-        this.cargarPestanaActiva(true);
+        this.mostrarMensaje('exito', 'Guardado.');
+        this.detector.markForCheck();
       },
       error: (e: HttpErrorResponse) => this.manejarErrorFormulario(e),
     });
@@ -380,14 +416,51 @@ export class InformacionBase {
 
   protected cambiarActivo(id: number, activo: boolean): void {
     const tab = this.tabActiva();
-    const recargar = () => this.cargarPestanaActiva(true);
+    const exito = () => this.mostrarMensaje('exito', activo ? 'Activado.' : 'Desactivado.');
+    const falla = (e: HttpErrorResponse) => {
+      this.mostrarMensaje(
+        'error',
+        (typeof e.error === 'object' && e.error !== null ? (e.error as ErrorApiAdmin).message : null)
+          ?? 'No pudimos cambiar el estado. Inténtalo nuevamente.',
+      );
+    };
     switch (tab) {
-      case 'tipoCurso': this.api.cambiarActivoTipoCurso(id, activo).subscribe(recargar); break;
-      case 'categoria': this.api.cambiarActivoCategoria(id, activo).subscribe(recargar); break;
-      case 'docente': this.api.cambiarActivoDocente(id, activo).subscribe(recargar); break;
-      case 'entidad': this.api.cambiarActivoEntidad(id, activo).subscribe(recargar); break;
-      case 'firmante': this.api.cambiarActivoFirmante(id, activo).subscribe(recargar); break;
-      case 'tipoMaterial': this.api.cambiarActivoTipoMaterial(id, activo).subscribe(recargar); break;
+      case 'tipoCurso':
+        this.api.cambiarActivoTipoCurso(id, activo).subscribe({
+          next: (item) => { this.tiposCurso.update((l) => this.aplicarCambioActivo(l, item, (x) => x.id)); exito(); this.detector.markForCheck(); },
+          error: falla,
+        });
+        break;
+      case 'categoria':
+        this.api.cambiarActivoCategoria(id, activo).subscribe({
+          next: (item) => { this.categorias.update((l) => this.aplicarCambioActivo(l, item, (x) => x.id)); exito(); this.detector.markForCheck(); },
+          error: falla,
+        });
+        break;
+      case 'docente':
+        this.api.cambiarActivoDocente(id, activo).subscribe({
+          next: (item) => { this.docentes.update((l) => this.aplicarCambioActivo(l, item, (x) => x.personaId)); exito(); this.detector.markForCheck(); },
+          error: falla,
+        });
+        break;
+      case 'entidad':
+        this.api.cambiarActivoEntidad(id, activo).subscribe({
+          next: (item) => { this.entidades.update((l) => this.aplicarCambioActivo(l, item, (x) => x.id)); exito(); this.detector.markForCheck(); },
+          error: falla,
+        });
+        break;
+      case 'firmante':
+        this.api.cambiarActivoFirmante(id, activo).subscribe({
+          next: (item) => { this.firmantes.update((l) => this.aplicarCambioActivo(l, item, (x) => x.id)); exito(); this.detector.markForCheck(); },
+          error: falla,
+        });
+        break;
+      case 'tipoMaterial':
+        this.api.cambiarActivoTipoMaterial(id, activo).subscribe({
+          next: (item) => { this.tiposMaterial.update((l) => this.aplicarCambioActivo(l, item, (x) => x.id)); exito(); this.detector.markForCheck(); },
+          error: falla,
+        });
+        break;
     }
   }
 
@@ -435,6 +508,45 @@ export class InformacionBase {
     const cuerpo = typeof error.error === 'object' && error.error !== null ? (error.error as ErrorApiAdmin) : null;
     this.errorFormulario.set(cuerpo?.message ?? 'No pudimos guardar los cambios. Inténtalo nuevamente.');
     this.detector.markForCheck();
+  }
+
+  private upsert<T>(lista: T[], item: T, idDe: (x: T) => number): T[] {
+    const id = idDe(item);
+    const existe = lista.some((x) => idDe(x) === id);
+    return existe ? lista.map((x) => (idDe(x) === id ? item : x)) : [item, ...lista];
+  }
+
+  /** Si la vista actual es "solo activos" (mostrarTodos apagado), un elemento que se acaba de
+   * desactivar debe desaparecer de la lista en vez de quedarse mostrando "Inactivo". */
+  private aplicarCambioActivo<T extends { activo: boolean }>(
+    lista: T[],
+    item: T,
+    idDe: (x: T) => number,
+  ): T[] {
+    const actualizada = this.upsert(lista, item, idDe);
+    return this.mostrarTodos() ? actualizada : actualizada.filter((x) => x.activo);
+  }
+
+  protected cerrarMensaje(): void {
+    this.limpiarTimeoutMensaje();
+    this.mensaje.set(null);
+  }
+
+  private mostrarMensaje(tipo: 'error' | 'exito', texto: string): void {
+    this.limpiarTimeoutMensaje();
+    this.mensaje.set({ tipo, texto });
+    this.mensajeTimeout = setTimeout(() => {
+      this.mensaje.set(null);
+      this.mensajeTimeout = null;
+      this.detector.markForCheck();
+    }, DURACION_MENSAJE_MS);
+  }
+
+  private limpiarTimeoutMensaje(): void {
+    if (this.mensajeTimeout !== null) {
+      clearTimeout(this.mensajeTimeout);
+      this.mensajeTimeout = null;
+    }
   }
 
   private textoOpcional(valor: string): string | null {

@@ -155,6 +155,10 @@
   margin: 20px 24px 0;
 }
 
+.infobase-alerta--pagina {
+  margin: 0 0 16px;
+}
+
 .infobase-fila {
   display: flex;
   align-items: center;
@@ -172,21 +176,12 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
-  text-align: left;
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
   min-width: 0;
 }
 
 .infobase-fila__nombre {
   font-weight: 600;
   color: var(--neutral-950);
-}
-
-.infobase-fila__principal:hover .infobase-fila__nombre {
-  color: var(--acento-700);
 }
 
 .infobase-fila__subtitulo {
@@ -197,8 +192,17 @@
   white-space: nowrap;
 }
 
+.infobase-fila__acciones {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
 .infobase-fila__accion {
   flex-shrink: 0;
+  height: 36px;
+  padding: 0 14px;
+  font-size: 13px;
 }
 
 .infobase-formulario {
