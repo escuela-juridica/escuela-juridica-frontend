@@ -1,0 +1,337 @@
+@if (error()) {
+  <div class="alerta alerta--error editor-card__alerta">
+    <span class="alerta__icono">!</span>
+    <div class="alerta__titulo">{{ error() }}</div>
+  </div>
+}
+
+@if (mensaje(); as m) {
+  <div class="alerta editor-alerta" [class.alerta--error]="m.tipo === 'error'" [class.alerta--exito]="m.tipo === 'exito'">
+    <span class="alerta__icono">{{ m.tipo === 'error' ? '!' : '✓' }}</span>
+    <div class="alerta__titulo">{{ m.texto }}</div>
+    <button type="button" class="alerta__cerrar" (click)="cerrarMensaje()" aria-label="Cerrar">✕</button>
+  </div>
+}
+
+@if (cargando() && !cargado()) {
+  <p class="editor-estado">Cargando exámenes…</p>
+} @else {
+  <div class="editor-contenido__acciones">
+    <button type="button" class="btn btn--secundario" (click)="abrirCrearExamen()">+ Nuevo examen</button>
+  </div>
+
+  @if (examenes().length === 0) {
+    <p class="editor-vacio-seleccion">Todavía no agregaste ningún examen.</p>
+  }
+
+  @for (examen of examenes(); track examen.id; let iE = $index) {
+    <div class="card editor-card editor-modulo card--acento-superior" [class.editor-modulo--inactivo]="!examen.activo">
+      <div class="editor-modulo__cabecera" (click)="alternarExamen(examen.id)">
+        <button type="button" class="editor-expandir" [class.editor-expandir--abierto]="examenExpandido(examen.id)" aria-label="Expandir examen">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+        </button>
+        <span class="editor-modulo__icono">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 2h6a2 2 0 0 1 2 2v1H7V4a2 2 0 0 1 2-2z" />
+            <rect x="5" y="5" width="14" height="17" rx="2" ry="2" />
+            <polyline points="9 13 11 15 15 11" />
+          </svg>
+        </span>
+        <div class="editor-modulo__titulo">
+          <span class="editor-modulo__eyebrow">{{ etiquetaFinalidad(examen) }}</span>
+          <span class="editor-modulo__nombre">
+            {{ examen.titulo }}
+            <span class="nota-pill">{{ examen.tipo === 'CALIFICADO' ? 'Calificado' : 'Práctica' }}</span>
+            @if (examen.bloqueaSiguienteModulo) { <span class="nota-pill">Bloquea siguiente módulo</span> }
+            @if (!examen.activo) { <span class="badge badge--disp-cerrado">Inactivo</span> }
+          </span>
+        </div>
+        <span class="editor-modulo__meta">{{ examen.preguntas.length }} pregunta(s)</span>
+        <div class="editor-fila-seleccion__orden" (click)="$event.stopPropagation()">
+          <button type="button" class="editor-orden-boton" [disabled]="iE === 0" (click)="moverExamen(iE, -1)" aria-label="Subir">↑</button>
+          <button type="button" class="editor-orden-boton" [disabled]="iE === examenes().length - 1" (click)="moverExamen(iE, 1)" aria-label="Bajar">↓</button>
+          <button type="button" class="btn btn--acento editor-boton-chico" (click)="abrirEditarExamen(examen)">Editar</button>
+          <button
+            type="button"
+            class="btn editor-boton-chico"
+            [class.btn--exito]="!examen.activo"
+            [class.btn--peligro]="examen.activo"
+            (click)="cambiarActivoExamen(examen)"
+          >
+            {{ examen.activo ? 'Desactivar' : 'Activar' }}
+          </button>
+        </div>
+      </div>
+
+      @if (examenExpandido(examen.id)) {
+        <div class="editor-modulo__cuerpo">
+          <p class="editor-material-info">
+            {{ examen.maximoIntentos ? examen.maximoIntentos + ' intento(s)' : 'Intentos ilimitados' }}
+            · {{ examen.tiempoLimiteMinutos ? examen.tiempoLimiteMinutos + ' min' : 'Sin límite de tiempo' }}
+            · Respuestas: {{ etiquetaMostrarRespuestas(examen.mostrarRespuestas) }}
+            · Revisión de abiertas: {{ examen.diasRevision }} día(s)
+          </p>
+
+          @if (examen.preguntas.length === 0) {
+            <p class="editor-vacio-seleccion">Sin preguntas todavía.</p>
+          }
+
+          @for (pregunta of examen.preguntas; track pregunta.id; let iP = $index) {
+            <div class="editor-leccion" [class.editor-leccion--inactiva]="!pregunta.activo">
+              <div class="editor-leccion__cabecera" (click)="alternarPregunta(pregunta.id)">
+                <button type="button" class="editor-expandir" [class.editor-expandir--abierto]="preguntaExpandida(pregunta.id)" aria-label="Expandir pregunta">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+                </button>
+                <span class="editor-leccion__icono">
+                  @switch (pregunta.tipo) {
+                    @case ('SELECCION_UNICA') {
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="3" fill="currentColor" stroke="none" /></svg>
+                    }
+                    @case ('SELECCION_MULTIPLE') {
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3" /><polyline points="8 12 11 15 16 9" /></svg>
+                    }
+                    @case ('VERDADERO_FALSO') {
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="10" rx="5" /><circle cx="8" cy="12" r="3" fill="currentColor" stroke="none" /></svg>
+                    }
+                    @default {
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg>
+                    }
+                  }
+                </span>
+                <div class="editor-leccion__titulo">
+                  <span>{{ pregunta.enunciado }}</span>
+                  <span class="nota-pill">{{ etiquetaTipoPregunta(pregunta.tipo) }}</span>
+                  <span class="nota-pill">{{ pregunta.puntaje }} pto(s)</span>
+                  @if (!pregunta.activo) { <span class="badge badge--disp-cerrado">Inactiva</span> }
+                </div>
+                <div class="editor-fila-seleccion__orden" (click)="$event.stopPropagation()">
+                  <button type="button" class="editor-orden-boton" [disabled]="iP === 0" (click)="moverPregunta(examen.id, iP, -1)" aria-label="Subir">↑</button>
+                  <button type="button" class="editor-orden-boton" [disabled]="iP === examen.preguntas.length - 1" (click)="moverPregunta(examen.id, iP, 1)" aria-label="Bajar">↓</button>
+                  <button type="button" class="btn btn--acento editor-boton-chico" (click)="abrirEditarPregunta(examen.id, pregunta)">Editar</button>
+                  <button
+                    type="button"
+                    class="btn editor-boton-chico"
+                    [class.btn--exito]="!pregunta.activo"
+                    [class.btn--peligro]="pregunta.activo"
+                    (click)="cambiarActivoPregunta(examen.id, pregunta)"
+                  >
+                    {{ pregunta.activo ? 'Desactivar' : 'Activar' }}
+                  </button>
+                </div>
+              </div>
+
+              @if (preguntaExpandida(pregunta.id)) {
+                <div class="editor-leccion__cuerpo">
+                  @if (pregunta.opciones.length === 0) {
+                    <p class="editor-material-info">Respuesta abierta: se revisa manualmente, sin alternativas.</p>
+                  } @else {
+                    <div class="editor-materiales">
+                      @for (opcion of pregunta.opciones; track opcion.id) {
+                        <div class="editor-material">
+                          <span class="editor-material__icono" [class.editor-opcion-correcta]="opcion.esCorrecta">
+                            @if (opcion.esCorrecta) {
+                              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                            } @else {
+                              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9" /></svg>
+                            }
+                          </span>
+                          <span class="editor-material__principal">
+                            <span class="editor-material__titulo">{{ opcion.texto }}</span>
+                          </span>
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+
+          <button type="button" class="btn btn--secundario editor-boton-chico" (click)="abrirCrearPregunta(examen.id)">+ Agregar pregunta</button>
+        </div>
+      }
+    </div>
+  }
+}
+
+@if (mostrarFormExamen()) {
+  <app-modal [titulo]="examenEditId() ? 'Editar examen' : 'Nuevo examen'" ancho="lg" (cerrar)="cancelarFormExamen()">
+    <div class="editor-campos editor-campos--1">
+      <div>
+        <label class="label">Título</label>
+        <input class="input" [value]="examenTitulo()" (input)="examenTitulo.set($any($event.target).value)" />
+      </div>
+      <div>
+        <label class="label"><span>Descripción</span><span class="nota-pill">Opcional</span></label>
+        <textarea class="input" rows="2" [value]="examenDescripcion()" (input)="examenDescripcion.set($any($event.target).value)"></textarea>
+      </div>
+
+      <div class="editor-campos editor-campos--2">
+        <div>
+          <label class="label">Finalidad</label>
+          <select class="input" [value]="examenFinalidad()" (change)="cambiarFinalidadExamenForm($any($event.target).value)">
+            <option value="MODULO">Examen de módulo</option>
+            <option value="FINAL">Examen final</option>
+          </select>
+        </div>
+        @if (examenFinalidad() === 'MODULO') {
+          <div>
+            <label class="label">Módulo</label>
+            <select class="input" [value]="examenModuloId()" (change)="examenModuloId.set(+$any($event.target).value)">
+              @for (modulo of modulosDisponibles; track modulo.id) {
+                <option [value]="modulo.id">{{ modulo.titulo }}</option>
+              }
+            </select>
+          </div>
+        }
+      </div>
+
+      <div class="editor-campos editor-campos--2">
+        <div>
+          <label class="label">Tipo</label>
+          <select class="input" [value]="examenTipo()" (change)="cambiarTipoExamenForm($any($event.target).value)">
+            <option value="CALIFICADO">Calificado</option>
+            <option value="PRACTICA">Práctica</option>
+          </select>
+        </div>
+        <div>
+          <label class="label"><span>Máximo de intentos</span><span class="nota-pill">{{ examenTipo() === 'PRACTICA' ? 'Siempre ilimitados' : 'Vacío = ilimitados' }}</span></label>
+          <input class="input" type="number" min="1" [value]="examenMaximoIntentos()" [disabled]="examenTipo() === 'PRACTICA'" (input)="examenMaximoIntentos.set($any($event.target).value)" />
+        </div>
+      </div>
+
+      <div class="editor-campos editor-campos--2">
+        <div>
+          <label class="label"><span>Tiempo límite (minutos)</span><span class="nota-pill">Opcional</span></label>
+          <input class="input" type="number" min="1" [value]="examenTiempoLimite()" (input)="examenTiempoLimite.set($any($event.target).value)" />
+        </div>
+        <div>
+          <label class="label">Mostrar respuestas correctas</label>
+          <select class="input" [value]="examenMostrarRespuestas()" (change)="examenMostrarRespuestas.set($any($event.target).value)">
+            <option value="AL_APROBAR">Al aprobar</option>
+            @if (examenMaximoIntentos().trim()) {
+              <option value="AL_AGOTAR">Al agotar intentos</option>
+            }
+            <option value="NUNCA">Nunca</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="editor-campos editor-campos--2">
+        <div class="editor-subform__switches">
+          <label class="interruptor">
+            <input type="checkbox" class="interruptor__entrada" [checked]="examenBarajarPreguntas()" (change)="examenBarajarPreguntas.set($any($event.target).checked)" />
+            <span class="interruptor__pista"><span class="interruptor__perilla"></span></span>
+            <span class="interruptor__texto">Barajar preguntas</span>
+          </label>
+          <label class="interruptor">
+            <input type="checkbox" class="interruptor__entrada" [checked]="examenBarajarOpciones()" (change)="examenBarajarOpciones.set($any($event.target).checked)" />
+            <span class="interruptor__pista"><span class="interruptor__perilla"></span></span>
+            <span class="interruptor__texto">Barajar alternativas</span>
+          </label>
+        </div>
+        <div class="editor-subform__switches">
+          <label class="interruptor">
+            <input
+              type="checkbox"
+              class="interruptor__entrada"
+              [checked]="examenBloquea()"
+              [disabled]="examenFinalidad() === 'FINAL' || examenTipo() === 'PRACTICA'"
+              (change)="examenBloquea.set($any($event.target).checked)"
+            />
+            <span class="interruptor__pista"><span class="interruptor__perilla"></span></span>
+            <span class="interruptor__texto">Bloquea el siguiente módulo</span>
+          </label>
+          @if (examenFinalidad() === 'FINAL') {
+            <p class="editor-material-info">Un examen final no tiene un siguiente módulo que bloquear.</p>
+          } @else if (examenTipo() === 'PRACTICA') {
+            <p class="editor-material-info">Un examen de práctica nunca bloquea el avance.</p>
+          }
+        </div>
+      </div>
+
+      @if (!esVirtual()) {
+        <div>
+          <label class="label"><span>Fecha de habilitación</span><span class="nota-pill">Opcional</span></label>
+          <input class="input" type="datetime-local" [value]="examenFechaHabilitacion()" (input)="examenFechaHabilitacion.set($any($event.target).value)" />
+          <p class="editor-material-info">Sin fecha, se habilita automáticamente según el avance del alumno.</p>
+        </div>
+      } @else {
+        <p class="editor-material-info">Un curso virtual no programa fecha de habilitación: se abre automáticamente según el avance.</p>
+      }
+
+      <div>
+        <label class="label">Días de revisión (preguntas abiertas)</label>
+        <input class="input" type="number" min="1" [value]="examenDiasRevision()" (input)="examenDiasRevision.set($any($event.target).value)" />
+        <p class="editor-material-info">Se bloquea una vez que el curso inició, para no cambiar el plazo prometido.</p>
+      </div>
+    </div>
+    <div class="editor-form__acciones">
+      <button type="button" class="btn btn--secundario" (click)="cancelarFormExamen()">Cancelar</button>
+      <button type="button" class="btn btn--primario" [disabled]="guardandoExamen()" (click)="guardarExamen()">
+        {{ guardandoExamen() ? 'Guardando…' : 'Guardar examen' }}
+      </button>
+    </div>
+  </app-modal>
+}
+
+@if (preguntaFormExamenId() !== null) {
+  <app-modal [titulo]="preguntaEditId() ? 'Editar pregunta' : 'Nueva pregunta'" ancho="lg" (cerrar)="cancelarFormPregunta()">
+    <div class="editor-campos editor-campos--1">
+      <div class="editor-campos editor-campos--2">
+        <div>
+          <label class="label">Tipo</label>
+          <select class="input" [value]="preguntaTipo()" (change)="cambiarTipoPreguntaForm($any($event.target).value)">
+            <option value="SELECCION_UNICA">Selección única</option>
+            <option value="SELECCION_MULTIPLE">Selección múltiple</option>
+            <option value="VERDADERO_FALSO">Verdadero o falso</option>
+            <option value="RESPUESTA_ABIERTA">Respuesta abierta</option>
+          </select>
+        </div>
+        <div>
+          <label class="label">Puntaje</label>
+          <input class="input" type="number" min="0.01" step="0.5" [value]="preguntaPuntaje()" (input)="preguntaPuntaje.set($any($event.target).value)" />
+        </div>
+      </div>
+      <div>
+        <label class="label">Enunciado</label>
+        <textarea class="input" rows="2" [value]="preguntaEnunciado()" (input)="preguntaEnunciado.set($any($event.target).value)"></textarea>
+      </div>
+
+      @if (preguntaTipo() === 'RESPUESTA_ABIERTA') {
+        <p class="editor-material-info">No tiene alternativas ni calificación automática: se revisa manualmente dentro del plazo de días de revisión del examen.</p>
+      } @else {
+        <div class="editor-opciones-editor">
+          @for (opcion of preguntaOpciones(); track $index; let i = $index) {
+            <div class="editor-opcion-fila">
+              <button
+                type="button"
+                class="editor-opcion-marca"
+                [class.editor-opcion-marca--activa]="opcion.esCorrecta"
+                [attr.aria-label]="opcion.esCorrecta ? 'Correcta' : 'Marcar como correcta'"
+                (click)="preguntaTipo() === 'SELECCION_MULTIPLE' ? alternarOpcionMultiple(i) : marcarOpcionUnica(i)"
+              >
+                @if (opcion.esCorrecta) {
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                }
+              </button>
+              <input class="input" [value]="opcion.texto" (input)="actualizarTextoOpcion(i, $any($event.target).value)" placeholder="Texto de la alternativa" />
+              @if (preguntaTipo() !== 'VERDADERO_FALSO') {
+                <button type="button" class="editor-opcion-quitar" [disabled]="preguntaOpciones().length <= 2" (click)="quitarOpcion(i)" aria-label="Quitar alternativa">✕</button>
+              }
+            </div>
+          }
+        </div>
+        @if (preguntaTipo() !== 'VERDADERO_FALSO') {
+          <button type="button" class="btn btn--secundario editor-boton-chico" (click)="agregarOpcion()">+ Agregar alternativa</button>
+        }
+      }
+    </div>
+    <div class="editor-form__acciones">
+      <button type="button" class="btn btn--secundario" (click)="cancelarFormPregunta()">Cancelar</button>
+      <button type="button" class="btn btn--primario" [disabled]="guardandoPregunta()" (click)="guardarPregunta()">
+        {{ guardandoPregunta() ? 'Guardando…' : 'Guardar pregunta' }}
+      </button>
+    </div>
+  </app-modal>
+}

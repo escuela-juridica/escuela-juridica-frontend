@@ -834,6 +834,9 @@
         </app-modal>
       }
     }
+    @case ('examenes') {
+      <app-examenes-tab [cursoId]="cursoId" [modalidad]="c.modalidad" [modulosDisponibles]="modulosActivosParaExamen()" />
+    }
     @default {
       <div class="card editor-card">
         <p class="editor-pendiente">Esta pestaña se habilita en una historia aparte.</p>

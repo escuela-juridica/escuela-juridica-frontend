@@ -35,6 +35,7 @@ import {
 import { CursoAdminApiService } from '../curso-admin-api.service';
 import { CursoEditorRespuesta, ModalidadCurso, TipoVentaCurso } from '../curso-admin.model';
 import { Modal } from '../../../../shared/ui/modal/modal';
+import { ExamenesTab } from './examenes-tab/examenes-tab';
 
 type PestanaEditor = 'informacion' | 'contenido' | 'sesiones' | 'examenes' | 'certificacion' | 'publicacion';
 type CampoInformacion = 'titulo' | 'fechaInicio' | 'fechaFin' | 'precioRegular' | 'cupoMaximo' | 'vigenciaAccesoDias';
@@ -50,7 +51,7 @@ interface ErrorApiAdmin {
  * juntos con un único botón, aunque internamente llamen a tres endpoints distintos. */
 @Component({
   selector: 'app-curso-editor',
-  imports: [ReactiveFormsModule, RouterLink, Modal],
+  imports: [ReactiveFormsModule, RouterLink, Modal, ExamenesTab],
   templateUrl: './curso-editor.html',
   styleUrl: './curso-editor.scss',
 })
@@ -362,6 +363,12 @@ export class CursoEditor implements OnInit {
         },
         error: () => this.erroContenido.set('No pudimos cargar el contenido del curso.'),
       });
+  }
+
+  protected modulosActivosParaExamen(): { id: number; titulo: string }[] {
+    return this.modulos()
+      .filter((m) => m.activo)
+      .map((m) => ({ id: m.id, titulo: m.titulo }));
   }
 
   protected moduloExpandido(moduloId: number): boolean {

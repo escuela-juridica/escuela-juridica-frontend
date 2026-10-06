@@ -1,0 +1,66 @@
+.editor-opciones-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.editor-opcion-fila {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.editor-opcion-fila .input {
+  flex: 1;
+}
+
+.editor-opcion-marca {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radio-completo);
+  border: 2px solid var(--neutral-300);
+  background: var(--blanco);
+  color: var(--blanco);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.editor-opcion-marca:hover {
+  border-color: var(--acento-500);
+}
+
+.editor-opcion-marca--activa {
+  border-color: var(--exito);
+  background: var(--exito);
+}
+
+.editor-opcion-quitar {
+  appearance: none;
+  border: none;
+  background: none;
+  color: var(--neutral-500);
+  cursor: pointer;
+  font-size: 14px;
+  flex-shrink: 0;
+  width: 24px;
+}
+
+.editor-opcion-quitar:hover:not(:disabled) {
+  color: var(--error);
+}
+
+.editor-opcion-quitar:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.editor-opcion-correcta {
+  background: var(--acento-100);
+  color: var(--acento-700);
+}
