@@ -13,6 +13,7 @@ import {
   CursoEditorRespuesta,
   CursoResumenRespuesta,
   ReglasCursoRespuesta,
+  ValidacionPublicacionRespuesta,
 } from './curso-admin.model';
 
 /** HU-010 — Crear y configurar un curso. Consume `/api/admin/cursos`. */
@@ -63,5 +64,13 @@ export class CursoAdminApiService {
   sugerirBeneficios(texto: string): Observable<string[]> {
     const params = new HttpParams().set('texto', texto.trim());
     return this.http.get<string[]>(`${this.url}/beneficios-sugeridos`, { params });
+  }
+
+  validarPublicacion(cursoId: number): Observable<ValidacionPublicacionRespuesta> {
+    return this.http.get<ValidacionPublicacionRespuesta>(`${this.url}/${cursoId}/validacion`);
+  }
+
+  publicar(cursoId: number): Observable<ValidacionPublicacionRespuesta> {
+    return this.http.post<ValidacionPublicacionRespuesta>(`${this.url}/${cursoId}/publicacion`, {});
   }
 }

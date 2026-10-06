@@ -1,0 +1,67 @@
+.publicacion__acciones {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.publicacion__grupo {
+  margin-bottom: 16px;
+}
+
+.publicacion__grupo-encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.publicacion__grupo-encabezado h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--neutral-950);
+}
+
+.publicacion__ir {
+  height: 32px;
+  padding: 0 12px;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.publicacion__lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.publicacion__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--neutral-800);
+  padding: 10px 12px;
+  border-radius: var(--radio-md);
+  background: var(--error-fondo);
+  border: 1px solid var(--error-borde);
+}
+
+.publicacion__item--advertencia {
+  background: var(--advertencia-fondo);
+  border-color: var(--advertencia-borde);
+}
+
+.publicacion__icono {
+  flex-shrink: 0;
+  font-weight: 700;
+  color: var(--error);
+}
+
+.publicacion__item--advertencia .publicacion__icono {
+  color: var(--advertencia);
+}

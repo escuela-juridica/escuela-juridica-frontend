@@ -119,3 +119,18 @@ export interface ReglasCursoRespuesta {
 }
 
 export interface ActualizarReglasCursoPeticion extends Omit<ReglasCursoRespuesta, 'bloqueada'> {}
+
+export interface ErrorValidacionCurso {
+  codigo: string;
+  seccion: string;
+  campo: string;
+  severidad: 'ERROR' | 'ADVERTENCIA';
+  mensaje: string;
+}
+
+export interface ValidacionPublicacionRespuesta {
+  puedePublicarse: boolean;
+  hallazgos: ErrorValidacionCurso[];
+  publicacionRealizada: boolean;
+  estadoCodigo: string;
+}

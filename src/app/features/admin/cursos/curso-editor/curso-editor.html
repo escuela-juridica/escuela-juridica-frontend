@@ -913,6 +913,15 @@
         (guardado)="recargarDespuesDeReglas()"
       />
     }
+    @case ('publicacion') {
+      <app-publicacion-tab
+        [cursoId]="cursoId"
+        [estadoCodigo]="c.estadoCodigo"
+        [estadoNombre]="c.estadoNombre"
+        (irAPestana)="irAPestanaDesdePublicacion($event)"
+        (publicado)="recargarDespuesDePublicar()"
+      />
+    }
     @default {
       <div class="card editor-card">
         <p class="editor-pendiente">Esta pestaña se habilita en una historia aparte.</p>

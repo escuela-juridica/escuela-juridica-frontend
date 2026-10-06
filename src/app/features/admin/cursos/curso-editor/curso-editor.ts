@@ -37,6 +37,7 @@ import { CursoEditorRespuesta, ModalidadCurso, TipoVentaCurso } from '../curso-a
 import { Modal } from '../../../../shared/ui/modal/modal';
 import { AlertaGlobalComponent } from '../../../../shared/ui/alerta-global/alerta-global';
 import { ExamenesTab } from './examenes-tab/examenes-tab';
+import { PublicacionTab } from './publicacion-tab/publicacion-tab';
 import { RequisitosTab } from './requisitos-tab/requisitos-tab';
 import { AlertaGlobalService } from '../../../../core/notificaciones/alerta-global.service';
 
@@ -59,7 +60,7 @@ interface SesionEnVivoEditor {
  * juntos con un único botón, aunque internamente llamen a tres endpoints distintos. */
 @Component({
   selector: 'app-curso-editor',
-  imports: [ReactiveFormsModule, RouterLink, Modal, ExamenesTab, RequisitosTab, AlertaGlobalComponent],
+  imports: [ReactiveFormsModule, RouterLink, Modal, ExamenesTab, RequisitosTab, PublicacionTab, AlertaGlobalComponent],
   templateUrl: './curso-editor.html',
   styleUrl: './curso-editor.scss',
 })
@@ -264,6 +265,16 @@ export class CursoEditor implements OnInit {
   /** Actualiza la fecha de cierre que HU-014 puede haber confirmado. */
   protected recargarDespuesDeReglas(): void {
     this.cargarTodo();
+  }
+
+  /** HU-015 — tras publicar, refresca estadoCodigo/publicado para reflejar la transición. */
+  protected recargarDespuesDePublicar(): void {
+    this.cargarTodo();
+  }
+
+  // El tab de publicación no conoce PestanaEditor (vive fuera del editor); se castea aquí.
+  protected irAPestanaDesdePublicacion(pestana: string): void {
+    this.cambiarPestana(pestana as PestanaEditor);
   }
 
   protected get esVirtual(): boolean {

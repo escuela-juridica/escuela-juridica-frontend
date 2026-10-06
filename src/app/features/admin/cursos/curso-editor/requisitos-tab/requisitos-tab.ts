@@ -37,6 +37,9 @@ export class RequisitosTab implements OnChanges {
   protected readonly secuenciaObligatoria = signal(true);
   protected readonly diasEspera = signal('0');
   protected readonly fechaCierre = signal('');
+  // Última fecha realmente confirmada por el servidor; evita que una propuesta client-side
+  // descartada (asistencia activada y luego desactivada sin guardar) se envíe como si fuera dato.
+  private fechaCierreConfirmada = '';
 
   protected readonly requiereAsistenciaDisponible = () => this.modalidad !== 'VIRTUAL';
 
@@ -58,7 +61,9 @@ export class RequisitosTab implements OnChanges {
       progresoMinimo: Number(this.progresoMinimo()), umbralVideo: Number(this.umbralVideo()),
       asistenciaMinima: Number(this.asistenciaMinima()), secuenciaObligatoria: this.secuenciaObligatoria(),
       diasEsperaCertificado: Number(this.diasEspera()),
-      fechaCierreMatricula: this.fechaCierre() || null,
+      fechaCierreMatricula: this.requiereAsistenciaDisponible() && this.requiereAsistencia()
+        ? (this.fechaCierre() || null)
+        : (this.fechaCierreConfirmada || null),
     };
     this.guardando.set(true);
     this.api.actualizarReglas(this.cursoId, cuerpo).pipe(finalize(() => this.guardando.set(false))).subscribe({
@@ -83,6 +88,7 @@ export class RequisitosTab implements OnChanges {
     this.progresoMinimo.set(String(r.progresoMinimo)); this.umbralVideo.set(String(r.umbralVideo));
     this.asistenciaMinima.set(String(r.asistenciaMinima)); this.secuenciaObligatoria.set(r.secuenciaObligatoria);
     this.diasEspera.set(String(r.diasEsperaCertificado)); this.fechaCierre.set(r.fechaCierreMatricula ?? ''); this.bloqueada.set(r.bloqueada);
+    this.fechaCierreConfirmada = r.fechaCierreMatricula ?? '';
     this.proponerCierre();
   }
 }
