@@ -33,6 +33,10 @@ export class ExamenApiService {
     return this.http.patch<ExamenRespuesta>(`${this.base}/examenes/${examenId}/activo`, { activo });
   }
 
+  eliminarExamen(examenId: number): Observable<void> {
+    return this.http.delete<void>(`${this.base}/examenes/${examenId}`);
+  }
+
   reordenarExamenes(cursoId: number, p: OrdenPeticion): Observable<ExamenRespuesta[]> {
     return this.http.put<ExamenRespuesta[]>(`${this.base}/cursos/${cursoId}/examenes/orden`, p);
   }
@@ -47,6 +51,10 @@ export class ExamenApiService {
 
   cambiarActivoPregunta(preguntaId: number, activo: boolean): Observable<PreguntaRespuesta> {
     return this.http.patch<PreguntaRespuesta>(`${this.base}/preguntas/${preguntaId}/activo`, { activo });
+  }
+
+  eliminarPregunta(preguntaId: number): Observable<void> {
+    return this.http.delete<void>(`${this.base}/preguntas/${preguntaId}`);
   }
 
   reordenarPreguntas(examenId: number, p: OrdenPeticion): Observable<PreguntaRespuesta[]> {

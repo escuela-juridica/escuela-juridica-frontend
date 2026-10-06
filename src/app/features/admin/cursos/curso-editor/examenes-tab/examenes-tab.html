@@ -91,11 +91,22 @@
             type="button"
             class="btn editor-boton-chico"
             [class.btn--exito]="!examen.activo"
-            [class.btn--peligro]="examen.activo"
+            [class.btn--neutro]="examen.activo"
             (click)="cambiarActivoExamen(examen)"
           >
             {{ examen.activo ? 'Desactivar' : 'Activar' }}
           </button>
+          @if (puedeEliminar()) {
+            <button type="button" class="btn btn--peligro editor-boton-icono" (click)="eliminarExamen(examen)" aria-label="Eliminar examen" title="Eliminar examen">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                <path d="M10 11v6" />
+                <path d="M14 11v6" />
+                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+              </svg>
+            </button>
+          }
         </div>
       </div>
 
@@ -164,11 +175,22 @@
                     type="button"
                     class="btn editor-boton-chico"
                     [class.btn--exito]="!pregunta.activo"
-                    [class.btn--peligro]="pregunta.activo"
+                    [class.btn--neutro]="pregunta.activo"
                     (click)="cambiarActivoPregunta(examen.id, pregunta)"
                   >
                     {{ pregunta.activo ? 'Desactivar' : 'Activar' }}
                   </button>
+                  @if (puedeEliminar()) {
+                    <button type="button" class="btn btn--peligro editor-boton-icono" (click)="eliminarPregunta(examen.id, pregunta)" aria-label="Eliminar pregunta" title="Eliminar pregunta">
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                        <path d="M10 11v6" />
+                        <path d="M14 11v6" />
+                        <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                      </svg>
+                    </button>
+                  }
                 </div>
               </div>
 

@@ -4,6 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 
 import { Modal } from '../../../../../shared/ui/modal/modal';
+import { ConfirmacionService } from '../../../../../core/dialogo/confirmacion.service';
 import { AlertaGlobalService } from '../../../../../core/notificaciones/alerta-global.service';
 import { ExamenApiService } from '../../examenes/examen-api.service';
 import {
@@ -35,11 +36,13 @@ export class ExamenesTab implements OnChanges {
   @Input({ required: true }) cursoId!: number;
   @Input() modalidad: string | null = 'VIRTUAL';
   @Input() modulosDisponibles: { id: number; titulo: string }[] = [];
+  @Input() estadoCodigo: string | null = null;
 
   private readonly api = inject(ExamenApiService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly detector = inject(ChangeDetectorRef);
   private readonly alertasGlobales = inject(AlertaGlobalService);
+  private readonly confirmacion = inject(ConfirmacionService);
 
   protected readonly examenes = signal<ExamenRespuesta[]>([]);
   protected readonly cargando = signal(false);
@@ -56,6 +59,8 @@ export class ExamenesTab implements OnChanges {
     this.verInactivos() ? this.examenes() : this.examenes().filter((e) => e.activo));
 
   protected readonly esVirtual = () => this.modalidad === 'VIRTUAL';
+  // HU-016: el borrado real solo existe mientras el curso sigue en BORRADOR.
+  protected readonly puedeEliminar = () => this.estadoCodigo === 'BORRADOR';
 
   // -- Formulario de examen --
   protected readonly mostrarFormExamen = signal(false);
@@ -340,6 +345,28 @@ export class ExamenesTab implements OnChanges {
       });
   }
 
+  protected async eliminarExamen(examen: ExamenRespuesta): Promise<void> {
+    const confirmado = await this.confirmacion.preguntar({
+      titulo: 'Eliminar examen',
+      mensaje: `Se borrará "${examen.titulo}" con todas sus preguntas y alternativas. Esta acción no se puede deshacer. ¿Continuar?`,
+      textoConfirmar: 'Eliminar examen',
+      variante: 'peligro',
+    });
+    if (!confirmado) {
+      return;
+    }
+    this.api
+      .eliminarExamen(examen.id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.examenes.update((lista) => lista.filter((e) => e.id !== examen.id));
+          this.alertasGlobales.mostrar('exito', 'Examen eliminado.');
+        },
+        error: () => this.alertasGlobales.mostrar('error', 'No pudimos eliminar el examen.'),
+      });
+  }
+
   // La lista que se muestra puede estar filtrada (ocultando inactivos); el orden real que mueven
   // los botones ↑/↓ y que se envía al backend sigue siendo el del arreglo completo.
   protected preguntasVisibles(examen: ExamenRespuesta): PreguntaRespuesta[] {
@@ -513,6 +540,29 @@ export class ExamenesTab implements OnChanges {
           this.detector.markForCheck();
         },
         error: () => this.alertasGlobales.mostrar('error', 'No pudimos cambiar el estado de la pregunta.'),
+      });
+  }
+
+  protected async eliminarPregunta(examenId: number, pregunta: PreguntaRespuesta): Promise<void> {
+    const confirmado = await this.confirmacion.preguntar({
+      titulo: 'Eliminar pregunta',
+      mensaje: 'Se borrará la pregunta con todas sus alternativas. Esta acción no se puede deshacer. ¿Continuar?',
+      textoConfirmar: 'Eliminar pregunta',
+      variante: 'peligro',
+    });
+    if (!confirmado) {
+      return;
+    }
+    this.api
+      .eliminarPregunta(pregunta.id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.examenes.update((lista) =>
+            lista.map((e) => (e.id === examenId ? { ...e, preguntas: e.preguntas.filter((p) => p.id !== pregunta.id) } : e)));
+          this.alertasGlobales.mostrar('exito', 'Pregunta eliminada.');
+        },
+        error: () => this.alertasGlobales.mostrar('error', 'No pudimos eliminar la pregunta.'),
       });
   }
 

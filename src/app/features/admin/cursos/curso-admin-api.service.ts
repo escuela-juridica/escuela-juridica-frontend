@@ -96,4 +96,8 @@ export class CursoAdminApiService {
   duplicar(cursoId: number): Observable<CursoEditorRespuesta> {
     return this.http.post<CursoEditorRespuesta>(`${this.url}/${cursoId}/duplicar`, {});
   }
+
+  eliminar(cursoId: number): Observable<void> {
+    return this.http.delete<void>(`${this.url}/${cursoId}`);
+  }
 }

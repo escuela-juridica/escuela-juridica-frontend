@@ -79,6 +79,7 @@ export class PublicacionTab implements OnChanges {
   protected readonly retrasando = signal(false);
   protected readonly cerrando = signal(false);
   protected readonly duplicando = signal(false);
+  protected readonly eliminando = signal(false);
   protected readonly fechaRetraso = signal('');
   protected readonly motivoCierre = signal('');
 
@@ -278,6 +279,30 @@ export class PublicacionTab implements OnChanges {
           this.router.navigate(['/admin/cursos', nuevo.id]);
         },
         error: (e: HttpErrorResponse) => this.alertas.mostrar('error', e.error?.message ?? 'No pudimos duplicar el curso.'),
+      });
+  }
+
+  protected async eliminarCurso(): Promise<void> {
+    const confirmado = await this.confirmacion.preguntar({
+      titulo: 'Eliminar curso',
+      mensaje: 'Se borrará el curso y todo su contenido (módulos, lecciones, materiales, exámenes) de forma '
+        + 'permanente. Esta acción no se puede deshacer. ¿Continuar?',
+      textoConfirmar: 'Eliminar curso',
+      variante: 'peligro',
+    });
+    if (!confirmado) {
+      return;
+    }
+    this.eliminando.set(true);
+    this.api
+      .eliminar(this.cursoId)
+      .pipe(finalize(() => this.eliminando.set(false)))
+      .subscribe({
+        next: () => {
+          this.alertas.mostrar('exito', 'Curso eliminado.');
+          this.router.navigate(['/admin/cursos']);
+        },
+        error: (e: HttpErrorResponse) => this.alertas.mostrar('error', e.error?.message ?? 'No pudimos eliminar el curso.'),
       });
   }
 }

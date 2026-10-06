@@ -39,6 +39,7 @@ import { AlertaGlobalComponent } from '../../../../shared/ui/alerta-global/alert
 import { ExamenesTab } from './examenes-tab/examenes-tab';
 import { PublicacionTab } from './publicacion-tab/publicacion-tab';
 import { RequisitosTab } from './requisitos-tab/requisitos-tab';
+import { ConfirmacionService } from '../../../../core/dialogo/confirmacion.service';
 import { AlertaGlobalService } from '../../../../core/notificaciones/alerta-global.service';
 
 type PestanaEditor = 'informacion' | 'contenido' | 'sesiones' | 'examenes' | 'certificacion' | 'publicacion';
@@ -73,6 +74,7 @@ export class CursoEditor implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly detector = inject(ChangeDetectorRef);
   private readonly alertasGlobales = inject(AlertaGlobalService);
+  private readonly confirmacion = inject(ConfirmacionService);
   private readonly fb = inject(NonNullableFormBuilder);
 
   protected readonly pestanas: { id: PestanaEditor; etiqueta: string }[] = [
@@ -128,6 +130,9 @@ export class CursoEditor implements OnInit {
   protected readonly verInactivosContenido = signal(false);
   protected readonly modulosVisibles = computed(() =>
     this.verInactivosContenido() ? this.modulos() : this.modulos().filter((m) => m.activo));
+  // HU-016: el borrado real de contenido solo existe mientras el curso sigue en BORRADOR; una
+  // vez publicado (incluso sin iniciar, ya admite matrícula) solo queda activar/desactivar.
+  protected readonly puedeEliminarContenido = computed(() => this.curso()?.estadoCodigo === 'BORRADOR');
   protected readonly sesionesEnVivo = computed<SesionEnVivoEditor[]>(() => this.modulos()
     .filter((modulo) => modulo.activo)
     .flatMap((modulo) => modulo.lecciones
@@ -557,6 +562,28 @@ export class CursoEditor implements OnInit {
       });
   }
 
+  protected async eliminarModulo(modulo: ModuloRespuesta): Promise<void> {
+    const confirmado = await this.confirmacion.preguntar({
+      titulo: 'Eliminar módulo',
+      mensaje: `Se borrará "${modulo.titulo}" con todas sus lecciones, materiales y exámenes de módulo. Esta acción no se puede deshacer. ¿Continuar?`,
+      textoConfirmar: 'Eliminar módulo',
+      variante: 'peligro',
+    });
+    if (!confirmado) {
+      return;
+    }
+    this.contenidoApi
+      .eliminarModulo(modulo.id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.modulos.update((lista) => lista.filter((m) => m.id !== modulo.id));
+          this.alertasGlobales.mostrar('exito', 'Módulo eliminado.');
+        },
+        error: () => this.alertasGlobales.mostrar('error', 'No pudimos eliminar el módulo.'),
+      });
+  }
+
   // Las listas que se muestran pueden estar filtradas (ocultando inactivos); el orden real que
   // mueven los botones ↑/↓ y que se envía al backend sigue siendo el del arreglo completo.
   protected leccionesVisibles(modulo: ModuloRespuesta): LeccionRespuesta[] {
@@ -718,6 +745,29 @@ export class CursoEditor implements OnInit {
           this.detector.markForCheck();
         },
         error: () => this.mostrarMensaje('error', 'No pudimos cambiar el estado de la lección.'),
+      });
+  }
+
+  protected async eliminarLeccion(moduloId: number, leccion: LeccionRespuesta): Promise<void> {
+    const confirmado = await this.confirmacion.preguntar({
+      titulo: 'Eliminar lección',
+      mensaje: `Se borrará "${leccion.titulo}" con todos sus materiales. Esta acción no se puede deshacer. ¿Continuar?`,
+      textoConfirmar: 'Eliminar lección',
+      variante: 'peligro',
+    });
+    if (!confirmado) {
+      return;
+    }
+    this.contenidoApi
+      .eliminarLeccion(leccion.id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.modulos.update((lista) =>
+            lista.map((m) => (m.id === moduloId ? { ...m, lecciones: m.lecciones.filter((l) => l.id !== leccion.id) } : m)));
+          this.alertasGlobales.mostrar('exito', 'Lección eliminada.');
+        },
+        error: () => this.alertasGlobales.mostrar('error', 'No pudimos eliminar la lección.'),
       });
   }
 
@@ -992,6 +1042,33 @@ export class CursoEditor implements OnInit {
           this.detector.markForCheck();
         },
         error: () => this.mostrarMensaje('error', 'No pudimos cambiar el estado del material.'),
+      });
+  }
+
+  protected async eliminarMaterial(leccionId: number, material: MaterialRespuesta): Promise<void> {
+    const confirmado = await this.confirmacion.preguntar({
+      titulo: 'Eliminar material',
+      mensaje: `Se borrará "${material.titulo}" de la lección. Esta acción no se puede deshacer (el archivo original, si es compartido con otro curso, no se ve afectado). ¿Continuar?`,
+      textoConfirmar: 'Eliminar material',
+      variante: 'peligro',
+    });
+    if (!confirmado) {
+      return;
+    }
+    this.contenidoApi
+      .eliminarMaterial(material.id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.modulos.update((lista) =>
+            lista.map((m) => ({
+              ...m,
+              lecciones: m.lecciones.map((l) =>
+                l.id === leccionId ? { ...l, materiales: l.materiales.filter((mat) => mat.id !== material.id) } : l),
+            })));
+          this.alertasGlobales.mostrar('exito', 'Material eliminado.');
+        },
+        error: () => this.alertasGlobales.mostrar('error', 'No pudimos eliminar el material.'),
       });
   }
 

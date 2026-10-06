@@ -51,6 +51,10 @@ export class ContenidoApiService {
     return this.http.patch<ModuloRespuesta>(`${this.base}/modulos/${moduloId}/activo`, { activo });
   }
 
+  eliminarModulo(moduloId: number): Observable<void> {
+    return this.http.delete<void>(`${this.base}/modulos/${moduloId}`);
+  }
+
   crearLeccion(moduloId: number, p: CrearLeccionPeticion): Observable<LeccionRespuesta> {
     return this.http.post<LeccionRespuesta>(`${this.base}/modulos/${moduloId}/lecciones`, p);
   }
@@ -65,6 +69,10 @@ export class ContenidoApiService {
 
   cambiarActivoLeccion(leccionId: number, activo: boolean): Observable<LeccionRespuesta> {
     return this.http.patch<LeccionRespuesta>(`${this.base}/lecciones/${leccionId}/activo`, { activo });
+  }
+
+  eliminarLeccion(leccionId: number): Observable<void> {
+    return this.http.delete<void>(`${this.base}/lecciones/${leccionId}`);
   }
 
   actualizarSesion(leccionId: number, p: ActualizarSesionPeticion): Observable<LeccionRespuesta> {
@@ -100,5 +108,9 @@ export class ContenidoApiService {
 
   cambiarActivoMaterial(materialId: number, activo: boolean): Observable<MaterialRespuesta> {
     return this.http.patch<MaterialRespuesta>(`${this.base}/materiales/${materialId}/activo`, { activo });
+  }
+
+  eliminarMaterial(materialId: number): Observable<void> {
+    return this.http.delete<void>(`${this.base}/materiales/${materialId}`);
   }
 }

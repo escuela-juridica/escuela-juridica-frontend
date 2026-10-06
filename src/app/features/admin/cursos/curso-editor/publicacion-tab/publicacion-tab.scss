@@ -66,19 +66,26 @@
 
 .publicacion__zona-riesgo {
   margin-bottom: 16px;
-  border-color: var(--error-borde);
-  background: var(--error-fondo);
+  background: var(--blanco);
+  border: 1px solid var(--error-borde);
 }
 
 .publicacion__zona-riesgo-titulo {
-  margin: 0 0 4px;
+  margin: 0 0 12px;
   font-size: 15px;
   font-weight: 700;
   color: var(--error);
 }
 
+.publicacion__zona-riesgo .editor-material-info {
+  margin: 0 !important;
+  line-height: 1.5;
+}
+
 .publicacion__zona-riesgo textarea {
-  margin-top: 12px;
+  display: block;
+  width: 100%;
+  margin-top: 16px;
   resize: vertical;
 }
 
