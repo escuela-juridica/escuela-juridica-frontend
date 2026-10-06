@@ -5,6 +5,7 @@ import { finalize } from 'rxjs';
 
 import { CursoAdminApiService } from '../../curso-admin-api.service';
 import { ErrorValidacionCurso, ValidacionPublicacionRespuesta } from '../../curso-admin.model';
+import { ConfirmacionService } from '../../../../../core/dialogo/confirmacion.service';
 import { AlertaGlobalService } from '../../../../../core/notificaciones/alerta-global.service';
 
 interface GrupoHallazgos {
@@ -64,6 +65,7 @@ export class PublicacionTab implements OnChanges {
 
   private readonly api = inject(CursoAdminApiService);
   private readonly alertas = inject(AlertaGlobalService);
+  private readonly confirmacion = inject(ConfirmacionService);
   private readonly router = inject(Router);
 
   protected readonly cargando = signal(false);
@@ -149,6 +151,29 @@ export class PublicacionTab implements OnChanges {
     this.irAPestana.emit(pestana);
   }
 
+  // Mismo mapeo que CursosListado.claseEstado, para que el badge se vea igual en todo el admin.
+  protected claseEstado(estadoCodigo: string): string {
+    switch (estadoCodigo) {
+      case 'BORRADOR': return 'badge--disp-proximo';
+      case 'PUBLICADO': return 'badge--disp-inmediato';
+      case 'EN_CURSO': return 'badge--disp-inmediato';
+      case 'CERRADO': return 'badge--disp-cerrado';
+      case 'CANCELADO': return 'badge--disp-cerrado';
+      default: return 'badge--disp-cerrado';
+    }
+  }
+
+  // El backend exige una fecha estrictamente posterior a la actual; el mínimo del selector debe
+  // ser el día siguiente, no el mismo día (que el backend rechazaría con un 400 confuso).
+  protected minFechaRetraso(): string {
+    if (!this.fechaInicio) {
+      return '';
+    }
+    const fecha = new Date(this.fechaInicio + 'T00:00:00');
+    fecha.setDate(fecha.getDate() + 1);
+    return fecha.toISOString().slice(0, 10);
+  }
+
   protected toggleDestacado(): void {
     const nuevo = !this.destacadoLocal();
     this.actualizandoDestacado.set(true);
@@ -165,8 +190,14 @@ export class PublicacionTab implements OnChanges {
       });
   }
 
-  protected adelantarInicio(): void {
-    if (!confirm('El curso pasará a EN CURSO de inmediato y no podrá volver a PUBLICADO. ¿Continuar?')) {
+  protected async adelantarInicio(): Promise<void> {
+    const confirmado = await this.confirmacion.preguntar({
+      titulo: 'Adelantar inicio',
+      mensaje: 'El curso pasará a EN CURSO de inmediato y no podrá volver a PUBLICADO. ¿Continuar?',
+      textoConfirmar: 'Adelantar inicio',
+      variante: 'peligro',
+    });
+    if (!confirmado) {
       return;
     }
     this.adelantando.set(true);
@@ -202,8 +233,14 @@ export class PublicacionTab implements OnChanges {
       });
   }
 
-  protected cerrar(): void {
-    if (!confirm('El curso se cerrará y dejará de ofrecerse para nuevas matrículas. Quienes ya cursan conservan su acceso. ¿Continuar?')) {
+  protected async cerrar(): Promise<void> {
+    const confirmado = await this.confirmacion.preguntar({
+      titulo: 'Cerrar curso',
+      mensaje: 'El curso se cerrará y dejará de ofrecerse para nuevas matrículas. Quienes ya cursan conservan su acceso. ¿Continuar?',
+      textoConfirmar: 'Cerrar curso',
+      variante: 'peligro',
+    });
+    if (!confirmado) {
       return;
     }
     this.cerrando.set(true);
@@ -220,7 +257,17 @@ export class PublicacionTab implements OnChanges {
       });
   }
 
-  protected duplicar(): void {
+  protected async duplicar(): Promise<void> {
+    const confirmado = await this.confirmacion.preguntar({
+      titulo: 'Duplicar como nueva convocatoria',
+      mensaje: 'Se creará un curso nuevo en borrador con la misma información, contenido, exámenes, reglas y '
+        + 'docentes. No se copian matrículas, pagos, progreso, intentos, asistencia ni certificados. '
+        + 'Deberás revisar fechas, precio y cupo antes de publicarlo. ¿Continuar?',
+      textoConfirmar: 'Duplicar',
+    });
+    if (!confirmado) {
+      return;
+    }
     this.duplicando.set(true);
     this.api
       .duplicar(this.cursoId)

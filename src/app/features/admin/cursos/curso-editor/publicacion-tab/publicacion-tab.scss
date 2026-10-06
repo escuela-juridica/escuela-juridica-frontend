@@ -4,16 +4,31 @@
   margin-top: 16px;
 }
 
-.publicacion__ciclo {
-  margin-bottom: 20px;
+// Franja de estado: ancla siempre visible, separada del contenido que cambia según el estado.
+.publicacion__barra-estado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 14px 20px;
+  margin-bottom: 16px;
+  background: var(--blanco);
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radio-md);
 }
 
-.publicacion__ciclo-encabezado {
+.publicacion__estado-info {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 12px;
+  align-items: center;
+  gap: 10px;
+}
+
+.publicacion__barra-acciones {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
 }
 
 .publicacion__destacado {
@@ -27,6 +42,17 @@
   white-space: nowrap;
 }
 
+.publicacion__duplicar {
+  height: 36px;
+  padding: 0 16px;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.publicacion__aviso-matriculas {
+  margin-bottom: 16px;
+}
+
 .publicacion__retraso {
   display: flex;
   align-items: center;
@@ -38,8 +64,33 @@
   width: auto;
 }
 
+.publicacion__zona-riesgo {
+  margin-bottom: 16px;
+  border-color: var(--error-borde);
+  background: var(--error-fondo);
+}
+
+.publicacion__zona-riesgo-titulo {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--error);
+}
+
+.publicacion__zona-riesgo textarea {
+  margin-top: 12px;
+  resize: vertical;
+}
+
 .publicacion__grupo {
   margin-bottom: 16px;
+}
+
+.publicacion__grupo > h3 {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--neutral-950);
 }
 
 .publicacion__grupo-encabezado {
