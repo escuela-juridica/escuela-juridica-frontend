@@ -22,9 +22,19 @@ import {
   EntidadRespuesta,
   FirmanteRespuesta,
   TipoCursoRespuesta,
+  TipoMaterialRespuesta,
 } from '../../informacion-base/informacion-base.model';
+import { ContenidoApiService } from '../contenido/contenido-api.service';
+import {
+  LeccionRespuesta,
+  MaterialRespuesta,
+  ModuloDisponibleRespuesta,
+  ModuloRespuesta,
+  TipoLeccion,
+} from '../contenido/contenido.model';
 import { CursoAdminApiService } from '../curso-admin-api.service';
 import { CursoEditorRespuesta, ModalidadCurso, TipoVentaCurso } from '../curso-admin.model';
+import { Modal } from '../../../../shared/ui/modal/modal';
 
 type PestanaEditor = 'informacion' | 'contenido' | 'sesiones' | 'examenes' | 'certificacion' | 'publicacion';
 type CampoInformacion = 'titulo' | 'fechaInicio' | 'fechaFin' | 'precioRegular' | 'cupoMaximo' | 'vigenciaAccesoDias';
@@ -40,13 +50,14 @@ interface ErrorApiAdmin {
  * juntos con un único botón, aunque internamente llamen a tres endpoints distintos. */
 @Component({
   selector: 'app-curso-editor',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, Modal],
   templateUrl: './curso-editor.html',
   styleUrl: './curso-editor.scss',
 })
 export class CursoEditor implements OnInit {
   private readonly api = inject(CursoAdminApiService);
   private readonly infoBaseApi = inject(InformacionBaseApiService);
+  private readonly contenidoApi = inject(ContenidoApiService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
@@ -90,6 +101,53 @@ export class CursoEditor implements OnInit {
   private readonly busquedaBeneficio$ = new Subject<string>();
   protected readonly beneficiosMaximo = 10;
   protected readonly beneficioLongitudMaxima = 150;
+
+  // ---------------------------------------------------------------- HU-011 Contenido --
+  protected readonly tiposMaterial = signal<TipoMaterialRespuesta[]>([]);
+  protected readonly modulos = signal<ModuloRespuesta[]>([]);
+  protected readonly cargandoContenido = signal(false);
+  protected readonly contenidoCargado = signal(false);
+  protected readonly erroContenido = signal<string | null>(null);
+  protected readonly modulosExpandidos = signal<Set<number>>(new Set());
+  protected readonly leccionesExpandidas = signal<Set<number>>(new Set());
+
+  protected readonly mostrarFormModulo = signal(false);
+  protected readonly moduloEditId = signal<number | null>(null);
+  protected readonly moduloTitulo = signal('');
+  protected readonly moduloDescripcion = signal('');
+  protected readonly guardandoModulo = signal(false);
+
+  protected readonly modalModuloExistenteAbierto = signal(false);
+  protected readonly busquedaModuloExistente = signal('');
+  protected readonly resultadosModuloExistente = signal<ModuloDisponibleRespuesta[]>([]);
+  protected readonly buscandoModuloExistente = signal(false);
+  private readonly busquedaModuloExistente$ = new Subject<string>();
+
+  protected readonly leccionFormModuloId = signal<number | null>(null);
+  protected readonly leccionEditId = signal<number | null>(null);
+  protected readonly leccionTitulo = signal('');
+  protected readonly leccionDescripcion = signal('');
+  protected readonly leccionTipo = signal<TipoLeccion>('GRABADA');
+  protected readonly leccionObligatoria = signal(true);
+  protected readonly leccionVistaPrevia = signal(false);
+  protected readonly leccionFechaInicio = signal('');
+  protected readonly leccionFechaFin = signal('');
+  protected readonly guardandoLeccion = signal(false);
+
+  protected readonly materialFormLeccionId = signal<number | null>(null);
+  protected readonly materialEditId = signal<number | null>(null);
+  protected readonly materialModo = signal<'enlace' | 'archivo'>('enlace');
+  protected readonly materialTitulo = signal('');
+  protected readonly materialTipoMaterialId = signal<number | null>(null);
+  protected readonly materialOrigen = signal<'YOUTUBE' | 'EXTERNO'>('YOUTUBE');
+  protected readonly materialReferencia = signal('');
+  protected readonly materialYoutubeNoListado = signal(false);
+  protected readonly materialPermiteDescarga = signal(false);
+  protected readonly materialArchivo = signal<File | null>(null);
+  protected readonly guardandoMaterial = signal(false);
+  protected readonly materialOrigenActual = signal('');
+  protected readonly materialOrigenCodigo = signal('');
+  protected readonly materialTipoNombreActual = signal('');
 
   protected readonly formInformacion = this.fb.group({
     titulo: ['', [Validators.required, Validators.maxLength(220)]],
@@ -135,6 +193,24 @@ export class CursoEditor implements OnInit {
         this.sugerenciasBeneficio.set(sugerencias.filter((s) => !this.beneficios().includes(s)));
         this.detector.markForCheck();
       });
+
+    this.busquedaModuloExistente$
+      .pipe(
+        debounceTime(250),
+        distinctUntilChanged(),
+        switchMap((texto) => {
+          this.buscandoModuloExistente.set(true);
+          return this.contenidoApi
+            .listarModulosDisponibles(texto, this.cursoId)
+            .pipe(catchError(() => of<ModuloDisponibleRespuesta[]>([])));
+        }),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((resultados) => {
+        this.resultadosModuloExistente.set(resultados);
+        this.buscandoModuloExistente.set(false);
+        this.detector.markForCheck();
+      });
   }
 
   ngOnInit(): void {
@@ -144,6 +220,9 @@ export class CursoEditor implements OnInit {
 
   protected cambiarPestana(id: PestanaEditor): void {
     this.tabActiva.set(id);
+    if (id === 'contenido' && !this.contenidoCargado()) {
+      this.cargarContenido();
+    }
   }
 
   protected get esVirtual(): boolean {
@@ -258,6 +337,558 @@ export class CursoEditor implements OnInit {
     this.firmantesSeleccionados.update((lista) => this.mover(lista, indice, direccion));
   }
 
+  // ---------------------------------------------------------------- HU-011 Contenido --
+
+  private cargarContenido(): void {
+    this.cargandoContenido.set(true);
+    this.erroContenido.set(null);
+    this.contenidoApi
+      .obtenerEstructura(this.cursoId)
+      .pipe(
+        finalize(() => {
+          this.cargandoContenido.set(false);
+          this.detector.markForCheck();
+        }),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (modulos) => {
+          this.modulos.set(modulos);
+          this.contenidoCargado.set(true);
+        },
+        error: () => this.erroContenido.set('No pudimos cargar el contenido del curso.'),
+      });
+  }
+
+  protected moduloExpandido(moduloId: number): boolean {
+    return this.modulosExpandidos().has(moduloId);
+  }
+
+  protected alternarModulo(moduloId: number): void {
+    this.modulosExpandidos.update((set) => this.alternarEnSet(set, moduloId));
+  }
+
+  protected leccionExpandida(leccionId: number): boolean {
+    return this.leccionesExpandidas().has(leccionId);
+  }
+
+  protected alternarLeccion(leccionId: number): void {
+    this.leccionesExpandidas.update((set) => this.alternarEnSet(set, leccionId));
+  }
+
+  private alternarEnSet(set: Set<number>, id: number): Set<number> {
+    const copia = new Set(set);
+    if (copia.has(id)) {
+      copia.delete(id);
+    } else {
+      copia.add(id);
+    }
+    return copia;
+  }
+
+  protected etiquetaTipoLeccion(tipo: string): string {
+    return tipo === 'EN_VIVO' ? 'En vivo' : 'Grabada';
+  }
+
+  protected etiquetaOrigenMaterial(origen: string): string {
+    switch (origen) {
+      case 'SUBIDO': return 'Archivo subido';
+      case 'YOUTUBE': return 'YouTube';
+      case 'EXTERNO': return 'Enlace externo';
+      default: return origen;
+    }
+  }
+
+  protected formatearTamano(bytes: number | null): string {
+    if (bytes === null) {
+      return '';
+    }
+    if (bytes >= 1_048_576) {
+      return `${(bytes / 1_048_576).toFixed(1)} MB`;
+    }
+    return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+  }
+
+  // -- Módulos --
+
+  protected abrirCrearModulo(): void {
+    this.moduloEditId.set(null);
+    this.moduloTitulo.set('');
+    this.moduloDescripcion.set('');
+    this.mostrarFormModulo.set(true);
+  }
+
+  protected abrirEditarModulo(modulo: ModuloRespuesta): void {
+    this.moduloEditId.set(modulo.id);
+    this.moduloTitulo.set(modulo.titulo);
+    this.moduloDescripcion.set(modulo.descripcion ?? '');
+    this.mostrarFormModulo.set(true);
+  }
+
+  protected cancelarFormModulo(): void {
+    this.mostrarFormModulo.set(false);
+  }
+
+  protected guardarModulo(): void {
+    const titulo = this.moduloTitulo().trim();
+    if (!titulo || this.guardandoModulo()) {
+      return;
+    }
+    this.guardandoModulo.set(true);
+    const peticion = { titulo, descripcion: this.textoOpcional(this.moduloDescripcion()) };
+    const editId = this.moduloEditId();
+    const llamada = editId
+      ? this.contenidoApi.actualizarModulo(editId, peticion)
+      : this.contenidoApi.crearModulo(this.cursoId, peticion);
+
+    llamada
+      .pipe(
+        finalize(() => {
+          this.guardandoModulo.set(false);
+          this.detector.markForCheck();
+        }),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (modulo) => {
+          if (editId) {
+            this.modulos.update((lista) => lista.map((m) => (m.id === modulo.id ? { ...m, ...modulo, lecciones: m.lecciones } : m)));
+          } else {
+            this.modulos.update((lista) => [...lista, modulo]);
+          }
+          this.mostrarFormModulo.set(false);
+          this.mostrarMensaje('exito', editId ? 'Módulo actualizado.' : 'Módulo creado.');
+        },
+        error: (error: HttpErrorResponse) => {
+          this.mostrarMensaje('error', this.mensajeError(error) ?? 'No pudimos guardar el módulo.');
+        },
+      });
+  }
+
+  protected cambiarActivoModulo(modulo: ModuloRespuesta): void {
+    this.contenidoApi
+      .cambiarActivoModulo(modulo.id, !modulo.activo)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (actualizado) => {
+          this.modulos.update((lista) => lista.map((m) => (m.id === actualizado.id ? { ...m, ...actualizado, lecciones: m.lecciones } : m)));
+          this.detector.markForCheck();
+        },
+        error: () => this.mostrarMensaje('error', 'No pudimos cambiar el estado del módulo.'),
+      });
+  }
+
+  protected moverModulo(indice: number, direccion: -1 | 1): void {
+    const lista = this.modulos();
+    const destino = indice + direccion;
+    if (destino < 0 || destino >= lista.length) {
+      return;
+    }
+    const copia = [...lista];
+    [copia[indice], copia[destino]] = [copia[destino], copia[indice]];
+    this.modulos.set(copia);
+    this.contenidoApi
+      .reordenarModulos(this.cursoId, { ids: copia.map((m) => m.id) })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (modulos) => this.modulos.set(modulos),
+        error: () => {
+          this.mostrarMensaje('error', 'No pudimos reordenar los módulos.');
+          this.cargarContenido();
+        },
+      });
+  }
+
+  protected abrirModuloExistente(): void {
+    this.busquedaModuloExistente.set('');
+    this.resultadosModuloExistente.set([]);
+    this.modalModuloExistenteAbierto.set(true);
+  }
+
+  protected cerrarModuloExistente(): void {
+    this.modalModuloExistenteAbierto.set(false);
+  }
+
+  protected buscarModuloExistente(texto: string): void {
+    this.busquedaModuloExistente.set(texto);
+    this.busquedaModuloExistente$.next(texto);
+  }
+
+  protected copiarModulo(moduloOrigenId: number): void {
+    this.contenidoApi
+      .copiarModulo(this.cursoId, moduloOrigenId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (modulo) => {
+          this.modulos.update((lista) => [...lista, modulo]);
+          this.modalModuloExistenteAbierto.set(false);
+          this.mostrarMensaje('exito', 'Módulo copiado.');
+        },
+        error: (error: HttpErrorResponse) => {
+          this.mostrarMensaje('error', this.mensajeError(error) ?? 'No pudimos copiar el módulo.');
+        },
+      });
+  }
+
+  // -- Lecciones --
+
+  protected abrirCrearLeccion(moduloId: number): void {
+    this.leccionEditId.set(null);
+    this.leccionTitulo.set('');
+    this.leccionDescripcion.set('');
+    this.leccionTipo.set('GRABADA');
+    this.leccionObligatoria.set(true);
+    this.leccionVistaPrevia.set(false);
+    this.leccionFechaInicio.set('');
+    this.leccionFechaFin.set('');
+    this.leccionFormModuloId.set(moduloId);
+  }
+
+  protected abrirEditarLeccion(moduloId: number, leccion: LeccionRespuesta): void {
+    this.leccionEditId.set(leccion.id);
+    this.leccionTitulo.set(leccion.titulo);
+    this.leccionDescripcion.set(leccion.descripcion ?? '');
+    this.leccionTipo.set(leccion.tipo);
+    this.leccionObligatoria.set(leccion.esObligatoria);
+    this.leccionVistaPrevia.set(leccion.esVistaPrevia);
+    this.leccionFechaInicio.set(this.aDatetimeLocal(leccion.fechaHoraInicio) ?? '');
+    this.leccionFechaFin.set(this.aDatetimeLocal(leccion.fechaHoraFin) ?? '');
+    this.leccionFormModuloId.set(moduloId);
+  }
+
+  protected cancelarFormLeccion(): void {
+    this.leccionFormModuloId.set(null);
+  }
+
+  protected cambiarTipoLeccionForm(tipo: TipoLeccion): void {
+    this.leccionTipo.set(tipo);
+    if (tipo === 'EN_VIVO') {
+      this.leccionVistaPrevia.set(false);
+    }
+  }
+
+  protected guardarLeccion(): void {
+    const titulo = this.leccionTitulo().trim();
+    const moduloId = this.leccionFormModuloId();
+    if (!titulo || moduloId === null || this.guardandoLeccion()) {
+      return;
+    }
+    this.guardandoLeccion.set(true);
+    const peticion = {
+      titulo,
+      descripcion: this.textoOpcional(this.leccionDescripcion()),
+      tipo: this.leccionTipo(),
+      esObligatoria: this.leccionObligatoria(),
+      esVistaPrevia: this.leccionVistaPrevia(),
+      fechaHoraInicio: this.aInstante(this.leccionFechaInicio() || null),
+      fechaHoraFin: this.aInstante(this.leccionFechaFin() || null),
+    };
+    const editId = this.leccionEditId();
+    const llamada = editId
+      ? this.contenidoApi.actualizarLeccion(editId, peticion)
+      : this.contenidoApi.crearLeccion(moduloId, peticion);
+
+    llamada
+      .pipe(
+        finalize(() => {
+          this.guardandoLeccion.set(false);
+          this.detector.markForCheck();
+        }),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (leccion) => {
+          this.actualizarLeccionEnEstado(moduloId, leccion, !editId);
+          this.leccionFormModuloId.set(null);
+          this.mostrarMensaje('exito', editId ? 'Lección actualizada.' : 'Lección creada.');
+        },
+        error: (error: HttpErrorResponse) => {
+          this.mostrarMensaje('error', this.mensajeError(error) ?? 'No pudimos guardar la lección.');
+        },
+      });
+  }
+
+  protected cambiarActivoLeccion(moduloId: number, leccion: LeccionRespuesta): void {
+    this.contenidoApi
+      .cambiarActivoLeccion(leccion.id, !leccion.activo)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (actualizada) => {
+          this.actualizarLeccionEnEstado(moduloId, actualizada, false);
+          this.detector.markForCheck();
+        },
+        error: () => this.mostrarMensaje('error', 'No pudimos cambiar el estado de la lección.'),
+      });
+  }
+
+  protected moverLeccion(moduloId: number, indice: number, direccion: -1 | 1): void {
+    const modulo = this.modulos().find((m) => m.id === moduloId);
+    if (!modulo) {
+      return;
+    }
+    const destino = indice + direccion;
+    if (destino < 0 || destino >= modulo.lecciones.length) {
+      return;
+    }
+    const copia = [...modulo.lecciones];
+    [copia[indice], copia[destino]] = [copia[destino], copia[indice]];
+    this.modulos.update((lista) => lista.map((m) => (m.id === moduloId ? { ...m, lecciones: copia } : m)));
+    this.contenidoApi
+      .reordenarLecciones(moduloId, { ids: copia.map((l) => l.id) })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (lecciones) => this.modulos.update((lista) => lista.map((m) => (m.id === moduloId ? { ...m, lecciones } : m))),
+        error: () => {
+          this.mostrarMensaje('error', 'No pudimos reordenar las lecciones.');
+          this.cargarContenido();
+        },
+      });
+  }
+
+  private actualizarLeccionEnEstado(moduloId: number, leccion: LeccionRespuesta, esNueva: boolean): void {
+    this.modulos.update((lista) =>
+      lista.map((m) => {
+        if (m.id !== moduloId) {
+          return m;
+        }
+        if (esNueva) {
+          return { ...m, lecciones: [...m.lecciones, leccion] };
+        }
+        return {
+          ...m,
+          lecciones: m.lecciones.map((l) => (l.id === leccion.id ? { ...l, ...leccion, materiales: l.materiales } : l)),
+        };
+      }),
+    );
+  }
+
+  // -- Materiales --
+
+  protected abrirCrearMaterial(leccionId: number): void {
+    this.materialEditId.set(null);
+    this.materialModo.set('enlace');
+    this.materialTitulo.set('');
+    this.materialTipoMaterialId.set(this.tiposMaterial()[0]?.id ?? null);
+    this.materialOrigen.set('YOUTUBE');
+    this.materialReferencia.set('');
+    this.materialYoutubeNoListado.set(false);
+    this.materialPermiteDescarga.set(false);
+    this.materialArchivo.set(null);
+    this.materialFormLeccionId.set(leccionId);
+  }
+
+  protected abrirEditarMaterial(leccionId: number, material: MaterialRespuesta): void {
+    this.materialEditId.set(material.id);
+    this.materialTitulo.set(material.titulo);
+    this.materialPermiteDescarga.set(material.permiteDescarga);
+    this.materialOrigenActual.set(this.etiquetaOrigenMaterial(material.recurso.origen));
+    this.materialOrigenCodigo.set(material.recurso.origen);
+    this.materialTipoNombreActual.set(material.recurso.tipoMaterialNombre);
+    this.materialOrigen.set(material.recurso.origen === 'EXTERNO' ? 'EXTERNO' : 'YOUTUBE');
+    this.materialReferencia.set(material.recurso.referencia);
+    this.materialYoutubeNoListado.set(material.recurso.youtubeNoListadoConfirmado ?? false);
+    this.materialFormLeccionId.set(leccionId);
+  }
+
+  protected tipoMaterialEsVideo(): boolean {
+    const id = this.materialTipoMaterialId();
+    return this.tiposMaterial().find((t) => t.id === id)?.codigo === 'VIDEO';
+  }
+
+  protected cambiarTipoMaterialForm(id: number): void {
+    this.materialTipoMaterialId.set(id);
+    const esVideo = this.tiposMaterial().find((t) => t.id === id)?.codigo === 'VIDEO';
+    this.materialOrigen.set(esVideo ? 'YOUTUBE' : 'EXTERNO');
+    if (!esVideo) {
+      this.materialYoutubeNoListado.set(false);
+    }
+  }
+
+  protected cancelarFormMaterial(): void {
+    this.materialFormLeccionId.set(null);
+  }
+
+  protected elegirModoMaterial(modo: 'enlace' | 'archivo'): void {
+    this.materialModo.set(modo);
+    if (modo === 'enlace') {
+      this.materialArchivo.set(null);
+    } else {
+      this.materialReferencia.set('');
+      this.materialYoutubeNoListado.set(false);
+    }
+  }
+
+  protected archivoSeleccionado(evento: Event): void {
+    const input = evento.target as HTMLInputElement;
+    this.materialArchivo.set(input.files && input.files.length > 0 ? input.files[0] : null);
+  }
+
+  protected guardarMaterial(): void {
+    const leccionId = this.materialFormLeccionId();
+    const titulo = this.materialTitulo().trim();
+    if (leccionId === null || !titulo || this.guardandoMaterial()) {
+      return;
+    }
+
+    if (this.materialEditId()) {
+      if (this.materialOrigenCodigo() !== 'SUBIDO' && !this.materialReferencia().trim()) {
+        this.mostrarMensaje('error', 'Ingresa la URL del material.');
+        return;
+      }
+      this.guardandoMaterial.set(true);
+      this.contenidoApi
+        .actualizarMaterial(this.materialEditId()!, {
+          titulo,
+          permiteDescarga: this.materialPermiteDescarga(),
+          referencia: this.materialOrigenCodigo() === 'SUBIDO' ? null : this.materialReferencia().trim(),
+          youtubeNoListadoConfirmado: this.materialOrigenCodigo() === 'YOUTUBE' ? this.materialYoutubeNoListado() : null,
+        })
+        .pipe(
+          finalize(() => {
+            this.guardandoMaterial.set(false);
+            this.detector.markForCheck();
+          }),
+          takeUntilDestroyed(this.destroyRef),
+        )
+        .subscribe({
+          next: (material) => {
+            this.actualizarMaterialEnEstado(leccionId, material, false);
+            this.materialFormLeccionId.set(null);
+            this.mostrarMensaje('exito', 'Material actualizado.');
+          },
+          error: (error: HttpErrorResponse) => {
+            this.mostrarMensaje('error', this.mensajeError(error) ?? 'No pudimos guardar el material.');
+          },
+        });
+      return;
+    }
+
+    const tipoMaterialId = this.materialTipoMaterialId();
+    if (!tipoMaterialId) {
+      this.mostrarMensaje('error', 'Elige el tipo de material.');
+      return;
+    }
+    if (this.materialModo() === 'enlace' && !this.materialReferencia().trim()) {
+      this.mostrarMensaje('error', 'Ingresa la URL del material.');
+      return;
+    }
+
+    this.guardandoMaterial.set(true);
+    const llamada =
+      this.materialModo() === 'archivo'
+        ? (() => {
+            const archivo = this.materialArchivo();
+            if (!archivo) {
+              this.guardandoMaterial.set(false);
+              this.mostrarMensaje('error', 'Selecciona un archivo.');
+              return null;
+            }
+            return this.contenidoApi.subirMaterialArchivo(
+              leccionId, archivo, titulo, tipoMaterialId, this.materialPermiteDescarga(),
+            );
+          })()
+        : this.contenidoApi.crearMaterialEnlace(leccionId, {
+            titulo,
+            tipoMaterialId,
+            origen: this.materialOrigen(),
+            referencia: this.materialReferencia().trim(),
+            youtubeNoListadoConfirmado: this.materialOrigen() === 'YOUTUBE' ? this.materialYoutubeNoListado() : null,
+            permiteDescarga: this.materialPermiteDescarga(),
+            duracionSegundos: null,
+          });
+
+    if (!llamada) {
+      return;
+    }
+
+    llamada
+      .pipe(
+        finalize(() => {
+          this.guardandoMaterial.set(false);
+          this.detector.markForCheck();
+        }),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (material) => {
+          this.actualizarMaterialEnEstado(leccionId, material, true);
+          this.materialFormLeccionId.set(null);
+          this.mostrarMensaje('exito', 'Material agregado.');
+        },
+        error: (error: HttpErrorResponse) => {
+          this.mostrarMensaje('error', this.mensajeError(error) ?? 'No pudimos guardar el material.');
+        },
+      });
+  }
+
+  protected cambiarActivoMaterial(leccionId: number, material: MaterialRespuesta): void {
+    this.contenidoApi
+      .cambiarActivoMaterial(material.id, !material.activo)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (actualizado) => {
+          this.actualizarMaterialEnEstado(leccionId, actualizado, false);
+          this.detector.markForCheck();
+        },
+        error: () => this.mostrarMensaje('error', 'No pudimos cambiar el estado del material.'),
+      });
+  }
+
+  protected moverMaterial(leccionId: number, moduloId: number, indice: number, direccion: -1 | 1): void {
+    const modulo = this.modulos().find((m) => m.id === moduloId);
+    const leccion = modulo?.lecciones.find((l) => l.id === leccionId);
+    if (!leccion) {
+      return;
+    }
+    const destino = indice + direccion;
+    if (destino < 0 || destino >= leccion.materiales.length) {
+      return;
+    }
+    const copia = [...leccion.materiales];
+    [copia[indice], copia[destino]] = [copia[destino], copia[indice]];
+    this.modulos.update((lista) =>
+      lista.map((m) =>
+        m.id !== moduloId
+          ? m
+          : { ...m, lecciones: m.lecciones.map((l) => (l.id === leccionId ? { ...l, materiales: copia } : l)) },
+      ),
+    );
+    this.contenidoApi
+      .reordenarMateriales(leccionId, { ids: copia.map((mat) => mat.id) })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (materiales) =>
+          this.modulos.update((lista) =>
+            lista.map((m) =>
+              m.id !== moduloId
+                ? m
+                : { ...m, lecciones: m.lecciones.map((l) => (l.id === leccionId ? { ...l, materiales } : l)) },
+            ),
+          ),
+        error: () => {
+          this.mostrarMensaje('error', 'No pudimos reordenar los materiales.');
+          this.cargarContenido();
+        },
+      });
+  }
+
+  private actualizarMaterialEnEstado(leccionId: number, material: MaterialRespuesta, esNuevo: boolean): void {
+    this.modulos.update((lista) =>
+      lista.map((m) => ({
+        ...m,
+        lecciones: m.lecciones.map((l) => {
+          if (l.id !== leccionId) {
+            return l;
+          }
+          if (esNuevo) {
+            return { ...l, materiales: [...l.materiales, material] };
+          }
+          return { ...l, materiales: l.materiales.map((mat) => (mat.id === material.id ? material : mat)) };
+        }),
+      })),
+    );
+  }
+
   protected cerrarMensaje(): void {
     this.limpiarTimeoutMensaje();
     this.mensaje.set(null);
@@ -364,19 +995,21 @@ export class CursoEditor implements OnInit {
       entidades: this.infoBaseApi.listarEntidades(false, 0, 100),
       docentes: this.infoBaseApi.listarDocentes(false, 0, 100),
       firmantes: this.infoBaseApi.listarFirmantes(false, 0, 100),
+      tiposMaterial: this.infoBaseApi.listarTiposMaterial(false, 0, 100),
     })
       .pipe(
         finalize(() => this.detector.markForCheck()),
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
-        next: ({ curso, tiposCurso, categorias, entidades, docentes, firmantes }) => {
+        next: ({ curso, tiposCurso, categorias, entidades, docentes, firmantes, tiposMaterial }) => {
           this.curso.set(curso);
           this.tiposCurso.set(tiposCurso.items);
           this.categorias.set(categorias.items);
           this.entidades.set(entidades.items);
           this.docentesDisponibles.set(docentes.items);
           this.firmantesDisponibles.set(firmantes.items);
+          this.tiposMaterial.set(tiposMaterial.items);
           this.aplicarCurso(curso);
         },
         error: () => this.curso.set(null),

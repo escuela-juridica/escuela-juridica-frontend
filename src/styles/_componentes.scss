@@ -337,6 +337,13 @@
   color: var(--input-texto);
 }
 
+textarea.input {
+  height: auto;
+  min-height: 96px;
+  padding: 12px 14px;
+  resize: vertical;
+}
+
 .input::placeholder {
   color: var(--input-placeholder);
 }
