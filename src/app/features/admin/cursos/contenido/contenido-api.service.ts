@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { API_URL } from '../../../../core/api/api.config';
 import {
   ActualizarMaterialPeticion,
+  ActualizarSesionPeticion,
   CrearLeccionPeticion,
   CrearMaterialEnlacePeticion,
   CrearModuloPeticion,
@@ -64,6 +65,10 @@ export class ContenidoApiService {
 
   cambiarActivoLeccion(leccionId: number, activo: boolean): Observable<LeccionRespuesta> {
     return this.http.patch<LeccionRespuesta>(`${this.base}/lecciones/${leccionId}/activo`, { activo });
+  }
+
+  actualizarSesion(leccionId: number, p: ActualizarSesionPeticion): Observable<LeccionRespuesta> {
+    return this.http.put<LeccionRespuesta>(`${this.base}/lecciones/${leccionId}/sesion`, p);
   }
 
   crearMaterialEnlace(leccionId: number, p: CrearMaterialEnlacePeticion): Observable<MaterialRespuesta> {

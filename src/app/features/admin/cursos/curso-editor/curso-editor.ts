@@ -130,9 +130,13 @@ export class CursoEditor implements OnInit {
   protected readonly leccionTipo = signal<TipoLeccion>('GRABADA');
   protected readonly leccionObligatoria = signal(true);
   protected readonly leccionVistaPrevia = signal(false);
-  protected readonly leccionFechaInicio = signal('');
-  protected readonly leccionFechaFin = signal('');
   protected readonly guardandoLeccion = signal(false);
+
+  protected readonly sesionLeccionId = signal<number | null>(null);
+  protected readonly sesionFechaInicio = signal('');
+  protected readonly sesionFechaFin = signal('');
+  protected readonly sesionEnlace = signal('');
+  protected readonly guardandoSesion = signal(false);
 
   protected readonly materialFormLeccionId = signal<number | null>(null);
   protected readonly materialEditId = signal<number | null>(null);
@@ -390,6 +394,19 @@ export class CursoEditor implements OnInit {
     return tipo === 'EN_VIVO' ? 'En vivo' : 'Grabada';
   }
 
+  protected etiquetaSesion(leccion: LeccionRespuesta): string {
+    if (!leccion.fechaHoraInicio || !leccion.fechaHoraFin) {
+      return '';
+    }
+    const inicio = new Date(leccion.fechaHoraInicio);
+    const fin = new Date(leccion.fechaHoraFin);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const fecha = `${pad(inicio.getDate())}/${pad(inicio.getMonth() + 1)}/${inicio.getFullYear()}`;
+    const horaInicio = `${pad(inicio.getHours())}:${pad(inicio.getMinutes())}`;
+    const horaFin = `${pad(fin.getHours())}:${pad(fin.getMinutes())}`;
+    return `${fecha} ${horaInicio}–${horaFin}`;
+  }
+
   protected etiquetaOrigenMaterial(origen: string): string {
     switch (origen) {
       case 'SUBIDO': return 'Archivo subido';
@@ -539,8 +556,6 @@ export class CursoEditor implements OnInit {
     this.leccionTipo.set('GRABADA');
     this.leccionObligatoria.set(true);
     this.leccionVistaPrevia.set(false);
-    this.leccionFechaInicio.set('');
-    this.leccionFechaFin.set('');
     this.leccionFormModuloId.set(moduloId);
   }
 
@@ -551,8 +566,6 @@ export class CursoEditor implements OnInit {
     this.leccionTipo.set(leccion.tipo);
     this.leccionObligatoria.set(leccion.esObligatoria);
     this.leccionVistaPrevia.set(leccion.esVistaPrevia);
-    this.leccionFechaInicio.set(this.aDatetimeLocal(leccion.fechaHoraInicio) ?? '');
-    this.leccionFechaFin.set(this.aDatetimeLocal(leccion.fechaHoraFin) ?? '');
     this.leccionFormModuloId.set(moduloId);
   }
 
@@ -580,8 +593,6 @@ export class CursoEditor implements OnInit {
       tipo: this.leccionTipo(),
       esObligatoria: this.leccionObligatoria(),
       esVistaPrevia: this.leccionVistaPrevia(),
-      fechaHoraInicio: this.aInstante(this.leccionFechaInicio() || null),
-      fechaHoraFin: this.aInstante(this.leccionFechaFin() || null),
     };
     const editId = this.leccionEditId();
     const llamada = editId
@@ -618,6 +629,57 @@ export class CursoEditor implements OnInit {
           this.detector.markForCheck();
         },
         error: () => this.mostrarMensaje('error', 'No pudimos cambiar el estado de la lección.'),
+      });
+  }
+
+  protected abrirProgramarSesion(leccion: LeccionRespuesta): void {
+    this.sesionLeccionId.set(leccion.id);
+    this.sesionFechaInicio.set(this.aDatetimeLocal(leccion.fechaHoraInicio) ?? '');
+    this.sesionFechaFin.set(this.aDatetimeLocal(leccion.fechaHoraFin) ?? '');
+    this.sesionEnlace.set(leccion.enlaceReunion ?? '');
+  }
+
+  protected cancelarSesion(): void {
+    this.sesionLeccionId.set(null);
+  }
+
+  protected guardarSesion(): void {
+    const leccionId = this.sesionLeccionId();
+    const inicio = this.aInstante(this.sesionFechaInicio() || null);
+    const fin = this.aInstante(this.sesionFechaFin() || null);
+    if (leccionId === null || this.guardandoSesion()) {
+      return;
+    }
+    if (!inicio || !fin) {
+      this.mostrarMensaje('error', 'Ingresa el inicio y el fin de la sesión.');
+      return;
+    }
+    if (new Date(fin).getTime() <= new Date(inicio).getTime()) {
+      this.mostrarMensaje('error', 'La hora de fin debe ser posterior a la de inicio.');
+      return;
+    }
+    this.guardandoSesion.set(true);
+    this.contenidoApi
+      .actualizarSesion(leccionId, { fechaHoraInicio: inicio, fechaHoraFin: fin, enlaceReunion: this.textoOpcional(this.sesionEnlace()) })
+      .pipe(
+        finalize(() => {
+          this.guardandoSesion.set(false);
+          this.detector.markForCheck();
+        }),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (leccion) => {
+          const modulo = this.modulos().find((m) => m.lecciones.some((l) => l.id === leccionId));
+          if (modulo) {
+            this.actualizarLeccionEnEstado(modulo.id, leccion, false);
+          }
+          this.sesionLeccionId.set(null);
+          this.mostrarMensaje('exito', 'Sesión programada.');
+        },
+        error: (error: HttpErrorResponse) => {
+          this.mostrarMensaje('error', this.mensajeError(error) ?? 'No pudimos guardar la sesión.');
+        },
       });
   }
 

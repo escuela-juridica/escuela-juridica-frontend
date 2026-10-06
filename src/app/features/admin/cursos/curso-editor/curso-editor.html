@@ -463,12 +463,22 @@
                           <span class="nota-pill">{{ etiquetaTipoLeccion(leccion.tipo) }}</span>
                           @if (leccion.esObligatoria) { <span class="nota-pill">Obligatoria</span> }
                           @if (leccion.esVistaPrevia) { <span class="nota-pill">Vista previa</span> }
+                          @if (leccion.tipo === 'EN_VIVO') {
+                            @if (leccion.fechaHoraInicio) {
+                              <span class="badge badge--disp-inmediato">{{ etiquetaSesion(leccion) }}</span>
+                            } @else {
+                              <span class="badge badge--disp-proximo">Sin programar</span>
+                            }
+                          }
                           @if (!leccion.activo) { <span class="badge badge--disp-cerrado">Inactiva</span> }
                         </div>
                         <span class="editor-leccion__meta">{{ leccion.materiales.length }} material(es)</span>
                         <div class="editor-fila-seleccion__orden" (click)="$event.stopPropagation()">
                           <button type="button" class="editor-orden-boton" [disabled]="iL === 0" (click)="moverLeccion(modulo.id, iL, -1)" aria-label="Subir">↑</button>
                           <button type="button" class="editor-orden-boton" [disabled]="iL === modulo.lecciones.length - 1" (click)="moverLeccion(modulo.id, iL, 1)" aria-label="Bajar">↓</button>
+                          @if (leccion.tipo === 'EN_VIVO') {
+                            <button type="button" class="btn btn--secundario editor-boton-chico" (click)="abrirProgramarSesion(leccion)">Programar sesión</button>
+                          }
                           <button type="button" class="btn btn--acento editor-boton-chico" (click)="abrirEditarLeccion(modulo.id, leccion)">Editar</button>
                           <button
                             type="button"
@@ -643,22 +653,45 @@
               </div>
             </div>
             @if (leccionTipo() === 'EN_VIVO') {
-              <div class="editor-campos editor-campos--2">
-                <div>
-                  <label class="label">Inicio</label>
-                  <input class="input" type="datetime-local" [value]="leccionFechaInicio()" (input)="leccionFechaInicio.set($any($event.target).value)" />
-                </div>
-                <div>
-                  <label class="label">Fin</label>
-                  <input class="input" type="datetime-local" [value]="leccionFechaFin()" (input)="leccionFechaFin.set($any($event.target).value)" />
-                </div>
-              </div>
+              <p class="editor-material-info">
+                La fecha, hora y enlace de la sesión se programan aparte, con "Programar sesión" sobre la lección ya creada.
+              </p>
             }
           </div>
           <div class="editor-form__acciones">
             <button type="button" class="btn btn--secundario" (click)="cancelarFormLeccion()">Cancelar</button>
             <button type="button" class="btn btn--primario" [disabled]="guardandoLeccion()" (click)="guardarLeccion()">
               {{ guardandoLeccion() ? 'Guardando…' : 'Guardar lección' }}
+            </button>
+          </div>
+        </app-modal>
+      }
+
+      @if (sesionLeccionId() !== null) {
+        <app-modal titulo="Programar sesión" (cerrar)="cancelarSesion()">
+          <div class="editor-campos editor-campos--1">
+            <p class="editor-material-info">
+              ESEJUR no crea ni administra la reunión; solo conserva el enlace que pegues aquí.
+            </p>
+            <div class="editor-campos editor-campos--2">
+              <div>
+                <label class="label">Inicio</label>
+                <input class="input" type="datetime-local" [value]="sesionFechaInicio()" (input)="sesionFechaInicio.set($any($event.target).value)" />
+              </div>
+              <div>
+                <label class="label">Fin</label>
+                <input class="input" type="datetime-local" [value]="sesionFechaFin()" (input)="sesionFechaFin.set($any($event.target).value)" />
+              </div>
+            </div>
+            <div>
+              <label class="label"><span>Enlace de la reunión</span><span class="nota-pill">Opcional</span></label>
+              <input class="input" [value]="sesionEnlace()" (input)="sesionEnlace.set($any($event.target).value)" placeholder="https://..." />
+            </div>
+          </div>
+          <div class="editor-form__acciones">
+            <button type="button" class="btn btn--secundario" (click)="cancelarSesion()">Cancelar</button>
+            <button type="button" class="btn btn--primario" [disabled]="guardandoSesion()" (click)="guardarSesion()">
+              {{ guardandoSesion() ? 'Guardando…' : 'Guardar sesión' }}
             </button>
           </div>
         </app-modal>

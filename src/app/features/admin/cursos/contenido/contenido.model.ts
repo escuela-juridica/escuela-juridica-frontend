@@ -35,6 +35,7 @@ export interface LeccionRespuesta {
   esVistaPrevia: boolean;
   fechaHoraInicio: string | null;
   fechaHoraFin: string | null;
+  enlaceReunion: string | null;
   activo: boolean;
   leccionOrigenId: number | null;
   materiales: MaterialRespuesta[];
@@ -69,8 +70,12 @@ export interface CrearLeccionPeticion {
   tipo: TipoLeccion;
   esObligatoria: boolean;
   esVistaPrevia: boolean;
-  fechaHoraInicio: string | null;
-  fechaHoraFin: string | null;
+}
+
+export interface ActualizarSesionPeticion {
+  fechaHoraInicio: string;
+  fechaHoraFin: string;
+  enlaceReunion: string | null;
 }
 
 export interface CrearMaterialEnlacePeticion {
