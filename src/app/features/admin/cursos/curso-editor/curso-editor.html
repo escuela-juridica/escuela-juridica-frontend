@@ -904,6 +904,15 @@
         }
       </section>
     }
+    @case ('certificacion') {
+      <app-requisitos-tab
+        [cursoId]="cursoId"
+        [modalidad]="c.modalidad"
+        [fechaInicio]="c.fechaInicio"
+        [fechaFin]="c.fechaFin"
+        (guardado)="recargarDespuesDeReglas()"
+      />
+    }
     @default {
       <div class="card editor-card">
         <p class="editor-pendiente">Esta pestaña se habilita en una historia aparte.</p>

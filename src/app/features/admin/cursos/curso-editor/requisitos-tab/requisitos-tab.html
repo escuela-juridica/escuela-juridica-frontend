@@ -1,0 +1,35 @@
+@if (cargando()) {
+  <p class="editor-estado">Cargando requisitos…</p>
+} @else {
+  <section class="requisitos" aria-label="Requisitos académicos y de certificación">
+    @if (error(); as mensaje) { <div class="alerta alerta--error"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div> }
+    @if (bloqueada()) { <div class="alerta alerta--info"><span class="alerta__icono">i</span><div class="alerta__titulo">Estas reglas ya están congeladas porque el curso inició o registró actividad académica.</div></div> }
+
+    <div class="card editor-card requisitos__cabecera">
+      <h2 class="editor-card__titulo">Condiciones para certificar</h2>
+      <p class="editor-material-info">Activa solo las condiciones que el alumno debe cumplir. El progreso se seguirá mostrando aunque no sea requisito.</p>
+    </div>
+
+    <div class="card editor-card requisitos__grupo">
+      <h3>Condiciones académicas</h3>
+      <div class="requisitos__condiciones">
+        <label class="requisitos__condicion"><span><strong>Exámenes calificados</strong><small>El alumno debe aprobar todas las evaluaciones calificadas.</small></span><span class="interruptor"><input class="interruptor__entrada" type="checkbox" [checked]="requiereExamenes()" [disabled]="bloqueada()" (change)="requiereExamenes.set($any($event.target).checked)"><span class="interruptor__pista"><span class="interruptor__perilla"></span></span></span></label>
+        <label class="requisitos__condicion"><span><strong>Progreso mínimo</strong><small>Exige completar el porcentaje indicado del curso.</small></span><span class="interruptor"><input class="interruptor__entrada" type="checkbox" [checked]="requiereProgreso()" [disabled]="bloqueada()" (change)="requiereProgreso.set($any($event.target).checked)"><span class="interruptor__pista"><span class="interruptor__perilla"></span></span></span></label>
+        @if (requiereAsistenciaDisponible()) { <label class="requisitos__condicion"><span><strong>Asistencia mínima</strong><small>Exige la asistencia registrada en las sesiones en vivo.</small></span><span class="interruptor"><input class="interruptor__entrada" type="checkbox" [checked]="requiereAsistencia()" [disabled]="bloqueada()" (change)="requiereAsistencia.set($any($event.target).checked); proponerCierre()"><span class="interruptor__pista"><span class="interruptor__perilla"></span></span></span></label> }
+      </div>
+      @if (!requiereExamenes() && !requiereProgreso() && !requiereAsistencia()) { <p class="requisitos__aviso">Sin condiciones activas, la emisión del certificado será únicamente manual y requerirá motivo.</p> }
+    </div>
+
+    <div class="card editor-card requisitos__grupo">
+      <h3>Umbrales</h3>
+      <div class="editor-campos editor-campos--2">
+        @if (requiereExamenes()) { <div><label class="label">Nota mínima (0 a 20)</label><input class="input" type="number" min="0" max="20" step="0.01" [value]="notaMinima()" [disabled]="bloqueada()" (input)="notaMinima.set($any($event.target).value)"></div><div><label class="label">Nota Refrendado (mayor a mínima)</label><input class="input" type="number" min="0" max="20" step="0.01" [value]="notaRefrendado()" [disabled]="bloqueada()" (input)="notaRefrendado.set($any($event.target).value)"></div> }
+        @if (requiereProgreso()) { <div><label class="label">Progreso mínimo (%)</label><input class="input" type="number" min="0" max="100" [value]="progresoMinimo()" [disabled]="bloqueada()" (input)="progresoMinimo.set($any($event.target).value)"></div><div><label class="label">Umbral de video (%)</label><input class="input" type="number" min="0" max="100" [value]="umbralVideo()" [disabled]="bloqueada()" (input)="umbralVideo.set($any($event.target).value)"></div> }
+        @if (requiereAsistencia()) { <div><label class="label">Asistencia mínima (%)</label><input class="input" type="number" min="0" max="100" [value]="asistenciaMinima()" [disabled]="bloqueada()" (input)="asistenciaMinima.set($any($event.target).value)"></div><div><label class="label">Cierre de matrícula</label><input class="input" type="date" [min]="fechaInicio ?? ''" [max]="fechaFin ?? ''" [value]="fechaCierre()" [disabled]="bloqueada()" (input)="fechaCierre.set($any($event.target).value)"><p class="campo-ayuda">Se propone la fecha de inicio y no puede superar el fin.</p></div> }
+      </div>
+    </div>
+
+    <div class="card editor-card requisitos__grupo"><h3>Emisión y recorrido</h3><div class="editor-campos editor-campos--2"><label class="requisitos__condicion requisitos__condicion--simple"><span><strong>Secuencia obligatoria</strong><small>El alumno deberá avanzar en el orden definido para módulos y lecciones.</small></span><span class="interruptor"><input class="interruptor__entrada" type="checkbox" [checked]="secuenciaObligatoria()" [disabled]="bloqueada()" (change)="secuenciaObligatoria.set($any($event.target).checked)"><span class="interruptor__pista"><span class="interruptor__perilla"></span></span></span></label><div><label class="label">Días de espera para certificado</label><input class="input" type="number" min="0" [value]="diasEspera()" [disabled]="bloqueada()" (input)="diasEspera.set($any($event.target).value)"><p class="campo-ayuda">0 significa emisión automática al cumplir las condiciones.</p></div></div></div>
+    <div class="editor-form__acciones"><button class="btn btn--primario" type="button" [disabled]="guardando() || bloqueada()" (click)="guardar()">{{ guardando() ? 'Guardando…' : 'Guardar requisitos' }}</button></div>
+  </section>
+}

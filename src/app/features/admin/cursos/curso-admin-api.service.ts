@@ -8,9 +8,11 @@ import {
   ActualizarInformacionCursoPeticion,
   AsignarDocentesPeticion,
   AsignarFirmantesPeticion,
+  ActualizarReglasCursoPeticion,
   CrearCursoPeticion,
   CursoEditorRespuesta,
   CursoResumenRespuesta,
+  ReglasCursoRespuesta,
 } from './curso-admin.model';
 
 /** HU-010 — Crear y configurar un curso. Consume `/api/admin/cursos`. */
@@ -48,6 +50,14 @@ export class CursoAdminApiService {
 
   actualizarFirmantes(cursoId: number, peticion: AsignarFirmantesPeticion): Observable<CursoEditorRespuesta> {
     return this.http.put<CursoEditorRespuesta>(`${this.url}/${cursoId}/firmantes`, peticion);
+  }
+
+  obtenerReglas(cursoId: number): Observable<ReglasCursoRespuesta> {
+    return this.http.get<ReglasCursoRespuesta>(`${this.url}/${cursoId}/reglas`);
+  }
+
+  actualizarReglas(cursoId: number, peticion: ActualizarReglasCursoPeticion): Observable<ReglasCursoRespuesta> {
+    return this.http.put<ReglasCursoRespuesta>(`${this.url}/${cursoId}/reglas`, peticion);
   }
 
   sugerirBeneficios(texto: string): Observable<string[]> {

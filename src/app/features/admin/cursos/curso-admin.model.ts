@@ -102,3 +102,20 @@ export interface AsignarDocentesPeticion {
 export interface AsignarFirmantesPeticion {
   firmanteIds: number[];
 }
+
+export interface ReglasCursoRespuesta {
+  requiereExamenes: boolean;
+  requiereProgreso: boolean;
+  requiereAsistencia: boolean;
+  notaMinima: number;
+  notaRefrendado: number;
+  progresoMinimo: number;
+  umbralVideo: number;
+  asistenciaMinima: number;
+  secuenciaObligatoria: boolean;
+  diasEsperaCertificado: number;
+  fechaCierreMatricula: string | null;
+  bloqueada: boolean;
+}
+
+export interface ActualizarReglasCursoPeticion extends Omit<ReglasCursoRespuesta, 'bloqueada'> {}

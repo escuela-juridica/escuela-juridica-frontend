@@ -1156,6 +1156,15 @@ textarea.input {
   color: var(--neutral-500);
 }
 
+/* Ayuda contextual inmediatamente debajo de un campo. A diferencia de la ayuda de listas o
+   materiales, conserva una separación positiva para no invadir el input anterior. */
+.campo-ayuda {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--neutral-500);
+}
+
 .editor-modulo {
   padding: 0;
   overflow: hidden;

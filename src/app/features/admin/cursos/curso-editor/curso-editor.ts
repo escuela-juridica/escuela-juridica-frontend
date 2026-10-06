@@ -37,6 +37,7 @@ import { CursoEditorRespuesta, ModalidadCurso, TipoVentaCurso } from '../curso-a
 import { Modal } from '../../../../shared/ui/modal/modal';
 import { AlertaGlobalComponent } from '../../../../shared/ui/alerta-global/alerta-global';
 import { ExamenesTab } from './examenes-tab/examenes-tab';
+import { RequisitosTab } from './requisitos-tab/requisitos-tab';
 import { AlertaGlobalService } from '../../../../core/notificaciones/alerta-global.service';
 
 type PestanaEditor = 'informacion' | 'contenido' | 'sesiones' | 'examenes' | 'certificacion' | 'publicacion';
@@ -58,7 +59,7 @@ interface SesionEnVivoEditor {
  * juntos con un único botón, aunque internamente llamen a tres endpoints distintos. */
 @Component({
   selector: 'app-curso-editor',
-  imports: [ReactiveFormsModule, RouterLink, Modal, ExamenesTab, AlertaGlobalComponent],
+  imports: [ReactiveFormsModule, RouterLink, Modal, ExamenesTab, RequisitosTab, AlertaGlobalComponent],
   templateUrl: './curso-editor.html',
   styleUrl: './curso-editor.scss',
 })
@@ -258,6 +259,11 @@ export class CursoEditor implements OnInit {
     if ((id === 'contenido' || id === 'sesiones' || id === 'examenes') && !this.contenidoCargado()) {
       this.cargarContenido();
     }
+  }
+
+  /** Actualiza la fecha de cierre que HU-014 puede haber confirmado. */
+  protected recargarDespuesDeReglas(): void {
+    this.cargarTodo();
   }
 
   protected get esVirtual(): boolean {
