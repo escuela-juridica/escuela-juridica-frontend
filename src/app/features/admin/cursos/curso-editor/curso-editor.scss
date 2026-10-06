@@ -94,6 +94,12 @@
   padding: 24px;
 }
 
+/* Los módulos son filas operativas, no tarjetas de formulario: la cabecera
+   controla su propio espaciado para mantener el listado compacto. */
+.editor-card.editor-modulo {
+  padding: 0;
+}
+
 .editor-card__titulo {
   margin: 0 0 16px;
   font-size: 16px;

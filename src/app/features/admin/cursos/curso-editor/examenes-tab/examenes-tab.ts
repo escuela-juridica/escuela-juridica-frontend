@@ -4,6 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 
 import { Modal } from '../../../../../shared/ui/modal/modal';
+import { AlertaGlobalService } from '../../../../../core/notificaciones/alerta-global.service';
 import { ExamenApiService } from '../../examenes/examen-api.service';
 import {
   CrearExamenPeticion,
@@ -38,6 +39,7 @@ export class ExamenesTab implements OnChanges {
   private readonly api = inject(ExamenApiService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly detector = inject(ChangeDetectorRef);
+  private readonly alertasGlobales = inject(AlertaGlobalService);
 
   protected readonly examenes = signal<ExamenRespuesta[]>([]);
   protected readonly cargando = signal(false);
@@ -67,6 +69,7 @@ export class ExamenesTab implements OnChanges {
   protected readonly examenBloquea = signal(false);
   protected readonly examenDiasRevision = signal('3');
   protected readonly guardandoExamen = signal(false);
+  protected readonly intentoGuardarExamen = signal(false);
 
   // -- Formulario de pregunta --
   protected readonly preguntaFormExamenId = signal<number | null>(null);
@@ -76,9 +79,17 @@ export class ExamenesTab implements OnChanges {
   protected readonly preguntaPuntaje = signal('1');
   protected readonly preguntaOpciones = signal<OpcionForm[]>([]);
   protected readonly guardandoPregunta = signal(false);
+  protected readonly intentoGuardarPregunta = signal(false);
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['cursoId'] && !this.cargado()) {
+    const cambioCurso = changes['cursoId'];
+    if (cambioCurso && cambioCurso.currentValue !== cambioCurso.previousValue) {
+      // La misma instancia puede recibir otro curso al navegar desde el editor.
+      // Nunca se deben mostrar exámenes, preguntas o expansiones del curso anterior.
+      this.examenes.set([]);
+      this.examenesExpandidos.set(new Set());
+      this.preguntasExpandidas.set(new Set());
+      this.cargado.set(false);
       this.cargar();
     }
   }
@@ -116,6 +127,14 @@ export class ExamenesTab implements OnChanges {
     });
   }
 
+  protected alternarExamenConTeclado(evento: Event, examenId: number): void {
+    if (evento.target !== evento.currentTarget) {
+      return;
+    }
+    evento.preventDefault();
+    this.alternarExamen(examenId);
+  }
+
   protected preguntaExpandida(preguntaId: number): boolean {
     return this.preguntasExpandidas().has(preguntaId);
   }
@@ -126,6 +145,14 @@ export class ExamenesTab implements OnChanges {
       copia.has(preguntaId) ? copia.delete(preguntaId) : copia.add(preguntaId);
       return copia;
     });
+  }
+
+  protected alternarPreguntaConTeclado(evento: Event, preguntaId: number): void {
+    if (evento.target !== evento.currentTarget) {
+      return;
+    }
+    evento.preventDefault();
+    this.alternarPregunta(preguntaId);
   }
 
   protected etiquetaFinalidad(examen: ExamenRespuesta): string {
@@ -152,6 +179,8 @@ export class ExamenesTab implements OnChanges {
   // ---------------------------------------------------------------- Examen --
 
   protected abrirCrearExamen(): void {
+    this.cerrarMensaje();
+    this.intentoGuardarExamen.set(false);
     this.examenEditId.set(null);
     this.examenTitulo.set('');
     this.examenDescripcion.set('');
@@ -170,6 +199,8 @@ export class ExamenesTab implements OnChanges {
   }
 
   protected abrirEditarExamen(examen: ExamenRespuesta): void {
+    this.cerrarMensaje();
+    this.intentoGuardarExamen.set(false);
     this.examenEditId.set(examen.id);
     this.examenTitulo.set(examen.titulo);
     this.examenDescripcion.set(examen.descripcion ?? '');
@@ -188,6 +219,7 @@ export class ExamenesTab implements OnChanges {
   }
 
   protected cancelarFormExamen(): void {
+    this.cerrarMensaje();
     this.mostrarFormExamen.set(false);
   }
 
@@ -211,7 +243,12 @@ export class ExamenesTab implements OnChanges {
 
   protected guardarExamen(): void {
     const titulo = this.examenTitulo().trim();
-    if (!titulo || this.guardandoExamen()) {
+    if (this.guardandoExamen()) {
+      return;
+    }
+    this.intentoGuardarExamen.set(true);
+    if (!titulo) {
+      this.mostrarMensaje('error', 'Ingresa el título del examen.');
       return;
     }
     if (this.examenFinalidad() === 'MODULO' && this.examenModuloId() === null) {
@@ -219,6 +256,22 @@ export class ExamenesTab implements OnChanges {
       return;
     }
     const maximoIntentos = this.examenTipo() === 'PRACTICA' ? null : this.aEntero(this.examenMaximoIntentos());
+    if (this.examenTipo() !== 'PRACTICA'
+        && this.examenMaximoIntentos().trim()
+        && (maximoIntentos === null || maximoIntentos < 1)) {
+      this.mostrarMensaje('error', 'El máximo de intentos debe ser un número entero mayor que cero.');
+      return;
+    }
+    const tiempoLimiteMinutos = this.aEntero(this.examenTiempoLimite());
+    if (this.examenTiempoLimite().trim() && (tiempoLimiteMinutos === null || tiempoLimiteMinutos < 1)) {
+      this.mostrarMensaje('error', 'El tiempo límite debe ser un número entero mayor que cero.');
+      return;
+    }
+    const diasRevision = this.aEntero(this.examenDiasRevision());
+    if (this.examenDiasRevision().trim() && (diasRevision === null || diasRevision < 1)) {
+      this.mostrarMensaje('error', 'Los días de revisión deben ser un número entero mayor que cero.');
+      return;
+    }
     if (this.examenMostrarRespuestas() === 'AL_AGOTAR' && maximoIntentos === null) {
       this.mostrarMensaje('error', '"Mostrar al agotar intentos" exige fijar un máximo de intentos.');
       return;
@@ -232,13 +285,13 @@ export class ExamenesTab implements OnChanges {
       tipo: this.examenTipo(),
       finalidad: this.examenFinalidad(),
       maximoIntentos,
-      tiempoLimiteMinutos: this.aEntero(this.examenTiempoLimite()),
+      tiempoLimiteMinutos,
       barajarPreguntas: this.examenBarajarPreguntas(),
       barajarOpciones: this.examenBarajarOpciones(),
       mostrarRespuestas: this.examenMostrarRespuestas(),
       fechaHabilitacion: this.esVirtual() ? null : this.aInstante(this.examenFechaHabilitacion() || null),
       bloqueaSiguienteModulo: this.examenFinalidad() === 'MODULO' && this.examenTipo() === 'CALIFICADO' && this.examenBloquea(),
-      diasRevision: this.aEntero(this.examenDiasRevision()) ?? 3,
+      diasRevision: diasRevision ?? 3,
     };
     const editId = this.examenEditId();
     const llamada = editId
@@ -261,7 +314,7 @@ export class ExamenesTab implements OnChanges {
             this.examenes.update((lista) => [...lista, examen]);
           }
           this.mostrarFormExamen.set(false);
-          this.mostrarMensaje('exito', editId ? 'Examen actualizado.' : 'Examen creado.');
+          this.alertasGlobales.mostrar('exito', editId ? 'Examen actualizado.' : 'Examen creado.');
         },
         error: (error: HttpErrorResponse) => {
           this.mostrarMensaje('error', this.mensajeError(error) ?? 'No pudimos guardar el examen.');
@@ -278,7 +331,7 @@ export class ExamenesTab implements OnChanges {
           this.examenes.update((lista) => lista.map((e) => (e.id === actualizado.id ? { ...e, ...actualizado, preguntas: e.preguntas } : e)));
           this.detector.markForCheck();
         },
-        error: () => this.mostrarMensaje('error', 'No pudimos cambiar el estado del examen.'),
+        error: () => this.alertasGlobales.mostrar('error', 'No pudimos cambiar el estado del examen.'),
       });
   }
 
@@ -297,7 +350,7 @@ export class ExamenesTab implements OnChanges {
       .subscribe({
         next: (examenes) => this.examenes.set(examenes),
         error: () => {
-          this.mostrarMensaje('error', 'No pudimos reordenar los exámenes.');
+          this.alertasGlobales.mostrar('error', 'No pudimos reordenar los exámenes.');
           this.cargar();
         },
       });
@@ -306,6 +359,8 @@ export class ExamenesTab implements OnChanges {
   // ---------------------------------------------------------------- Pregunta --
 
   protected abrirCrearPregunta(examenId: number): void {
+    this.cerrarMensaje();
+    this.intentoGuardarPregunta.set(false);
     this.preguntaEditId.set(null);
     this.preguntaTipo.set('SELECCION_UNICA');
     this.preguntaEnunciado.set('');
@@ -315,6 +370,8 @@ export class ExamenesTab implements OnChanges {
   }
 
   protected abrirEditarPregunta(examenId: number, pregunta: PreguntaRespuesta): void {
+    this.cerrarMensaje();
+    this.intentoGuardarPregunta.set(false);
     this.preguntaEditId.set(pregunta.id);
     this.preguntaTipo.set(pregunta.tipo);
     this.preguntaEnunciado.set(pregunta.enunciado);
@@ -324,6 +381,7 @@ export class ExamenesTab implements OnChanges {
   }
 
   protected cancelarFormPregunta(): void {
+    this.cerrarMensaje();
     this.preguntaFormExamenId.set(null);
   }
 
@@ -362,7 +420,12 @@ export class ExamenesTab implements OnChanges {
     const examenId = this.preguntaFormExamenId();
     const enunciado = this.preguntaEnunciado().trim();
     const puntaje = this.aDecimal(this.preguntaPuntaje());
-    if (examenId === null || !enunciado || this.guardandoPregunta()) {
+    if (examenId === null || this.guardandoPregunta()) {
+      return;
+    }
+    this.intentoGuardarPregunta.set(true);
+    if (!enunciado) {
+      this.mostrarMensaje('error', 'Ingresa el enunciado de la pregunta.');
       return;
     }
     if (!puntaje || puntaje <= 0) {
@@ -413,7 +476,7 @@ export class ExamenesTab implements OnChanges {
         next: (pregunta) => {
           this.actualizarPreguntaEnEstado(examenId, pregunta, !editId);
           this.preguntaFormExamenId.set(null);
-          this.mostrarMensaje('exito', editId ? 'Pregunta actualizada.' : 'Pregunta creada.');
+          this.alertasGlobales.mostrar('exito', editId ? 'Pregunta actualizada.' : 'Pregunta creada.');
         },
         error: (error: HttpErrorResponse) => {
           this.mostrarMensaje('error', this.mensajeError(error) ?? 'No pudimos guardar la pregunta.');
@@ -430,7 +493,7 @@ export class ExamenesTab implements OnChanges {
           this.actualizarPreguntaEnEstado(examenId, actualizada, false);
           this.detector.markForCheck();
         },
-        error: () => this.mostrarMensaje('error', 'No pudimos cambiar el estado de la pregunta.'),
+        error: () => this.alertasGlobales.mostrar('error', 'No pudimos cambiar el estado de la pregunta.'),
       });
   }
 
@@ -452,7 +515,7 @@ export class ExamenesTab implements OnChanges {
       .subscribe({
         next: (preguntas) => this.examenes.update((lista) => lista.map((e) => (e.id === examenId ? { ...e, preguntas } : e))),
         error: () => {
-          this.mostrarMensaje('error', 'No pudimos reordenar las preguntas.');
+          this.alertasGlobales.mostrar('error', 'No pudimos reordenar las preguntas.');
           this.cargar();
         },
       });
@@ -506,11 +569,11 @@ export class ExamenesTab implements OnChanges {
 
   private aEntero(valor: string): number | null {
     const limpio = valor.trim();
-    if (!limpio) {
+    if (!limpio || !/^-?\d+$/.test(limpio)) {
       return null;
     }
-    const n = parseInt(limpio, 10);
-    return Number.isNaN(n) ? null : n;
+    const n = Number(limpio);
+    return Number.isSafeInteger(n) ? n : null;
   }
 
   private aDecimal(valor: string): number | null {
@@ -518,8 +581,8 @@ export class ExamenesTab implements OnChanges {
     if (!limpio) {
       return null;
     }
-    const n = parseFloat(limpio);
-    return Number.isNaN(n) ? null : n;
+    const n = Number(limpio);
+    return Number.isFinite(n) ? n : null;
   }
 
   private aInstante(valor: string | null): string | null {

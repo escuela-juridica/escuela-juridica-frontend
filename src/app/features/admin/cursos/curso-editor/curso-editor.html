@@ -25,12 +25,16 @@
   </div>
 
   @if (mensaje(); as m) {
-    <div class="alerta editor-alerta" [class.alerta--error]="m.tipo === 'error'" [class.alerta--exito]="m.tipo === 'exito'">
-      <span class="alerta__icono">{{ m.tipo === 'error' ? '!' : '✓' }}</span>
-      <div class="alerta__titulo">{{ m.texto }}</div>
-      <button type="button" class="alerta__cerrar" (click)="cerrarMensaje()" aria-label="Cerrar">✕</button>
-    </div>
+    @if (!hayModalContenidoAbierto) {
+      <div class="alerta editor-alerta" [class.alerta--error]="m.tipo === 'error'" [class.alerta--exito]="m.tipo === 'exito'">
+        <span class="alerta__icono">{{ m.tipo === 'error' ? '!' : '✓' }}</span>
+        <div class="alerta__titulo">{{ m.texto }}</div>
+        <button type="button" class="alerta__cerrar" (click)="cerrarMensaje()" aria-label="Cerrar">✕</button>
+      </div>
+    }
   }
+
+  <app-alerta-global />
 
   <div class="editor-tabs" role="tablist">
     @for (pestana of pestanas; track pestana.id) {
@@ -255,7 +259,11 @@
               }
             </ul>
           } @else {
-            <p class="editor-vacio-seleccion">Todavía no agregaste ningún beneficio.</p>
+            <div class="estado-vacio estado-vacio--editor estado-vacio--compact">
+              <span class="estado-vacio__icono" aria-hidden="true">+</span>
+              <h3 class="estado-vacio__titulo">Sin beneficios agregados</h3>
+              <p class="estado-vacio__texto">Escribe uno arriba para sumarlo al curso.</p>
+            </div>
           }
         </div>
 
@@ -307,7 +315,11 @@
               }
             </div>
           } @else {
-            <p class="editor-vacio-seleccion">Todavía no agregaste ningún docente.</p>
+            <div class="estado-vacio estado-vacio--editor estado-vacio--compact">
+              <span class="estado-vacio__icono" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3"/><path d="M5 21a7 7 0 0 1 14 0"/></svg></span>
+              <h3 class="estado-vacio__titulo">Sin docentes asignados</h3>
+              <p class="estado-vacio__texto">Busca y agrega los docentes que aparecerán en el curso.</p>
+            </div>
           }
         </div>
 
@@ -359,7 +371,11 @@
               }
             </div>
           } @else {
-            <p class="editor-vacio-seleccion">Todavía no agregaste ningún firmante.</p>
+            <div class="estado-vacio estado-vacio--editor estado-vacio--compact">
+              <span class="estado-vacio__icono" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m14 4 6 6M4 20l5-1 10-10a2.1 2.1 0 0 0-3-3L6 16l-2 4Z"/></svg></span>
+              <h3 class="estado-vacio__titulo">Sin firmantes asignados</h3>
+              <p class="estado-vacio__texto">Agrega los firmantes que correspondan al certificado.</p>
+            </div>
           }
         </div>
 
@@ -388,7 +404,14 @@
           </div>
 
           @if (modulos().length === 0) {
-            <p class="editor-vacio-seleccion">Todavía no agregaste ningún módulo.</p>
+            <div class="estado-vacio estado-vacio--editor">
+              <span class="estado-vacio__icono" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v2H4V5Z"/><path d="M4 9h16v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9Z"/><path d="M12 12v6M9 15h6"/></svg>
+              </span>
+              <h3 class="estado-vacio__titulo">El contenido del curso está vacío</h3>
+              <p class="estado-vacio__texto">Crea el primer módulo para comenzar a organizar lecciones, materiales y evaluaciones.</p>
+              <button type="button" class="btn btn--primario" (click)="abrirCrearModulo()">Crear primer módulo</button>
+            </div>
           }
 
           @for (modulo of modulos(); track modulo.id; let iM = $index) {
@@ -436,7 +459,11 @@
                   }
 
                   @if (modulo.lecciones.length === 0) {
-                    <p class="editor-vacio-seleccion">Sin lecciones todavía.</p>
+                    <div class="estado-vacio estado-vacio--editor estado-vacio--compact">
+                      <span class="estado-vacio__icono" aria-hidden="true">≡</span>
+                      <h3 class="estado-vacio__titulo">Sin lecciones todavía</h3>
+                      <p class="estado-vacio__texto">Agrega una lección grabada o en vivo para continuar el módulo.</p>
+                    </div>
                   }
 
                   @for (leccion of modulo.lecciones; track leccion.id; let iL = $index) {
@@ -495,7 +522,11 @@
                       @if (leccionExpandida(leccion.id)) {
                         <div class="editor-leccion__cuerpo">
                           @if (leccion.materiales.length === 0) {
-                            <p class="editor-vacio-seleccion">Sin materiales todavía.</p>
+                            <div class="estado-vacio estado-vacio--editor estado-vacio--compact">
+                              <span class="estado-vacio__icono" aria-hidden="true">↗</span>
+                              <h3 class="estado-vacio__titulo">Sin materiales todavía</h3>
+                              <p class="estado-vacio__texto">Adjunta un archivo, video o enlace para esta lección.</p>
+                            </div>
                           } @else {
                             <div class="editor-materiales">
                               @for (material of leccion.materiales; track material.id; let iMat = $index) {
@@ -567,6 +598,11 @@
 
       @if (modalModuloExistenteAbierto()) {
         <app-modal titulo="Agregar módulo existente" ancho="lg" (cerrar)="cerrarModuloExistente()">
+          @if (mensaje(); as m) {
+            <div class="alerta editor-alerta" [class.alerta--error]="m.tipo === 'error'" [class.alerta--exito]="m.tipo === 'exito'">
+              <span class="alerta__icono">{{ m.tipo === 'error' ? '!' : '✓' }}</span><div class="alerta__titulo">{{ m.texto }}</div><button type="button" class="alerta__cerrar" (click)="cerrarMensaje()" aria-label="Cerrar">✕</button>
+            </div>
+          }
           <div class="editor-buscador">
             <input
               class="input"
@@ -599,6 +635,9 @@
 
       @if (mostrarFormModulo()) {
         <app-modal [titulo]="moduloEditId() ? 'Editar módulo' : 'Nuevo módulo'" (cerrar)="cancelarFormModulo()">
+          @if (mensaje(); as m) {
+            <div class="alerta editor-alerta" [class.alerta--error]="m.tipo === 'error'" [class.alerta--exito]="m.tipo === 'exito'"><span class="alerta__icono">{{ m.tipo === 'error' ? '!' : '✓' }}</span><div class="alerta__titulo">{{ m.texto }}</div><button type="button" class="alerta__cerrar" (click)="cerrarMensaje()" aria-label="Cerrar">✕</button></div>
+          }
           <div class="editor-campos editor-campos--1">
             <div>
               <label class="label">Título</label>
@@ -620,6 +659,9 @@
 
       @if (leccionFormModuloId() !== null) {
         <app-modal [titulo]="leccionEditId() ? 'Editar lección' : 'Nueva lección'" (cerrar)="cancelarFormLeccion()">
+          @if (mensaje(); as m) {
+            <div class="alerta editor-alerta" [class.alerta--error]="m.tipo === 'error'" [class.alerta--exito]="m.tipo === 'exito'"><span class="alerta__icono">{{ m.tipo === 'error' ? '!' : '✓' }}</span><div class="alerta__titulo">{{ m.texto }}</div><button type="button" class="alerta__cerrar" (click)="cerrarMensaje()" aria-label="Cerrar">✕</button></div>
+          }
           <div class="editor-campos editor-campos--1">
             <div>
               <label class="label">Título</label>
@@ -669,6 +711,9 @@
 
       @if (sesionLeccionId() !== null) {
         <app-modal titulo="Programar sesión" (cerrar)="cancelarSesion()">
+          @if (mensaje(); as m) {
+            <div class="alerta editor-alerta" [class.alerta--error]="m.tipo === 'error'" [class.alerta--exito]="m.tipo === 'exito'"><span class="alerta__icono">{{ m.tipo === 'error' ? '!' : '✓' }}</span><div class="alerta__titulo">{{ m.texto }}</div><button type="button" class="alerta__cerrar" (click)="cerrarMensaje()" aria-label="Cerrar">✕</button></div>
+          }
           <div class="editor-campos editor-campos--1">
             <p class="editor-material-info">
               ESEJUR no crea ni administra la reunión; solo conserva el enlace que pegues aquí.
@@ -699,6 +744,9 @@
 
       @if (materialFormLeccionId() !== null) {
         <app-modal [titulo]="materialEditId() ? 'Editar material' : 'Nuevo material'" ancho="lg" (cerrar)="cancelarFormMaterial()">
+          @if (mensaje(); as m) {
+            <div class="alerta editor-alerta" [class.alerta--error]="m.tipo === 'error'" [class.alerta--exito]="m.tipo === 'exito'"><span class="alerta__icono">{{ m.tipo === 'error' ? '!' : '✓' }}</span><div class="alerta__titulo">{{ m.texto }}</div><button type="button" class="alerta__cerrar" (click)="cerrarMensaje()" aria-label="Cerrar">✕</button></div>
+          }
           @if (materialEditId()) {
             <div class="editor-campos editor-campos--1">
               <p class="editor-material-info">

@@ -1,8 +1,8 @@
-<div class="modal-fondo" (click)="alClicFondo()">
+<div class="modal-fondo">
   <div
     class="modal-caja"
     [class.modal-caja--lg]="ancho === 'lg'"
-    (click)="$event.stopPropagation()"
+    #cajaModal
     role="dialog"
     aria-modal="true"
   >

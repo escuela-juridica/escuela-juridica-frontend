@@ -840,6 +840,47 @@ textarea.input {
   max-width: 460px;
 }
 
+.estado-vacio--editor {
+  margin: 0;
+  border-color: var(--neutral-300);
+  background: linear-gradient(135deg, var(--blanco), var(--acento-050));
+}
+
+.estado-vacio__icono {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 14px;
+  border-radius: var(--radio-completo);
+  background: var(--acento-100);
+  color: var(--acento-700);
+  display: grid;
+  place-items: center;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.estado-vacio--compact {
+  padding: 24px;
+}
+
+.estado-vacio--compact .estado-vacio__icono {
+  width: 38px;
+  height: 38px;
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+.estado-vacio--compact .estado-vacio__titulo {
+  font-size: 15px;
+  line-height: 21px;
+}
+
+.estado-vacio--compact .estado-vacio__texto {
+  margin-bottom: 0;
+  font-size: 13px;
+  line-height: 19px;
+}
+
 // ---------------------------------------------------- Panel comercial ficha --
 // PF-002: el panel de precio "flota" pegado al hero en escritorio; en pantallas
 // angostas (donde la ficha ya se apilo a una columna) vuelve a su posicion normal.
@@ -907,6 +948,15 @@ textarea.input {
   justify-content: flex-end;
   gap: 12px;
   margin-bottom: 20px;
+}
+
+/* Dentro de un modal, las acciones finales no deben quedar adheridas al
+   ultimo control del formulario. Se aplica a todos los modales reutilizables. */
+.modal-cuerpo .editor-form__acciones {
+  margin-top: 24px;
+  margin-bottom: 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--neutral-100);
 }
 
 .editor-lista {
@@ -1124,7 +1174,7 @@ textarea.input {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 18px 20px;
+  padding: 12px 20px;
   cursor: pointer;
 }
 
@@ -1178,7 +1228,7 @@ textarea.input {
 }
 
 .editor-modulo__cuerpo {
-  padding: 4px 20px 20px 24px;
+  padding: 12px 20px 20px 24px;
   margin-left: 33px;
   border-left: 2px solid var(--acento-100);
 }

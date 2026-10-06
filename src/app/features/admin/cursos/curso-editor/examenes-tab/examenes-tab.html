@@ -6,27 +6,45 @@
 }
 
 @if (mensaje(); as m) {
+  @if (!mostrarFormExamen() && preguntaFormExamenId() === null) {
   <div class="alerta editor-alerta" [class.alerta--error]="m.tipo === 'error'" [class.alerta--exito]="m.tipo === 'exito'">
     <span class="alerta__icono">{{ m.tipo === 'error' ? '!' : '✓' }}</span>
     <div class="alerta__titulo">{{ m.texto }}</div>
     <button type="button" class="alerta__cerrar" (click)="cerrarMensaje()" aria-label="Cerrar">✕</button>
   </div>
+  }
 }
 
 @if (cargando() && !cargado()) {
   <p class="editor-estado">Cargando exámenes…</p>
 } @else {
   <div class="editor-contenido__acciones">
-    <button type="button" class="btn btn--secundario" (click)="abrirCrearExamen()">+ Nuevo examen</button>
+    <button type="button" class="btn btn--secundario examenes-tab__crear" (click)="abrirCrearExamen()">+ Nuevo examen</button>
   </div>
 
   @if (examenes().length === 0) {
-    <p class="editor-vacio-seleccion">Todavía no agregaste ningún examen.</p>
+    <div class="estado-vacio estado-vacio--editor">
+      <span class="estado-vacio__icono" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6a2 2 0 0 1 2 2v2H7V5a2 2 0 0 1 2-2Z"/><rect x="5" y="7" width="14" height="14" rx="2"/><path d="m9 14 2 2 4-4"/></svg>
+      </span>
+      <h3 class="estado-vacio__titulo">Aún no hay exámenes</h3>
+      <p class="estado-vacio__texto">Crea una evaluación por módulo o un examen final para organizar cómo se medirá el aprendizaje.</p>
+      <button type="button" class="btn btn--primario" (click)="abrirCrearExamen()">Crear primer examen</button>
+    </div>
   }
 
   @for (examen of examenes(); track examen.id; let iE = $index) {
     <div class="card editor-card editor-modulo card--acento-superior" [class.editor-modulo--inactivo]="!examen.activo">
-      <div class="editor-modulo__cabecera" (click)="alternarExamen(examen.id)">
+      <div
+        class="editor-modulo__cabecera"
+        role="button"
+        tabindex="0"
+        [attr.aria-expanded]="examenExpandido(examen.id)"
+        [attr.aria-label]="'Expandir o contraer examen: ' + examen.titulo"
+        (click)="alternarExamen(examen.id)"
+        (keydown.enter)="alternarExamenConTeclado($event, examen.id)"
+        (keydown.space)="alternarExamenConTeclado($event, examen.id)"
+      >
         <button type="button" class="editor-expandir" [class.editor-expandir--abierto]="examenExpandido(examen.id)" aria-label="Expandir examen">
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
         </button>
@@ -73,12 +91,28 @@
           </p>
 
           @if (examen.preguntas.length === 0) {
-            <p class="editor-vacio-seleccion">Sin preguntas todavía.</p>
+            <div class="estado-vacio estado-vacio--editor estado-vacio--compact">
+              <span class="estado-vacio__icono" aria-hidden="true">?</span>
+              <h3 class="estado-vacio__titulo">Sin preguntas todavía</h3>
+              <p class="estado-vacio__texto">Agrega preguntas para que este examen pueda evaluar al alumno.</p>
+              <button type="button" class="btn btn--primario examenes-tab__accion-pregunta" (click)="abrirCrearPregunta(examen.id)">
+                + Crear primera pregunta
+              </button>
+            </div>
           }
 
           @for (pregunta of examen.preguntas; track pregunta.id; let iP = $index) {
             <div class="editor-leccion" [class.editor-leccion--inactiva]="!pregunta.activo">
-              <div class="editor-leccion__cabecera" (click)="alternarPregunta(pregunta.id)">
+              <div
+                class="editor-leccion__cabecera"
+                role="button"
+                tabindex="0"
+                [attr.aria-expanded]="preguntaExpandida(pregunta.id)"
+                [attr.aria-label]="'Expandir o contraer pregunta: ' + pregunta.enunciado"
+                (click)="alternarPregunta(pregunta.id)"
+                (keydown.enter)="alternarPreguntaConTeclado($event, pregunta.id)"
+                (keydown.space)="alternarPreguntaConTeclado($event, pregunta.id)"
+              >
                 <button type="button" class="editor-expandir" [class.editor-expandir--abierto]="preguntaExpandida(pregunta.id)" aria-label="Expandir pregunta">
                   <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
                 </button>
@@ -147,7 +181,11 @@
             </div>
           }
 
-          <button type="button" class="btn btn--secundario editor-boton-chico" (click)="abrirCrearPregunta(examen.id)">+ Agregar pregunta</button>
+          @if (examen.preguntas.length > 0) {
+            <button type="button" class="btn btn--secundario editor-boton-chico examenes-tab__accion-pregunta" (click)="abrirCrearPregunta(examen.id)">
+              + Agregar pregunta
+            </button>
+          }
         </div>
       }
     </div>
@@ -156,10 +194,25 @@
 
 @if (mostrarFormExamen()) {
   <app-modal [titulo]="examenEditId() ? 'Editar examen' : 'Nuevo examen'" ancho="lg" (cerrar)="cancelarFormExamen()">
+    @if (mensaje(); as m) {
+      <div class="alerta examenes-tab__alerta-modal" [class.alerta--error]="m.tipo === 'error'" [class.alerta--exito]="m.tipo === 'exito'">
+        <span class="alerta__icono">{{ m.tipo === 'error' ? '!' : '✓' }}</span>
+        <div class="alerta__titulo">{{ m.texto }}</div>
+        <button type="button" class="alerta__cerrar" (click)="cerrarMensaje()" aria-label="Cerrar">✕</button>
+      </div>
+    }
     <div class="editor-campos editor-campos--1">
       <div>
-        <label class="label">Título</label>
-        <input class="input" [value]="examenTitulo()" (input)="examenTitulo.set($any($event.target).value)" />
+        <label class="label"><span>Título</span><span class="nota-pill">Obligatorio</span></label>
+        <input
+          class="input"
+          [class.input--error]="intentoGuardarExamen() && !examenTitulo().trim()"
+          [value]="examenTitulo()"
+          (input)="examenTitulo.set($any($event.target).value)"
+        />
+        @if (intentoGuardarExamen() && !examenTitulo().trim()) {
+          <p class="campo-error">Ingresa un título para identificar el examen.</p>
+        }
       </div>
       <div>
         <label class="label"><span>Descripción</span><span class="nota-pill">Opcional</span></label>
@@ -243,9 +296,9 @@
             <span class="interruptor__texto">Bloquea el siguiente módulo</span>
           </label>
           @if (examenFinalidad() === 'FINAL') {
-            <p class="editor-material-info">Un examen final no tiene un siguiente módulo que bloquear.</p>
+            <p class="editor-material-info examenes-tab__ayuda-campo">Un examen final no tiene un siguiente módulo que bloquear.</p>
           } @else if (examenTipo() === 'PRACTICA') {
-            <p class="editor-material-info">Un examen de práctica nunca bloquea el avance.</p>
+            <p class="editor-material-info examenes-tab__ayuda-campo">Un examen de práctica nunca bloquea el avance.</p>
           }
         </div>
       </div>
@@ -254,16 +307,16 @@
         <div>
           <label class="label"><span>Fecha de habilitación</span><span class="nota-pill">Opcional</span></label>
           <input class="input" type="datetime-local" [value]="examenFechaHabilitacion()" (input)="examenFechaHabilitacion.set($any($event.target).value)" />
-          <p class="editor-material-info">Sin fecha, se habilita automáticamente según el avance del alumno.</p>
+          <p class="editor-material-info examenes-tab__ayuda-campo">Sin fecha, se habilita automáticamente según el avance del alumno.</p>
         </div>
       } @else {
-        <p class="editor-material-info">Un curso virtual no programa fecha de habilitación: se abre automáticamente según el avance.</p>
+        <p class="editor-material-info examenes-tab__ayuda-campo">Un curso virtual no programa fecha de habilitación: se abre automáticamente según el avance.</p>
       }
 
       <div>
         <label class="label">Días de revisión (preguntas abiertas)</label>
         <input class="input" type="number" min="1" [value]="examenDiasRevision()" (input)="examenDiasRevision.set($any($event.target).value)" />
-        <p class="editor-material-info">Se bloquea una vez que el curso inició, para no cambiar el plazo prometido.</p>
+        <p class="editor-material-info examenes-tab__ayuda-campo">Solo se aplica si agregas preguntas abiertas. Se bloquea una vez que el curso inició, para no cambiar el plazo prometido.</p>
       </div>
     </div>
     <div class="editor-form__acciones">
@@ -277,6 +330,13 @@
 
 @if (preguntaFormExamenId() !== null) {
   <app-modal [titulo]="preguntaEditId() ? 'Editar pregunta' : 'Nueva pregunta'" ancho="lg" (cerrar)="cancelarFormPregunta()">
+    @if (mensaje(); as m) {
+      <div class="alerta examenes-tab__alerta-modal" [class.alerta--error]="m.tipo === 'error'" [class.alerta--exito]="m.tipo === 'exito'">
+        <span class="alerta__icono">{{ m.tipo === 'error' ? '!' : '✓' }}</span>
+        <div class="alerta__titulo">{{ m.texto }}</div>
+        <button type="button" class="alerta__cerrar" (click)="cerrarMensaje()" aria-label="Cerrar">✕</button>
+      </div>
+    }
     <div class="editor-campos editor-campos--1">
       <div class="editor-campos editor-campos--2">
         <div>
@@ -294,12 +354,21 @@
         </div>
       </div>
       <div>
-        <label class="label">Enunciado</label>
-        <textarea class="input" rows="2" [value]="preguntaEnunciado()" (input)="preguntaEnunciado.set($any($event.target).value)"></textarea>
+        <label class="label"><span>Enunciado</span><span class="nota-pill">Obligatorio</span></label>
+        <textarea
+          class="input"
+          [class.input--error]="intentoGuardarPregunta() && !preguntaEnunciado().trim()"
+          rows="2"
+          [value]="preguntaEnunciado()"
+          (input)="preguntaEnunciado.set($any($event.target).value)"
+        ></textarea>
+        @if (intentoGuardarPregunta() && !preguntaEnunciado().trim()) {
+          <p class="campo-error">Describe lo que debe responder el alumno.</p>
+        }
       </div>
 
       @if (preguntaTipo() === 'RESPUESTA_ABIERTA') {
-        <p class="editor-material-info">No tiene alternativas ni calificación automática: se revisa manualmente dentro del plazo de días de revisión del examen.</p>
+        <p class="editor-material-info examenes-tab__ayuda-campo">No tiene alternativas ni calificación automática: se revisa manualmente dentro del plazo de días de revisión del examen.</p>
       } @else {
         <div class="editor-opciones-editor">
           @for (opcion of preguntaOpciones(); track $index; let i = $index) {

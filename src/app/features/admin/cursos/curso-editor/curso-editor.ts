@@ -35,7 +35,9 @@ import {
 import { CursoAdminApiService } from '../curso-admin-api.service';
 import { CursoEditorRespuesta, ModalidadCurso, TipoVentaCurso } from '../curso-admin.model';
 import { Modal } from '../../../../shared/ui/modal/modal';
+import { AlertaGlobalComponent } from '../../../../shared/ui/alerta-global/alerta-global';
 import { ExamenesTab } from './examenes-tab/examenes-tab';
+import { AlertaGlobalService } from '../../../../core/notificaciones/alerta-global.service';
 
 type PestanaEditor = 'informacion' | 'contenido' | 'sesiones' | 'examenes' | 'certificacion' | 'publicacion';
 type CampoInformacion = 'titulo' | 'fechaInicio' | 'fechaFin' | 'precioRegular' | 'cupoMaximo' | 'vigenciaAccesoDias';
@@ -51,7 +53,7 @@ interface ErrorApiAdmin {
  * juntos con un único botón, aunque internamente llamen a tres endpoints distintos. */
 @Component({
   selector: 'app-curso-editor',
-  imports: [ReactiveFormsModule, RouterLink, Modal, ExamenesTab],
+  imports: [ReactiveFormsModule, RouterLink, Modal, ExamenesTab, AlertaGlobalComponent],
   templateUrl: './curso-editor.html',
   styleUrl: './curso-editor.scss',
 })
@@ -63,6 +65,7 @@ export class CursoEditor implements OnInit {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly detector = inject(ChangeDetectorRef);
+  private readonly alertasGlobales = inject(AlertaGlobalService);
   private readonly fb = inject(NonNullableFormBuilder);
 
   protected readonly pestanas: { id: PestanaEditor; etiqueta: string }[] = [
@@ -223,9 +226,20 @@ export class CursoEditor implements OnInit {
     this.cargarTodo();
   }
 
+  /** Las validaciones y fallos de guardado pertenecen al formulario que sigue abierto. */
+  protected get hayModalContenidoAbierto(): boolean {
+    return this.modalModuloExistenteAbierto()
+      || this.mostrarFormModulo()
+      || this.leccionFormModuloId() !== null
+      || this.sesionLeccionId() !== null
+      || this.materialFormLeccionId() !== null;
+  }
+
   protected cambiarPestana(id: PestanaEditor): void {
     this.tabActiva.set(id);
-    if (id === 'contenido' && !this.contenidoCargado()) {
+    // Los exámenes de módulo necesitan conocer los módulos ya creados. La estructura debe
+    // cargarse también al entrar directamente a esta pestaña, no solo si antes se visitó Contenido.
+    if ((id === 'contenido' || id === 'examenes') && !this.contenidoCargado()) {
       this.cargarContenido();
     }
   }
@@ -436,6 +450,7 @@ export class CursoEditor implements OnInit {
   // -- Módulos --
 
   protected abrirCrearModulo(): void {
+    this.cerrarMensaje();
     this.moduloEditId.set(null);
     this.moduloTitulo.set('');
     this.moduloDescripcion.set('');
@@ -443,6 +458,7 @@ export class CursoEditor implements OnInit {
   }
 
   protected abrirEditarModulo(modulo: ModuloRespuesta): void {
+    this.cerrarMensaje();
     this.moduloEditId.set(modulo.id);
     this.moduloTitulo.set(modulo.titulo);
     this.moduloDescripcion.set(modulo.descripcion ?? '');
@@ -450,6 +466,7 @@ export class CursoEditor implements OnInit {
   }
 
   protected cancelarFormModulo(): void {
+    this.cerrarMensaje();
     this.mostrarFormModulo.set(false);
   }
 
@@ -481,7 +498,7 @@ export class CursoEditor implements OnInit {
             this.modulos.update((lista) => [...lista, modulo]);
           }
           this.mostrarFormModulo.set(false);
-          this.mostrarMensaje('exito', editId ? 'Módulo actualizado.' : 'Módulo creado.');
+          this.alertasGlobales.mostrar('exito', editId ? 'Módulo actualizado.' : 'Módulo creado.');
         },
         error: (error: HttpErrorResponse) => {
           this.mostrarMensaje('error', this.mensajeError(error) ?? 'No pudimos guardar el módulo.');
@@ -524,12 +541,14 @@ export class CursoEditor implements OnInit {
   }
 
   protected abrirModuloExistente(): void {
+    this.cerrarMensaje();
     this.busquedaModuloExistente.set('');
     this.resultadosModuloExistente.set([]);
     this.modalModuloExistenteAbierto.set(true);
   }
 
   protected cerrarModuloExistente(): void {
+    this.cerrarMensaje();
     this.modalModuloExistenteAbierto.set(false);
   }
 
@@ -546,7 +565,7 @@ export class CursoEditor implements OnInit {
         next: (modulo) => {
           this.modulos.update((lista) => [...lista, modulo]);
           this.modalModuloExistenteAbierto.set(false);
-          this.mostrarMensaje('exito', 'Módulo copiado.');
+          this.alertasGlobales.mostrar('exito', 'Módulo copiado.');
         },
         error: (error: HttpErrorResponse) => {
           this.mostrarMensaje('error', this.mensajeError(error) ?? 'No pudimos copiar el módulo.');
@@ -557,6 +576,7 @@ export class CursoEditor implements OnInit {
   // -- Lecciones --
 
   protected abrirCrearLeccion(moduloId: number): void {
+    this.cerrarMensaje();
     this.leccionEditId.set(null);
     this.leccionTitulo.set('');
     this.leccionDescripcion.set('');
@@ -567,6 +587,7 @@ export class CursoEditor implements OnInit {
   }
 
   protected abrirEditarLeccion(moduloId: number, leccion: LeccionRespuesta): void {
+    this.cerrarMensaje();
     this.leccionEditId.set(leccion.id);
     this.leccionTitulo.set(leccion.titulo);
     this.leccionDescripcion.set(leccion.descripcion ?? '');
@@ -577,6 +598,7 @@ export class CursoEditor implements OnInit {
   }
 
   protected cancelarFormLeccion(): void {
+    this.cerrarMensaje();
     this.leccionFormModuloId.set(null);
   }
 
@@ -618,7 +640,7 @@ export class CursoEditor implements OnInit {
         next: (leccion) => {
           this.actualizarLeccionEnEstado(moduloId, leccion, !editId);
           this.leccionFormModuloId.set(null);
-          this.mostrarMensaje('exito', editId ? 'Lección actualizada.' : 'Lección creada.');
+          this.alertasGlobales.mostrar('exito', editId ? 'Lección actualizada.' : 'Lección creada.');
         },
         error: (error: HttpErrorResponse) => {
           this.mostrarMensaje('error', this.mensajeError(error) ?? 'No pudimos guardar la lección.');
@@ -640,6 +662,7 @@ export class CursoEditor implements OnInit {
   }
 
   protected abrirProgramarSesion(leccion: LeccionRespuesta): void {
+    this.cerrarMensaje();
     this.sesionLeccionId.set(leccion.id);
     this.sesionFechaInicio.set(this.aDatetimeLocal(leccion.fechaHoraInicio) ?? '');
     this.sesionFechaFin.set(this.aDatetimeLocal(leccion.fechaHoraFin) ?? '');
@@ -647,6 +670,7 @@ export class CursoEditor implements OnInit {
   }
 
   protected cancelarSesion(): void {
+    this.cerrarMensaje();
     this.sesionLeccionId.set(null);
   }
 
@@ -682,7 +706,7 @@ export class CursoEditor implements OnInit {
             this.actualizarLeccionEnEstado(modulo.id, leccion, false);
           }
           this.sesionLeccionId.set(null);
-          this.mostrarMensaje('exito', 'Sesión programada.');
+          this.alertasGlobales.mostrar('exito', 'Sesión programada.');
         },
         error: (error: HttpErrorResponse) => {
           this.mostrarMensaje('error', this.mensajeError(error) ?? 'No pudimos guardar la sesión.');
@@ -734,6 +758,7 @@ export class CursoEditor implements OnInit {
   // -- Materiales --
 
   protected abrirCrearMaterial(leccionId: number): void {
+    this.cerrarMensaje();
     this.materialEditId.set(null);
     this.materialModo.set('enlace');
     this.materialTitulo.set('');
@@ -747,6 +772,7 @@ export class CursoEditor implements OnInit {
   }
 
   protected abrirEditarMaterial(leccionId: number, material: MaterialRespuesta): void {
+    this.cerrarMensaje();
     this.materialEditId.set(material.id);
     this.materialTitulo.set(material.titulo);
     this.materialPermiteDescarga.set(material.permiteDescarga);
@@ -774,6 +800,7 @@ export class CursoEditor implements OnInit {
   }
 
   protected cancelarFormMaterial(): void {
+    this.cerrarMensaje();
     this.materialFormLeccionId.set(null);
   }
 
@@ -823,7 +850,7 @@ export class CursoEditor implements OnInit {
           next: (material) => {
             this.actualizarMaterialEnEstado(leccionId, material, false);
             this.materialFormLeccionId.set(null);
-            this.mostrarMensaje('exito', 'Material actualizado.');
+            this.alertasGlobales.mostrar('exito', 'Material actualizado.');
           },
           error: (error: HttpErrorResponse) => {
             this.mostrarMensaje('error', this.mensajeError(error) ?? 'No pudimos guardar el material.');
@@ -882,7 +909,7 @@ export class CursoEditor implements OnInit {
         next: (material) => {
           this.actualizarMaterialEnEstado(leccionId, material, true);
           this.materialFormLeccionId.set(null);
-          this.mostrarMensaje('exito', 'Material agregado.');
+          this.alertasGlobales.mostrar('exito', 'Material agregado.');
         },
         error: (error: HttpErrorResponse) => {
           this.mostrarMensaje('error', this.mensajeError(error) ?? 'No pudimos guardar el material.');
@@ -1029,7 +1056,7 @@ export class CursoEditor implements OnInit {
         next: (curso) => {
           this.curso.set(curso);
           this.intentoGuardar.set(false);
-          this.mostrarMensaje('exito', 'Cambios guardados.');
+          this.alertasGlobales.mostrar('exito', 'Cambios guardados.');
         },
         error: (error: HttpErrorResponse) => {
           this.errorInformacion.set(this.mensajeError(error) ?? 'No pudimos guardar los cambios.');
