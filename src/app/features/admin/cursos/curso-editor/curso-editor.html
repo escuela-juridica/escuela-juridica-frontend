@@ -401,6 +401,18 @@
           <div class="editor-contenido__acciones">
             <button type="button" class="btn btn--secundario" (click)="abrirCrearModulo()">+ Nuevo módulo</button>
             <button type="button" class="btn btn--secundario" (click)="abrirModuloExistente()">+ Agregar módulo existente</button>
+            <label class="editor-ver-inactivos">
+              <span class="interruptor">
+                <input
+                  class="interruptor__entrada"
+                  type="checkbox"
+                  [checked]="verInactivosContenido()"
+                  (change)="verInactivosContenido.set($any($event.target).checked)"
+                />
+                <span class="interruptor__pista"><span class="interruptor__perilla"></span></span>
+              </span>
+              Ver inactivos
+            </label>
           </div>
 
           @if (modulos().length === 0) {
@@ -412,9 +424,15 @@
               <p class="estado-vacio__texto">Crea el primer módulo para comenzar a organizar lecciones, materiales y evaluaciones.</p>
               <button type="button" class="btn btn--primario" (click)="abrirCrearModulo()">Crear primer módulo</button>
             </div>
+          } @else if (modulosVisibles().length === 0) {
+            <div class="estado-vacio estado-vacio--editor estado-vacio--compact">
+              <span class="estado-vacio__icono" aria-hidden="true">≡</span>
+              <h3 class="estado-vacio__titulo">Todos los módulos están inactivos</h3>
+              <p class="estado-vacio__texto">Activa "Ver inactivos" para revisarlos.</p>
+            </div>
           }
 
-          @for (modulo of modulos(); track modulo.id; let iM = $index) {
+          @for (modulo of modulosVisibles(); track modulo.id; let iM = $index) {
             <div class="card editor-card editor-modulo card--acento-superior" [class.editor-modulo--inactivo]="!modulo.activo">
               <div class="editor-modulo__cabecera" (click)="alternarModulo(modulo.id)">
                 <button type="button" class="editor-expandir" [class.editor-expandir--abierto]="moduloExpandido(modulo.id)" aria-label="Expandir módulo">
@@ -437,8 +455,8 @@
                 </div>
                 <span class="editor-modulo__meta">{{ modulo.lecciones.length }} lección(es)</span>
                 <div class="editor-fila-seleccion__orden" (click)="$event.stopPropagation()">
-                  <button type="button" class="editor-orden-boton" [disabled]="iM === 0" (click)="moverModulo(iM, -1)" aria-label="Subir">↑</button>
-                  <button type="button" class="editor-orden-boton" [disabled]="iM === modulos().length - 1" (click)="moverModulo(iM, 1)" aria-label="Bajar">↓</button>
+                  <button type="button" class="editor-orden-boton" [disabled]="indiceRealModulo(modulo) === 0" (click)="moverModulo(indiceRealModulo(modulo), -1)" aria-label="Subir">↑</button>
+                  <button type="button" class="editor-orden-boton" [disabled]="indiceRealModulo(modulo) === modulos().length - 1" (click)="moverModulo(indiceRealModulo(modulo), 1)" aria-label="Bajar">↓</button>
                   <button type="button" class="btn btn--acento editor-boton-chico" (click)="abrirEditarModulo(modulo)">Editar</button>
                   <button
                     type="button"
@@ -466,7 +484,7 @@
                     </div>
                   }
 
-                  @for (leccion of modulo.lecciones; track leccion.id; let iL = $index) {
+                  @for (leccion of leccionesVisibles(modulo); track leccion.id; let iL = $index) {
                     <div class="editor-leccion" [class.editor-leccion--inactiva]="!leccion.activo">
                       <div class="editor-leccion__cabecera" (click)="alternarLeccion(leccion.id)">
                         <button type="button" class="editor-expandir" [class.editor-expandir--abierto]="leccionExpandida(leccion.id)" aria-label="Expandir lección">
@@ -501,8 +519,8 @@
                         </div>
                         <span class="editor-leccion__meta">{{ leccion.materiales.length }} material(es)</span>
                         <div class="editor-fila-seleccion__orden" (click)="$event.stopPropagation()">
-                          <button type="button" class="editor-orden-boton" [disabled]="iL === 0" (click)="moverLeccion(modulo.id, iL, -1)" aria-label="Subir">↑</button>
-                          <button type="button" class="editor-orden-boton" [disabled]="iL === modulo.lecciones.length - 1" (click)="moverLeccion(modulo.id, iL, 1)" aria-label="Bajar">↓</button>
+                          <button type="button" class="editor-orden-boton" [disabled]="indiceRealLeccion(modulo, leccion) === 0" (click)="moverLeccion(modulo.id, indiceRealLeccion(modulo, leccion), -1)" aria-label="Subir">↑</button>
+                          <button type="button" class="editor-orden-boton" [disabled]="indiceRealLeccion(modulo, leccion) === modulo.lecciones.length - 1" (click)="moverLeccion(modulo.id, indiceRealLeccion(modulo, leccion), 1)" aria-label="Bajar">↓</button>
                           @if (leccion.tipo === 'EN_VIVO') {
                             <button type="button" class="btn btn--secundario editor-boton-chico" (click)="abrirProgramarSesion(leccion)">Programar sesión</button>
                           }
@@ -529,7 +547,7 @@
                             </div>
                           } @else {
                             <div class="editor-materiales">
-                              @for (material of leccion.materiales; track material.id; let iMat = $index) {
+                              @for (material of materialesVisibles(leccion); track material.id; let iMat = $index) {
                                 <div class="editor-material" [class.editor-material--inactivo]="!material.activo">
                                   <span class="editor-material__icono" [attr.data-origen]="material.recurso.origen">
                                     @switch (material.recurso.origen) {
@@ -564,8 +582,8 @@
                                     </span>
                                   </span>
                                   <span class="editor-fila-seleccion__orden">
-                                    <button type="button" class="editor-orden-boton" [disabled]="iMat === 0" (click)="moverMaterial(leccion.id, modulo.id, iMat, -1)" aria-label="Subir">↑</button>
-                                    <button type="button" class="editor-orden-boton" [disabled]="iMat === leccion.materiales.length - 1" (click)="moverMaterial(leccion.id, modulo.id, iMat, 1)" aria-label="Bajar">↓</button>
+                                    <button type="button" class="editor-orden-boton" [disabled]="indiceRealMaterial(leccion, material) === 0" (click)="moverMaterial(leccion.id, modulo.id, indiceRealMaterial(leccion, material), -1)" aria-label="Subir">↑</button>
+                                    <button type="button" class="editor-orden-boton" [disabled]="indiceRealMaterial(leccion, material) === leccion.materiales.length - 1" (click)="moverMaterial(leccion.id, modulo.id, indiceRealMaterial(leccion, material), 1)" aria-label="Bajar">↓</button>
                                     <button type="button" class="btn btn--acento editor-boton-chico" (click)="abrirEditarMaterial(leccion.id, material)">Editar</button>
                                     <button
                                       type="button"

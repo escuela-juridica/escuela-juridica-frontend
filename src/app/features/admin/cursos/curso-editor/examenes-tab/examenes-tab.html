@@ -20,6 +20,18 @@
 } @else {
   <div class="editor-contenido__acciones">
     <button type="button" class="btn btn--secundario examenes-tab__crear" (click)="abrirCrearExamen()">+ Nuevo examen</button>
+    <label class="editor-ver-inactivos">
+      <span class="interruptor">
+        <input
+          class="interruptor__entrada"
+          type="checkbox"
+          [checked]="verInactivos()"
+          (change)="verInactivos.set($any($event.target).checked)"
+        />
+        <span class="interruptor__pista"><span class="interruptor__perilla"></span></span>
+      </span>
+      Ver inactivos
+    </label>
   </div>
 
   @if (examenes().length === 0) {
@@ -31,9 +43,15 @@
       <p class="estado-vacio__texto">Crea una evaluación por módulo o un examen final para organizar cómo se medirá el aprendizaje.</p>
       <button type="button" class="btn btn--primario" (click)="abrirCrearExamen()">Crear primer examen</button>
     </div>
+  } @else if (examenesVisibles().length === 0) {
+    <div class="estado-vacio estado-vacio--editor estado-vacio--compact">
+      <span class="estado-vacio__icono" aria-hidden="true">?</span>
+      <h3 class="estado-vacio__titulo">Todos los exámenes están inactivos</h3>
+      <p class="estado-vacio__texto">Activa "Ver inactivos" para revisarlos.</p>
+    </div>
   }
 
-  @for (examen of examenes(); track examen.id; let iE = $index) {
+  @for (examen of examenesVisibles(); track examen.id; let iE = $index) {
     <div class="card editor-card editor-modulo card--acento-superior" [class.editor-modulo--inactivo]="!examen.activo">
       <div
         class="editor-modulo__cabecera"
@@ -66,8 +84,8 @@
         </div>
         <span class="editor-modulo__meta">{{ examen.preguntas.length }} pregunta(s)</span>
         <div class="editor-fila-seleccion__orden" (click)="$event.stopPropagation()">
-          <button type="button" class="editor-orden-boton" [disabled]="iE === 0" (click)="moverExamen(iE, -1)" aria-label="Subir">↑</button>
-          <button type="button" class="editor-orden-boton" [disabled]="iE === examenes().length - 1" (click)="moverExamen(iE, 1)" aria-label="Bajar">↓</button>
+          <button type="button" class="editor-orden-boton" [disabled]="indiceRealExamen(examen) === 0" (click)="moverExamen(indiceRealExamen(examen), -1)" aria-label="Subir">↑</button>
+          <button type="button" class="editor-orden-boton" [disabled]="indiceRealExamen(examen) === examenes().length - 1" (click)="moverExamen(indiceRealExamen(examen), 1)" aria-label="Bajar">↓</button>
           <button type="button" class="btn btn--acento editor-boton-chico" (click)="abrirEditarExamen(examen)">Editar</button>
           <button
             type="button"
@@ -101,7 +119,7 @@
             </div>
           }
 
-          @for (pregunta of examen.preguntas; track pregunta.id; let iP = $index) {
+          @for (pregunta of preguntasVisibles(examen); track pregunta.id; let iP = $index) {
             <div class="editor-leccion" [class.editor-leccion--inactiva]="!pregunta.activo">
               <div
                 class="editor-leccion__cabecera"
@@ -139,8 +157,8 @@
                   @if (!pregunta.activo) { <span class="badge badge--disp-cerrado">Inactiva</span> }
                 </div>
                 <div class="editor-fila-seleccion__orden" (click)="$event.stopPropagation()">
-                  <button type="button" class="editor-orden-boton" [disabled]="iP === 0" (click)="moverPregunta(examen.id, iP, -1)" aria-label="Subir">↑</button>
-                  <button type="button" class="editor-orden-boton" [disabled]="iP === examen.preguntas.length - 1" (click)="moverPregunta(examen.id, iP, 1)" aria-label="Bajar">↓</button>
+                  <button type="button" class="editor-orden-boton" [disabled]="indiceRealPregunta(examen, pregunta) === 0" (click)="moverPregunta(examen.id, indiceRealPregunta(examen, pregunta), -1)" aria-label="Subir">↑</button>
+                  <button type="button" class="editor-orden-boton" [disabled]="indiceRealPregunta(examen, pregunta) === examen.preguntas.length - 1" (click)="moverPregunta(examen.id, indiceRealPregunta(examen, pregunta), 1)" aria-label="Bajar">↓</button>
                   <button type="button" class="btn btn--acento editor-boton-chico" (click)="abrirEditarPregunta(examen.id, pregunta)">Editar</button>
                   <button
                     type="button"

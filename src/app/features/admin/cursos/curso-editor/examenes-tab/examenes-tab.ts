@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectorRef, Component, DestroyRef, Input, OnChanges, SimpleChanges, inject, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, Input, OnChanges, SimpleChanges, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 
@@ -49,6 +49,11 @@ export class ExamenesTab implements OnChanges {
   private mensajeTimeout: ReturnType<typeof setTimeout> | null = null;
   protected readonly examenesExpandidos = signal<Set<number>>(new Set());
   protected readonly preguntasExpandidas = signal<Set<number>>(new Set());
+  // Por defecto lo desactivado no aparece (igual que en Información Base); el interruptor lo
+  // trae de vuelta cuando el admin necesita revisarlo o reactivarlo.
+  protected readonly verInactivos = signal(false);
+  protected readonly examenesVisibles = computed(() =>
+    this.verInactivos() ? this.examenes() : this.examenes().filter((e) => e.activo));
 
   protected readonly esVirtual = () => this.modalidad === 'VIRTUAL';
 
@@ -333,6 +338,20 @@ export class ExamenesTab implements OnChanges {
         },
         error: () => this.alertasGlobales.mostrar('error', 'No pudimos cambiar el estado del examen.'),
       });
+  }
+
+  // La lista que se muestra puede estar filtrada (ocultando inactivos); el orden real que mueven
+  // los botones ↑/↓ y que se envía al backend sigue siendo el del arreglo completo.
+  protected preguntasVisibles(examen: ExamenRespuesta): PreguntaRespuesta[] {
+    return this.verInactivos() ? examen.preguntas : examen.preguntas.filter((p) => p.activo);
+  }
+
+  protected indiceRealExamen(examen: ExamenRespuesta): number {
+    return this.examenes().findIndex((e) => e.id === examen.id);
+  }
+
+  protected indiceRealPregunta(examen: ExamenRespuesta, pregunta: PreguntaRespuesta): number {
+    return examen.preguntas.findIndex((p) => p.id === pregunta.id);
   }
 
   protected moverExamen(indice: number, direccion: -1 | 1): void {

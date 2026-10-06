@@ -123,6 +123,11 @@ export class CursoEditor implements OnInit {
   protected readonly erroContenido = signal<string | null>(null);
   protected readonly modulosExpandidos = signal<Set<number>>(new Set());
   protected readonly leccionesExpandidas = signal<Set<number>>(new Set());
+  // Por defecto lo desactivado no aparece (igual que en Información Base); el interruptor lo
+  // trae de vuelta cuando el admin necesita revisarlo o reactivarlo.
+  protected readonly verInactivosContenido = signal(false);
+  protected readonly modulosVisibles = computed(() =>
+    this.verInactivosContenido() ? this.modulos() : this.modulos().filter((m) => m.activo));
   protected readonly sesionesEnVivo = computed<SesionEnVivoEditor[]>(() => this.modulos()
     .filter((modulo) => modulo.activo)
     .flatMap((modulo) => modulo.lecciones
@@ -550,6 +555,28 @@ export class CursoEditor implements OnInit {
         },
         error: () => this.mostrarMensaje('error', 'No pudimos cambiar el estado del módulo.'),
       });
+  }
+
+  // Las listas que se muestran pueden estar filtradas (ocultando inactivos); el orden real que
+  // mueven los botones ↑/↓ y que se envía al backend sigue siendo el del arreglo completo.
+  protected leccionesVisibles(modulo: ModuloRespuesta): LeccionRespuesta[] {
+    return this.verInactivosContenido() ? modulo.lecciones : modulo.lecciones.filter((l) => l.activo);
+  }
+
+  protected materialesVisibles(leccion: LeccionRespuesta): MaterialRespuesta[] {
+    return this.verInactivosContenido() ? leccion.materiales : leccion.materiales.filter((m) => m.activo);
+  }
+
+  protected indiceRealModulo(modulo: ModuloRespuesta): number {
+    return this.modulos().findIndex((m) => m.id === modulo.id);
+  }
+
+  protected indiceRealLeccion(modulo: ModuloRespuesta, leccion: LeccionRespuesta): number {
+    return modulo.lecciones.findIndex((l) => l.id === leccion.id);
+  }
+
+  protected indiceRealMaterial(leccion: LeccionRespuesta, material: MaterialRespuesta): number {
+    return leccion.materiales.findIndex((m) => m.id === material.id);
   }
 
   protected moverModulo(indice: number, direccion: -1 | 1): void {

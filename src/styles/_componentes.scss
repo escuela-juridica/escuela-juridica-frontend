@@ -1072,8 +1072,21 @@ textarea.input {
 
 .editor-contenido__acciones {
   display: flex;
+  align-items: center;
+  flex-wrap: wrap;
   gap: 12px;
   margin-bottom: 20px;
+}
+
+.editor-ver-inactivos {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--neutral-700);
+  white-space: nowrap;
 }
 
 .editor-boton-chico {
