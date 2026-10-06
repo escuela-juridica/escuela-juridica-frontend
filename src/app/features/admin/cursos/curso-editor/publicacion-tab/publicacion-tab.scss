@@ -4,6 +4,40 @@
   margin-top: 16px;
 }
 
+.publicacion__ciclo {
+  margin-bottom: 20px;
+}
+
+.publicacion__ciclo-encabezado {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.publicacion__destacado {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--neutral-700);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.publicacion__retraso {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.publicacion__retraso .input {
+  width: auto;
+}
+
 .publicacion__grupo {
   margin-bottom: 16px;
 }

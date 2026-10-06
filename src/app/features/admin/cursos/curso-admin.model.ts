@@ -62,6 +62,7 @@ export interface CursoEditorRespuesta {
   estadoCodigo: string;
   estadoNombre: string;
   publicado: boolean;
+  tieneMatriculas: boolean;
   docentes: DocenteCursoRespuesta[];
   firmantes: FirmanteCursoRespuesta[];
   creadoEn: string;
@@ -133,4 +134,16 @@ export interface ValidacionPublicacionRespuesta {
   hallazgos: ErrorValidacionCurso[];
   publicacionRealizada: boolean;
   estadoCodigo: string;
+}
+
+export interface RetrasarInicioPeticion {
+  nuevaFechaInicio: string;
+}
+
+export interface CerrarCursoPeticion {
+  motivo: string | null;
+}
+
+export interface CambiarDestacadoPeticion {
+  destacado: boolean;
 }

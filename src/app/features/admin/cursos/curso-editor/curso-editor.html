@@ -918,8 +918,13 @@
         [cursoId]="cursoId"
         [estadoCodigo]="c.estadoCodigo"
         [estadoNombre]="c.estadoNombre"
+        [destacado]="c.destacado"
+        [tieneMatriculas]="c.tieneMatriculas"
+        [fechaInicio]="c.fechaInicio"
+        [fechaFin]="c.fechaFin"
         (irAPestana)="irAPestanaDesdePublicacion($event)"
         (publicado)="recargarDespuesDePublicar()"
+        (actualizado)="recargarDespuesDePublicar()"
       />
     }
     @default {

@@ -9,10 +9,13 @@ import {
   AsignarDocentesPeticion,
   AsignarFirmantesPeticion,
   ActualizarReglasCursoPeticion,
+  CambiarDestacadoPeticion,
+  CerrarCursoPeticion,
   CrearCursoPeticion,
   CursoEditorRespuesta,
   CursoResumenRespuesta,
   ReglasCursoRespuesta,
+  RetrasarInicioPeticion,
   ValidacionPublicacionRespuesta,
 } from './curso-admin.model';
 
@@ -72,5 +75,25 @@ export class CursoAdminApiService {
 
   publicar(cursoId: number): Observable<ValidacionPublicacionRespuesta> {
     return this.http.post<ValidacionPublicacionRespuesta>(`${this.url}/${cursoId}/publicacion`, {});
+  }
+
+  adelantarInicio(cursoId: number): Observable<CursoEditorRespuesta> {
+    return this.http.post<CursoEditorRespuesta>(`${this.url}/${cursoId}/adelantar-inicio`, {});
+  }
+
+  retrasarInicio(cursoId: number, peticion: RetrasarInicioPeticion): Observable<CursoEditorRespuesta> {
+    return this.http.post<CursoEditorRespuesta>(`${this.url}/${cursoId}/retrasar-inicio`, peticion);
+  }
+
+  cerrar(cursoId: number, peticion: CerrarCursoPeticion): Observable<CursoEditorRespuesta> {
+    return this.http.post<CursoEditorRespuesta>(`${this.url}/${cursoId}/cerrar`, peticion);
+  }
+
+  cambiarDestacado(cursoId: number, peticion: CambiarDestacadoPeticion): Observable<CursoEditorRespuesta> {
+    return this.http.patch<CursoEditorRespuesta>(`${this.url}/${cursoId}/destacado`, peticion);
+  }
+
+  duplicar(cursoId: number): Observable<CursoEditorRespuesta> {
+    return this.http.post<CursoEditorRespuesta>(`${this.url}/${cursoId}/duplicar`, {});
   }
 }

@@ -1,13 +1,36 @@
-@if (estadoCodigo !== 'BORRADOR') {
-  <div class="card editor-card">
-    <h2 class="editor-card__titulo">Publicación</h2>
-    <div class="alerta alerta--exito">
-      <span class="alerta__icono">✓</span>
-      <div class="alerta__titulo">Este curso ya está {{ estadoNombre }}.</div>
+<section class="publicacion" aria-label="Publicación y ciclo de vida del curso">
+  <div class="card editor-card publicacion__ciclo">
+    <div class="publicacion__ciclo-encabezado">
+      <div>
+        <h2 class="editor-card__titulo">Ciclo de vida</h2>
+        <p class="editor-material-info">Estado actual: <strong>{{ estadoNombre }}</strong></p>
+      </div>
+      <label class="publicacion__destacado">
+        <span class="interruptor">
+          <input
+            class="interruptor__entrada"
+            type="checkbox"
+            [checked]="destacadoLocal()"
+            [disabled]="actualizandoDestacado()"
+            (change)="toggleDestacado()"
+          />
+          <span class="interruptor__pista"><span class="interruptor__perilla"></span></span>
+        </span>
+        Destacado en el catálogo
+      </label>
     </div>
+    @if (tieneMatriculas) {
+      <div class="alerta alerta--advertencia">
+        <span class="alerta__icono">!</span>
+        <div class="alerta__titulo">Este curso ya tiene matrículas. Edita sus datos comerciales con cuidado.</div>
+      </div>
+    }
+    <button type="button" class="btn btn--secundario" [disabled]="duplicando()" (click)="duplicar()">
+      {{ duplicando() ? 'Duplicando…' : 'Duplicar como nueva convocatoria' }}
+    </button>
   </div>
-} @else {
-  <section class="publicacion" aria-label="Validar y publicar el curso">
+
+  @if (estadoCodigo === 'BORRADOR') {
     @if (error(); as mensaje) {
       <div class="alerta alerta--error">
         <span class="alerta__icono">!</span>
@@ -65,5 +88,60 @@
         }
       }
     }
-  </section>
-}
+  } @else {
+    @if (estadoCodigo === 'PUBLICADO') {
+      <div class="card editor-card publicacion__grupo">
+        <h3>Antes de iniciar</h3>
+        <p class="editor-material-info">Adelanta el inicio ahora mismo, o retrasa la fecha programada.</p>
+        <div class="publicacion__acciones">
+          <button type="button" class="btn btn--primario" [disabled]="adelantando()" (click)="adelantarInicio()">
+            {{ adelantando() ? 'Adelantando…' : 'Adelantar inicio' }}
+          </button>
+        </div>
+        <div class="publicacion__retraso">
+          <input
+            class="input"
+            type="date"
+            [min]="fechaInicio ?? ''"
+            [max]="fechaFin ?? ''"
+            [value]="fechaRetraso()"
+            (input)="fechaRetraso.set($any($event.target).value)"
+          />
+          <button type="button" class="btn btn--secundario" [disabled]="retrasando()" (click)="retrasarInicio()">
+            {{ retrasando() ? 'Guardando…' : 'Retrasar inicio' }}
+          </button>
+        </div>
+      </div>
+    }
+
+    @if (estadoCodigo === 'PUBLICADO' || estadoCodigo === 'EN_CURSO') {
+      <div class="card editor-card publicacion__grupo">
+        <h3>Cerrar anticipadamente</h3>
+        <p class="editor-material-info">
+          Deja de ofrecerse para nuevas matrículas; quienes ya cursan conservan su acceso vigente.
+        </p>
+        <textarea
+          class="input"
+          placeholder="Motivo (opcional)"
+          rows="2"
+          [value]="motivoCierre()"
+          (input)="motivoCierre.set($any($event.target).value)"
+        ></textarea>
+        <div class="publicacion__acciones">
+          <button type="button" class="btn btn--peligro" [disabled]="cerrando()" (click)="cerrar()">
+            {{ cerrando() ? 'Cerrando…' : 'Cerrar curso' }}
+          </button>
+        </div>
+      </div>
+    }
+
+    @if (estadoCodigo === 'CERRADO') {
+      <div class="card editor-card">
+        <div class="alerta alerta--info">
+          <span class="alerta__icono">i</span>
+          <div class="alerta__titulo">Este curso está cerrado. No admite nuevas matrículas; duplícalo para una nueva convocatoria.</div>
+        </div>
+      </div>
+    }
+  }
+</section>
