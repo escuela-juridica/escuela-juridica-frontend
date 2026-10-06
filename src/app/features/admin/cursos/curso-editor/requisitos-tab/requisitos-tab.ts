@@ -67,9 +67,22 @@ export class RequisitosTab implements OnChanges {
     };
     this.guardando.set(true);
     this.api.actualizarReglas(this.cursoId, cuerpo).pipe(finalize(() => this.guardando.set(false))).subscribe({
-      next: (reglas) => { this.aplicar(reglas); this.alertas.mostrar('exito', 'Requisitos de certificación actualizados.'); this.guardado.emit(); },
+      next: (reglas) => {
+        this.aplicar(reglas);
+        this.alertas.mostrar('exito', 'Requisitos de certificación actualizados.');
+        this.guardado.emit();
+        this.scrollArriba();
+      },
       error: (e: HttpErrorResponse) => this.error.set(e.error?.message ?? 'No pudimos guardar los requisitos.'),
     });
+  }
+
+  // Igual que en Información: sin esto, la confirmación queda arriba fuera de vista si guardaste
+  // con la página desplazada hacia abajo (esta pestaña puede tener varias tarjetas).
+  private scrollArriba(): void {
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 
   private cargar(): void {
