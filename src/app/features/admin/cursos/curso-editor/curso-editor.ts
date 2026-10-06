@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectorRef, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -47,6 +47,11 @@ interface ErrorApiAdmin {
   message?: string;
 }
 
+interface SesionEnVivoEditor {
+  moduloTitulo: string;
+  leccion: LeccionRespuesta;
+}
+
 /** HU-010 — Editor del curso (ADM-PF-014). Solo la pestaña "Información" está implementada; el
  * resto (Contenido HU-011, Sesiones HU-012, Exámenes HU-013, Certificación HU-014, Publicación
  * HU-015) se completa en sus propias historias. Información, docentes y firmantes se guardan
@@ -76,6 +81,8 @@ export class CursoEditor implements OnInit {
     { id: 'certificacion', etiqueta: 'Certificación' },
     { id: 'publicacion', etiqueta: 'Publicación' },
   ];
+  protected readonly pestanasVisibles = computed(() => this.pestanas
+    .filter((pestana) => pestana.id !== 'sesiones' || this.curso()?.modalidad !== 'VIRTUAL'));
   protected readonly tabActiva = signal<PestanaEditor>('informacion');
 
   protected readonly cursoId = Number(this.route.snapshot.paramMap.get('id'));
@@ -114,6 +121,11 @@ export class CursoEditor implements OnInit {
   protected readonly erroContenido = signal<string | null>(null);
   protected readonly modulosExpandidos = signal<Set<number>>(new Set());
   protected readonly leccionesExpandidas = signal<Set<number>>(new Set());
+  protected readonly sesionesEnVivo = computed<SesionEnVivoEditor[]>(() => this.modulos()
+    .filter((modulo) => modulo.activo)
+    .flatMap((modulo) => modulo.lecciones
+      .filter((leccion) => leccion.activo && leccion.tipo === 'EN_VIVO')
+      .map((leccion) => ({ moduloTitulo: modulo.titulo, leccion }))));
 
   protected readonly mostrarFormModulo = signal(false);
   protected readonly moduloEditId = signal<number | null>(null);
@@ -236,10 +248,14 @@ export class CursoEditor implements OnInit {
   }
 
   protected cambiarPestana(id: PestanaEditor): void {
+    if (id === 'sesiones' && this.curso()?.modalidad === 'VIRTUAL') {
+      this.tabActiva.set('contenido');
+      return;
+    }
     this.tabActiva.set(id);
     // Los exámenes de módulo necesitan conocer los módulos ya creados. La estructura debe
     // cargarse también al entrar directamente a esta pestaña, no solo si antes se visitó Contenido.
-    if ((id === 'contenido' || id === 'examenes') && !this.contenidoCargado()) {
+    if ((id === 'contenido' || id === 'sesiones' || id === 'examenes') && !this.contenidoCargado()) {
       this.cargarContenido();
     }
   }
@@ -685,13 +701,18 @@ export class CursoEditor implements OnInit {
       this.mostrarMensaje('error', 'Ingresa el inicio y el fin de la sesión.');
       return;
     }
+    const enlace = this.textoOpcional(this.sesionEnlace());
+    if (!enlace) {
+      this.mostrarMensaje('error', 'Ingresa el enlace de la reunión.');
+      return;
+    }
     if (new Date(fin).getTime() <= new Date(inicio).getTime()) {
       this.mostrarMensaje('error', 'La hora de fin debe ser posterior a la de inicio.');
       return;
     }
     this.guardandoSesion.set(true);
     this.contenidoApi
-      .actualizarSesion(leccionId, { fechaHoraInicio: inicio, fechaHoraFin: fin, enlaceReunion: this.textoOpcional(this.sesionEnlace()) })
+      .actualizarSesion(leccionId, { fechaHoraInicio: inicio, fechaHoraFin: fin, enlaceReunion: enlace })
       .pipe(
         finalize(() => {
           this.guardandoSesion.set(false);
@@ -1057,6 +1078,9 @@ export class CursoEditor implements OnInit {
           this.curso.set(curso);
           this.intentoGuardar.set(false);
           this.alertasGlobales.mostrar('exito', 'Cambios guardados.');
+          // Información es el único formulario largo cuyo mensaje de éxito está al inicio
+          // de la página; en las demás pestañas se conserva la posición de trabajo.
+          this.scrollArriba();
         },
         error: (error: HttpErrorResponse) => {
           this.errorInformacion.set(this.mensajeError(error) ?? 'No pudimos guardar los cambios.');
@@ -1174,7 +1198,11 @@ export class CursoEditor implements OnInit {
   private mostrarMensaje(tipo: 'error' | 'exito', texto: string): void {
     this.limpiarTimeoutMensaje();
     this.mensaje.set({ tipo, texto });
-    this.scrollArriba();
+    // Los mensajes locales de Contenido/Sesiones viven normalmente dentro de un modal.
+    // No desplazar la página evita que el usuario pierda el contexto de la fila que editaba.
+    if (this.tabActiva() === 'informacion') {
+      this.scrollArriba();
+    }
     this.mensajeTimeout = setTimeout(() => {
       this.mensaje.set(null);
       this.mensajeTimeout = null;
@@ -1182,8 +1210,8 @@ export class CursoEditor implements OnInit {
     }, 5000);
   }
 
-  /** La pestaña puede ser larga (varias tarjetas); sin esto, el mensaje de confirmación queda
-   * arriba, fuera de vista, si guardaste con la página desplazada hacia abajo. */
+  /** Información puede contener varias tarjetas; tras guardarla, su confirmación global queda
+   * al inicio. Las demás pestañas no invocan este desplazamiento por una operación exitosa. */
   private scrollArriba(): void {
     if (typeof window !== 'undefined') {
       window.scrollTo({ top: 0, behavior: 'smooth' });

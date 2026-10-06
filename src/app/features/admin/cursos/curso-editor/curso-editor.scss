@@ -117,6 +117,85 @@
   margin-bottom: 16px;
 }
 
+.editor-sesiones__encabezado {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.editor-sesiones__encabezado .editor-card__titulo {
+  margin-bottom: 4px;
+}
+
+.editor-sesiones__ayuda {
+  margin: 0;
+  color: var(--neutral-500);
+  font-size: 13px;
+}
+
+.editor-sesiones__lista {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.editor-sesion {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border: 1px solid var(--neutral-200);
+  border-left: 3px solid var(--acento-500);
+  border-radius: var(--radio-md);
+  background: var(--blanco);
+}
+
+.editor-sesion__icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: var(--radio-completo);
+  background: var(--acento-050);
+  color: var(--acento-700);
+}
+
+.editor-sesion__principal {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.editor-sesion__modulo,
+.editor-sesion__fecha,
+.editor-sesion__enlace {
+  font-size: 12px;
+  color: var(--neutral-500);
+}
+
+.editor-sesion__modulo {
+  color: var(--acento-700);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.editor-sesion__titulo {
+  margin: 0;
+  color: var(--neutral-950);
+  font-size: 15px;
+}
+
+.editor-sesion__enlace--pendiente {
+  color: var(--advertencia);
+}
+
 .editor-nota {
   margin-top: 16px;
 }
