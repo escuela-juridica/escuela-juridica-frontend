@@ -1,1 +1,138 @@
-.reporte{padding:32px}.reporte__encabezado{display:flex;justify-content:space-between;align-items:center;gap:16px}.reporte h1{margin:0}.reporte p,small{color:var(--neutral-600)}.reporte__filtros{display:flex;gap:12px;margin:24px 0}.reporte input,.reporte select{min-height:42px;border:1px solid var(--neutral-300);border-radius:8px;padding:0 12px}.reporte input{min-width:280px}.reporte__tabla{overflow:auto;border:1px solid var(--neutral-200);border-radius:10px;background:#fff}table{border-collapse:collapse;width:100%}th,td{padding:13px;text-align:left;border-bottom:1px solid var(--neutral-100);white-space:nowrap}th{font-size:12px;color:var(--neutral-600)}small{display:block;margin-top:4px}@media(max-width:700px){.reporte{padding:20px}.reporte__encabezado,.reporte__filtros{flex-direction:column;align-items:stretch}.reporte input{min-width:0}}
+// Sin padding propio: .admin-contenido (layout-admin) ya da los 32px, igual que en Matrículas.
+
+.reporte__titulo {
+  font-size: 22px;
+  line-height: 30px;
+  font-weight: 700;
+  color: var(--neutral-950);
+  margin: 0;
+}
+
+.reporte__cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.reporte__cabecera p {
+  margin: 4px 0 0;
+  color: var(--neutral-600);
+}
+
+.reporte__acciones-exportar {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.reporte__btn-exportar {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.reporte__filtros {
+  display: flex;
+  gap: 12px;
+  margin: 24px 0;
+}
+
+.reporte__filtros .input {
+  flex: 1;
+  min-width: 240px;
+}
+
+.reporte__filtros select.input {
+  flex: none;
+  width: auto;
+}
+
+.reporte__btn-filtro {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+}
+
+// Gris sólido (no blanco), icono "X" simple: limpiar filtros no es una acción destructiva.
+.reporte__btn-limpiar {
+  background: var(--neutral-600);
+  color: var(--blanco);
+  transition: background-color 0.15s ease;
+}
+
+.reporte__btn-limpiar:hover {
+  background: var(--neutral-800);
+}
+
+.reporte__tabla {
+  overflow: auto;
+  border: 1px solid var(--neutral-200);
+  border-radius: 10px;
+  background: var(--blanco);
+}
+
+.reporte__tabla table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.reporte__tabla th,
+.reporte__tabla td {
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--neutral-100);
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.reporte__tabla th {
+  color: var(--neutral-500);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.reporte__tabla td strong {
+  color: var(--neutral-950);
+  font-weight: 600;
+}
+
+.reporte__tabla small {
+  display: block;
+  color: var(--neutral-500);
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.reporte__paginacion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+  font-size: 14px;
+  color: var(--neutral-600);
+}
+
+.reporte__celda-matricula {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+@media (max-width: 700px) {
+  .reporte__cabecera,
+  .reporte__filtros {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .reporte__filtros .input {
+    min-width: 0;
+  }
+}

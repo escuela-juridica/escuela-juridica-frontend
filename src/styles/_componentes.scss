@@ -576,6 +576,28 @@ textarea.input {
   color: var(--neutral-600);
 }
 
+.badge--disp-cancelado {
+  background: var(--error-fondo);
+  color: var(--error);
+}
+
+// Forma de ingreso a una matrícula (HU administrativas de EP03): distinto significado de
+// "disponibilidad", así que usa su propia pareja de clases aunque comparta colores con otros usos.
+.badge--ingreso-gratuito {
+  background: var(--celeste-050);
+  color: var(--celeste-700);
+}
+
+.badge--ingreso-manual {
+  background: var(--violeta-050);
+  color: var(--violeta-700);
+}
+
+.badge--ingreso-pago {
+  background: var(--exito-fondo);
+  color: var(--exito);
+}
+
 // Estados administrativos genéricos (HU-008: estado de cuenta y similares).
 .badge--advertencia-suave {
   background: var(--advertencia-fondo);

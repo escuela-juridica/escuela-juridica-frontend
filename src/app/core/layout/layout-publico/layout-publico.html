@@ -7,6 +7,9 @@
 
     @if (estaAutenticado()) {
       <div class="header-acciones">
+        @if (usuario()?.rolPrincipal === 'ADMINISTRADOR') {
+          <a routerLink="/admin" class="btn btn--secundario header-panel-admin">Panel admin</a>
+        }
         <div class="header-cuenta" #cuentaMenu>
           <button
             type="button"

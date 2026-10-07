@@ -1,1 +1,184 @@
-.matriculas { padding: 32px; } .matriculas__cabecera { display:flex; justify-content:space-between; align-items:center; gap:16px; } .matriculas__cabecera h1 { margin: 0; } .matriculas__cabecera p { color: var(--neutral-600); } .matriculas__filtros { display:flex; gap:12px; margin:24px 0; } .matriculas__filtros input,.matriculas__filtros select,.formulario-matricula input,.formulario-matricula select,.formulario-matricula textarea { min-height:42px; padding:0 12px; border:1px solid var(--neutral-300); border-radius:8px; box-sizing:border-box; width:100%; } .matriculas__filtros input { min-width:300px; } .matriculas__tabla { overflow:auto; border:1px solid var(--neutral-200); border-radius:10px; background:white; } table { border-collapse:collapse; width:100%; } th,td { padding:14px; text-align:left; border-bottom:1px solid var(--neutral-100); } th { color:var(--neutral-600); font-size:13px; } small { display:block; color:var(--neutral-500); margin-top:4px; } .estado { color:var(--success-700, #087443); font-weight:700; } .estado--cancelada { color:var(--danger-700, #b42318); } .btn-cancelar { border:0; background:none; color:#b42318; font-weight:700; cursor:pointer; } .formulario-matricula { display:grid; gap:16px; } .formulario-matricula label { display:grid; gap:7px; color:var(--neutral-800); font-weight:600; } .formulario-matricula textarea { padding-top:10px; resize:vertical; } .formulario-matricula__dos { display:grid; grid-template-columns:1fr 1fr; gap:16px; } .formulario-matricula__acciones { display:flex; justify-content:flex-end; gap:12px; margin-top:8px; } @media(max-width:700px) { .matriculas { padding:20px; } .matriculas__cabecera,.matriculas__filtros,.formulario-matricula__dos { flex-direction:column; display:flex; } .matriculas__filtros input { min-width:0; } }
+// Sin padding propio: .admin-contenido (layout-admin) ya da los 32px, igual que en Cursos y
+// Usuarios — ponerlo aquí también duplicaba el espaciado.
+
+.matriculas__titulo {
+  font-size: 22px;
+  line-height: 30px;
+  font-weight: 700;
+  color: var(--neutral-950);
+  margin: 0;
+}
+
+.matriculas__cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.matriculas__cabecera p {
+  margin: 4px 0 0;
+  color: var(--neutral-600);
+}
+
+.matriculas__filtros {
+  display: flex;
+  gap: 12px;
+  margin: 24px 0;
+}
+
+.matriculas__filtros .input {
+  flex: 1;
+  min-width: 240px;
+}
+
+.matriculas__filtros select.input {
+  flex: none;
+  width: auto;
+}
+
+.matriculas__btn-filtro {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+}
+
+// Gris sólido (no blanco, para no confundirse con los campos del formulario) — su icono es una
+// "X" simple, no un tacho, porque limpiar filtros no es una acción destructiva.
+.matriculas__btn-limpiar {
+  background: var(--neutral-600);
+  color: var(--blanco);
+  transition: background-color 0.15s ease;
+}
+
+.matriculas__btn-limpiar:hover {
+  background: var(--neutral-800);
+}
+
+.matriculas__tabla {
+  overflow: auto;
+  border: 1px solid var(--neutral-200);
+  border-radius: 10px;
+  background: var(--blanco);
+}
+
+.matriculas__tabla table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.matriculas__tabla th,
+.matriculas__tabla td {
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--neutral-100);
+  font-size: 14px;
+}
+
+.matriculas__tabla th {
+  color: var(--neutral-500);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.matriculas__tabla td strong {
+  color: var(--neutral-950);
+  font-weight: 600;
+}
+
+.matriculas__tabla small {
+  display: block;
+  color: var(--neutral-500);
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+// Rojo sólido, igual que "Eliminar" en Cursos (.btn--peligro) — una acción destructiva no debe
+// verse igual que el badge informativo de "Cancelada".
+.matriculas__btn-cancelar {
+  display: inline-flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 12px;
+  border: none;
+  border-radius: var(--radio-md);
+  background: var(--error);
+  color: var(--blanco);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.matriculas__btn-cancelar:hover:not(:disabled) {
+  background: #8f1b13;
+}
+
+.matriculas__btn-cancelar:disabled {
+  border-color: var(--neutral-200);
+  background: var(--neutral-100);
+  color: var(--neutral-400);
+  cursor: not-allowed;
+}
+
+.matriculas__paginacion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+  font-size: 14px;
+  color: var(--neutral-600);
+}
+
+.matriculas__cancelar-texto {
+  margin: 0 0 16px;
+  color: var(--neutral-600);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+// ----------------------------------------------------------- Formulario modal --
+
+.formulario-matricula {
+  display: grid;
+  gap: 16px;
+}
+
+.formulario-matricula label {
+  display: grid;
+  gap: 7px;
+  color: var(--neutral-800);
+  font-weight: 600;
+}
+
+.formulario-matricula__dos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.formulario-matricula__acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+@media (max-width: 700px) {
+  .matriculas__cabecera,
+  .matriculas__filtros,
+  .formulario-matricula__dos {
+    flex-direction: column;
+    align-items: stretch;
+    display: flex;
+  }
+
+  .matriculas__filtros .input {
+    min-width: 0;
+  }
+}

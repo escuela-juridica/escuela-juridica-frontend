@@ -1,7 +1,8 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { API_URL } from '../../core/api/api.config';
+import { PageResponse } from '../../core/api/page-response.model';
 import { Matricula, MatriculaAdministrativa } from './matricula.model';
 
 export interface CrearMatriculaAdministrativa {
@@ -22,8 +23,9 @@ export class MatriculaApiService {
     return this.http.post<Matricula>(`${API_URL}/cursos/${cursoId}/matricula-gratuita`, {});
   }
 
-  listarAdministrativas(texto = '', estado = ''): Observable<MatriculaAdministrativa[]> {
-    return this.http.get<MatriculaAdministrativa[]>(`${API_URL}/admin/matriculas`, { params: { texto, estado } });
+  listarAdministrativas(texto = '', estado = '', page = 0, size = 20): Observable<PageResponse<MatriculaAdministrativa>> {
+    const params = new HttpParams().set('texto', texto).set('estado', estado).set('page', page).set('size', size);
+    return this.http.get<PageResponse<MatriculaAdministrativa>>(`${API_URL}/admin/matriculas`, { params });
   }
 
   cancelar(id: number, motivo: string): Observable<Matricula> {
@@ -33,6 +35,11 @@ export class MatriculaApiService {
   crearAdministrativa(peticion: CrearMatriculaAdministrativa): Observable<Matricula> {
     return this.http.post<Matricula>(`${API_URL}/admin/matriculas`, peticion);
   }
-  reporte(texto = '', estado = ''): Observable<ReporteMatricula[]> { return this.http.get<ReporteMatricula[]>(`${API_URL}/admin/reportes/matriculas`, { params: { texto, estado } }); }
+  reporte(texto = '', estado = '', page = 0, size = 20): Observable<PageResponse<ReporteMatricula>> {
+    const params = new HttpParams().set('texto', texto).set('estado', estado).set('page', page).set('size', size);
+    return this.http.get<PageResponse<ReporteMatricula>>(`${API_URL}/admin/reportes/matriculas`, { params });
+  }
   urlExportacion(texto = '', estado = ''): string { return `${API_URL}/admin/reportes/matriculas/exportar?texto=${encodeURIComponent(texto)}&estado=${encodeURIComponent(estado)}`; }
+  urlExportacionPdf(texto = '', estado = ''): string { return `${API_URL}/admin/reportes/matriculas/exportar-pdf?texto=${encodeURIComponent(texto)}&estado=${encodeURIComponent(estado)}`; }
+  urlExportacionExcel(texto = '', estado = ''): string { return `${API_URL}/admin/reportes/matriculas/exportar-excel?texto=${encodeURIComponent(texto)}&estado=${encodeURIComponent(estado)}`; }
 }
