@@ -11,11 +11,19 @@
     <div class="eyebrow"><span class="eyebrow__dash"></span><span class="eyebrow__texto">Tu panel</span></div>
     <h1 class="tipo-h1 panel-titulo">Hola, {{ primerNombre || 'estudiante' }}</h1>
     
-    @if (cursosActivos.length > 0) {
-      <p class="panel-subtitulo">Tienes {{ cursosActivos.length }} {{ cursosActivos.length === 1 ? 'curso activo' : 'cursos activos' }}.</p>
-      <h2 class="tipo-h2 panel-seccion-titulo">Continuar donde quedaste</h2>
+    @if (cargando()) {
+      <p class="panel-subtitulo">Cargando tus cursos...</p>
+    } @else if (error()) {
+      <div class="estado-vacio"><h3 class="estado-vacio__titulo">No pudimos cargar tus cursos</h3><button type="button" class="btn btn--primario" (click)="cargar()">Reintentar</button></div>
+    } @else if (cursosActivos().length > 0) {
+      <p class="panel-subtitulo">Tienes {{ cursosActivos().length }} {{ cursosActivos().length === 1 ? 'curso registrado' : 'cursos registrados' }}.</p>
+      <div class="panel-pestanas" role="tablist" aria-label="Mis cursos">
+        <button type="button" role="tab" [class.panel-pestanas__boton--activo]="pestana() === 'EN_PROGRESO'" (click)="seleccionarPestana('EN_PROGRESO')">En progreso</button>
+        <button type="button" role="tab" [class.panel-pestanas__boton--activo]="pestana() === 'COMPLETADOS'" (click)="seleccionarPestana('COMPLETADOS')">Completados</button>
+      </div>
+      <h2 class="tipo-h2 panel-seccion-titulo">{{ pestana() === 'EN_PROGRESO' ? 'Cursos en progreso' : 'Cursos completados' }}</h2>
       
-      @for (curso of cursosActivos; track curso.id) {
+      @for (curso of cursosVisibles(); track curso.id) {
         <div class="card panel-curso">
           <div class="panel-curso__acento"></div>
           <div class="panel-curso__imagen" [style.background-image]="'url(' + curso.imagenUrl + ')'"></div>
@@ -32,10 +40,12 @@
               {{ curso.leccionesCompletadas }} de {{ curso.totalLecciones }} lecciones · sigue con "{{ curso.siguienteLeccionNombre }}"
             </div>
           </div>
-          <button type="button" [routerLink]="['/aula', curso.id]" class="btn btn--acento panel-curso__boton">
-            Continuar curso
+          <button type="button" [routerLink]="['/aula', curso.id]" [disabled]="!curso.accesoEfectivo" class="btn btn--acento panel-curso__boton">
+            {{ curso.accesoEfectivo ? 'Continuar curso' : 'Acceso no disponible' }}
           </button>
         </div>
+      } @empty {
+        <div class="estado-vacio"><h3 class="estado-vacio__titulo">No tienes cursos en esta sección</h3><p class="estado-vacio__texto">Tus cursos se mostrarán aquí según su avance académico.</p></div>
       }
     } @else {
       <!-- Estado Alterno cuando no está matriculado en ningún curso -->

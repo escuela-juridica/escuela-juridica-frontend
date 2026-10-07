@@ -17,6 +17,8 @@ import {
 } from '../curso-formato.util';
 import { FichaCursoDetalle, LeccionFicha, VistaPrevia } from '../curso.model';
 import { Session } from '../../../core/session/session';
+import { MatriculaApiService } from '../../matriculas/matricula-api.service';
+import { AlertaGlobalService } from '../../../core/notificaciones/alerta-global.service';
 
 const LARGO_MAXIMO_DESCRIPCION = 260;
 
@@ -35,6 +37,8 @@ export class FichaCurso implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly session = inject(Session);
   private readonly router = inject(Router);
+  private readonly matriculasApi = inject(MatriculaApiService);
+  private readonly alertas = inject(AlertaGlobalService);
 
   protected readonly ficha = signal<FichaCursoDetalle | null>(null);
   protected readonly estado = signal<EstadoPantalla>('cargando');
@@ -210,6 +214,19 @@ export class FichaCurso implements OnInit {
   }
 
   protected alAccionComercial(): void {
+    const curso = this.ficha();
+    if (!curso) return;
+    if (this.session.estaAutenticado() && curso.estadoComercial.accion === 'ACCESS_FREE') {
+      this.matriculasApi.matricularGratis(curso.cursoId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+        next: () => {
+          this.alertas.mostrar('exito', 'Tu matricula fue registrada. Ya puedes verla en Mis cursos.');
+          void this.router.navigate(['/app/panel']);
+        },
+        error: (error: HttpErrorResponse) =>
+          this.alertas.mostrar('error', error.error?.message ?? 'No pudimos registrar la matricula.'),
+      });
+      return;
+    }
     if (this.session.estaAutenticado()) {
       alert('La matrícula y el pago en línea estarán disponibles próximamente.');
       return;

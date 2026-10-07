@@ -124,6 +124,20 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/admin/cursos/curso-editor/curso-editor').then((m) => m.CursoEditor),
       },
+      {
+        path: 'matriculas',
+        loadComponent: () =>
+          import('./features/admin/matriculas/matriculas-listado/matriculas-listado').then(
+            (m) => m.MatriculasListado,
+          ),
+      },
+      {
+        path: 'reportes/matriculas',
+        loadComponent: () =>
+          import('./features/admin/reportes/reporte-matriculas/reporte-matriculas').then(
+            (m) => m.ReporteMatriculas,
+          ),
+      },
     ],
   },
 ];

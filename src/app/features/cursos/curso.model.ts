@@ -96,6 +96,7 @@ export interface ModuloFicha {
 }
 
 export interface FichaCursoDetalle {
+  cursoId: number;
   urlAmigable: string;
   titulo: string;
   descripcion: string | null;
