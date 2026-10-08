@@ -42,9 +42,17 @@
     flex: 0 0 200px;
     align-self: stretch;
     aspect-ratio: 16 / 9;
-    background-image: url('/img/catalogo/curso-1.jpg');
     background-size: cover;
     background-position: center;
+}
+
+.panel-curso__imagen--vacia {
+    display: grid;
+    place-items: center;
+    background-color: var(--neutral-100);
+    color: var(--neutral-600);
+    font-size: 13px;
+    font-weight: 600;
 }
 
 .panel-curso__info {

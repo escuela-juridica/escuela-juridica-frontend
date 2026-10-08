@@ -1,9 +1,9 @@
-import { DatePipe, LowerCasePipe } from '@angular/common';
+import { CurrencyPipe, DatePipe, LowerCasePipe } from '@angular/common';
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatriculaApiService } from '../../../matriculas/matricula-api.service';
-import { MatriculaAdministrativa } from '../../../matriculas/matricula.model';
+import { AdvertenciaMatricula, MatriculaAdministrativa, MatriculaDetalleAdministrativa } from '../../../matriculas/matricula.model';
 import { AlertaGlobalService } from '../../../../core/notificaciones/alerta-global.service';
 import { Modal } from '../../../../shared/ui/modal/modal';
 import { AdminUsuariosApiService } from '../../usuarios/admin-usuarios-api.service';
@@ -14,7 +14,7 @@ import { CrearMatriculaAdministrativa } from '../../../matriculas/matricula-api.
 
 @Component({
   selector: 'app-matriculas-listado',
-  imports: [FormsModule, DatePipe, LowerCasePipe, Modal],
+  imports: [FormsModule, DatePipe, LowerCasePipe, CurrencyPipe, Modal],
   templateUrl: './matriculas-listado.html',
   styleUrl: './matriculas-listado.scss',
 })
@@ -40,6 +40,12 @@ export class MatriculasListado {
   protected readonly filaCancelando = signal<MatriculaAdministrativa | null>(null);
   protected readonly motivoCancelacion = signal('');
   protected readonly cancelando = signal(false);
+  protected readonly advertencia = signal<AdvertenciaMatricula | null>(null);
+  protected readonly consultandoAdvertencia = signal(false);
+  protected readonly errorAdvertencia = signal(false);
+  protected readonly detalle = signal<MatriculaDetalleAdministrativa | null>(null);
+  protected readonly cargandoDetalle = signal(false);
+  protected readonly reenviando = signal(false);
   protected nueva: CrearMatriculaAdministrativa = {
     usuarioId: 0,
     cursoId: 0,
@@ -48,6 +54,7 @@ export class MatriculasListado {
     medio: null,
     referencia: null,
     motivo: '',
+    confirmoAdvertenciaAcademica: false,
   };
 
   constructor() {
@@ -103,6 +110,17 @@ export class MatriculasListado {
     }
   }
 
+  protected etiquetaEstado(estado: string): string {
+    switch (estado) {
+      case 'ACTIVA': return 'Activa';
+      case 'CANCELADA': return 'Cancelada';
+      case 'VENCIDA': return 'Vencida';
+      case 'FINALIZADA': return 'Finalizada';
+      case 'PENDIENTE_PAGO': return 'Pendiente de pago';
+      default: return estado;
+    }
+  }
+
   protected claseIngreso(formaIngreso: string): string {
     switch (formaIngreso) {
       case 'GRATUITA': return 'badge--ingreso-gratuito';
@@ -148,6 +166,10 @@ export class MatriculasListado {
   }
 
   protected abrirFormulario(): void {
+    this.nueva = { usuarioId: 0, cursoId: 0, condicionEconomica: 'EXONERADO', importe: 0,
+      medio: null, referencia: null, motivo: '', confirmoAdvertenciaAcademica: false };
+    this.advertencia.set(null);
+    this.errorAdvertencia.set(false);
     this.formularioAbierto.set(true);
     this.usuariosApi
       .listar('', 'ALUMNO', 'TODOS', 0, 50)
@@ -159,9 +181,65 @@ export class MatriculasListado {
       .subscribe((r) => this.cursos.set(r.items.filter((c) => c.estadoCodigo === 'PUBLICADO' || c.estadoCodigo === 'EN_CURSO')));
   }
 
+  protected consultarAdvertencia(cursoId: number): void {
+    this.nueva.confirmoAdvertenciaAcademica = false;
+    this.advertencia.set(null);
+    this.errorAdvertencia.set(false);
+    if (!cursoId) return;
+    this.consultandoAdvertencia.set(true);
+    this.api.advertenciaAcademica(cursoId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (advertencia) => {
+        this.advertencia.set(advertencia);
+        this.consultandoAdvertencia.set(false);
+      },
+      error: () => {
+        this.errorAdvertencia.set(true);
+        this.consultandoAdvertencia.set(false);
+      },
+    });
+  }
+
+  protected abrirDetalle(fila: MatriculaAdministrativa): void {
+    this.detalle.set(null);
+    this.cargandoDetalle.set(true);
+    this.api.detalleAdministrativo(fila.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (detalle) => { this.detalle.set(detalle); this.cargandoDetalle.set(false); },
+      error: () => {
+        this.cargandoDetalle.set(false);
+        this.alertas.mostrar('error', 'No pudimos cargar el detalle de la matrícula.');
+      },
+    });
+  }
+
+  protected reenviarConfirmacion(): void {
+    const id = this.detalle()?.id;
+    if (!id) return;
+    this.reenviando.set(true);
+    this.api.reenviarConfirmacion(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (resultado) => {
+        this.reenviando.set(false);
+        this.alertas.mostrar(resultado.enviado ? 'exito' : 'error', resultado.mensaje);
+      },
+      error: () => {
+        this.reenviando.set(false);
+        this.alertas.mostrar('error', 'No pudimos reenviar la confirmación.');
+      },
+    });
+  }
+
+  protected cerrarDetalle(): void { this.detalle.set(null); }
+
   protected guardar(): void {
     if (!this.nueva.usuarioId || !this.nueva.cursoId || !this.nueva.motivo.trim()) {
       this.alertas.mostrar('error', 'Selecciona alumno, curso y registra un motivo.');
+      return;
+    }
+    if (this.consultandoAdvertencia() || this.errorAdvertencia()) {
+      this.alertas.mostrar('error', 'Espera a que validemos las condiciones académicas del curso.');
+      return;
+    }
+    if (this.advertencia()?.requiereConfirmacion && !this.nueva.confirmoAdvertenciaAcademica) {
+      this.alertas.mostrar('error', 'Confirma que deseas continuar con esta advertencia académica.');
       return;
     }
     if (

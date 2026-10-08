@@ -218,8 +218,11 @@ export class FichaCurso implements OnInit {
     if (!curso) return;
     if (this.session.estaAutenticado() && curso.estadoComercial.accion === 'ACCESS_FREE') {
       this.matriculasApi.matricularGratis(curso.cursoId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-        next: () => {
-          this.alertas.mostrar('exito', 'Tu matricula fue registrada. Ya puedes verla en Mis cursos.');
+        next: (matricula) => {
+          this.alertas.mostrar(matricula.estadoNotificacion === 'ERROR' ? 'error' : 'exito',
+            matricula.estadoNotificacion === 'ERROR'
+              ? 'La matrícula quedó registrada, pero no pudimos enviar el correo. Puedes reenviarlo desde Mis cursos.'
+              : 'Tu matrícula fue registrada. Ya puedes verla en Mis cursos.');
           void this.router.navigate(['/app/panel']);
         },
         error: (error: HttpErrorResponse) =>

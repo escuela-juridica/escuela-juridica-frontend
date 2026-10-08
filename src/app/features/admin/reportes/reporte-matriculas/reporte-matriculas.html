@@ -41,7 +41,21 @@
       <option value="">Todos los estados</option>
       <option value="ACTIVA">Activa</option>
       <option value="CANCELADA">Cancelada</option>
+      <option value="VENCIDA">Vencida</option>
+      <option value="PENDIENTE_PAGO">Pendiente de pago</option>
     </select>
+    <select class="input" [(ngModel)]="cursoId">
+      <option [ngValue]="null">Todos los cursos</option>
+      @for (curso of cursos(); track curso.id) { <option [ngValue]="curso.id">{{ curso.titulo }}</option> }
+    </select>
+    <select class="input" [(ngModel)]="modalidad">
+      <option value="">Todas las modalidades</option>
+      <option value="VIRTUAL">Virtual</option>
+      <option value="EN_VIVO">En vivo</option>
+      <option value="HIBRIDO">Híbrido</option>
+    </select>
+    <label class="reporte__filtro-fecha">Desde<input class="input" type="date" [(ngModel)]="fechaDesde" [max]="fechaActual" /></label>
+    <label class="reporte__filtro-fecha">Hasta<input class="input" type="date" [(ngModel)]="fechaHasta" [min]="fechaDesde" [max]="fechaActual" /></label>
     <button class="btn btn--acento reporte__btn-filtro" type="button" (click)="buscar()">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="11" cy="11" r="7" />
@@ -82,6 +96,7 @@
             <th>Acceso</th>
             <th>Origen</th>
             <th>Situación académica</th>
+            <th>Certificado</th>
           </tr>
         </thead>
         <tbody>
@@ -99,6 +114,7 @@
               <td>{{ fila.fechaActivacion ? (fila.fechaActivacion | date:'dd/MM/yyyy, h:mm a' | lowercase) : '—' }}</td>
               <td><span [class]="'badge ' + claseIngreso(fila.formaIngreso)">{{ etiquetaIngreso(fila.formaIngreso) }}</span></td>
               <td><span [class]="'badge ' + claseSituacion(fila.situacionAcademica)">{{ etiquetaSituacion(fila.situacionAcademica) }}</span></td>
+              <td>{{ etiquetaCertificado(fila.estadoCertificado) }}</td>
             </tr>
           }
         </tbody>

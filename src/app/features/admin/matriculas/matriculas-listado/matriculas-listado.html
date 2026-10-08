@@ -52,7 +52,7 @@
             <th>Ingreso</th>
             <th>Estado</th>
             <th>Registrada</th>
-            <th></th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -66,12 +66,13 @@
                 </span>
               </td>
               <td>
-                <span class="badge" [class.badge--disp-inmediato]="fila.estado === 'ACTIVA'" [class.badge--disp-cancelado]="fila.estado === 'CANCELADA'">
-                  {{ fila.estado === 'ACTIVA' ? 'Activa' : 'Cancelada' }}
+                <span class="badge" [class.badge--disp-inmediato]="fila.estado === 'ACTIVA'" [class.badge--disp-cancelado]="fila.estado !== 'ACTIVA'">
+                  {{ etiquetaEstado(fila.estado) }}
                 </span>
               </td>
               <td>{{ fila.fechaMatricula | date:'dd/MM/yyyy, h:mm a' | lowercase }}</td>
               <td>
+                <button type="button" class="btn btn--secundario" (click)="abrirDetalle(fila)">Ver detalle</button>
                 @if (fila.estado === 'ACTIVA') {
                   <button type="button" class="matriculas__btn-cancelar" (click)="abrirCancelar(fila)">Cancelar</button>
                 } @else {
@@ -117,13 +118,37 @@
       </label>
       <label>
         Curso
-        <select class="input" [(ngModel)]="nueva.cursoId">
+        <select class="input" [(ngModel)]="nueva.cursoId" (ngModelChange)="consultarAdvertencia($event)">
           <option [ngValue]="0">Selecciona un curso publicado</option>
           @for (curso of cursos(); track curso.id) {
             <option [ngValue]="curso.id">{{ curso.titulo }}</option>
           }
         </select>
       </label>
+      @if (consultandoAdvertencia()) {
+        <p class="matriculas__aviso-carga">Revisando las condiciones académicas del curso…</p>
+      }
+      @if (errorAdvertencia()) {
+        <div class="alerta alerta--error" role="alert">
+          <span class="alerta__icono">!</span>
+          <div class="alerta__titulo">No pudimos consultar las sesiones. Intenta seleccionar el curso nuevamente.</div>
+        </div>
+      }
+      @if (advertencia(); as aviso) {
+        @if (aviso.requiereConfirmacion) {
+          <div class="alerta alerta--advertencia matriculas__aviso-academico" role="status">
+            <span class="alerta__icono">!</span>
+            <div>
+              <strong>Advertencia académica</strong>
+              <p>{{ aviso.mensaje }}</p>
+              <label class="matriculas__confirmacion-aviso">
+                <input type="checkbox" [(ngModel)]="nueva.confirmoAdvertenciaAcademica" />
+                Confirmo que deseo registrar la matrícula con esta condición.
+              </label>
+            </div>
+          </div>
+        }
+      }
       <label>
         Condición
         <select class="input" [(ngModel)]="nueva.condicionEconomica">
@@ -144,6 +169,70 @@
         <button type="button" class="btn btn--primario" [disabled]="enviando()" (click)="guardar()">
           {{ enviando() ? 'Guardando…' : 'Registrar matrícula' }}
         </button>
+      </div>
+    </div>
+  </app-modal>
+}
+
+@if (cargandoDetalle()) {
+  <app-modal titulo="Detalle de matrícula" (cerrar)="cerrarDetalle()">
+    <p class="matriculas__aviso-carga">Cargando el historial de acceso y pagos…</p>
+  </app-modal>
+}
+
+@if (detalle(); as info) {
+  <app-modal titulo="Detalle de matrícula" (cerrar)="cerrarDetalle()">
+    <div class="matricula-detalle">
+      <section class="matricula-detalle__resumen">
+        <h3>{{ info.alumno }}</h3>
+        <p>{{ info.correo }}</p>
+        <dl>
+          <div><dt>Curso</dt><dd>{{ info.cursoTitulo }}</dd></div>
+          <div><dt>Modalidad</dt><dd>{{ info.modalidad }}</dd></div>
+          <div><dt>Estado del acceso</dt><dd>{{ etiquetaEstado(info.estado) }}</dd></div>
+          <div><dt>Forma de ingreso</dt><dd>{{ etiquetaIngreso(info.formaIngreso) }}</dd></div>
+          <div><dt>Responsable</dt><dd>{{ info.responsable }}</dd></div>
+          <div><dt>Fecha de matrícula</dt><dd>{{ info.fechaMatricula | date:'dd/MM/yyyy, h:mm a' | lowercase }}</dd></div>
+          <div><dt>Fecha de activación</dt><dd>{{ info.fechaActivacion ? (info.fechaActivacion | date:'dd/MM/yyyy, h:mm a' | lowercase) : '—' }}</dd></div>
+          <div><dt>Vencimiento</dt><dd>{{ info.fechaVencimiento ? (info.fechaVencimiento | date:'dd/MM/yyyy, h:mm a' | lowercase) : 'Acceso permanente' }}</dd></div>
+          @if (info.motivoCancelacion) { <div><dt>Motivo de cancelación</dt><dd>{{ info.motivoCancelacion }}</dd></div> }
+        </dl>
+      </section>
+      <section>
+        <h3>Historial económico</h3>
+        @if (info.pagos.length) {
+          @for (pago of info.pagos; track pago.pagoId) {
+            <article class="matricula-detalle__pago">
+              <strong>{{ pago.estado }} · {{ pago.importe | currency:pago.moneda:'symbol':'1.2-2' }}</strong>
+              <span>{{ pago.origen }}{{ pago.medio ? ' · ' + pago.medio : '' }}</span>
+              @if (pago.referencia) { <span>Referencia: {{ pago.referencia }}</span> }
+              @if (pago.motivo) { <span>Motivo: {{ pago.motivo }}</span> }
+              <span>Registrado por: {{ pago.registradoPor }}</span>
+              <small>{{ pago.resultadoEn ? (pago.resultadoEn | date:'dd/MM/yyyy, h:mm a' | lowercase) : 'Sin fecha' }}</small>
+            </article>
+          }
+        } @else {
+          <p class="matricula-detalle__sin-pago">Esta matrícula no tiene movimientos económicos registrados.</p>
+        }
+      </section>
+      <section>
+        <h3>Historial de acceso</h3>
+        @for (evento of info.historialEstados; track $index) {
+          <article class="matricula-detalle__evento">
+            <strong>{{ evento.estadoAnterior ?? 'Creada' }} → {{ etiquetaEstado(evento.estadoNuevo) }}</strong>
+            <small>{{ evento.realizadoEn | date:'dd/MM/yyyy, h:mm a' | lowercase }}</small>
+            <span>Responsable: {{ evento.realizadoPor }}</span>
+            @if (evento.motivo) { <p>{{ evento.motivo }}</p> }
+          </article>
+        } @empty {
+          <p class="matricula-detalle__sin-pago">Aún no hay cambios de estado registrados.</p>
+        }
+      </section>
+      <div class="formulario-matricula__acciones">
+        <button type="button" class="btn btn--secundario" [disabled]="reenviando()" (click)="reenviarConfirmacion()">
+          {{ reenviando() ? 'Enviando…' : 'Reenviar confirmación' }}
+        </button>
+        <button type="button" class="btn btn--primario" (click)="cerrarDetalle()">Cerrar</button>
       </div>
     </div>
   </app-modal>

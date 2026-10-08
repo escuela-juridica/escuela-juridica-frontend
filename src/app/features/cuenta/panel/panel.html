@@ -26,7 +26,9 @@
       @for (curso of cursosVisibles(); track curso.id) {
         <div class="card panel-curso">
           <div class="panel-curso__acento"></div>
-          <div class="panel-curso__imagen" [style.background-image]="'url(' + curso.imagenUrl + ')'"></div>
+          <div class="panel-curso__imagen" [class.panel-curso__imagen--vacia]="!curso.imagenUrl" [style.background-image]="curso.imagenUrl ? 'url(' + curso.imagenUrl + ')' : 'none'">
+            @if (!curso.imagenUrl) { <span>Curso ESEJUR</span> }
+          </div>
           <div class="panel-curso__info">
             <div class="panel-curso__categoria">{{ curso.tipo }} · {{ curso.categoria }}</div>
             <h3 class="panel-curso__nombre">{{ curso.nombre }}</h3>
@@ -37,12 +39,23 @@
               <span class="panel-curso__progreso-porcentaje">{{ curso.porcentajeProgreso }}%</span>
             </div>
             <div class="panel-curso__leccion">
-              {{ curso.leccionesCompletadas }} de {{ curso.totalLecciones }} lecciones · sigue con "{{ curso.siguienteLeccionNombre }}"
+              @if (curso.fechaInicio && !curso.accesoEfectivo) {
+                El curso inicia el {{ curso.fechaInicio | date:'dd/MM/yyyy' }}.
+              } @else if (curso.totalLecciones > 0) {
+                {{ curso.leccionesCompletadas }} de {{ curso.totalLecciones }} lecciones completadas · siguiente: "{{ curso.siguienteLeccionNombre }}"
+              } @else {
+                {{ curso.siguienteLeccionNombre }}
+              }
             </div>
           </div>
           <button type="button" [routerLink]="['/aula', curso.id]" [disabled]="!curso.accesoEfectivo" class="btn btn--acento panel-curso__boton">
             {{ curso.accesoEfectivo ? 'Continuar curso' : 'Acceso no disponible' }}
           </button>
+          @if (curso.estadoNotificacion === 'ERROR') {
+            <button type="button" class="btn btn--secundario" [disabled]="reenviando() === curso.id" (click)="reenviarConfirmacion(curso.id)">
+              {{ reenviando() === curso.id ? 'Enviando…' : 'Reenviar confirmación' }}
+            </button>
+          }
         </div>
       } @empty {
         <div class="estado-vacio"><h3 class="estado-vacio__titulo">No tienes cursos en esta sección</h3><p class="estado-vacio__texto">Tus cursos se mostrarán aquí según su avance académico.</p></div>
