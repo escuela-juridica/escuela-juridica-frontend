@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { obtenerIniciales } from '../../session/nombre-utils';
 import { Session } from '../../session/session';
+import { ConfirmacionService } from '../../dialogo/confirmacion.service';
 
 /**
  * Navbar + riel según el prototipo real de HU-008 (Figma: EP02-PF-010-HU-008-Gestión de
@@ -19,6 +20,7 @@ import { Session } from '../../session/session';
 export class LayoutAdmin {
   private readonly session = inject(Session);
   private readonly router = inject(Router);
+  private readonly confirmacion = inject(ConfirmacionService);
 
   protected readonly usuario = this.session.usuario;
   protected readonly menuMovilAbierto = signal(false);
@@ -35,7 +37,16 @@ export class LayoutAdmin {
     this.menuMovilAbierto.set(false);
   }
 
-  cerrarSesion(): void {
+  async cerrarSesion(): Promise<void> {
+    const confirmado = await this.confirmacion.preguntar({
+      titulo: 'Cerrar sesión',
+      mensaje: '¿Deseas salir de tu sesión ahora?',
+      textoConfirmar: 'Sí, cerrar sesión',
+      textoCancelar: 'Seguir aquí',
+      variante: 'peligro',
+    });
+    if (!confirmado) return;
+
     this.session.cerrarSesion().subscribe(() => {
       void this.router.navigate(['/catalogo']);
     });

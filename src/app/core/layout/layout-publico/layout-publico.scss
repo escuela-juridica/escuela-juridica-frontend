@@ -32,97 +32,319 @@ header {
   margin-left: auto;
 }
 
-.header-cuenta {
-  position: relative;
+.header-accion-movil {
+  display: none;
+}
+
+.header-salir-movil {
+  display: none;
+}
+
+.header-avatar-movil {
+  display: none;
 }
 
 .menu-cuenta {
-  position: absolute;
-  top: 48px;
-  right: 0;
-  width: 240px;
-  background: #ffffff;
-  border: 1px solid var(--neutral-200);
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(16, 24, 40, 0.14);
-  z-index: 200;
-  overflow: hidden;
+  position: relative;
+  margin-left: auto;
 }
 
-.menu-cuenta__cabecera {
-  padding: 16px;
+.menu-cuenta__activador {
   display: flex;
-  gap: 10px;
   align-items: center;
-  border-bottom: 1px solid var(--neutral-200);
+  gap: 9px;
+  max-width: 320px;
+  min-height: 44px;
+  padding: 4px 9px;
+  border: 1px solid var(--marca-700);
+  border-radius: var(--radio-md);
+  background: transparent;
+  color: var(--neutral-950);
+  font: inherit;
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease;
 }
 
-.menu-cuenta__avatar-info {
-  min-width: 0;
+.menu-cuenta__activador:hover,
+.menu-cuenta__activador[aria-expanded='true'] {
+  background: var(--acento-050);
+  border-color: var(--acento-700);
+  box-shadow: 0 0 0 3px rgb(0 111 115 / 10%);
 }
 
 .menu-cuenta__nombre {
-  font-size: 14px;
-  line-height: 20px;
+  max-width: 210px;
+  overflow: hidden;
+  color: var(--neutral-950);
+  font-size: 13px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menu-cuenta__flecha {
+  flex: 0 0 auto;
+  color: var(--neutral-500);
+  transition: transform 120ms ease;
+}
+
+.menu-cuenta__flecha--abierta {
+  transform: rotate(180deg);
+}
+
+.menu-cuenta__panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 120;
+  width: min(280px, calc(100vw - 24px));
+  padding: 7px;
+  border: 1px solid var(--marca-700);
+  border-radius: var(--radio-lg);
+  background: #fff;
+  box-shadow: 0 12px 30px rgb(16 56 96 / 20%);
+}
+
+.menu-cuenta__identidad {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 11px 12px;
+  border-bottom: 1px solid var(--neutral-200);
+}
+
+.menu-cuenta__nombre-completo {
+  overflow: hidden;
+  color: var(--neutral-950);
+  font-size: 13px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menu-cuenta__correo {
+  overflow: hidden;
+  color: var(--neutral-500);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menu-cuenta__opcion {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 40px;
+  padding: 0 11px;
+  border: 0;
+  border-radius: var(--radio-sm);
+  background: transparent;
+  color: var(--marca-900);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.menu-cuenta__opcion:hover {
+  background: var(--acento-050);
+}
+
+.menu-cuenta__opcion--salir {
+  margin-top: 3px;
+  border: 1px solid var(--error-borde);
+  background: var(--error-fondo);
+  color: var(--error);
+  font-weight: 700;
+}
+
+.menu-cuenta__opcion--salir:hover {
+  border-color: var(--error);
+  background: #fee4e2;
+}
+
+// Cuenta siempre visible en la barra (nombre + correo + avatar + Salir), igual
+// que <app-layout-alumno> (layout-alumno.scss): aquí con texto oscuro porque
+// este header es blanco, no el navbar oscuro del alumno/admin.
+.header-cuenta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.header-cuenta-boton {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-cuenta-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: 0;
+  max-width: 180px;
+}
+
+.header-cuenta-nombre {
+  font-size: 13px;
   font-weight: 600;
   color: var(--neutral-950);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 100%;
 }
 
-.menu-cuenta__correo {
+.header-cuenta-correo {
   font-size: 12px;
-  line-height: 16px;
   color: var(--neutral-500);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 100%;
 }
 
-.menu-cuenta__acciones {
-  padding: 8px;
-}
-
-.menu-cuenta__item {
-  display: block;
-  width: 100%;
-  text-align: left;
-  padding: 10px 12px;
-  border-radius: 8px;
-  font-size: 14px;
-  line-height: 20px;
-  color: var(--neutral-600);
-  background: none;
-  border: none;
+.header-salir {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 34px;
+  padding: 0 11px;
+  border: 1px solid transparent;
+  border-radius: var(--radio-md);
+  background: #b42318;
+  color: var(--blanco);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
   cursor: pointer;
-  text-decoration: none;
 }
 
-.menu-cuenta__item:hover {
-  background: var(--neutral-050);
+.header-salir:hover {
+  background: #8f1c14;
+}
+
+@media (max-width: 767px) {
+  .header-cuenta-info {
+    display: none;
+  }
+
+  .header-salir span {
+    display: none;
+  }
+
+  .header-acciones--autenticado {
+    width: auto;
+    margin-left: auto;
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+
+  .header-acciones--autenticado .menu-cuenta {
+    display: none;
+  }
+
+  .header-acciones--autenticado .header-accion-movil,
+  .header-salir-movil,
+  .header-avatar-movil {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    min-height: 38px;
+    padding: 0 11px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .header-acciones--autenticado .header-accion-movil {
+    gap: 6px;
+  }
+
+  .header-salir-movil {
+    gap: 6px;
+    border: 1px solid #b42318;
+    border-radius: var(--radio-md);
+    background: #b42318;
+    color: var(--blanco);
+    font-family: inherit;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .header-avatar-movil {
+    flex: 0 0 34px;
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    min-height: 34px;
+    padding: 0;
+  }
+
+  .header-salir-movil:hover {
+    background: #8f1c14;
+  }
 }
 
 @media (max-width: 480px) {
-  // El logo + los dos botones no caben en una fila a 320-375px: en vez de
-  // dejar que el auto-margin los empuje a un lado de forma rara al envolver,
-  // se centran las dos filas y los botones ocupan el ancho completo.
   .header-fila {
-    justify-content: center;
-    gap: 10px;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 12px;
   }
 
-  .header-acciones {
+  .header-logo {
+    height: 34px;
+  }
+
+  .header-acciones:not(.header-acciones--autenticado) {
     margin-left: 0;
     width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
   }
 
-  .header-acciones .btn {
-    flex: 1;
+  .header-acciones:not(.header-acciones--autenticado) .btn {
+    flex: 1 1 auto;
+    min-width: 120px;
     height: 40px;
     padding: 0 10px;
     font-size: 13px;
+  }
+
+  .header-acciones--autenticado {
+    width: auto;
+    margin-left: auto;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    gap: 6px;
+  }
+
+  .header-acciones--autenticado .header-accion-movil,
+  .header-salir-movil {
+    flex: 0 0 auto;
+    min-height: 36px;
+    padding: 0 8px;
+    font-size: 12px;
+  }
+
+  .header-acciones--autenticado .header-accion-movil {
+    gap: 5px;
+  }
+
+  .header-acciones--autenticado {
+    gap: 4px;
+  }
+
+  .header-avatar-movil {
+    flex-basis: 30px;
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+    min-height: 30px;
+    padding: 0;
   }
 }
