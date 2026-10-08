@@ -15,7 +15,7 @@
         } @else {
           <a routerLink="/app/panel" class="btn btn--secundario header-accion-movil">
             <span class="avatar avatar--sm avatar--cuenta header-avatar-movil">{{ iniciales }}</span>
-            Mi espacio
+            Mis cursos
           </a>
         }
         <button type="button" class="header-salir-movil" (click)="cerrarSesion()" aria-label="Cerrar sesión">
@@ -48,7 +48,7 @@
               @if (usuario()?.rolPrincipal === 'ADMINISTRADOR') {
                 <a routerLink="/admin" role="menuitem" class="menu-cuenta__opcion" (click)="cerrarMenuCuenta()">Panel admin</a>
               } @else {
-                <a routerLink="/app/panel" role="menuitem" class="menu-cuenta__opcion" (click)="cerrarMenuCuenta()">Mi espacio</a>
+                <a routerLink="/app/panel" role="menuitem" class="menu-cuenta__opcion" (click)="cerrarMenuCuenta()">Mis cursos</a>
               }
               <button type="button" role="menuitem" class="menu-cuenta__opcion menu-cuenta__opcion--salir" (click)="cerrarSesion()">
                 Cerrar sesión
