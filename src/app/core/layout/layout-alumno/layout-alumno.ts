@@ -14,11 +14,8 @@ export class LayoutAlumno {
   private readonly router = inject(Router);
 
   protected readonly usuario = this.session.usuario;
-  protected readonly menuCuentaAbierto = signal(false);
   protected readonly menuMovilAbierto = signal(false);
-  protected readonly errorSesion = signal('');
 
-  private readonly cuentaMenuRef = viewChild<ElementRef<HTMLElement>>('cuentaMenu');
   private readonly movilBotonRef = viewChild<ElementRef<HTMLElement>>('movilBoton');
   private readonly movilPanelRef = viewChild<ElementRef<HTMLElement>>('movilPanel');
 
@@ -26,16 +23,9 @@ export class LayoutAlumno {
     return obtenerIniciales(this.usuario()?.nombreCompleto) || 'LC';
   }
 
-  /** Antes comparaba contra el host de todo el layout (header + contenido), así que casi
-   * cualquier clic en la página contaba como "adentro" y el menú nunca se cerraba solo. Ahora
-   * cada menú compara solo contra su propio contenedor. */
   @HostListener('document:click', ['$event'])
   protected alClicFuera(evento: MouseEvent): void {
     const objetivo = evento.target as Node;
-
-    if (!this.cuentaMenuRef()?.nativeElement.contains(objetivo)) {
-      this.menuCuentaAbierto.set(false);
-    }
 
     const dentroDeMovil =
       this.movilBotonRef()?.nativeElement.contains(objetivo) ||
@@ -43,14 +33,6 @@ export class LayoutAlumno {
     if (!dentroDeMovil) {
       this.menuMovilAbierto.set(false);
     }
-  }
-
-  protected toggleMenuCuenta(): void {
-    this.menuCuentaAbierto.update((abierto) => !abierto);
-  }
-
-  protected cerrarMenuCuenta(): void {
-    this.menuCuentaAbierto.set(false);
   }
 
   protected toggleMenuMovil(): void {

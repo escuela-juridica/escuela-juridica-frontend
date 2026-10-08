@@ -1,8 +1,9 @@
 // Header/footer del área del alumno (EP01: PF-008 y PF-009). Estilos propios de este layout.
 
+// Fondo --neutral-950 (grafito), igual que el navbar del admin (layout-admin.scss):
+// mismo tratamiento para que ambas áreas (admin y alumno) se vean consistentes.
 header {
-  background: #ffffff;
-  border-bottom: 1px solid var(--neutral-200);
+  background: var(--neutral-950);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -19,8 +20,17 @@ header {
   flex-wrap: wrap;
 }
 
+.header-logo-caja {
+  background: var(--blanco);
+  border-radius: var(--radio-md);
+  padding: 4px 10px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
 .header-logo {
-  height: 44px;
+  height: 36px;
   width: auto;
   cursor: pointer;
 }
@@ -42,7 +52,7 @@ header {
 
 .header-nav__deshabilitado {
   border-bottom: 3px solid transparent;
-  color: var(--neutral-400);
+  color: rgba(255, 255, 255, 0.35);
   font-weight: 400;
   cursor: default;
 }
@@ -53,86 +63,86 @@ header {
   gap: 12px;
 }
 
+// Cuenta siempre visible en la barra (nombre + correo + avatar + Salir), igual
+// que el navbar del admin (.admin-navbar__cuenta en layout-admin.scss) en vez
+// de un menú desplegable: "Mi perfil" ya está en el nav principal, así que no
+// hace falta duplicarlo aquí.
 .header-cuenta {
-  position: relative;
-}
-
-.menu-cuenta {
-  position: absolute;
-  top: 48px;
-  right: 0;
-  width: 240px;
-  background: #ffffff;
-  border: 1px solid var(--neutral-200);
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(16, 24, 40, 0.14);
-  z-index: 200;
-  overflow: hidden;
-}
-
-.menu-cuenta__cabecera {
-  padding: 16px;
   display: flex;
-  gap: 10px;
   align-items: center;
-  border-bottom: 1px solid var(--neutral-200);
+  gap: 12px;
+  flex-shrink: 0;
 }
 
-.menu-cuenta__avatar-info {
+.header-cuenta-boton {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-cuenta-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
   min-width: 0;
+  max-width: 180px;
 }
 
-.menu-cuenta__nombre {
-  font-size: 14px;
-  line-height: 20px;
+.header-cuenta-nombre {
+  font-size: 13px;
   font-weight: 600;
-  color: var(--neutral-950);
+  color: var(--blanco);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 100%;
 }
 
-.menu-cuenta__correo {
+.header-cuenta-correo {
   font-size: 12px;
-  line-height: 16px;
-  color: var(--neutral-500);
+  color: rgba(255, 255, 255, 0.6);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 100%;
 }
 
-.menu-cuenta__acciones {
-  padding: 8px;
-}
-
-.menu-cuenta__item {
-  display: block;
-  width: 100%;
-  text-align: left;
-  padding: 10px 12px;
-  border-radius: 8px;
-  font-size: 14px;
-  line-height: 20px;
-  color: var(--neutral-600);
-  background: none;
-  border: none;
+.header-salir {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 34px;
+  padding: 0 11px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: var(--radio-md);
+  background: #b42318;
+  color: var(--blanco);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
   cursor: pointer;
-  text-decoration: none;
 }
 
-.menu-cuenta__item:hover {
-  background: var(--neutral-050);
+.header-salir:hover {
+  background: #8f1c14;
 }
 
 .nav-enlace {
   border-bottom: 3px solid transparent;
-  color: var(--neutral-600);
+  border-radius: var(--radio-md) var(--radio-md) 0 0;
+  color: rgba(255, 255, 255, 0.75);
   font-weight: 400;
+}
+
+.nav-enlace:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--blanco);
+  text-decoration: none;
 }
 
 .nav-enlace--activo {
   border-bottom-color: var(--acento-500);
-  color: var(--marca-900);
+  color: var(--blanco);
   font-weight: 600;
 }
 
@@ -190,14 +200,14 @@ header {
   height: 40px;
   flex: none;
   border-radius: var(--radio-md);
-  border: 1px solid var(--neutral-200);
-  background: #ffffff;
-  color: var(--neutral-600);
+  border: none;
+  background: none;
+  color: var(--blanco);
   cursor: pointer;
 }
 
 .header-hamburguesa:hover {
-  background: var(--neutral-050);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .menu-movil {
@@ -205,7 +215,7 @@ header {
   flex-direction: column;
   gap: 2px;
   padding: 8px 16px 16px;
-  border-top: 1px solid var(--neutral-200);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .menu-movil__item {
@@ -213,24 +223,25 @@ header {
   border-radius: var(--radio-md);
   font-size: 14px;
   line-height: 20px;
-  color: var(--neutral-600);
+  color: rgba(255, 255, 255, 0.75);
   font-weight: 400;
   text-decoration: none;
   cursor: pointer;
 }
 
 .menu-movil__item:hover {
-  background: var(--neutral-050);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--blanco);
 }
 
 .menu-movil__item--activo {
-  color: var(--marca-900);
+  color: var(--blanco);
   font-weight: 600;
-  background: var(--acento-050);
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .menu-movil__item--deshabilitado {
-  color: var(--neutral-400);
+  color: rgba(255, 255, 255, 0.35);
   cursor: default;
 }
 
@@ -245,5 +256,14 @@ header {
 
   .header-hamburguesa {
     display: inline-flex;
+  }
+
+  // Sin nombre/correo ni texto "Salir": solo caben el avatar y el ícono.
+  .header-cuenta-info {
+    display: none;
+  }
+
+  .header-salir span {
+    display: none;
   }
 }

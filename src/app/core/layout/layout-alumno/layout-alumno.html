@@ -1,7 +1,7 @@
 <!-- Encabezado y pie del área del alumno (EP01: PF-008 y PF-009). Mockup fiel al prototipo. -->
 <header>
   <div class="header-fila">
-    <a routerLink="/catalogo"
+    <a routerLink="/catalogo" class="header-logo-caja"
       ><img src="img/logo-esejur.png" alt="Escuela Jurídica" class="header-logo"
     /></a>
     <nav class="header-nav">
@@ -39,43 +39,18 @@
           <line x1="3" y1="18" x2="21" y2="18" />
         </svg>
       </button>
-      <div class="header-cuenta" #cuentaMenu>
-        <button
-          type="button"
-          class="avatar avatar--md avatar--cuenta"
-          style="padding: 0"
-          aria-haspopup="true"
-          [attr.aria-expanded]="menuCuentaAbierto()"
-          (click)="toggleMenuCuenta()"
-        >
-          {{ iniciales }}
+      <div class="header-cuenta">
+        <div class="header-cuenta-boton">
+          <span class="header-cuenta-info">
+            <span class="header-cuenta-nombre">{{ usuario()?.nombreCompleto || 'Lucía Caminos' }}</span>
+            <span class="header-cuenta-correo">{{ usuario()?.correo || 'lucia.caminos@esejur.pe' }}</span>
+          </span>
+          <span class="avatar avatar--sm avatar--cuenta">{{ iniciales }}</span>
+        </div>
+        <button type="button" (click)="cerrarSesion()" class="header-salir" aria-label="Cerrar sesión">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 17l5-5-5-5" /><path d="M15 12H3" /><path d="M21 19V5a2 2 0 0 0-2-2h-6" /></svg>
+          <span>Salir</span>
         </button>
-        @if (menuCuentaAbierto()) {
-          <div class="menu-cuenta">
-            <div class="menu-cuenta__cabecera">
-              <span class="avatar avatar--sm avatar--cuenta" style="flex: 0 0 36px">{{ iniciales }}</span>
-              <div class="menu-cuenta__avatar-info">
-                <div class="menu-cuenta__nombre">
-                  {{ usuario()?.nombreCompleto || 'Lucía Caminos' }}
-                </div>
-                <div class="menu-cuenta__correo">
-                  {{ usuario()?.correo || 'lucia.caminos@esejur.pe' }}
-                </div>
-              </div>
-            </div>
-            <div class="menu-cuenta__acciones">
-              <a routerLink="/app/perfil" (click)="cerrarMenuCuenta()" class="menu-cuenta__item"
-                >Mi perfil</a
-              >
-              <button type="button" (click)="cerrarSesion()" class="menu-cuenta__item">
-                Cerrar sesión
-              </button>
-              @if (errorSesion()) {
-                <p role="alert">{{ errorSesion() }}</p>
-              }
-            </div>
-          </div>
-        }
       </div>
     </div>
   </div>
