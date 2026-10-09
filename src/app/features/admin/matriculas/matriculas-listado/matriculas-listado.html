@@ -72,12 +72,10 @@
               </td>
               <td>{{ fila.fechaMatricula | date:'dd/MM/yyyy, h:mm a' | lowercase }}</td>
               <td>
-                <button type="button" class="btn btn--secundario" (click)="abrirDetalle(fila)">Ver detalle</button>
-                @if (fila.estado === 'ACTIVA') {
-                  <button type="button" class="matriculas__btn-cancelar" (click)="abrirCancelar(fila)">Cancelar</button>
-                } @else {
-                  <button type="button" class="matriculas__btn-cancelar" disabled>Cancelar</button>
-                }
+                <div class="matriculas__acciones">
+                  <button type="button" class="btn btn--secundario" (click)="abrirDetalle(fila)">Ver detalle</button>
+                  <button type="button" class="btn btn--peligro" [disabled]="fila.estado !== 'ACTIVA'" (click)="abrirCancelar(fila)">Cancelar</button>
+                </div>
               </td>
             </tr>
           }
@@ -109,21 +107,27 @@
     <div class="formulario-matricula">
       <label>
         Alumno
-        <select class="input" [(ngModel)]="nueva.usuarioId">
+        <select class="input" [class.input--error]="intentoRegistrar() && !nueva.usuarioId" [(ngModel)]="nueva.usuarioId">
           <option [ngValue]="0">Selecciona un alumno</option>
           @for (alumno of alumnos(); track alumno.usuarioId) {
             <option [ngValue]="alumno.usuarioId">{{ alumno.nombreCompleto }} · {{ alumno.correo }}</option>
           }
         </select>
+        @if (intentoRegistrar() && !nueva.usuarioId) {
+          <div class="campo-error">Selecciona el alumno que se va a matricular.</div>
+        }
       </label>
       <label>
         Curso
-        <select class="input" [(ngModel)]="nueva.cursoId" (ngModelChange)="consultarAdvertencia($event)">
+        <select class="input" [class.input--error]="intentoRegistrar() && !nueva.cursoId" [(ngModel)]="nueva.cursoId" (ngModelChange)="consultarAdvertencia($event)">
           <option [ngValue]="0">Selecciona un curso publicado</option>
           @for (curso of cursos(); track curso.id) {
             <option [ngValue]="curso.id">{{ curso.titulo }}</option>
           }
         </select>
+        @if (intentoRegistrar() && !nueva.cursoId) {
+          <div class="campo-error">Selecciona el curso en el que se matriculará.</div>
+        }
       </label>
       @if (consultandoAdvertencia()) {
         <p class="matriculas__aviso-carga">Revisando las condiciones académicas del curso…</p>
@@ -158,12 +162,36 @@
       </label>
       @if (nueva.condicionEconomica === 'REGISTRADO_MANUAL') {
         <div class="formulario-matricula__dos">
-          <label>Importe<input class="input" type="number" min="0.01" [(ngModel)]="nueva.importe" /></label>
-          <label>Medio<input class="input" [(ngModel)]="nueva.medio" placeholder="Transferencia, Yape..." /></label>
+          <label>
+            Importe
+            <input class="input" type="number" min="0.01" [class.input--error]="intentoRegistrar() && !nueva.importe" [(ngModel)]="nueva.importe" />
+            @if (intentoRegistrar() && !nueva.importe) {
+              <div class="campo-error">Ingresa el importe pagado.</div>
+            }
+          </label>
+          <label>
+            Medio
+            <input class="input" [class.input--error]="intentoRegistrar() && !nueva.medio?.trim()" [(ngModel)]="nueva.medio" placeholder="Transferencia, Yape..." />
+            @if (intentoRegistrar() && !nueva.medio?.trim()) {
+              <div class="campo-error">Indica el medio de pago.</div>
+            }
+          </label>
         </div>
-        <label>Referencia<input class="input" [(ngModel)]="nueva.referencia" placeholder="Nro. de operación o constancia" /></label>
+        <label>
+          Referencia
+          <input class="input" [class.input--error]="intentoRegistrar() && !nueva.referencia?.trim()" [(ngModel)]="nueva.referencia" placeholder="Nro. de operación o constancia" />
+          @if (intentoRegistrar() && !nueva.referencia?.trim()) {
+            <div class="campo-error">Ingresa el número de operación o constancia.</div>
+          }
+        </label>
       }
-      <label>Motivo<textarea class="input" [(ngModel)]="nueva.motivo" rows="3" placeholder="Justificación de la asignación"></textarea></label>
+      <label>
+        Motivo
+        <textarea class="input" [class.input--error]="intentoRegistrar() && !nueva.motivo.trim()" [(ngModel)]="nueva.motivo" rows="3" placeholder="Justificación de la asignación"></textarea>
+        @if (intentoRegistrar() && !nueva.motivo.trim()) {
+          <div class="campo-error">Explica el motivo de esta matrícula.</div>
+        }
+      </label>
       <div class="formulario-matricula__acciones">
         <button type="button" class="btn btn--secundario" (click)="formularioAbierto.set(false)">Cancelar</button>
         <button type="button" class="btn btn--primario" [disabled]="enviando()" (click)="guardar()">
@@ -181,25 +209,32 @@
 }
 
 @if (detalle(); as info) {
-  <app-modal titulo="Detalle de matrícula" (cerrar)="cerrarDetalle()">
+  <app-modal titulo="Detalle de matrícula" ancho="lg" (cerrar)="cerrarDetalle()">
     <div class="matricula-detalle">
+      <section class="matricula-detalle__identidad">
+        <span class="avatar avatar--md avatar--cuenta">{{ iniciales(info.alumno) }}</span>
+        <div class="matricula-detalle__identidad-texto">
+          <h3>{{ info.alumno }}</h3>
+          <p>{{ info.correo }}</p>
+        </div>
+        <span class="badge" [class.badge--disp-inmediato]="info.estado === 'ACTIVA'" [class.badge--disp-cancelado]="info.estado !== 'ACTIVA'">
+          {{ etiquetaEstado(info.estado) }}
+        </span>
+      </section>
       <section class="matricula-detalle__resumen">
-        <h3>{{ info.alumno }}</h3>
-        <p>{{ info.correo }}</p>
         <dl>
           <div><dt>Curso</dt><dd>{{ info.cursoTitulo }}</dd></div>
           <div><dt>Modalidad</dt><dd>{{ info.modalidad }}</dd></div>
-          <div><dt>Estado del acceso</dt><dd>{{ etiquetaEstado(info.estado) }}</dd></div>
-          <div><dt>Forma de ingreso</dt><dd>{{ etiquetaIngreso(info.formaIngreso) }}</dd></div>
+          <div><dt>Forma de ingreso</dt><dd><span [class]="'badge ' + claseIngreso(info.formaIngreso)">{{ etiquetaIngreso(info.formaIngreso) }}</span></dd></div>
           <div><dt>Responsable</dt><dd>{{ info.responsable }}</dd></div>
           <div><dt>Fecha de matrícula</dt><dd>{{ info.fechaMatricula | date:'dd/MM/yyyy, h:mm a' | lowercase }}</dd></div>
           <div><dt>Fecha de activación</dt><dd>{{ info.fechaActivacion ? (info.fechaActivacion | date:'dd/MM/yyyy, h:mm a' | lowercase) : '—' }}</dd></div>
           <div><dt>Vencimiento</dt><dd>{{ info.fechaVencimiento ? (info.fechaVencimiento | date:'dd/MM/yyyy, h:mm a' | lowercase) : 'Acceso permanente' }}</dd></div>
-          @if (info.motivoCancelacion) { <div><dt>Motivo de cancelación</dt><dd>{{ info.motivoCancelacion }}</dd></div> }
+          @if (info.motivoCancelacion) { <div class="matricula-detalle__ancho-completo"><dt>Motivo de cancelación</dt><dd>{{ info.motivoCancelacion }}</dd></div> }
         </dl>
       </section>
       <section>
-        <h3>Historial económico</h3>
+        <h3 class="matricula-detalle__titulo-seccion">Historial económico</h3>
         @if (info.pagos.length) {
           @for (pago of info.pagos; track pago.pagoId) {
             <article class="matricula-detalle__pago">
@@ -216,7 +251,7 @@
         }
       </section>
       <section>
-        <h3>Historial de acceso</h3>
+        <h3 class="matricula-detalle__titulo-seccion">Historial de acceso</h3>
         @for (evento of info.historialEstados; track $index) {
           <article class="matricula-detalle__evento">
             <strong>{{ evento.estadoAnterior ?? 'Creada' }} → {{ etiquetaEstado(evento.estadoNuevo) }}</strong>

@@ -11,6 +11,7 @@ import { UsuarioAdminRespuesta } from '../../usuarios/usuario-admin.model';
 import { CursoAdminApiService } from '../../cursos/curso-admin-api.service';
 import { CursoResumenRespuesta } from '../../cursos/curso-admin.model';
 import { CrearMatriculaAdministrativa } from '../../../matriculas/matricula-api.service';
+import { obtenerIniciales } from '../../../../core/session/nombre-utils';
 
 @Component({
   selector: 'app-matriculas-listado',
@@ -46,6 +47,9 @@ export class MatriculasListado {
   protected readonly detalle = signal<MatriculaDetalleAdministrativa | null>(null);
   protected readonly cargandoDetalle = signal(false);
   protected readonly reenviando = signal(false);
+  // Mismo patrón que examenes-tab.ts: se activa al intentar guardar, y recién ahí los campos
+  // vacíos se marcan en rojo (.input--error) — no desde que se abre el formulario.
+  protected readonly intentoRegistrar = signal(false);
   protected nueva: CrearMatriculaAdministrativa = {
     usuarioId: 0,
     cursoId: 0,
@@ -121,6 +125,9 @@ export class MatriculasListado {
     }
   }
 
+  // Avatar del encabezado del modal de detalle (misma función que usan los navbars).
+  protected readonly iniciales = obtenerIniciales;
+
   protected claseIngreso(formaIngreso: string): string {
     switch (formaIngreso) {
       case 'GRATUITA': return 'badge--ingreso-gratuito';
@@ -170,6 +177,7 @@ export class MatriculasListado {
       medio: null, referencia: null, motivo: '', confirmoAdvertenciaAcademica: false };
     this.advertencia.set(null);
     this.errorAdvertencia.set(false);
+    this.intentoRegistrar.set(false);
     this.formularioAbierto.set(true);
     this.usuariosApi
       .listar('', 'ALUMNO', 'TODOS', 0, 50)
@@ -230,6 +238,7 @@ export class MatriculasListado {
   protected cerrarDetalle(): void { this.detalle.set(null); }
 
   protected guardar(): void {
+    this.intentoRegistrar.set(true);
     if (!this.nueva.usuarioId || !this.nueva.cursoId || !this.nueva.motivo.trim()) {
       this.alertas.mostrar('error', 'Selecciona alumno, curso y registra un motivo.');
       return;

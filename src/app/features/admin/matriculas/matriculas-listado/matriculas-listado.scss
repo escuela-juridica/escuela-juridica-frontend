@@ -97,32 +97,14 @@
   margin-top: 2px;
 }
 
-// Rojo sólido, igual que "Eliminar" en Cursos (.btn--peligro) — una acción destructiva no debe
-// verse igual que el badge informativo de "Cancelada".
-.matriculas__btn-cancelar {
-  display: inline-flex;
+// Fila de botones de la columna Acciones: "Ver detalle" (.btn--secundario) y "Cancelar"
+// (.btn--peligro, igual que "Eliminar" en Cursos) ya comparten el tamaño estándar de .btn
+// (44px) — antes "Cancelar" era un botón a medida de 30px sin contenedor, así que quedaban
+// desalineados en vez de una fila limpia.
+.matriculas__acciones {
+  display: flex;
   align-items: center;
-  height: 30px;
-  padding: 0 12px;
-  border: none;
-  border-radius: var(--radio-md);
-  background: var(--error);
-  color: var(--blanco);
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background-color 0.15s ease;
-}
-
-.matriculas__btn-cancelar:hover:not(:disabled) {
-  background: #8f1b13;
-}
-
-.matriculas__btn-cancelar:disabled {
-  border-color: var(--neutral-200);
-  background: var(--neutral-100);
-  color: var(--neutral-400);
-  cursor: not-allowed;
+  gap: 8px;
 }
 
 .matriculas__paginacion {
@@ -202,19 +184,54 @@
 }
 
 .matricula-detalle section {
-  border-bottom: 1px solid #eaecf0;
+  border-bottom: 1px solid var(--neutral-200);
   padding-bottom: 1rem;
 }
 
-.matricula-detalle h3 {
-  color: #103860;
-  font-size: 1rem;
-  margin: 0 0 0.65rem;
+// Encabezado de identidad: avatar + nombre/correo + badge de estado a la derecha, en vez de
+// solo texto plano — mismo patrón de .avatar que ya usan los navbars de la app.
+.matricula-detalle__identidad {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
 }
 
-.matricula-detalle__resumen > p {
-  color: #667085;
-  margin: -0.4rem 0 0.9rem;
+.matricula-detalle__identidad-texto {
+  min-width: 0;
+}
+
+.matricula-detalle__identidad-texto h3 {
+  color: var(--neutral-950);
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.matricula-detalle__identidad-texto p {
+  color: var(--neutral-500);
+  font-size: 0.85rem;
+  margin: 0.1rem 0 0;
+}
+
+.matricula-detalle__identidad > .badge {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+// Título de cada bloque de historial: más discreto que el nombre del encabezado, con un
+// acento de color a la izquierda para separar visualmente las secciones de la tabla de datos.
+.matricula-detalle__titulo-seccion {
+  color: var(--marca-900);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin: 0 0 0.65rem;
+  padding-left: 0.6rem;
+  border-left: 3px solid var(--acento-500);
 }
 
 .matricula-detalle dl {
@@ -222,6 +239,10 @@
   gap: 0.55rem 1rem;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   margin: 0;
+}
+
+.matricula-detalle__ancho-completo {
+  grid-column: 1 / -1;
 }
 
 .matricula-detalle dl div,
@@ -233,7 +254,7 @@
 
 .matricula-detalle dt,
 .matricula-detalle small {
-  color: #667085;
+  color: var(--neutral-500);
   font-size: 0.78rem;
 }
 
@@ -243,24 +264,42 @@
 
 .matricula-detalle__pago,
 .matricula-detalle__evento {
-  background: #f8fafc;
-  border: 1px solid #eaecf0;
+  background: var(--neutral-050);
+  border: 1px solid var(--neutral-200);
   border-radius: 0.5rem;
   margin-top: 0.5rem;
   padding: 0.75rem;
 }
 
 .matricula-detalle__pago span,
-.matricula-detalle__evento p,
-.matricula-detalle__sin-pago {
-  color: #475467;
+.matricula-detalle__evento p {
+  color: var(--neutral-600);
   font-size: 0.88rem;
   margin: 0;
+}
+
+.matricula-detalle__sin-pago {
+  color: var(--neutral-500);
+  font-size: 0.88rem;
+  text-align: center;
+  margin: 0;
+  padding: 1rem;
+  background: var(--neutral-050);
+  border: 1px dashed var(--neutral-200);
+  border-radius: 0.5rem;
 }
 
 @media (max-width: 640px) {
   .matricula-detalle dl {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .matricula-detalle__identidad {
+    flex-wrap: wrap;
+  }
+
+  .matricula-detalle__identidad > .badge {
+    margin-left: 0;
   }
 }
 
