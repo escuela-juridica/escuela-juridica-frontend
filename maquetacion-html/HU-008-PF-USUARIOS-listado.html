@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Admin · Usuarios — ESEJUR</title>
+<link rel="stylesheet" href="estilos.css" />
+<style>
+/* ============================================================
+   ESTILOS PROPIOS DE ESTA PANTALLA (HU-008 — Admin usuarios)
+   ============================================================
+   El header oscuro + riel lateral de íconos son componentes
+   reusables reales (layout-admin.html/.scss, compartidos por
+   Cursos, Usuarios, Matrículas y Reportes) — acá están con
+   estilo inline porque este paquete no corre Angular, pero no
+   se tocan. Las clases .usuarios-admin-* de abajo SÍ son
+   propias de esta pantalla (copiadas tal cual del componente
+   Angular real antes de que se vaciara para este ejercicio).
+   ============================================================ */
+.admin-pagina { padding: 32px; max-width: 1040px; margin: 0 auto; }
+
+.usuarios-admin-cabecera {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.usuarios-admin-titulo {
+  font-size: 22px;
+  line-height: 30px;
+  font-weight: 700;
+  color: var(--neutral-950);
+  margin: 0;
+}
+
+.usuarios-admin-subtitulo {
+  color: var(--neutral-600);
+  margin: 4px 0 0;
+}
+
+.usuarios-admin-filtros {
+  display: grid;
+  grid-template-columns: 1fr 220px;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.usuarios-admin-tabla {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radio-lg);
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.usuarios-admin-fila {
+  display: grid;
+  grid-template-columns: 1.4fr 1.6fr 0.9fr 1fr 1.3fr 84px;
+  gap: 12px;
+  align-items: center;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--neutral-100);
+  color: inherit;
+  font-size: 14px;
+}
+
+.usuarios-admin-fila:last-child { border-bottom: none; }
+.usuarios-admin-fila:not(.usuarios-admin-fila--cabecera):hover { background: var(--neutral-050); }
+
+.usuarios-admin-fila__ver {
+  appearance: none;
+  border: none;
+  background: var(--acento-700);
+  color: var(--blanco);
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--radio-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.usuarios-admin-fila__ver:hover { background: var(--marca-900); }
+
+.usuarios-admin-fila--cabecera {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--neutral-500);
+}
+
+.usuarios-admin-fila__nombre { font-weight: 600; color: var(--neutral-950); }
+.usuarios-admin-fila__correo { color: var(--neutral-600); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.usuarios-admin-paginacion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+  font-size: 14px;
+  color: var(--neutral-600);
+}
+
+/* Modales de crear/ver usuario — mismo patrón app-modal que Matrículas y Sesiones admin */
+.modal-fondo { position: static; padding: 0 32px 32px; }
+.modal-caja { width: 100%; max-width: 640px; margin: 0 auto; background: #fff; border-radius: 16px; box-shadow: 0 20px 40px rgba(16,24,40,.12); border: 1px solid var(--neutral-200); }
+.modal-cabecera { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid var(--neutral-100); }
+.modal-titulo { margin: 0; font-size: 18px; font-weight: 700; color: var(--neutral-950); }
+.modal-cuerpo { padding: 24px; display: grid; gap: 16px; }
+.modal-acciones { display: flex; justify-content: flex-end; gap: 12px; padding: 0 24px 24px; }
+
+@media (max-width: 900px) {
+  .usuarios-admin-filtros { grid-template-columns: 1fr; }
+  .usuarios-admin-fila--cabecera { display: none; }
+  .usuarios-admin-fila { grid-template-columns: 1fr; gap: 4px; }
+}
+</style>
+</head>
+<body>
+
+<div class="guia-equipo">
+  <div class="guia-equipo__titulo">Admin · Usuarios (listado, crear y detalle)</div>
+  <span class="guia-equipo__hu">HU-008 — Gestionar usuarios administrativamente</span>
+
+  <h3>Qué es esta pantalla</h3>
+  <ul>
+    <li>Es el listado de cuentas del panel de administración (ruta <code>/admin/usuarios</code> en
+    el riel lateral). Esta historia <strong>ya estuvo terminada y funcionando</strong> — se reasignó
+    como ejercicio del equipo, así que esta maqueta es la pantalla real, no un diseño nuevo. La guía
+    técnica completa (con el código íntegro para reconstruirla) está en
+    <code>docs/epica-4/HU-008-MAPA-TECNICO-GESTIONAR-USUARIOS.md</code>.</li>
+    <li>"Crear usuario" y el botón "Ver" de cada fila <strong>no navegan a otra pantalla</strong>:
+    abren un modal (<code>app-modal</code>, el mismo componente que usan Matrículas y Sesiones del
+    admin) con el formulario de alta o el detalle/edición de esa cuenta. Más abajo, bajo la etiqueta
+    "Estado alterno", quedaron los dos modales maquetados para que veas su contenido — en la app real
+    se abre uno solo a la vez, nunca junto con la tabla.</li>
+    <li>La columna "Estado de cuenta" muestra <strong>un solo rótulo por fila</strong>, nunca dos a
+    la vez: Deshabilitada (gana siempre si la cuenta está apagada), Contraseña temporal, Correo sin
+    verificar, o Habilitada. Las cuatro filas de ejemplo de la tabla cubren esos cuatro casos.</li>
+  </ul>
+
+  <h3>Dónde poner tus estilos</h3>
+  <ul>
+    <li>Bloque <code>&lt;style&gt;</code> de acá arriba — clases <code>.usuarios-admin-*</code> (ya
+    vienen con los valores reales que tenía el componente Angular, incluido el tamaño del título:
+    22px/30px, el estándar de todos los <code>&lt;h1&gt;</code> de pantallas admin, no 28px).</li>
+    <li><code>.btn</code>, <code>.badge</code>, <code>.input</code>, <code>.alerta</code>,
+    <code>.estado-vacio</code>, <code>.label</code>, <code>.campo-error</code>,
+    <code>.nota-pill</code> ya están en <code>estilos.css</code> — reusalas, no crees versiones
+    nuevas.</li>
+  </ul>
+
+  <h3>Qué NO tocar</h3>
+  <ul>
+    <li>El header oscuro + riel lateral de íconos — son <code>layout-admin.html</code>, compartidos
+    por todo el admin (Cursos, Usuarios, Matrículas, Reportes).</li>
+    <li>El bloque "Estado alterno" de abajo (los dos modales y el estado "sin resultados") es solo
+    para que veas esos tres diseños — en la app real nunca conviven con la tabla al mismo tiempo.</li>
+  </ul>
+
+  <h3>Cuándo termines</h3>
+  <p>
+    Copiá <strong>solo lo que está adentro de <code>&lt;main&gt;...&lt;/main&gt;</code></strong>.
+    La cabecera + filtros + tabla van a
+    <code>src/app/features/admin/usuarios/usuarios-listado/usuarios-listado.html</code> (hoy tiene
+    un placeholder <code>.pantalla-pendiente</code> — se reemplaza por esto). El modal "Crear
+    usuario" va a <code>usuario-crear/usuario-crear.html</code> y el modal de detalle va a
+    <code>usuario-detalle/usuario-detalle.html</code> (ambos en la misma carpeta
+    <code>features/admin/usuarios/</code>). Las clases <code>.usuarios-admin-*</code> del
+    <code>&lt;style&gt;</code> van a <code>usuarios-listado.scss</code>, al lado del
+    <code>.html</code>.
+  </p>
+
+  <div class="guia-equipo__nuevo">
+    <strong>¿Necesitás un estilo que no existe ni en <code>estilos.css</code> ni acá arriba?</strong> Anotalo:
+    <br />— (vacío, tu equipo escribe acá) —
+  </div>
+</div>
+
+<!-- ============================================================
+     A PARTIR DE ACÁ: CONTENIDO REAL (header/riel del admin + pantalla de usuarios)
+     ============================================================ -->
+<div class="admin-shell" style="display:flex; flex-direction:column; min-height:100vh; background:var(--neutral-050)">
+  <header style="position:sticky; top:0; z-index:30; display:flex; align-items:center; gap:16px; height:60px; padding:0 20px; background:#101828">
+    <div style="background:#fff; border-radius:8px; padding:6px 12px; display:flex; align-items:center">
+      <img src="img/logo-esejur.png" alt="Escuela Jurídica" style="height:26px" />
+    </div>
+    <span style="flex:1"></span>
+    <span style="color:#fff; font-size:13px; font-weight:600">Ricardo Prada</span>
+    <span class="avatar avatar--sm avatar--cuenta">RP</span>
+    <button type="button" style="display:flex; align-items:center; gap:7px; min-height:34px; padding:0 11px; border:1px solid rgba(255,255,255,.35); border-radius:8px; background:#b42318; color:#fff; font-weight:700; font-size:13px">Salir</button>
+  </header>
+
+  <div style="display:flex; flex:1">
+    <aside style="width:232px; background:#101828; padding:16px 0; flex-shrink:0">
+      <div style="padding:10px 20px; color:rgba(255,255,255,.5); font-size:12px; text-transform:uppercase">Administración</div>
+      <div style="padding:10px 20px; color:rgba(255,255,255,.75); font-size:14px">Cursos</div>
+      <div style="padding:10px 20px; color:#fff; background:rgba(255,255,255,.08); border-left:3px solid #00d8d8; font-size:14px">Usuarios</div>
+      <div style="padding:10px 20px; color:rgba(255,255,255,.75); font-size:14px">Matrículas</div>
+      <div style="padding:10px 20px; color:rgba(255,255,255,.75); font-size:14px">Reportes</div>
+    </aside>
+
+    <main style="flex:1">
+      <div class="admin-pagina">
+        <div class="usuarios-admin-cabecera">
+          <div>
+            <h1 class="usuarios-admin-titulo">Usuarios</h1>
+            <p class="usuarios-admin-subtitulo">La habilitación exige correo verificado y contraseña propia.</p>
+          </div>
+          <button type="button" class="btn btn--primario">Crear usuario</button>
+        </div>
+
+        <div class="usuarios-admin-filtros">
+          <input class="input" placeholder="Buscar por nombre o correo" />
+          <select class="input">
+            <option>Todos los roles</option>
+            <option>Alumno</option>
+            <option>Administrador</option>
+          </select>
+        </div>
+
+        <div class="usuarios-admin-tabla">
+          <div class="usuarios-admin-fila usuarios-admin-fila--cabecera">
+            <span>Nombre</span>
+            <span>Correo</span>
+            <span>Rol</span>
+            <span>Origen</span>
+            <span>Estado de cuenta</span>
+            <span></span>
+          </div>
+
+          <div class="usuarios-admin-fila">
+            <span class="usuarios-admin-fila__nombre">Lucía Caminos Reyes</span>
+            <span class="usuarios-admin-fila__correo">lucia.caminos@esejur.pe</span>
+            <span>Alumno</span>
+            <span>Formulario</span>
+            <span><span class="badge badge--disp-inmediato">Habilitada</span></span>
+            <button type="button" class="usuarios-admin-fila__ver" aria-label="Ver Lucía Caminos Reyes">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+              <span>Ver</span>
+            </button>
+          </div>
+
+          <div class="usuarios-admin-fila">
+            <span class="usuarios-admin-fila__nombre">Joel Anthony Saldaña</span>
+            <span class="usuarios-admin-fila__correo">joel.saldana@esejur.pe</span>
+            <span>Alumno</span>
+            <span>Administración</span>
+            <span><span class="badge badge--advertencia-suave">Contraseña temporal</span></span>
+            <button type="button" class="usuarios-admin-fila__ver" aria-label="Ver Joel Anthony Saldaña">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+              <span>Ver</span>
+            </button>
+          </div>
+
+          <div class="usuarios-admin-fila">
+            <span class="usuarios-admin-fila__nombre">Ana María Torres Lazo</span>
+            <span class="usuarios-admin-fila__correo">ana.torres@esejur.pe</span>
+            <span>Alumno</span>
+            <span>Google</span>
+            <span><span class="badge badge--advertencia-suave">Correo sin verificar</span></span>
+            <button type="button" class="usuarios-admin-fila__ver" aria-label="Ver Ana María Torres Lazo">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+              <span>Ver</span>
+            </button>
+          </div>
+
+          <div class="usuarios-admin-fila">
+            <span class="usuarios-admin-fila__nombre">Ricardo Prada Gómez</span>
+            <span class="usuarios-admin-fila__correo">ricardo.prada@esejur.pe</span>
+            <span>Administrador</span>
+            <span>Administración</span>
+            <span><span class="badge badge--disp-cerrado">Deshabilitada</span></span>
+            <button type="button" class="usuarios-admin-fila__ver" aria-label="Ver Ricardo Prada Gómez">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+              <span>Ver</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="usuarios-admin-paginacion">
+          <button type="button" class="btn btn--secundario">Anterior</button>
+          <span>Página 1 de 6</span>
+          <button type="button" class="btn btn--secundario">Siguiente</button>
+        </div>
+
+        <!-- Estado alterno: sin resultados -->
+        <p class="pantalla-pendiente__codigo" style="margin: 40px 0 16px">Estado alterno · Sin resultados</p>
+        <div class="estado-vacio">
+          <h3 class="estado-vacio__titulo">Sin resultados</h3>
+          <p class="estado-vacio__texto">Ningún usuario coincide con esa búsqueda.</p>
+        </div>
+
+        <!-- Estado alterno: modal "Crear usuario" -->
+        <p class="pantalla-pendiente__codigo" style="margin: 40px 0 16px">Estado alterno · Modal "Crear usuario"</p>
+        <div class="modal-fondo">
+          <div class="modal-caja">
+            <div class="modal-cabecera">
+              <h2 class="modal-titulo">Crear usuario</h2>
+              <button type="button" style="width:32px;height:32px;border-radius:999px;border:none;background:var(--neutral-050)">✕</button>
+            </div>
+            <div class="modal-cuerpo">
+              <div class="alerta alerta--info">
+                <span class="alerta__icono">i</span>
+                <div class="alerta__texto">
+                  No defines usuario ni contraseña aquí: el correo que pongas abajo es el usuario. El
+                  sistema genera una contraseña temporal aleatoria que verás una sola vez al crear la
+                  cuenta y que también se envía por correo junto con el código de verificación.
+                </div>
+              </div>
+              <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:16px">
+                <label class="label">Nombres<input class="input" value="María" /></label>
+                <label class="label">Apellido paterno<input class="input" value="Torres" /></label>
+                <label class="label"><span>Apellido materno</span><span class="nota-pill">Opcional</span><input class="input" /></label>
+                <label class="label">Correo<input class="input" type="email" value="maria.torres@esejur.pe" /></label>
+                <label class="label"><span>Teléfono</span><span class="nota-pill">Opcional</span><input class="input" placeholder="999 999 999" /></label>
+                <label class="label"><span>Documento de identidad</span><span class="nota-pill">Opcional</span><input class="input" placeholder="45781203" /></label>
+              </div>
+              <div>
+                <label class="label">Rol</label>
+                <div style="display:flex; gap:16px; margin-top:4px">
+                  <label style="display:inline-flex; align-items:center; gap:8px; font-size:14px"><input type="checkbox" checked /> Alumno</label>
+                  <label style="display:inline-flex; align-items:center; gap:8px; font-size:14px"><input type="checkbox" /> Administrador</label>
+                </div>
+              </div>
+            </div>
+            <div class="modal-acciones">
+              <button type="button" class="btn btn--secundario">Cancelar</button>
+              <button type="button" class="btn btn--primario">Crear usuario</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Estado alterno: modal "Detalle del usuario" -->
+        <p class="pantalla-pendiente__codigo" style="margin: 40px 0 16px">Estado alterno · Modal "Detalle del usuario"</p>
+        <div class="modal-fondo">
+          <div class="modal-caja">
+            <div class="modal-cabecera">
+              <h2 class="modal-titulo">Detalle del usuario</h2>
+              <button type="button" style="width:32px;height:32px;border-radius:999px;border:none;background:var(--neutral-050)">✕</button>
+            </div>
+            <div class="modal-cuerpo">
+              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px">
+                <div>
+                  <div style="font-size:18px; font-weight:700; color:var(--neutral-950)">Joel Anthony Saldaña</div>
+                  <div style="font-size:14px; color:var(--neutral-600); margin-top:2px">joel.saldana@esejur.pe</div>
+                </div>
+                <span class="badge badge--advertencia-suave">Contraseña temporal</span>
+              </div>
+
+              <div>
+                <h3 style="margin:0 0 4px; font-size:14px; font-weight:700; color:var(--neutral-950)">Roles</h3>
+                <p style="margin:0 0 12px; font-size:13px; color:var(--neutral-500)">
+                  Marca o desmarca los roles de la cuenta. No puedes dejarla sin ningún rol, ni
+                  retirarte tu propio rol de administrador, ni al último administrador habilitado.
+                </p>
+                <div style="display:flex; gap:16px">
+                  <label style="display:inline-flex; align-items:center; gap:8px; font-size:14px"><input type="checkbox" checked /> Alumno</label>
+                  <label style="display:inline-flex; align-items:center; gap:8px; font-size:14px"><input type="checkbox" /> Administrador</label>
+                </div>
+              </div>
+
+              <div>
+                <h3 style="margin:0 0 12px; font-size:14px; font-weight:700; color:var(--neutral-950)">Acceso</h3>
+                <div style="display:flex; align-items:center; gap:20px; flex-wrap:wrap">
+                  <label class="interruptor">
+                    <input type="checkbox" class="interruptor__entrada" checked />
+                    <span class="interruptor__pista"><span class="interruptor__perilla"></span></span>
+                    <span class="interruptor__texto">Cuenta habilitada</span>
+                  </label>
+                  <button type="button" class="btn btn--secundario">Reenviar código de verificación</button>
+                  <button type="button" class="btn btn--secundario">Resetear contraseña</button>
+                </div>
+              </div>
+            </div>
+            <div class="modal-acciones">
+              <button type="button" class="btn btn--secundario">Cerrar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+</body>
+</html>

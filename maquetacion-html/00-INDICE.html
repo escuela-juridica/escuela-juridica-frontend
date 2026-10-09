@@ -21,11 +21,13 @@
   <div class="eyebrow"><span class="eyebrow__dash"></span><span class="eyebrow__texto">Guía para el equipo</span></div>
   <h1 class="tipo-h1" style="color: var(--neutral-950); margin: 0 0 8px">Maquetación HTML — ESEJUR (EP04)</h1>
   <p style="font-size: 16px; line-height: 24px; color: var(--neutral-600); margin: 0 0 32px">
-    Este paquete tiene las 4 pantallas de la Épica 4 (Aula, progreso y sesiones) que se están
-    construyendo ahora, en HTML plano, para que cada equipo pueda maquetar sin tocar el proyecto
-    Angular. No hace falta instalar nada: cada archivo se abre con doble clic en el navegador.
-    <strong>Reemplaza al paquete anterior de la Épica 1</strong> (ya implementada) — si necesitás
-    repasar esas pantallas, están en el proyecto Angular real, ya no acá.
+    Este paquete tiene las 4 pantallas que se están reconstruyendo ahora como ejercicio de equipo, en
+    HTML plano, para que cada equipo pueda maquetar sin tocar el proyecto Angular. No hace falta
+    instalar nada: cada archivo se abre con doble clic en el navegador.
+    <strong>HU-022, HU-023 y HU-026 (aula, materiales y sesiones en vivo del alumno) ya no están en
+    este paquete</strong> — se reemplazaron por HU-008, HU-020 y HU-041 (tres pantallas administrativas
+    que ya estaban implementadas y se retiraron para reconstruirlas como ejercicio). HU-027 sigue igual
+    que antes.
   </p>
 
   <h2 class="tipo-h2" style="color: var(--neutral-950); margin: 32px 0 8px">Cómo funciona (leer antes de empezar)</h2>
@@ -58,8 +60,8 @@
   <div class="paso">
     <div class="paso__num">3</div>
     <div>
-      <strong>Probá en el navegador</strong> guardando y recargando la página (F5). El link al logo de cada pantalla
-      vuelve al Aula (<code>HU-022-PF-AULA-ingresar.html</code>) — no hace falta tener Angular corriendo.
+      <strong>Probá en el navegador</strong> guardando y recargando la página (F5). No hace falta tener Angular
+      corriendo para ver la maqueta.
     </div>
   </div>
   <div class="paso">
@@ -68,8 +70,8 @@
       <strong>Cuando termines, vos mismo/a copiás tu HTML y tu CSS al archivo real de Angular</strong> — el archivo
       exacto está indicado en el recuadro de tu pantalla. Son dos copias:
       <ul style="margin: 10px 0 0">
-        <li>El contenido de <code>&lt;main&gt;</code> → al archivo <code>.html</code> real (puede ser una carpeta
-        nueva: ver el recuadro de cada pantalla).</li>
+        <li>El contenido de <code>&lt;main&gt;</code> → al archivo <code>.html</code> real (ya existe, solo tiene un
+        placeholder <code>.pantalla-pendiente</code> por ahora — reemplazalo, no crees un archivo nuevo).</li>
         <li>El bloque <code>&lt;style&gt;</code> local → al archivo <code>.scss</code> real de esa misma pantalla.</li>
       </ul>
     </div>
@@ -77,38 +79,27 @@
   <div class="paso">
     <div class="paso__num">5</div>
     <div>
-      <strong>Antes de pegar, convertí los enlaces</strong> igual que en el paquete anterior: un
-      <code>href="archivo.html"</code> de acá se convierte en <code>routerLink="/la-ruta-real"</code> en Angular.
-      <table class="tabla" style="margin-top: 12px">
-        <thead><tr><th>En este paquete (HTML plano)</th><th>En Angular (pegá esto en su lugar)</th></tr></thead>
-        <tbody>
-          <tr><td><code>href="HU-022-PF-AULA-ingresar.html"</code></td><td><code>routerLink="/aula/1"</code> (el id no importa, es el mismo ejemplo fijo)</td></tr>
-          <tr><td><code>href="HU-026-PF-CALENDARIO-calendario.html"</code></td><td><code>routerLink="/app/calendario"</code></td></tr>
-        </tbody>
-      </table>
-      <p style="margin-top: 10px">
-        Si necesitaste un color/estilo que no existía en <code>estilos.css</code>, anotalo en el recuadro amarillo al
-        final de la guía de tu pantalla y avisale a Enrique antes de usarlo.
-      </p>
+      Si necesitaste un color/estilo que no existía en <code>estilos.css</code>, anotalo en el recuadro amarillo al
+      final de la guía de tu pantalla y avisale a Enrique antes de usarlo.
     </div>
   </div>
 
   <h2 class="tipo-h2" style="color: var(--neutral-950); margin: 40px 0 8px">Qué NO forma parte de este paquete</h2>
   <ul style="font-size: 15px; line-height: 24px; color: var(--neutral-600)">
-    <li><strong>Nada de lógica/funcionalidad real</strong> — la navegación del calendario, el envío de los modales de
-    HU-027, el candado real de descarga: nada de eso funciona acá. Esto es solo para maquetación visual.</li>
+    <li><strong>Nada de lógica/funcionalidad real</strong> — filtros, paginación, envío de formularios: nada de eso
+    funciona acá. Esto es solo para maquetación visual.</li>
     <li><strong>Los "Estado alterno"</strong> que ves en algunas pantallas (con esa etiqueta celeste) — son variantes
-    que en la app real nunca se muestran juntas con el resto; están apiladas solo para que se vean todos los
-    diseños de una vez.</li>
-    <li><strong>El editor de curso completo de HU-027</strong> — esa pantalla ya existe en el admin real (la arma
-    HU-012); acá solo está la tabla de sesiones y los 3 modales que esta historia agrega.</li>
+    (modales, por ejemplo) que en la app real nunca se muestran juntas con el resto; están apiladas solo para que se
+    vean todos los diseños de una vez.</li>
+    <li><strong>HU-019 ("+ Nueva matrícula") dentro de HU-020</strong> — ya está implementada y funcionando en el
+    proyecto real; en la maqueta de HU-020 solo está dibujada para contexto, no hace falta volver a maquetarla.</li>
   </ul>
 
   <h2 class="tipo-h2" style="color: var(--neutral-950); margin: 40px 0 8px">Las 4 pantallas</h2>
   <p style="font-size: 15px; line-height: 22px; color: var(--neutral-600); margin: 0 0 16px">
-    HU-022 y HU-023 maquetan <strong>el mismo archivo real</strong> de Angular (la pantalla de Aula tiene temario +
-    contenido con materiales, todo junto) — están separadas acá solo para que cada equipo vea bien su parte, pero
-    hay que coordinar el merge. La columna <strong>"Equipo"</strong> es quién la maqueta según lo acordado.
+    Las tres primeras (HU-008, HU-020, HU-041) ya estaban implementadas y se retiraron a propósito para que el
+    equipo las reconstruya — hay código real de referencia en la guía técnica de cada una, no hace falta inventar
+    el diseño desde cero. HU-020 comparte archivo con HU-019 ("+ Nueva matrícula"), que ya está hecha y no se toca.
   </p>
   <table class="tabla">
     <thead>
@@ -116,22 +107,16 @@
     </thead>
     <tbody>
       <tr>
-        <td><a href="HU-022-PF-AULA-ingresar.html">HU-022-PF-AULA-ingresar.html</a></td>
-        <td>HU-022 — Ingresar y continuar un curso</td>
-        <td>Área del alumno (logo + menú + cuenta) + footer</td>
-        <td><code>features/aula/aula/aula.html</code> (carpeta nueva)</td>
+        <td><a href="HU-008-PF-USUARIOS-listado.html">HU-008-PF-USUARIOS-listado.html</a></td>
+        <td>HU-008 — Gestionar usuarios administrativamente</td>
+        <td>Admin (navbar oscuro + riel lateral)</td>
+        <td><code>features/admin/usuarios/usuarios-listado/</code> (ya existe, hoy con placeholder)</td>
       </tr>
       <tr>
-        <td><a href="HU-023-PF-AULA-materiales.html">HU-023-PF-AULA-materiales.html</a></td>
-        <td>HU-023 — Consultar materiales protegidos</td>
-        <td>Área del alumno (logo + menú + cuenta) + footer</td>
-        <td><code>features/aula/aula/aula.html</code> (mismo archivo que HU-022, coordinar merge)</td>
-      </tr>
-      <tr>
-        <td><a href="HU-026-PF-CALENDARIO-calendario.html">HU-026-PF-CALENDARIO-calendario.html</a></td>
-        <td>HU-026 — Participar en sesiones en vivo</td>
-        <td>Área del alumno (logo + menú + cuenta) + footer</td>
-        <td><code>features/aula/calendario/calendario.html</code> (carpeta nueva)</td>
+        <td><a href="HU-020-PF-MATRICULAS-listado.html">HU-020-PF-MATRICULAS-listado.html</a></td>
+        <td>HU-020 — Controlar matrículas y pagos</td>
+        <td>Admin (navbar oscuro + riel lateral)</td>
+        <td><code>features/admin/matriculas/matriculas-listado/</code> (ya existe, HU-019 funcionando)</td>
       </tr>
       <tr>
         <td><a href="HU-027-PF-ADMIN-sesiones.html">HU-027-PF-ADMIN-sesiones.html</a></td>
@@ -139,22 +124,28 @@
         <td>Admin (navbar oscuro + riel lateral)</td>
         <td><code>features/admin/cursos/curso-editor/sesiones-tab/</code> (agregado a la pestaña existente)</td>
       </tr>
+      <tr>
+        <td><a href="HU-041-PF-REPORTE-matriculas.html">HU-041-PF-REPORTE-matriculas.html</a></td>
+        <td>HU-041 — Consultar el reporte de matrículas</td>
+        <td>Admin (navbar oscuro + riel lateral)</td>
+        <td><code>features/admin/reportes/reporte-matriculas/</code> (ya existe, hoy con placeholder)</td>
+      </tr>
     </tbody>
   </table>
 
   <h2 class="tipo-h2" style="color: var(--neutral-950); margin: 40px 0 8px">Guía técnica (cómo programar, no solo maquetar)</h2>
   <p style="font-size: 15px; line-height: 24px; color: var(--neutral-600)">
     Este paquete es solo HTML/CSS. El "cómo se programa de verdad" (entidades, DTOs, servicios, controladores,
-    endpoints) está en <code>detalles/06-MAPA-TECNICO/EP04-AULA-PROGRESO-Y-SESIONES/</code>, un archivo
-    <code>HU-0XX-MAPA-TECNICO-*.md</code> por historia, con código Java/TypeScript real para copiar y adaptar — leanlo
-    antes de escribir el servicio de verdad, no solo la maqueta visual.
+    endpoints, y para HU-008/020/041 el código real que ya existía) está en
+    <code>escuela-juridica-backend/docs/epica-4/</code>, un archivo <code>HU-0XX-MAPA-TECNICO-*.md</code> por
+    historia — leanlo antes de escribir el servicio de verdad, no solo la maqueta visual.
   </p>
 
   <h2 class="tipo-h2" style="color: var(--neutral-950); margin: 40px 0 8px">Archivos de este paquete</h2>
   <ul style="font-size: 15px; line-height: 24px; color: var(--neutral-600)">
     <li><code>estilos.css</code> — todos los colores, botones, tarjetas, etc. Compartido por toda la app, no
     renombrar clases.</li>
-    <li><code>img/</code> — logo y fotos que usan estas pantallas (reusa las de EP01).</li>
+    <li><code>img/</code> — logo y fotos que usan estas pantallas.</li>
     <li>Los 4 archivos <code>HU-0XX-...-nombre.html</code> — una pantalla cada uno.</li>
   </ul>
 

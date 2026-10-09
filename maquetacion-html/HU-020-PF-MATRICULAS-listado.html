@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Admin · Matrículas y pagos — ESEJUR</title>
+<link rel="stylesheet" href="estilos.css" />
+<style>
+/* ============================================================
+   ESTILOS PROPIOS DE ESTA PANTALLA (HU-020 — Matrículas y pagos)
+   ============================================================
+   El header oscuro + riel lateral son layout-admin.html/.scss,
+   compartidos por todo el admin — acá están con estilo inline
+   porque este paquete no corre Angular, pero no se tocan.
+   "+ Nueva matrícula" y su modal son de HU-019 y ya están
+   implementados y funcionando en el componente real — esta
+   maqueta solo documenta el listado, el detalle y el cancelar.
+   ============================================================ */
+.matriculas__titulo { font-size: 22px; line-height: 30px; font-weight: 700; color: var(--neutral-950); margin: 0; }
+.matriculas__cabecera { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; }
+.matriculas__cabecera p { margin: 4px 0 0; color: var(--neutral-600); }
+.matriculas__filtros { display: flex; gap: 12px; margin: 24px 0; }
+.matriculas__filtros .input { flex: 1; min-width: 240px; }
+.matriculas__filtros select.input { flex: none; width: auto; }
+.matriculas__btn-filtro { display: inline-flex; align-items: center; gap: 8px; flex: none; }
+.matriculas__btn-limpiar { background: var(--neutral-600); color: var(--blanco); }
+.matriculas__tabla { overflow: auto; border: 1px solid var(--neutral-200); border-radius: 10px; background: var(--blanco); }
+.matriculas__tabla table { border-collapse: collapse; width: 100%; }
+.matriculas__tabla th, .matriculas__tabla td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--neutral-100); font-size: 14px; }
+.matriculas__tabla th { color: var(--neutral-500); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
+.matriculas__tabla td strong { color: var(--neutral-950); font-weight: 600; }
+.matriculas__tabla small { display: block; color: var(--neutral-500); font-size: 12px; margin-top: 2px; }
+.matriculas__acciones { display: flex; align-items: center; gap: 8px; }
+.matriculas__paginacion { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 20px; font-size: 14px; color: var(--neutral-600); }
+.matriculas__cancelar-texto { margin: 0 0 16px; color: var(--neutral-600); font-size: 14px; line-height: 1.5; }
+.modal-fondo { position: fixed; inset: 0; background: rgba(16,24,40,.55); display: flex; align-items: center; justify-content: center; padding: 24px; }
+.modal-caja { width: 100%; max-width: 560px; background: #fff; border-radius: 16px; box-shadow: 0 20px 40px rgba(16,24,40,.25); }
+.modal-cabecera { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid var(--neutral-100); }
+.modal-titulo { margin: 0; font-size: 18px; font-weight: 700; color: var(--neutral-950); }
+.modal-cuerpo { padding: 24px; display: grid; gap: 16px; }
+.modal-acciones { display: flex; justify-content: flex-end; gap: 12px; padding: 0 24px 24px; }
+.matricula-detalle { display: grid; gap: 1.25rem; }
+.matricula-detalle section { border-bottom: 1px solid var(--neutral-200); padding-bottom: 1rem; }
+.matricula-detalle__identidad { display: flex; align-items: center; gap: 0.85rem; }
+.matricula-detalle__identidad-texto h3 { color: var(--neutral-950); font-size: 1.05rem; font-weight: 700; margin: 0; }
+.matricula-detalle__identidad-texto p { color: var(--neutral-500); font-size: 0.85rem; margin: 0.1rem 0 0; }
+.matricula-detalle__identidad > .badge { margin-left: auto; }
+.matricula-detalle__titulo-seccion { color: var(--marca-900); font-size: 0.8rem; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; margin: 0 0 0.65rem; padding-left: 0.6rem; border-left: 3px solid var(--acento-500); }
+.matricula-detalle dl { display: grid; gap: 0.55rem 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0; }
+.matricula-detalle__ancho-completo { grid-column: 1 / -1; }
+.matricula-detalle dl div, .matricula-detalle__pago, .matricula-detalle__evento { display: grid; gap: 0.2rem; }
+.matricula-detalle dt, .matricula-detalle small { color: var(--neutral-500); font-size: 0.78rem; }
+.matricula-detalle dd { margin: 0; }
+.matricula-detalle__pago, .matricula-detalle__evento { background: var(--neutral-050); border: 1px solid var(--neutral-200); border-radius: 0.5rem; margin-top: 0.5rem; padding: 0.75rem; }
+.matricula-detalle__pago span, .matricula-detalle__evento p { color: var(--neutral-600); font-size: 0.88rem; margin: 0; }
+.estado-alterno { max-width: 1200px; margin: 40px auto 0; padding: 0 32px; }
+.estado-alterno__etiqueta { display: inline-block; background: var(--acento-100); color: var(--marca-900); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; padding: 3px 10px; border-radius: 999px; margin-bottom: 12px; }
+</style>
+</head>
+<body>
+
+<div class="guia-equipo">
+  <div class="guia-equipo__titulo">Admin · Matrículas y pagos</div>
+  <span class="guia-equipo__hu">HU-020 — Controlar matrículas y pagos</span>
+
+  <h3>Qué es esta pantalla</h3>
+  <ul>
+    <li>El listado de matrículas de la administración, con filtros por texto y estado, y dos acciones
+    por fila: "Ver detalle" y "Cancelar" (deshabilitada si la matrícula no está Activa).</li>
+    <li>El botón "+ Nueva matrícula" de la cabecera <strong>ya existe y funciona</strong> (es de HU-019,
+    no se toca) — acá solo está dibujado para contexto, no hace falta maquetarlo de nuevo.</li>
+    <li>Hay <strong>2 modales</strong> abajo con la etiqueta "ESTADO ALTERNO": "Detalle de matrícula"
+    (historial económico y de acceso, separados) y "Cancelar matrícula" (pide motivo obligatorio). En la
+    app real se abre uno solo a la vez.</li>
+  </ul>
+
+  <h3>Dónde poner tus estilos</h3>
+  <ul>
+    <li>Bloque <code>&lt;style&gt;</code> de acá arriba — clases <code>.matriculas-*</code> y
+    <code>.matricula-detalle*</code>. El estilo de <code>.formulario-matricula*</code> (del modal
+    "Nueva matrícula") ya existe en <code>matriculas-listado.scss</code>, no lo dupliques.</li>
+  </ul>
+
+  <h3>Qué NO tocar</h3>
+  <ul>
+    <li>El header oscuro + riel lateral de íconos — son <code>layout-admin.html</code>, compartidos por
+    todo el admin.</li>
+    <li>El botón "+ Nueva matrícula" y su modal — ya están implementados (HU-019).</li>
+  </ul>
+
+  <h3>Cuándo termines</h3>
+  <p>
+    Esto va en <code>src/app/features/admin/matriculas/matriculas-listado/matriculas-listado.html</code>
+    (y <code>.scss</code> al lado) — el archivo ya existe con "+ Nueva matrícula" funcionando, agregá el
+    listado y los dos modales alrededor, sin tocar lo que ya hay.
+  </p>
+
+  <div class="guia-equipo__nuevo">
+    <strong>¿Necesitás un estilo que no existe ni en <code>estilos.css</code> ni acá arriba?</strong> Anotalo:
+    <br />— (vacío, tu equipo escribe acá) —
+  </div>
+</div>
+
+<div class="admin-shell" style="display:flex; flex-direction:column; min-height:100vh; background:var(--neutral-050)">
+  <header style="position:sticky; top:0; z-index:30; display:flex; align-items:center; gap:16px; height:60px; padding:0 20px; background:#101828">
+    <div style="background:#fff; border-radius:8px; padding:6px 12px; display:flex; align-items:center">
+      <img src="img/logo-esejur.png" alt="Escuela Jurídica" style="height:26px" />
+    </div>
+    <span style="flex:1"></span>
+    <span style="color:#fff; font-size:13px; font-weight:600">Ricardo Prada</span>
+    <span class="avatar avatar--sm avatar--cuenta">RP</span>
+    <button type="button" style="display:flex; align-items:center; gap:7px; min-height:34px; padding:0 11px; border:1px solid rgba(255,255,255,.35); border-radius:8px; background:#b42318; color:#fff; font-weight:700; font-size:13px">Salir</button>
+  </header>
+
+  <div style="display:flex; flex:1">
+    <aside style="width:232px; background:#101828; padding:16px 0; flex-shrink:0">
+      <div style="padding:10px 20px; color:rgba(255,255,255,.5); font-size:12px; text-transform:uppercase">Administración</div>
+      <div style="padding:10px 20px; color:rgba(255,255,255,.75); font-size:14px">Dashboard</div>
+      <div style="padding:10px 20px; color:rgba(255,255,255,.75); font-size:14px">Cursos</div>
+      <div style="padding:10px 20px; color:rgba(255,255,255,.75); font-size:14px">Usuarios</div>
+      <div style="padding:10px 20px; color:#fff; background:rgba(255,255,255,.08); border-left:3px solid #00d8d8; font-size:14px">Matrículas y pagos</div>
+      <div style="padding:10px 20px; color:rgba(255,255,255,.35); font-size:14px">Operación académica</div>
+      <div style="padding:10px 20px; color:rgba(255,255,255,.35); font-size:14px">Reportes</div>
+    </aside>
+
+    <main style="flex:1">
+      <div style="padding:32px; max-width:1100px; margin:0 auto">
+        <div class="matriculas__cabecera">
+          <div>
+            <h1 class="matriculas__titulo">Matrículas y pagos</h1>
+            <p>Consulta las matrículas activas, manuales y exoneradas.</p>
+          </div>
+          <button type="button" class="btn btn--primario" disabled title="HU-019, ya implementado">+ Nueva matrícula</button>
+        </div>
+
+        <div class="matriculas__filtros">
+          <input class="input" placeholder="Buscar alumno, correo o curso" />
+          <select class="input">
+            <option>Todos los estados</option>
+            <option>Activa</option>
+            <option>Cancelada</option>
+          </select>
+          <button class="btn btn--acento matriculas__btn-filtro" type="button">Buscar</button>
+          <button class="btn matriculas__btn-limpiar matriculas__btn-filtro" type="button">Limpiar</button>
+        </div>
+
+        <div class="matriculas__tabla">
+          <table>
+            <thead>
+              <tr><th>Alumno</th><th>Curso</th><th>Ingreso</th><th>Estado</th><th>Registrada</th><th>Acciones</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Joel Anthony Saldaña</strong><small>joel.saldana@escuelajuridica.edu.pe</small></td>
+                <td>Curso de Derecho Notarial y Función Notarial</td>
+                <td><span class="badge badge--ingreso-pago">Pago en línea</span></td>
+                <td><span class="badge badge--disp-inmediato">Activa</span></td>
+                <td>07/10/2026, 5:28 pm</td>
+                <td>
+                  <div class="matriculas__acciones">
+                    <button type="button" class="btn btn--secundario">Ver detalle</button>
+                    <button type="button" class="btn btn--peligro">Cancelar</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Gabriel Antonio Mayanga</strong><small>gabriel.mayanga@escuelajuridica.edu.pe</small></td>
+                <td>Curso de Litigación Oral en el Proceso Penal</td>
+                <td><span class="badge badge--ingreso-pago">Pago en línea</span></td>
+                <td><span class="badge badge--disp-cancelado">Cancelada</span></td>
+                <td>07/10/2026, 5:28 pm</td>
+                <td>
+                  <div class="matriculas__acciones">
+                    <button type="button" class="btn btn--secundario">Ver detalle</button>
+                    <button type="button" class="btn btn--peligro" disabled>Cancelar</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="matriculas__paginacion">
+          <button type="button" class="btn btn--secundario" disabled>Anterior</button>
+          <span>Página 1 de 3</span>
+          <button type="button" class="btn btn--secundario">Siguiente</button>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div class="estado-alterno">
+  <span class="estado-alterno__etiqueta">ESTADO ALTERNO · Modal "Detalle de matrícula"</span>
+  <div class="modal-fondo" style="position: static; background: none; padding: 0">
+    <div class="modal-caja" style="max-width: 640px">
+      <div class="modal-cabecera">
+        <h3 class="modal-titulo">Detalle de matrícula</h3>
+        <button type="button" aria-label="Cerrar" style="border:0; background:none; font-size:20px; cursor:pointer">✕</button>
+      </div>
+      <div class="modal-cuerpo">
+        <div class="matricula-detalle">
+          <section class="matricula-detalle__identidad">
+            <span class="avatar avatar--md avatar--cuenta">JS</span>
+            <div class="matricula-detalle__identidad-texto">
+              <h3>Joel Anthony Saldaña</h3>
+              <p>joel.saldana@escuelajuridica.edu.pe</p>
+            </div>
+            <span class="badge badge--disp-inmediato">Activa</span>
+          </section>
+          <section class="matricula-detalle__resumen">
+            <dl>
+              <div><dt>Curso</dt><dd>Curso de Derecho Notarial y Función Notarial</dd></div>
+              <div><dt>Modalidad</dt><dd>Virtual</dd></div>
+              <div><dt>Forma de ingreso</dt><dd><span class="badge badge--ingreso-pago">Pago en línea</span></dd></div>
+              <div><dt>Responsable</dt><dd>Autoservicio / sistema</dd></div>
+              <div><dt>Fecha de matrícula</dt><dd>07/10/2026, 5:28 pm</dd></div>
+              <div><dt>Vencimiento</dt><dd>Acceso permanente</dd></div>
+            </dl>
+          </section>
+          <section>
+            <h3 class="matricula-detalle__titulo-seccion">Historial económico</h3>
+            <article class="matricula-detalle__pago">
+              <strong>APROBADO · S/ 250.00</strong>
+              <span>PAGO_EN_LINEA</span>
+              <span>Registrado por: Autoservicio / sistema</span>
+              <small>07/10/2026, 5:28 pm</small>
+            </article>
+          </section>
+          <section>
+            <h3 class="matricula-detalle__titulo-seccion">Historial de acceso</h3>
+            <article class="matricula-detalle__evento">
+              <strong>Creada → Activa</strong>
+              <small>07/10/2026, 5:28 pm</small>
+              <span>Responsable: Autoservicio / sistema</span>
+            </article>
+          </section>
+        </div>
+      </div>
+      <div class="modal-acciones">
+        <button type="button" class="btn btn--secundario">Reenviar confirmación</button>
+        <button type="button" class="btn btn--primario">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="estado-alterno">
+  <span class="estado-alterno__etiqueta">ESTADO ALTERNO · Modal "Cancelar matrícula"</span>
+  <div class="modal-fondo" style="position: static; background: none; padding: 0">
+    <div class="modal-caja">
+      <div class="modal-cabecera">
+        <h3 class="modal-titulo">Cancelar matrícula</h3>
+        <button type="button" aria-label="Cerrar" style="border:0; background:none; font-size:20px; cursor:pointer">✕</button>
+      </div>
+      <div class="modal-cuerpo">
+        <p class="matriculas__cancelar-texto">
+          Vas a cancelar la matrícula de <strong>Joel Anthony Saldaña</strong> en
+          <strong>Curso de Derecho Notarial y Función Notarial</strong>. Esta acción no se puede deshacer.
+        </p>
+        <label>
+          Motivo
+          <textarea class="input" rows="3" placeholder="Explica por qué se cancela esta matrícula"></textarea>
+        </label>
+      </div>
+      <div class="modal-acciones">
+        <button type="button" class="btn btn--secundario">Volver</button>
+        <button type="button" class="btn btn--peligro">Cancelar matrícula</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
