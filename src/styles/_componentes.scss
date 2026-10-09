@@ -642,15 +642,19 @@ textarea.input {
   margin-top: 1px;
 }
 
+// margin: 0 porque son <p>: sin resetear el margen por defecto del navegador se
+// acumulaba un salto grande entre el título y el texto dentro de la misma alerta.
 .alerta__titulo {
   font-size: 14px;
   line-height: 20px;
   font-weight: 600;
+  margin: 0;
 }
 
 .alerta__texto {
   font-size: 14px;
   line-height: 20px;
+  margin: 2px 0 0;
 }
 
 .alerta__cerrar {
