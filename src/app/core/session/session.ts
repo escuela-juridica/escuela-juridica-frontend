@@ -61,10 +61,15 @@ export class Session {
   cerrarSesion(): Observable<void> {
     return this.accesoApi.cerrar().pipe(
       catchError(() => of(undefined)),
-      tap(() => {
-        this._usuario.set(null);
-        this._estado.set('visitante');
-      }),
+      tap(() => this.limpiarLocal()),
     );
+  }
+
+  /** Limpia el estado sin llamar al backend: lo usa sesionVencidaInterceptor cuando una
+   * petición ya devolvió 401 (la cookie venció o es inválida), así que cerrar sesión en el
+   * servidor no tiene sentido — ya no hay nada que invalidar ahí. */
+  limpiarLocal(): void {
+    this._usuario.set(null);
+    this._estado.set('visitante');
   }
 }

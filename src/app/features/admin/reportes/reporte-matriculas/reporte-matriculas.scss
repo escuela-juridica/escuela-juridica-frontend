@@ -57,11 +57,16 @@
   gap: 5px;
 }
 
+.reporte__filtro-acciones {
+  display: flex;
+  align-items: end;
+  gap: 12px;
+}
+
 .reporte__btn-filtro {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  justify-self: start;
 }
 
 // Gris sólido (no blanco), icono "X" simple: limpiar filtros no es una acción destructiva.

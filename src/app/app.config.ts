@@ -11,12 +11,15 @@ import { firstValueFrom } from 'rxjs';
 import { routes } from './app.routes';
 import { cargaGlobalInterceptor } from './core/interceptors/carga-global.interceptor';
 import { credencialesInterceptor } from './core/interceptors/credenciales.interceptor';
+import { sesionVencidaInterceptor } from './core/interceptors/sesion-vencida.interceptor';
 import { Session } from './core/session/session';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideHttpClient(withInterceptors([cargaGlobalInterceptor, credencialesInterceptor])),
+    provideHttpClient(
+      withInterceptors([cargaGlobalInterceptor, credencialesInterceptor, sesionVencidaInterceptor]),
+    ),
     provideRouter(
       routes,
       withInMemoryScrolling({ scrollPositionRestoration: 'top', anchorScrolling: 'enabled' }),

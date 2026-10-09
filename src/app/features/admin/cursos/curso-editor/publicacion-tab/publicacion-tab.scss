@@ -94,10 +94,15 @@
 }
 
 .publicacion__grupo > h3 {
-  margin: 0 0 4px;
+  margin: 0 0 8px;
   font-size: 15px;
   font-weight: 700;
   color: var(--neutral-950);
+}
+
+.publicacion__grupo > .editor-material-info {
+  margin: 0 0 12px;
+  line-height: 1.5;
 }
 
 .publicacion__grupo-encabezado {
