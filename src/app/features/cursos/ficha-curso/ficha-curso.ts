@@ -17,6 +17,9 @@ import {
 } from '../curso-formato.util';
 import { FichaCursoDetalle, LeccionFicha, VistaPrevia } from '../curso.model';
 import { Session } from '../../../core/session/session';
+import { MatriculaApiService } from '../../matriculas/matricula-api.service';
+import { AlertaGlobalService } from '../../../core/notificaciones/alerta-global.service';
+import { Modal } from '../../../shared/ui/modal/modal';
 
 const LARGO_MAXIMO_DESCRIPCION = 260;
 
@@ -25,7 +28,7 @@ type EstadoVistaPrevia = 'inactiva' | 'cargando' | 'lista' | 'error';
 
 @Component({
   selector: 'app-ficha-curso',
-  imports: [RouterLink, NgClass],
+  imports: [RouterLink, NgClass, Modal],
   templateUrl: './ficha-curso.html',
   styleUrl: './ficha-curso.scss',
 })
@@ -35,6 +38,8 @@ export class FichaCurso implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly session = inject(Session);
   private readonly router = inject(Router);
+  private readonly matriculasApi = inject(MatriculaApiService);
+  private readonly alertas = inject(AlertaGlobalService);
 
   protected readonly ficha = signal<FichaCursoDetalle | null>(null);
   protected readonly estado = signal<EstadoPantalla>('cargando');
@@ -44,6 +49,10 @@ export class FichaCurso implements OnInit {
   protected readonly vistaPrevia = signal<VistaPrevia | null>(null);
   protected readonly vistaPreviaEstado = signal<EstadoVistaPrevia>('inactiva');
   protected readonly leccionBloqueadaId = signal<number | null>(null);
+  protected readonly dialogoMatriculaAbierto = signal(false);
+  protected readonly procesandoMatricula = signal(false);
+  protected readonly errorMatricula = signal('');
+  protected readonly yaMatriculado = signal(false);
 
   private readonly reintentarBusqueda = new Subject<void>();
   private urlAmigableActual = '';
@@ -126,6 +135,7 @@ export class FichaCurso implements OnInit {
     this.reintentarBusqueda
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.cargarFicha(this.urlAmigableActual));
+
   }
 
   protected reintentar(): void {
@@ -199,6 +209,7 @@ export class FichaCurso implements OnInit {
   }
 
   protected etiquetaAccionComercial(): string {
+    if (this.yaMatriculado()) return 'Ver curso';
     switch (this.ficha()?.estadoComercial.accion) {
       case 'ACCESS_FREE':
         return 'Acceder gratis';
@@ -209,14 +220,69 @@ export class FichaCurso implements OnInit {
     }
   }
 
+  protected abrirConfirmacionMatricula(): void {
+    if (this.procesandoMatricula()) return;
+    this.errorMatricula.set('');
+    this.dialogoMatriculaAbierto.set(true);
+  }
+
+  protected cerrarConfirmacionMatricula(): void {
+    if (this.procesandoMatricula()) return;
+    this.dialogoMatriculaAbierto.set(false);
+    this.errorMatricula.set('');
+  }
+
+  protected confirmarMatriculaGratis(): void {
+    const curso = this.ficha();
+    if (!curso || !this.session.estaAutenticado() || this.procesandoMatricula()) return;
+    this.procesandoMatricula.set(true);
+    this.errorMatricula.set('');
+    this.matriculasApi.matricularGratis(curso.cursoId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (matricula) => {
+          this.procesandoMatricula.set(false);
+          this.dialogoMatriculaAbierto.set(false);
+          this.alertas.mostrar(matricula.estadoNotificacion === 'ERROR' ? 'info' : 'exito',
+            matricula.estadoNotificacion === 'ERROR'
+              ? 'La matrícula quedó registrada, pero no pudimos enviar el correo. Puedes reenviarlo desde Mis cursos.'
+              : 'Tu matrícula fue registrada. Ya puedes verla en Mis cursos.');
+          void this.router.navigate(['/app/panel']);
+        },
+        error: (error: HttpErrorResponse) => {
+          this.procesandoMatricula.set(false);
+          this.errorMatricula.set(error.error?.message ?? 'No pudimos registrar la matrícula. Revisa los requisitos e inténtalo nuevamente.');
+        },
+      });
+  }
+
   protected alAccionComercial(): void {
+    const curso = this.ficha();
+    if (!curso) return;
+    if (this.yaMatriculado()) {
+      void this.router.navigate(['/app/panel']);
+      return;
+    }
+    if (curso.estadoComercial.accion === 'ACCESS_FREE') {
+      if (this.session.estaAutenticado()) this.abrirConfirmacionMatricula();
+      else void this.router.navigate(['/acceso'], { state: { mensajeInfo: 'Inicia sesión para confirmar tu matrícula gratuita.' } });
+      return;
+    }
     if (this.session.estaAutenticado()) {
-      alert('La matrícula y el pago en línea estarán disponibles próximamente.');
+      this.abrirConfirmacionMatricula();
       return;
     }
     void this.router.navigate(['/acceso'], {
       state: { mensajeInfo: 'Para continuar debes iniciar sesión.' },
     });
+  }
+
+  protected irAMisCursos(): void {
+    void this.router.navigate(['/app/panel']);
+  }
+
+  protected get esMatriculaGratuita(): boolean {
+    return this.ficha()?.estadoComercial.accion === 'ACCESS_FREE';
   }
 
   private cargarFicha(urlAmigable: string): void {
@@ -248,6 +314,7 @@ export class FichaCurso implements OnInit {
         }
         this.ficha.set(resultado);
         this.estado.set('listo');
+        this.consultarMatriculaActiva(resultado.urlAmigable);
 
         const primerModulo = resultado.modulos[0];
         if (primerModulo) {
@@ -258,6 +325,16 @@ export class FichaCurso implements OnInit {
           this.cargarVistaPrevia(previa.leccionId);
         }
       });
+  }
+
+  private consultarMatriculaActiva(urlAmigable: string): void {
+    this.yaMatriculado.set(false);
+    if (!this.session.estaAutenticado()) return;
+    this.matriculasApi.misCursos().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (matriculas) => this.yaMatriculado.set(matriculas.some(
+        (matricula) => matricula.cursoUrlAmigable === urlAmigable && matricula.estado === 'ACTIVA',
+      )),
+    });
   }
 
   private cargarVistaPrevia(leccionId: number): void {

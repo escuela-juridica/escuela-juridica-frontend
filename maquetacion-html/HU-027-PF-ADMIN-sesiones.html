@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Admin · Sesiones en vivo del curso — ESEJUR</title>
+<link rel="stylesheet" href="estilos.css" />
+<style>
+/* ============================================================
+   ESTILOS PROPIOS DE ESTA PANTALLA (HU-027 — Admin sesiones)
+   ============================================================
+   El header/riel del admin son componentes reusables reales
+   (layout-admin.html/.scss) — acá están con estilo inline
+   porque este paquete no corre Angular, pero no se tocan.
+   ============================================================ */
+.admin-pagina { padding: 32px; max-width: 980px; margin: 0 auto; }
+.admin-pagina__titulo { margin: 0 0 4px; color: var(--neutral-950); }
+.admin-pagina__subtitulo { color: var(--neutral-600); margin: 0 0 28px; }
+.sesiones-tabla { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--neutral-200); border-radius: 10px; overflow: hidden; }
+.sesiones-tabla th, .sesiones-tabla td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--neutral-100); font-size: 14px; }
+.sesiones-tabla th { font-size: 12px; text-transform: uppercase; color: var(--neutral-500); letter-spacing: .03em; }
+.sesiones-tabla__acciones { display: flex; gap: 8px; }
+.btn-chico { height: 34px; padding: 0 12px; font-size: 13px; }
+.modal-fondo { position: fixed; inset: 0; background: rgba(16,24,40,.55); display: flex; align-items: center; justify-content: center; padding: 24px; }
+.modal-caja { width: 100%; max-width: 480px; background: #fff; border-radius: 16px; box-shadow: 0 20px 40px rgba(16,24,40,.25); }
+.modal-cabecera { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid var(--neutral-100); }
+.modal-titulo { margin: 0; font-size: 18px; font-weight: 700; color: var(--neutral-950); }
+.modal-cuerpo { padding: 24px; display: grid; gap: 16px; }
+.modal-acciones { display: flex; justify-content: flex-end; gap: 12px; padding: 0 24px 24px; }
+.historial-item { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--neutral-100); font-size: 13px; }
+.historial-item__accion { flex: 0 0 120px; font-weight: 700; color: var(--marca-900); }
+</style>
+</head>
+<body>
+
+<div class="guia-equipo">
+  <div class="guia-equipo__titulo">Admin · Sesiones en vivo de un curso</div>
+  <span class="guia-equipo__hu">HU-027 — Administrar cambios en sesiones en vivo</span>
+
+  <h3>Qué es esta pantalla</h3>
+  <ul>
+    <li>Es una ampliación de la pestaña "Contenido" que ya existe en el editor de curso del admin
+    (donde se programan las sesiones en vivo desde HU-012) — acá se ve solo la tabla de sesiones con
+    los botones nuevos de esta historia. No hace falta maquetar el editor completo, solo esta tabla y
+    sus 3 modales (reprogramar, cancelar, corregir).</li>
+    <li>Los botones "Reprogramar"/"Cancelar" solo aparecen en sesiones <strong>futuras</strong>; una
+    sesión ya realizada muestra en su lugar "Corregir" (enlace, grabación o asistencia). Una sesión
+    cancelada no tiene ninguno de los dos, solo queda visible con su etiqueta roja.</li>
+    <li>Hay <strong>3 modales</strong> abajo, uno debajo del otro con la etiqueta "ESTADO ALTERNO" — en
+    la app real se abre uno solo a la vez, por eso están apilados acá, para que vean los tres diseños
+    juntos.</li>
+  </ul>
+
+  <h3>Dónde poner tus estilos</h3>
+  <ul>
+    <li>Bloque <code>&lt;style&gt;</code> de acá arriba — clases <code>.sesiones-*</code>,
+    <code>.modal-*</code>, <code>.historial-*</code>.</li>
+    <li>Los modales ya siguen el mismo patrón de <code>app-modal</code> que usan Matrículas y
+    Usuarios en el admin real — si ya viste esa pantalla, es la misma estructura.</li>
+  </ul>
+
+  <h3>Qué NO tocar</h3>
+  <ul>
+    <li>El header oscuro + riel lateral de íconos — son <code>layout-admin.html</code>, compartidos
+    por todo el admin (Cursos, Usuarios, Matrículas, Reportes).</li>
+  </ul>
+
+  <h3>Cuándo termines</h3>
+  <p>
+    La tabla de sesiones va dentro de la pestaña de contenido ya existente en
+    <code>src/app/features/admin/cursos/curso-editor/</code> (coordiná con quien tenga esa pestaña
+    armada, es un agregado, no un archivo nuevo completo). Los 3 modales son componentes nuevos:
+    sugerido <code>sesiones-tab/modal-reprogramar.html</code>,
+    <code>modal-cancelar.html</code> y <code>modal-corregir.html</code> dentro de esa misma carpeta.
+  </p>
+
+  <div class="guia-equipo__nuevo">
+    <strong>¿Necesitás un estilo que no existe ni en <code>estilos.css</code> ni acá arriba?</strong> Anotalo:
+    <br />— (vacío, tu equipo escribe acá) —
+  </div>
+</div>
+
+<div class="admin-shell" style="display:flex; flex-direction:column; min-height:100vh; background:var(--neutral-050)">
+  <header style="position:sticky; top:0; z-index:30; display:flex; align-items:center; gap:16px; height:60px; padding:0 20px; background:#101828">
+    <div style="background:#fff; border-radius:8px; padding:6px 12px; display:flex; align-items:center">
+      <img src="img/logo-esejur.png" alt="Escuela Jurídica" style="height:26px" />
+    </div>
+    <span style="flex:1"></span>
+    <span style="color:#fff; font-size:13px; font-weight:600">Ricardo Prada</span>
+    <span class="avatar avatar--sm avatar--cuenta">RP</span>
+    <button type="button" style="display:flex; align-items:center; gap:7px; min-height:34px; padding:0 11px; border:1px solid rgba(255,255,255,.35); border-radius:8px; background:#b42318; color:#fff; font-weight:700; font-size:13px">Salir</button>
+  </header>
+
+  <div style="display:flex; flex:1">
+    <aside style="width:232px; background:#101828; padding:16px 0; flex-shrink:0">
+      <div style="padding:10px 20px; color:rgba(255,255,255,.5); font-size:12px; text-transform:uppercase">Cursos</div>
+      <div style="padding:10px 20px; color:#fff; background:rgba(255,255,255,.08); border-left:3px solid #00d8d8; font-size:14px">Contenido del curso</div>
+    </aside>
+
+    <main style="flex:1">
+      <div class="admin-pagina">
+        <div class="eyebrow"><span class="eyebrow__dash"></span><span class="eyebrow__texto">Diplomado en Derecho Registral</span></div>
+        <h1 class="tipo-h1 admin-pagina__titulo">Sesiones en vivo</h1>
+        <p class="admin-pagina__subtitulo">Reprograma, cancela o corrige las sesiones de este curso.</p>
+
+        <table class="sesiones-tabla">
+          <thead>
+            <tr><th>Sesión</th><th>Fecha</th><th>Estado</th><th>Acciones</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Casos prácticos</strong></td>
+              <td>12/11/2026 · 7:00 p. m.</td>
+              <td><span class="badge badge--disp-proximo">Futura</span></td>
+              <td class="sesiones-tabla__acciones">
+                <button type="button" class="btn btn--secundario btn-chico">Reprogramar</button>
+                <button type="button" class="btn btn--peligro btn-chico" style="background:#b42318;color:#fff;border:none;border-radius:8px">Cancelar</button>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Redacción de escrituras</strong></td>
+              <td>25/11/2026 · 7:00 p. m.</td>
+              <td><span class="badge badge--disp-proximo">Futura</span></td>
+              <td class="sesiones-tabla__acciones">
+                <button type="button" class="btn btn--secundario btn-chico">Reprogramar</button>
+                <button type="button" class="btn btn--peligro btn-chico" style="background:#b42318;color:#fff;border:none;border-radius:8px">Cancelar</button>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Taller de inscripciones</strong></td>
+              <td>18/11/2026 · 7:00 p. m.</td>
+              <td><span class="badge badge--disp-cancelado">Cancelada</span></td>
+              <td class="sesiones-tabla__acciones">—</td>
+            </tr>
+            <tr>
+              <td><strong>Introducción al curso</strong></td>
+              <td>29/10/2026 · 7:00 p. m.</td>
+              <td><span class="badge badge--disp-cerrado">Realizada</span></td>
+              <td class="sesiones-tabla__acciones">
+                <button type="button" class="btn btn--neutro btn-chico">Corregir</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================================
+     Estados alternos: los 3 modales (uno a la vez en la app real)
+     ============================================================ -->
+<p class="pantalla-pendiente__codigo" style="text-align:center; margin: 32px 0 12px">Estado alterno · Modal "Reprogramar sesión"</p>
+<div class="modal-fondo" style="position:static; padding:0 32px">
+  <div class="modal-caja">
+    <div class="modal-cabecera"><h2 class="modal-titulo">Reprogramar sesión</h2><button type="button" style="width:32px;height:32px;border-radius:999px;border:none;background:var(--neutral-050)">✕</button></div>
+    <div class="modal-cuerpo">
+      <label class="label">Nueva fecha<input type="date" class="input" value="2026-11-20" /></label>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
+        <label class="label">Hora inicio<input type="time" class="input" value="19:00" /></label>
+        <label class="label">Hora fin<input type="time" class="input" value="21:00" /></label>
+      </div>
+      <label class="label">Motivo (obligatorio)<textarea class="input" rows="3" placeholder="Explica por qué se reprograma esta sesión"></textarea></label>
+      <!-- Aviso que aparece SOLO si la nueva fecha supera la fecha de fin del curso -->
+      <div class="alerta alerta--advertencia" role="alert">
+        <span class="alerta__icono">!</span>
+        <div><p class="alerta__titulo">Esta fecha supera el fin del curso</p><p class="alerta__texto">Amplía la fecha de fin del curso (17/12/2026 → 20/12/2026) para poder guardar.</p></div>
+      </div>
+      <label class="label">Nueva fecha de fin del curso<input type="date" class="input" value="2026-12-20" /></label>
+    </div>
+    <div class="modal-acciones">
+      <button type="button" class="btn btn--secundario">Cancelar</button>
+      <button type="button" class="btn btn--primario">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<p class="pantalla-pendiente__codigo" style="text-align:center; margin: 32px 0 12px">Estado alterno · Modal "Cancelar sesión"</p>
+<div class="modal-fondo" style="position:static; padding:0 32px">
+  <div class="modal-caja">
+    <div class="modal-cabecera"><h2 class="modal-titulo">Cancelar sesión</h2><button type="button" style="width:32px;height:32px;border-radius:999px;border:none;background:var(--neutral-050)">✕</button></div>
+    <div class="modal-cuerpo">
+      <div class="alerta alerta--error" role="alert">
+        <span class="alerta__icono">!</span>
+        <div><p class="alerta__titulo">Esta acción no se puede deshacer</p><p class="alerta__texto">La sesión quedará cancelada de forma definitiva y se avisará a los alumnos.</p></div>
+      </div>
+      <label class="label">Motivo (obligatorio)<textarea class="input" rows="3" placeholder="Explica por qué se cancela esta sesión"></textarea></label>
+    </div>
+    <div class="modal-acciones">
+      <button type="button" class="btn btn--secundario">Volver</button>
+      <button type="button" class="btn" style="background:#b42318;color:#fff">Cancelar sesión</button>
+    </div>
+  </div>
+</div>
+
+<p class="pantalla-pendiente__codigo" style="text-align:center; margin: 32px 0 12px">Estado alterno · Modal "Corregir sesión realizada"</p>
+<div class="modal-fondo" style="position:static; padding:0 32px 32px">
+  <div class="modal-caja">
+    <div class="modal-cabecera"><h2 class="modal-titulo">Corregir sesión realizada</h2><button type="button" style="width:32px;height:32px;border-radius:999px;border:none;background:var(--neutral-050)">✕</button></div>
+    <div class="modal-cuerpo">
+      <label class="label">Enlace de la grabación<input class="input" placeholder="https://..." /></label>
+      <p class="tipo-h3" style="font-size:14px; margin:8px 0 0">Corregir asistencia</p>
+      <div style="display:flex; align-items:center; gap:10px">
+        <span style="flex:1; font-size:14px">Joel Anthony Saldaña</span>
+        <select class="input" style="width:160px">
+          <option>Presente</option>
+          <option>Ausente</option>
+          <option>Justificada</option>
+        </select>
+      </div>
+      <label class="label">Motivo de la corrección (obligatorio)<input class="input" placeholder="Ej: problema de conexión confirmado por el alumno" /></label>
+
+      <p class="tipo-h3" style="font-size:14px; margin:16px 0 0">Historial de cambios</p>
+      <div class="historial-item"><span class="historial-item__accion">Reprogramación</span><span>De 05/11 7pm a 12/11 7pm — "Cambio de disponibilidad del docente" — 28/10/2026</span></div>
+      <div class="historial-item"><span class="historial-item__accion">Corrección</span><span>Asistencia de Joel Saldaña: Ausente → Presente — "Confirmó ingreso con 10 min de retraso" — 29/10/2026</span></div>
+    </div>
+    <div class="modal-acciones">
+      <button type="button" class="btn btn--secundario">Cerrar</button>
+      <button type="button" class="btn btn--primario">Guardar</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

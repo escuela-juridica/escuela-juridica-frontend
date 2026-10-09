@@ -88,8 +88,7 @@ export const routes: Routes = [
       }, // PF-009
     ],
   },
-  // HU-008: NO ES LA VERSIÓN FINAL — solo "usuarios" existe hasta ahora, contra
-  // /api/admin/usuarios (API REST real pero sin base de datos, ver AdminUsuariosApiService).
+  // EP02: HU-008 (usuarios), HU-009 (información base, bajo "Configuración") y HU-010 (cursos).
   // El resto del panel administrativo queda pendiente.
   {
     path: 'admin',
@@ -99,6 +98,7 @@ export const routes: Routes = [
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'usuarios' },
       {
+        // Crear y editar usuario se hacen en modales dentro del listado, no en rutas aparte.
         path: 'usuarios',
         loadComponent: () =>
           import('./features/admin/usuarios/usuarios-listado/usuarios-listado').then(
@@ -106,17 +106,36 @@ export const routes: Routes = [
           ),
       },
       {
-        path: 'usuarios/nuevo',
+        path: 'informacion-base',
         loadComponent: () =>
-          import('./features/admin/usuarios/usuario-crear/usuario-crear').then(
-            (m) => m.UsuarioCrear,
+          import('./features/admin/informacion-base/informacion-base').then(
+            (m) => m.InformacionBase,
           ),
       },
       {
-        path: 'usuarios/:id',
+        path: 'cursos',
         loadComponent: () =>
-          import('./features/admin/usuarios/usuario-detalle/usuario-detalle').then(
-            (m) => m.UsuarioDetalle,
+          import('./features/admin/cursos/cursos-listado/cursos-listado').then(
+            (m) => m.CursosListado,
+          ),
+      },
+      {
+        path: 'cursos/:id',
+        loadComponent: () =>
+          import('./features/admin/cursos/curso-editor/curso-editor').then((m) => m.CursoEditor),
+      },
+      {
+        path: 'matriculas',
+        loadComponent: () =>
+          import('./features/admin/matriculas/matriculas-listado/matriculas-listado').then(
+            (m) => m.MatriculasListado,
+          ),
+      },
+      {
+        path: 'reportes/matriculas',
+        loadComponent: () =>
+          import('./features/admin/reportes/reporte-matriculas/reporte-matriculas').then(
+            (m) => m.ReporteMatriculas,
           ),
       },
     ],

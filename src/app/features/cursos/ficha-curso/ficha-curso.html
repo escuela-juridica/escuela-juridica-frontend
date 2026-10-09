@@ -296,7 +296,18 @@
               </div>
             }
 
-            @if (curso.estadoComercial.matriculaPermitida) {
+            @if (yaMatriculado()) {
+              <div class="alerta alerta--exito ficha-price__matriculado" role="status">
+                <span class="alerta__icono">✓</span>
+                <div>
+                  <p class="alerta__titulo">Ya estás matriculado</p>
+                  <p class="alerta__texto">Este curso está en Mis cursos. Puedes continuar desde tu panel.</p>
+                </div>
+              </div>
+              <button type="button" class="btn btn--primario btn--grande btn--ancho-completo" (click)="irAMisCursos()">
+                Ver mis cursos
+              </button>
+            } @else if (curso.estadoComercial.matriculaPermitida) {
               <button type="button" class="btn btn--primario btn--grande btn--ancho-completo" (click)="alAccionComercial()">
                 {{ etiquetaAccionComercial() }}
               </button>
@@ -317,6 +328,64 @@
           </div>
         </aside>
       </div>
+
+      @if (dialogoMatriculaAbierto()) {
+        <app-modal
+          [titulo]="esMatriculaGratuita ? 'Confirmar matrícula gratuita' : 'Resumen de matrícula'"
+          ancho="md"
+          (cerrar)="cerrarConfirmacionMatricula()"
+        >
+          <div class="confirmacion-matricula">
+            @if (errorMatricula()) {
+              <div class="alerta alerta--error" role="alert">
+                <span class="alerta__icono">!</span>
+                <div><p class="alerta__titulo">No pudimos completar la matrícula</p><p class="alerta__texto">{{ errorMatricula() }}</p></div>
+              </div>
+            }
+            <p class="confirmacion-matricula__intro">
+              Revisa los datos antes de continuar. La matrícula solo se registrará cuando confirmes.
+            </p>
+            <section class="confirmacion-matricula__curso" aria-label="Curso seleccionado">
+              @if (curso.imagenPortadaUrl) {
+                <img class="confirmacion-matricula__imagen" [src]="curso.imagenPortadaUrl" [alt]="'Portada de ' + curso.titulo" />
+              }
+              <div>
+                <span class="confirmacion-matricula__etiqueta">{{ etiquetaModalidad() }} · {{ curso.tipoCursoNombre || 'Curso' }}</span>
+                <h3>{{ curso.titulo }}</h3>
+                <p>{{ curso.modulos.length }} módulos · {{ totalLecciones() }} lecciones</p>
+              </div>
+            </section>
+            <div class="confirmacion-matricula__resumen">
+              <div><span>Importe</span><strong>{{ formatearPrecio(curso.estadoComercial.precioActual) }}</strong></div>
+              @if (curso.estadoComercial.promocionActiva) {
+                <div><span>Precio regular</span><span class="confirmacion-matricula__tachado">{{ formatearPrecio(curso.estadoComercial.precioRegular) }}</span></div>
+              }
+              <div><span>Acceso</span><strong>{{ curso.fechaInicio ? 'Desde el ' + formatearFecha(curso.fechaInicio) : 'Al activarse la matrícula' }}</strong></div>
+            </div>
+            @if (esMatriculaGratuita) {
+              <div class="alerta alerta--info confirmacion-matricula__nota">
+                <span class="alerta__icono">i</span>
+                <div><p class="alerta__titulo">No se realizará ningún cobro</p><p class="alerta__texto">Al confirmar, se activará tu matrícula y recibirás un correo con los datos de acceso.</p></div>
+              </div>
+            } @else {
+              <div class="alerta alerta--info confirmacion-matricula__nota">
+                <span class="alerta__icono">i</span>
+                <div><p class="alerta__titulo">Pago en línea aún no habilitado</p><p class="alerta__texto">El cobro con tarjeta, Yape o Plin requiere la integración de Culqi. Todavía no se registrará una matrícula ni se realizará un cobro.</p></div>
+              </div>
+            }
+            <div class="confirmacion-matricula__acciones">
+              <button type="button" class="btn btn--secundario" [disabled]="procesandoMatricula()" (click)="cerrarConfirmacionMatricula()">Cancelar</button>
+              @if (esMatriculaGratuita) {
+                <button type="button" class="btn btn--primario" [disabled]="procesandoMatricula()" (click)="confirmarMatriculaGratis()">
+                  {{ procesandoMatricula() ? 'Registrando matrícula…' : 'Confirmar matrícula gratuita' }}
+                </button>
+              } @else {
+                <button type="button" class="btn btn--primario" disabled title="Disponible cuando Culqi esté integrado">Pago próximamente</button>
+              }
+            </div>
+          </div>
+        </app-modal>
+      }
     }
   }
 }

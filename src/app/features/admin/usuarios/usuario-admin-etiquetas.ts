@@ -1,4 +1,4 @@
-import { CondicionCuentaAdmin, UsuarioAdminDetalle } from './usuario-admin.model';
+import { CondicionCuentaAdmin, UsuarioAdminRespuesta } from './usuario-admin.model';
 
 export function etiquetaCondicion(condicion: CondicionCuentaAdmin): string {
   switch (condicion) {
@@ -13,10 +13,10 @@ export function etiquetaCondicion(condicion: CondicionCuentaAdmin): string {
   }
 }
 
-/** Un solo rótulo por fila, como en el Figma (EP02-PF-010): "Habilitada" / "Deshabilitada" /
- * "Contraseña temporal" / "Correo sin verificar". Si faltan las dos, prioriza la contraseña
- * porque es lo primero que la persona debe resolver al entrar con la clave temporal. */
-export function etiquetaEstadoCuenta(usuario: Pick<UsuarioAdminDetalle, 'activo' | 'condicion'>): string {
+/** Un solo rótulo por fila: "Habilitada" / "Deshabilitada" / "Contraseña temporal" /
+ * "Correo sin verificar". Si faltan las dos, prioriza la contraseña porque es lo primero que la
+ * persona debe resolver al entrar con la clave temporal. */
+export function etiquetaEstadoCuenta(usuario: Pick<UsuarioAdminRespuesta, 'activo' | 'condicion'>): string {
   if (!usuario.activo) {
     return 'Deshabilitada';
   }
@@ -30,20 +30,9 @@ export function etiquetaEstadoCuenta(usuario: Pick<UsuarioAdminDetalle, 'activo'
 }
 
 /** Clase de color para acompañar `etiquetaEstadoCuenta`. */
-export function claseEstadoCuenta(usuario: Pick<UsuarioAdminDetalle, 'activo' | 'condicion'>): string {
+export function claseEstadoCuenta(usuario: Pick<UsuarioAdminRespuesta, 'activo' | 'condicion'>): string {
   if (!usuario.activo) {
     return 'badge--disp-cerrado';
   }
   return usuario.condicion === 'NINGUNA' ? 'badge--disp-inmediato' : 'badge--advertencia-suave';
-}
-
-export function etiquetaOtorgadoPor(usuario: Pick<UsuarioAdminDetalle, 'otorgadoPor'>): string {
-  switch (usuario.otorgadoPor) {
-    case 'ADMINISTRADOR_INICIAL':
-      return 'Administrador inicial';
-    case 'EQUIPO_ADMINISTRACION':
-      return 'Equipo Administración';
-    default:
-      return 'Autoservicio';
-  }
 }

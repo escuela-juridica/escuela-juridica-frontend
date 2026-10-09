@@ -1,43 +1,129 @@
 <div class="admin-shell">
-  <aside class="admin-sidebar">
-    <img src="img/logo-esejur.png" alt="Escuela Jurídica" class="admin-sidebar__logo" />
+  <header class="admin-navbar">
+    <button type="button" class="admin-navbar__hamburguesa" (click)="toggleMenuMovil()" aria-label="Abrir menú">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="4" y1="7" x2="20" y2="7" />
+        <line x1="4" y1="12" x2="20" y2="12" />
+        <line x1="4" y1="17" x2="20" y2="17" />
+      </svg>
+    </button>
 
-    <nav class="admin-sidebar__nav">
-      <span class="admin-sidebar__item admin-sidebar__item--deshabilitado">Dashboard</span>
-      <span class="admin-sidebar__item admin-sidebar__item--deshabilitado">Cursos</span>
-      <a
-        routerLink="/admin/usuarios"
-        routerLinkActive="admin-sidebar__item--activo"
-        class="admin-sidebar__item"
-        >Usuarios</a
-      >
-      <span class="admin-sidebar__item admin-sidebar__item--deshabilitado">Matrículas y pagos</span>
-      <span class="admin-sidebar__item admin-sidebar__item--deshabilitado">Operación académica</span>
-      <span class="admin-sidebar__item admin-sidebar__item--deshabilitado">Certificados</span>
-      <span class="admin-sidebar__item admin-sidebar__item--deshabilitado">Reclamaciones</span>
-      <span class="admin-sidebar__item admin-sidebar__item--deshabilitado">Reportes</span>
-      <span class="admin-sidebar__item admin-sidebar__item--deshabilitado">Configuración</span>
-    </nav>
-
-    <div class="admin-sidebar__cuenta" #cuentaMenu>
-      <button type="button" class="admin-sidebar__cuenta-boton" (click)="toggleMenuCuenta()">
-        <span class="avatar avatar--sm avatar--cuenta">{{ iniciales }}</span>
-        <span class="admin-sidebar__cuenta-info">
-          <span class="admin-sidebar__cuenta-nombre">{{ usuario()?.nombreCompleto }}</span>
-          <span class="admin-sidebar__cuenta-correo">{{ usuario()?.correo }}</span>
-        </span>
-      </button>
-      @if (menuCuentaAbierto()) {
-        <div class="admin-sidebar__menu">
-          <button type="button" (click)="cerrarSesion()" class="admin-sidebar__menu-item">
-            Cerrar sesión
-          </button>
-        </div>
-      }
+    <div class="admin-navbar__logo-caja">
+      <img src="img/logo-esejur.png" alt="Escuela Jurídica" class="admin-navbar__logo" />
     </div>
-  </aside>
 
-  <main class="admin-contenido">
-    <router-outlet />
-  </main>
+    <a routerLink="/" class="admin-navbar__sitio" title="Ver sitio público">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+        <polyline points="15 3 21 3 21 9" />
+        <line x1="10" y1="14" x2="21" y2="3" />
+      </svg>
+      <span>Ver sitio público</span>
+    </a>
+
+    <span class="admin-navbar__spacer"></span>
+
+    <div class="admin-navbar__cuenta">
+      <div class="admin-navbar__cuenta-boton">
+        <span class="admin-navbar__cuenta-info">
+          <span class="admin-navbar__cuenta-nombre">{{ usuario()?.nombreCompleto }}</span>
+          <span class="admin-navbar__cuenta-correo">{{ usuario()?.correo }}</span>
+        </span>
+        <span class="avatar avatar--sm avatar--cuenta">{{ iniciales }}</span>
+      </div>
+      <button type="button" (click)="cerrarSesion()" class="admin-navbar__salir" aria-label="Cerrar sesión">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 17l5-5-5-5" /><path d="M15 12H3" /><path d="M21 19V5a2 2 0 0 0-2-2h-6" /></svg>
+        <span>Salir</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="admin-body">
+    @if (menuMovilAbierto()) {
+      <div class="admin-sidebar__superposicion" (click)="cerrarMenuMovil()"></div>
+    }
+
+    <aside class="admin-sidebar" [class.admin-sidebar--abierto]="menuMovilAbierto()">
+      <nav class="admin-sidebar__nav">
+        <span class="admin-sidebar__item admin-sidebar__item--deshabilitado" title="Dashboard">
+          <svg class="admin-sidebar__icono" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11l9-8 9 8" />
+            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          </svg>
+          <span class="admin-sidebar__etiqueta">Dashboard</span>
+        </span>
+
+        <a routerLink="/admin/cursos" routerLinkActive="admin-sidebar__item--activo" class="admin-sidebar__item" title="Cursos" (click)="cerrarMenuMovil()">
+          <svg class="admin-sidebar__icono" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 5a2 2 0 0 1 2-2h5v16H5a2 2 0 0 0-2 2V5z" />
+            <path d="M21 5a2 2 0 0 0-2-2h-5v16h5a2 2 0 0 1 2 2V5z" />
+          </svg>
+          <span class="admin-sidebar__etiqueta">Cursos</span>
+        </a>
+
+        <a routerLink="/admin/usuarios" routerLinkActive="admin-sidebar__item--activo" class="admin-sidebar__item" title="Usuarios" (click)="cerrarMenuMovil()">
+          <svg class="admin-sidebar__icono" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
+          <span class="admin-sidebar__etiqueta">Usuarios</span>
+        </a>
+
+        <a routerLink="/admin/matriculas" routerLinkActive="admin-sidebar__item--activo" class="admin-sidebar__item" title="Matrículas y pagos" (click)="cerrarMenuMovil()">
+          <svg class="admin-sidebar__icono" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="5" width="20" height="14" rx="2" />
+            <line x1="2" y1="10" x2="22" y2="10" />
+          </svg>
+          <span class="admin-sidebar__etiqueta">Matrículas y pagos</span>
+        </a>
+
+        <span class="admin-sidebar__item admin-sidebar__item--deshabilitado" title="Operación académica">
+          <svg class="admin-sidebar__icono" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 2h6a1 1 0 0 1 1 1v1H8V3a1 1 0 0 1 1-1z" />
+            <rect x="5" y="4" width="14" height="18" rx="2" />
+            <path d="M9 12l2 2 4-4" />
+          </svg>
+          <span class="admin-sidebar__etiqueta">Operación académica</span>
+        </span>
+
+        <span class="admin-sidebar__item admin-sidebar__item--deshabilitado" title="Certificados">
+          <svg class="admin-sidebar__icono" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="6" />
+            <path d="M9 13.5L7 22l5-3 5 3-2-8.5" />
+          </svg>
+          <span class="admin-sidebar__etiqueta">Certificados</span>
+        </span>
+
+        <span class="admin-sidebar__item admin-sidebar__item--deshabilitado" title="Reclamaciones">
+          <svg class="admin-sidebar__icono" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          </svg>
+          <span class="admin-sidebar__etiqueta">Reclamaciones</span>
+        </span>
+
+        <a routerLink="/admin/reportes/matriculas" routerLinkActive="admin-sidebar__item--activo" class="admin-sidebar__item" title="Reportes" (click)="cerrarMenuMovil()">
+          <svg class="admin-sidebar__icono" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="6" y1="20" x2="6" y2="12" />
+            <line x1="12" y1="20" x2="12" y2="8" />
+            <line x1="18" y1="20" x2="18" y2="4" />
+          </svg>
+          <span class="admin-sidebar__etiqueta">Reportes</span>
+        </a>
+
+        <a routerLink="/admin/informacion-base" routerLinkActive="admin-sidebar__item--activo" class="admin-sidebar__item" title="Configuración" (click)="cerrarMenuMovil()">
+          <svg class="admin-sidebar__icono" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+          </svg>
+          <span class="admin-sidebar__etiqueta">Configuración</span>
+        </a>
+      </nav>
+    </aside>
+
+    <main class="admin-contenido">
+      <router-outlet />
+    </main>
+  </div>
 </div>

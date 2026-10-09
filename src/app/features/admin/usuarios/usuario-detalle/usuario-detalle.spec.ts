@@ -1,8 +1,6 @@
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute, provideRouter } from '@angular/router';
-import { of } from 'rxjs';
 
 import { UsuarioDetalle } from './usuario-detalle';
 
@@ -13,19 +11,12 @@ describe('UsuarioDetalle', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [UsuarioDetalle],
-      providers: [
-        provideRouter([]),
-        provideHttpClient(),
-        provideHttpClientTesting(),
-        {
-          provide: ActivatedRoute,
-          useValue: { paramMap: of({ get: () => '1' }) },
-        },
-      ],
+      providers: [provideHttpClient(), provideHttpClientTesting()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(UsuarioDetalle);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('usuarioId', 1);
     await fixture.whenStable();
   });
 

@@ -7,6 +7,62 @@
 //   >= 1280px escritorio amplio · 1024-1279 escritorio compacto
 //   768-1023 tableta · < 768 movil · < 480 movil estrecho
 
+// -------------------------------------------------------------- Interruptor --
+// Switch on/off reutilizable (HU-008 detalle de usuario, HU-009 informacion base).
+.interruptor {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--neutral-700);
+  cursor: pointer;
+  user-select: none;
+}
+
+.interruptor__entrada {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.interruptor__pista {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  border-radius: var(--radio-completo);
+  background: var(--neutral-200);
+  transition: background-color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.interruptor__perilla {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radio-completo);
+  background: var(--blanco);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.2);
+  transition: transform 0.15s ease;
+}
+
+.interruptor__entrada:checked + .interruptor__pista {
+  background: var(--acento-700);
+}
+
+.interruptor__entrada:checked + .interruptor__pista .interruptor__perilla {
+  transform: translateX(16px);
+}
+
+.interruptor__entrada:focus-visible + .interruptor__pista {
+  outline: 2px solid var(--input-anillo-foco);
+  outline-offset: 2px;
+}
+
 // -------------------------------------------------------------- Contenedor --
 .contenedor {
   max-width: 1200px;
@@ -195,6 +251,33 @@
   background: var(--boton-neutro-bg-hover);
 }
 
+.btn--exito {
+  background: var(--exito);
+  color: var(--blanco);
+}
+
+.btn--exito:hover {
+  background: #016139;
+}
+
+.btn--peligro {
+  background: var(--error);
+  color: var(--blanco);
+}
+
+.btn--peligro:hover {
+  background: #8f1b13;
+}
+
+.btn--info {
+  background: var(--informacion);
+  color: var(--blanco);
+}
+
+.btn--info:hover {
+  background: #0e4694;
+}
+
 .btn--google {
   background: var(--blanco);
   color: var(--neutral-800);
@@ -252,6 +335,13 @@
   padding: 0 14px;
   background: var(--input-fondo);
   color: var(--input-texto);
+}
+
+textarea.input {
+  height: auto;
+  min-height: 96px;
+  padding: 12px 14px;
+  resize: vertical;
 }
 
 .input::placeholder {
@@ -486,6 +576,28 @@
   color: var(--neutral-600);
 }
 
+.badge--disp-cancelado {
+  background: var(--error-fondo);
+  color: var(--error);
+}
+
+// Forma de ingreso a una matrícula (HU administrativas de EP03): distinto significado de
+// "disponibilidad", así que usa su propia pareja de clases aunque comparta colores con otros usos.
+.badge--ingreso-gratuito {
+  background: var(--celeste-050);
+  color: var(--celeste-700);
+}
+
+.badge--ingreso-manual {
+  background: var(--violeta-050);
+  color: var(--violeta-700);
+}
+
+.badge--ingreso-pago {
+  background: var(--exito-fondo);
+  color: var(--exito);
+}
+
 // Estados administrativos genéricos (HU-008: estado de cuenta y similares).
 .badge--advertencia-suave {
   background: var(--advertencia-fondo);
@@ -530,15 +642,40 @@
   margin-top: 1px;
 }
 
+// margin: 0 porque son <p>: sin resetear el margen por defecto del navegador se
+// acumulaba un salto grande entre el título y el texto dentro de la misma alerta.
 .alerta__titulo {
   font-size: 14px;
   line-height: 20px;
   font-weight: 600;
+  margin: 0;
 }
 
 .alerta__texto {
   font-size: 14px;
   line-height: 20px;
+  margin: 2px 0 0;
+}
+
+.alerta__cerrar {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: inherit;
+  opacity: 0.6;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  margin-left: auto;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  border-radius: var(--radio-completo);
+}
+
+.alerta__cerrar:hover {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.06);
 }
 
 .alerta--error {
@@ -729,6 +866,47 @@
   max-width: 460px;
 }
 
+.estado-vacio--editor {
+  margin: 0;
+  border-color: var(--neutral-300);
+  background: linear-gradient(135deg, var(--blanco), var(--acento-050));
+}
+
+.estado-vacio__icono {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 14px;
+  border-radius: var(--radio-completo);
+  background: var(--acento-100);
+  color: var(--acento-700);
+  display: grid;
+  place-items: center;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.estado-vacio--compact {
+  padding: 24px;
+}
+
+.estado-vacio--compact .estado-vacio__icono {
+  width: 38px;
+  height: 38px;
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+.estado-vacio--compact .estado-vacio__titulo {
+  font-size: 15px;
+  line-height: 21px;
+}
+
+.estado-vacio--compact .estado-vacio__texto {
+  margin-bottom: 0;
+  font-size: 13px;
+  line-height: 19px;
+}
+
 // ---------------------------------------------------- Panel comercial ficha --
 // PF-002: el panel de precio "flota" pegado al hero en escritorio; en pantallas
 // angostas (donde la ficha ya se apilo a una columna) vuelve a su posicion normal.
@@ -755,6 +933,550 @@
   }
   100% {
     background-position: 0 50%;
+  }
+}
+
+// --------------------------------------------------- Editor en árbol (admin) --
+// Patrón compartido por las pestañas "Contenido" (HU-011/HU-012) y "Exámenes" (HU-013) del
+// editor de curso: tarjetas anidadas expandibles con cabecera, acciones de orden y formularios
+// en modal. Vive aquí (no en curso-editor.scss) porque ExamenesTab es un componente propio y
+// necesita las mismas clases sin duplicarlas.
+
+.editor-estado {
+  text-align: center;
+  color: var(--neutral-500);
+  padding: 32px 0;
+}
+
+.editor-campos {
+  display: grid;
+  gap: 16px;
+}
+
+.editor-campos--1 {
+  grid-template-columns: 1fr;
+}
+
+.editor-campos--2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.editor-campos--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.editor-campo--ancho {
+  grid-column: 1 / -1;
+}
+
+.editor-form__acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+/* Dentro de un modal, las acciones finales no deben quedar adheridas al
+   ultimo control del formulario. Se aplica a todos los modales reutilizables. */
+.modal-cuerpo .editor-form__acciones {
+  margin-top: 24px;
+  margin-bottom: 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--neutral-100);
+}
+
+.editor-lista {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radio-md);
+  overflow: hidden;
+}
+
+.editor-fila-seleccion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--neutral-100);
+}
+
+.editor-fila-seleccion:last-child {
+  border-bottom: none;
+}
+
+.editor-fila-seleccion:hover {
+  background: var(--neutral-050);
+}
+
+.editor-fila-seleccion--inactiva {
+  opacity: 0.65;
+}
+
+.editor-fila-seleccion__principal {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+  font-size: 14px;
+  color: var(--neutral-950);
+  flex: 1;
+}
+
+.editor-fila-seleccion__cargo {
+  font-size: 13px;
+  color: var(--neutral-500);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.editor-fila-seleccion__orden {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.editor-fila-seleccion__numero {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radio-completo);
+  background: var(--acento-700);
+  color: var(--blanco);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.editor-orden-boton {
+  appearance: none;
+  border: 1px solid var(--neutral-200);
+  background: var(--blanco);
+  color: var(--neutral-700);
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radio-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.editor-orden-boton:hover:not(:disabled) {
+  background: var(--acento-050);
+  color: var(--acento-700);
+  border-color: var(--acento-100);
+}
+
+.editor-orden-boton:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.editor-orden-boton--quitar:hover:not(:disabled) {
+  background: var(--error-fondo);
+  color: var(--error);
+  border-color: var(--error-borde);
+}
+
+.editor-vacio-seleccion {
+  margin: 0;
+  padding: 16px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--neutral-500);
+  border: 1px dashed var(--neutral-200);
+  border-radius: var(--radio-md);
+}
+
+.editor-contenido__acciones {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.editor-ver-inactivos {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--neutral-700);
+  white-space: nowrap;
+}
+
+.editor-boton-chico {
+  height: 30px;
+  padding: 0 12px;
+  font-size: 12px;
+}
+
+.editor-boton-icono {
+  height: 30px;
+  width: 30px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.editor-subform__switches {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  justify-content: center;
+}
+
+.editor-modo-selector {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.editor-modo-opcion {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  padding: 14px 16px;
+  border: 2px solid var(--neutral-200);
+  border-radius: var(--radio-md);
+  background: var(--blanco);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.editor-modo-opcion:hover {
+  border-color: var(--acento-500);
+  background: var(--acento-050);
+}
+
+.editor-modo-opcion--activa {
+  border-color: var(--acento-700);
+  background: var(--acento-050);
+  box-shadow: 0 0 0 1px var(--acento-700);
+}
+
+.editor-modo-opcion__icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radio-md);
+  background: var(--acento-100);
+  color: var(--acento-700);
+  flex-shrink: 0;
+}
+
+.editor-modo-opcion__texto {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.editor-modo-opcion__texto strong {
+  font-size: 14px;
+  color: var(--neutral-950);
+}
+
+.editor-modo-opcion__texto small {
+  font-size: 12px;
+  color: var(--neutral-500);
+}
+
+.editor-material-info {
+  margin: -8px 0 4px;
+  font-size: 13px;
+  color: var(--neutral-500);
+}
+
+/* Ayuda contextual inmediatamente debajo de un campo. A diferencia de la ayuda de listas o
+   materiales, conserva una separación positiva para no invadir el input anterior. */
+.campo-ayuda {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--neutral-500);
+}
+
+.editor-modulo {
+  padding: 0;
+  overflow: hidden;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.editor-modulo:hover {
+  box-shadow: var(--sombra-sm);
+}
+
+.editor-modulo--inactivo {
+  opacity: 0.6;
+}
+
+.editor-modulo__cabecera {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  cursor: pointer;
+}
+
+.editor-modulo__cabecera:hover {
+  background: var(--acento-050);
+}
+
+.editor-modulo__icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radio-md);
+  background: var(--acento-100);
+  color: var(--acento-700);
+  flex-shrink: 0;
+}
+
+.editor-modulo__titulo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.editor-modulo__eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--acento-700);
+}
+
+.editor-modulo__nombre {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--neutral-950);
+}
+
+.editor-modulo__meta {
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--neutral-500);
+  white-space: nowrap;
+}
+
+.editor-modulo__cuerpo {
+  padding: 12px 20px 20px 24px;
+  margin-left: 33px;
+  border-left: 2px solid var(--acento-100);
+}
+
+.editor-expandir {
+  appearance: none;
+  border: none;
+  background: none;
+  color: var(--neutral-500);
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+}
+
+.editor-expandir--abierto {
+  transform: rotate(90deg);
+}
+
+.editor-leccion {
+  background: var(--acento-050);
+  border: 1px solid var(--acento-100);
+  border-left: 3px solid var(--acento-500);
+  border-radius: var(--radio-md);
+  margin-bottom: 12px;
+  transition: box-shadow 0.15s ease;
+}
+
+.editor-leccion:hover {
+  box-shadow: var(--sombra-xs);
+}
+
+.editor-leccion--inactiva {
+  opacity: 0.6;
+  background: var(--neutral-050);
+  border-left-color: var(--neutral-300);
+}
+
+.editor-leccion__cabecera {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  cursor: pointer;
+}
+
+.editor-leccion__cabecera:hover {
+  background: var(--acento-100);
+}
+
+.editor-leccion__icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radio-completo);
+  background: var(--blanco);
+  color: var(--acento-700);
+  flex-shrink: 0;
+  box-shadow: inset 0 0 0 1px var(--acento-100);
+}
+
+.editor-leccion__icono--vivo {
+  color: var(--error);
+  box-shadow: inset 0 0 0 1px var(--error-borde);
+}
+
+.editor-leccion__titulo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--neutral-950);
+}
+
+.editor-leccion__meta {
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--neutral-500);
+  white-space: nowrap;
+}
+
+.editor-leccion__cuerpo {
+  padding: 2px 16px 16px 16px;
+  margin-left: 13px;
+  border-left: 2px dashed var(--acento-100);
+}
+
+.editor-materiales {
+  display: flex;
+  flex-direction: column;
+  background: var(--blanco);
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radio-md);
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.editor-material {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--neutral-100);
+  transition: background-color 0.15s ease;
+}
+
+.editor-material:last-child {
+  border-bottom: none;
+}
+
+.editor-material:hover {
+  background: var(--neutral-050);
+}
+
+.editor-material--inactivo {
+  opacity: 0.6;
+}
+
+.editor-material__icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radio-completo);
+  background: var(--neutral-100);
+  color: var(--neutral-500);
+  flex-shrink: 0;
+}
+
+.editor-material__icono[data-origen='YOUTUBE'] {
+  background: var(--error-fondo);
+  color: var(--error);
+}
+
+.editor-material__icono[data-origen='EXTERNO'] {
+  background: var(--acento-100);
+  color: var(--acento-700);
+}
+
+.editor-material__principal {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.editor-material__titulo {
+  font-size: 14px;
+  color: var(--neutral-950);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.editor-material__detalle {
+  font-size: 12px;
+  color: var(--neutral-500);
+}
+
+@media (max-width: 900px) {
+  .editor-modulo__cuerpo {
+    margin-left: 20px;
+    padding: 4px 12px 16px 16px;
+  }
+  .editor-leccion__cuerpo {
+    margin-left: 8px;
+    padding: 2px 10px 12px 10px;
+  }
+  .editor-modulo__meta,
+  .editor-leccion__meta {
+    display: none;
+  }
+  .editor-campos--2,
+  .editor-campos--3 {
+    grid-template-columns: 1fr;
+  }
+  .editor-modo-selector {
+    grid-template-columns: 1fr;
   }
 }
 

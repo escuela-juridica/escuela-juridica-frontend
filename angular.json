@@ -7,7 +7,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "desarrollo-web-integrado-frontend": {
+    "escuela-juridica-frontend": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -31,6 +31,7 @@
               }
             ],
             "styles": [
+              "node_modules/ngx-spinner/animations/ball-spin-clockwise-fade.css",
               "src/styles.scss"
             ]
           },
@@ -68,10 +69,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "desarrollo-web-integrado-frontend:build:production"
+              "buildTarget": "escuela-juridica-frontend:build:production"
             },
             "development": {
-              "buildTarget": "desarrollo-web-integrado-frontend:build:development"
+              "buildTarget": "escuela-juridica-frontend:build:development"
             }
           },
           "defaultConfiguration": "development"

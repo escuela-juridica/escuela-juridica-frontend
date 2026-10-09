@@ -1,0 +1,318 @@
+// Sin padding propio: .admin-contenido (layout-admin) ya da los 32px, igual que en Cursos y
+// Usuarios — ponerlo aquí también duplicaba el espaciado.
+
+.matriculas__titulo {
+  font-size: 22px;
+  line-height: 30px;
+  font-weight: 700;
+  color: var(--neutral-950);
+  margin: 0;
+}
+
+.matriculas__cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.matriculas__cabecera p {
+  margin: 4px 0 0;
+  color: var(--neutral-600);
+}
+
+.matriculas__filtros {
+  display: flex;
+  gap: 12px;
+  margin: 24px 0;
+}
+
+.matriculas__filtros .input {
+  flex: 1;
+  min-width: 240px;
+}
+
+.matriculas__filtros select.input {
+  flex: none;
+  width: auto;
+}
+
+.matriculas__btn-filtro {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+}
+
+// Gris sólido (no blanco, para no confundirse con los campos del formulario) — su icono es una
+// "X" simple, no un tacho, porque limpiar filtros no es una acción destructiva.
+.matriculas__btn-limpiar {
+  background: var(--neutral-600);
+  color: var(--blanco);
+  transition: background-color 0.15s ease;
+}
+
+.matriculas__btn-limpiar:hover {
+  background: var(--neutral-800);
+}
+
+.matriculas__tabla {
+  overflow: auto;
+  border: 1px solid var(--neutral-200);
+  border-radius: 10px;
+  background: var(--blanco);
+}
+
+.matriculas__tabla table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.matriculas__tabla th,
+.matriculas__tabla td {
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--neutral-100);
+  font-size: 14px;
+}
+
+.matriculas__tabla th {
+  color: var(--neutral-500);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.matriculas__tabla td strong {
+  color: var(--neutral-950);
+  font-weight: 600;
+}
+
+.matriculas__tabla small {
+  display: block;
+  color: var(--neutral-500);
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+// Fila de botones de la columna Acciones: "Ver detalle" (.btn--secundario) y "Cancelar"
+// (.btn--peligro, igual que "Eliminar" en Cursos) ya comparten el tamaño estándar de .btn
+// (44px) — antes "Cancelar" era un botón a medida de 30px sin contenedor, así que quedaban
+// desalineados en vez de una fila limpia.
+.matriculas__acciones {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.matriculas__paginacion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+  font-size: 14px;
+  color: var(--neutral-600);
+}
+
+.matriculas__cancelar-texto {
+  margin: 0 0 16px;
+  color: var(--neutral-600);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+// ----------------------------------------------------------- Formulario modal --
+
+.formulario-matricula {
+  display: grid;
+  gap: 16px;
+}
+
+.formulario-matricula label {
+  display: grid;
+  gap: 7px;
+  color: var(--neutral-800);
+  font-weight: 600;
+}
+
+.formulario-matricula__dos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.formulario-matricula__acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.matriculas__aviso-carga {
+  color: #475467;
+  font-size: 0.9rem;
+  margin: 0.25rem 0;
+}
+
+.matriculas__aviso-academico {
+  align-items: flex-start;
+  display: flex;
+  gap: 0.75rem;
+  margin-block: 0.25rem;
+}
+
+.matriculas__aviso-academico p {
+  margin: 0.35rem 0 0.65rem;
+}
+
+.matriculas__confirmacion-aviso {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.matricula-detalle {
+  display: grid;
+  gap: 1.25rem;
+  max-height: min(68vh, 680px);
+  overflow-y: auto;
+  padding: 0.15rem 0.2rem 0.25rem;
+}
+
+.matricula-detalle section {
+  border-bottom: 1px solid var(--neutral-200);
+  padding-bottom: 1rem;
+}
+
+// Encabezado de identidad: avatar + nombre/correo + badge de estado a la derecha, en vez de
+// solo texto plano — mismo patrón de .avatar que ya usan los navbars de la app.
+.matricula-detalle__identidad {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.matricula-detalle__identidad-texto {
+  min-width: 0;
+}
+
+.matricula-detalle__identidad-texto h3 {
+  color: var(--neutral-950);
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.matricula-detalle__identidad-texto p {
+  color: var(--neutral-500);
+  font-size: 0.85rem;
+  margin: 0.1rem 0 0;
+}
+
+.matricula-detalle__identidad > .badge {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+// Título de cada bloque de historial: más discreto que el nombre del encabezado, con un
+// acento de color a la izquierda para separar visualmente las secciones de la tabla de datos.
+.matricula-detalle__titulo-seccion {
+  color: var(--marca-900);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin: 0 0 0.65rem;
+  padding-left: 0.6rem;
+  border-left: 3px solid var(--acento-500);
+}
+
+.matricula-detalle dl {
+  display: grid;
+  gap: 0.55rem 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+}
+
+.matricula-detalle__ancho-completo {
+  grid-column: 1 / -1;
+}
+
+.matricula-detalle dl div,
+.matricula-detalle__pago,
+.matricula-detalle__evento {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.matricula-detalle dt,
+.matricula-detalle small {
+  color: var(--neutral-500);
+  font-size: 0.78rem;
+}
+
+.matricula-detalle dd {
+  margin: 0;
+}
+
+.matricula-detalle__pago,
+.matricula-detalle__evento {
+  background: var(--neutral-050);
+  border: 1px solid var(--neutral-200);
+  border-radius: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+}
+
+.matricula-detalle__pago span,
+.matricula-detalle__evento p {
+  color: var(--neutral-600);
+  font-size: 0.88rem;
+  margin: 0;
+}
+
+.matricula-detalle__sin-pago {
+  color: var(--neutral-500);
+  font-size: 0.88rem;
+  text-align: center;
+  margin: 0;
+  padding: 1rem;
+  background: var(--neutral-050);
+  border: 1px dashed var(--neutral-200);
+  border-radius: 0.5rem;
+}
+
+@media (max-width: 640px) {
+  .matricula-detalle dl {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .matricula-detalle__identidad {
+    flex-wrap: wrap;
+  }
+
+  .matricula-detalle__identidad > .badge {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 700px) {
+  .matriculas__cabecera,
+  .matriculas__filtros,
+  .formulario-matricula__dos {
+    flex-direction: column;
+    align-items: stretch;
+    display: flex;
+  }
+
+  .matriculas__filtros .input {
+    min-width: 0;
+  }
+}

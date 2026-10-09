@@ -6,40 +6,53 @@
     <a routerLink="/catalogo"><img src="img/logo-esejur.png" alt="Escuela Jurídica" class="header-logo" /></a>
 
     @if (estaAutenticado()) {
-      <div class="header-acciones">
-        <div class="header-cuenta" #cuentaMenu>
+      <div class="header-acciones header-acciones--autenticado">
+        @if (usuario()?.rolPrincipal === 'ADMINISTRADOR') {
+          <a routerLink="/admin" class="btn btn--secundario header-accion-movil">
+            <span class="avatar avatar--sm avatar--cuenta header-avatar-movil">{{ iniciales }}</span>
+            Panel admin
+          </a>
+        } @else {
+          <a routerLink="/app/panel" class="btn btn--secundario header-accion-movil">
+            <span class="avatar avatar--sm avatar--cuenta header-avatar-movil">{{ iniciales }}</span>
+            Mis cursos
+          </a>
+        }
+        <button type="button" class="header-salir-movil" (click)="cerrarSesion()" aria-label="Cerrar sesión">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M10 17l5-5-5-5" /><path d="M15 12H3" /><path d="M21 19V5a2 2 0 0 0-2-2h-6" />
+          </svg>
+          Salir
+        </button>
+        <div class="menu-cuenta" #menuCuenta>
           <button
             type="button"
-            class="avatar avatar--md avatar--cuenta"
-            style="padding: 0"
+            class="menu-cuenta__activador"
+            aria-label="Abrir menú de usuario"
             aria-haspopup="true"
             [attr.aria-expanded]="menuCuentaAbierto()"
-            (click)="toggleMenuCuenta()"
+            (click)="alternarMenuCuenta()"
           >
-            {{ iniciales }}
+            <span class="avatar avatar--sm avatar--cuenta">{{ iniciales }}</span>
+            <span class="menu-cuenta__nombre">{{ usuario()?.nombreCompleto }}</span>
+            <svg class="menu-cuenta__flecha" [class.menu-cuenta__flecha--abierta]="menuCuentaAbierto()" viewBox="0 0 20 20" width="16" height="16" aria-hidden="true">
+              <path d="m5 7.5 5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
           </button>
           @if (menuCuentaAbierto()) {
-            <div class="menu-cuenta">
-              <div class="menu-cuenta__cabecera">
-                <span class="avatar avatar--sm avatar--cuenta" style="flex: 0 0 36px">{{ iniciales }}</span>
-                <div class="menu-cuenta__avatar-info">
-                  <div class="menu-cuenta__nombre">{{ usuario()?.nombreCompleto }}</div>
-                  <div class="menu-cuenta__correo">{{ usuario()?.correo }}</div>
-                </div>
+            <div class="menu-cuenta__panel" role="menu">
+              <div class="menu-cuenta__identidad">
+                <span class="menu-cuenta__nombre-completo">{{ usuario()?.nombreCompleto }}</span>
+                <span class="menu-cuenta__correo">{{ usuario()?.correo }}</span>
               </div>
-              <div class="menu-cuenta__acciones">
-                @if (usuario()?.rolPrincipal === 'ALUMNO') {
-                  <a routerLink="/app/panel" (click)="cerrarMenuCuenta()" class="menu-cuenta__item"
-                    >Mis cursos</a
-                  >
-                  <a routerLink="/app/perfil" (click)="cerrarMenuCuenta()" class="menu-cuenta__item"
-                    >Mi perfil</a
-                  >
-                }
-                <button type="button" (click)="cerrarSesion()" class="menu-cuenta__item">
-                  Cerrar sesión
-                </button>
-              </div>
+              @if (usuario()?.rolPrincipal === 'ADMINISTRADOR') {
+                <a routerLink="/admin" role="menuitem" class="menu-cuenta__opcion" (click)="cerrarMenuCuenta()">Panel admin</a>
+              } @else {
+                <a routerLink="/app/panel" role="menuitem" class="menu-cuenta__opcion" (click)="cerrarMenuCuenta()">Mis cursos</a>
+              }
+              <button type="button" role="menuitem" class="menu-cuenta__opcion menu-cuenta__opcion--salir" (click)="cerrarSesion()">
+                Cerrar sesión
+              </button>
             </div>
           }
         </div>

@@ -4,56 +4,77 @@ import { Observable } from 'rxjs';
 
 import { API_URL } from '../../../core/api/api.config';
 import {
-  ActualizarUsuarioAdminPeticion,
+  ActualizarDatosPersonalesPeticion,
+  CambiarActivoPeticion,
+  ConcederRolPeticion,
   CrearUsuarioAdminPeticion,
   CrearUsuarioAdminRespuesta,
+  PageResponse,
+  ResetearContrasenaRespuesta,
   RolUsuarioAdmin,
-  UsuarioAdminDetalle,
+  UsuarioAdminRespuesta,
 } from './usuario-admin.model';
 
-/**
- * ⚠️ IMPLEMENTACIÓN TEMPORAL, solo para la Épica 01, pedida explícitamente por el docente: llama a
- * `/api/admin/usuarios`, un CRUD REST básico SIN base de datos (los datos viven en memoria en el
- * backend y se reinician con cada arranque). A propósito no está integrado con el login/JWT de la
- * app: es un endpoint público, separado de los usuarios administradores reales. Ver el comentario
- * del paquete `pe.edu.utp.escuela.app.adminusuarios` en el backend para más contexto.
- *
- * Cuando se implemente la Épica 02 (panel de administración real, EP02-PF-010), este servicio y
- * los componentes que lo consumen deben eliminarse junto con ese paquete del backend.
- */
+/** HU-008 — Gestionar usuarios administrativamente. Consume `/api/admin/usuarios`, respaldado por
+ * base de datos real y protegido por sesión + rol ADMINISTRADOR. */
 @Injectable({ providedIn: 'root' })
 export class AdminUsuariosApiService {
   private readonly http = inject(HttpClient);
   private readonly url = `${API_URL}/admin/usuarios`;
 
-  listar(busqueda: string, rol: RolUsuarioAdmin | 'TODOS'): Observable<UsuarioAdminDetalle[]> {
-    let params = new HttpParams();
-    if (busqueda.trim()) {
-      params = params.set('busqueda', busqueda.trim());
+  listar(
+    texto: string,
+    rol: RolUsuarioAdmin | 'TODOS',
+    activo: boolean | 'TODOS',
+    page: number,
+    size: number,
+  ): Observable<PageResponse<UsuarioAdminRespuesta>> {
+    let params = new HttpParams().set('page', page).set('size', size);
+    if (texto.trim()) {
+      params = params.set('texto', texto.trim());
     }
     if (rol !== 'TODOS') {
       params = params.set('rol', rol);
     }
-    return this.http.get<UsuarioAdminDetalle[]>(this.url, { params });
+    if (activo !== 'TODOS') {
+      params = params.set('activo', activo);
+    }
+    return this.http.get<PageResponse<UsuarioAdminRespuesta>>(this.url, { params });
   }
 
-  obtener(usuarioId: number): Observable<UsuarioAdminDetalle> {
-    return this.http.get<UsuarioAdminDetalle>(`${this.url}/${usuarioId}`);
+  obtener(usuarioId: number): Observable<UsuarioAdminRespuesta> {
+    return this.http.get<UsuarioAdminRespuesta>(`${this.url}/${usuarioId}`);
+  }
+
+  actualizarDatosPersonales(
+    usuarioId: number,
+    peticion: ActualizarDatosPersonalesPeticion,
+  ): Observable<UsuarioAdminRespuesta> {
+    return this.http.put<UsuarioAdminRespuesta>(`${this.url}/${usuarioId}/datos-personales`, peticion);
   }
 
   crear(peticion: CrearUsuarioAdminPeticion): Observable<CrearUsuarioAdminRespuesta> {
     return this.http.post<CrearUsuarioAdminRespuesta>(this.url, peticion);
   }
 
-  actualizar(usuarioId: number, peticion: ActualizarUsuarioAdminPeticion): Observable<UsuarioAdminDetalle> {
-    return this.http.put<UsuarioAdminDetalle>(`${this.url}/${usuarioId}`, peticion);
+  concederRol(usuarioId: number, peticion: ConcederRolPeticion): Observable<UsuarioAdminRespuesta> {
+    return this.http.post<UsuarioAdminRespuesta>(`${this.url}/${usuarioId}/roles`, peticion);
   }
 
-  cambiarEstado(usuarioId: number, activo: boolean): Observable<void> {
-    return this.http.put<void>(`${this.url}/${usuarioId}/estado`, { activo });
+  /** Desviación deliberada de HU-008 (que dice que un rol no se retira), pedida explícitamente. */
+  revocarRol(usuarioId: number, rol: RolUsuarioAdmin): Observable<UsuarioAdminRespuesta> {
+    return this.http.delete<UsuarioAdminRespuesta>(`${this.url}/${usuarioId}/roles/${rol}`);
   }
 
-  eliminar(usuarioId: number): Observable<void> {
-    return this.http.delete<void>(`${this.url}/${usuarioId}`);
+  cambiarActivo(usuarioId: number, peticion: CambiarActivoPeticion): Observable<UsuarioAdminRespuesta> {
+    return this.http.patch<UsuarioAdminRespuesta>(`${this.url}/${usuarioId}/activo`, peticion);
+  }
+
+  reenviarHabilitacion(usuarioId: number): Observable<void> {
+    return this.http.post<void>(`${this.url}/${usuarioId}/reenviar-habilitacion`, {});
+  }
+
+  resetearContrasena(usuarioId: number): Observable<ResetearContrasenaRespuesta> {
+    return this.http.post<ResetearContrasenaRespuesta>(`${this.url}/${usuarioId}/resetear-contrasena`, {});
   }
 }

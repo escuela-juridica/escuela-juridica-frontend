@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PF-AULA · Materiales de la lección — ESEJUR</title>
+<link rel="stylesheet" href="estilos.css" />
+<style>
+/* ============================================================
+   ESTILOS PROPIOS DE ESTA PANTALLA (HU-023 — Materiales)
+   ============================================================
+   Mismas clases .aula-* que HU-022 (misma pantalla real,
+   features/aula/aula/aula.html) — si HU-022 ya las definió en
+   su .scss cuando ustedes empiecen, NO las vuelvan a declarar,
+   solo sumen lo que falte acá (el candado de descarga
+   deshabilitada, principalmente).
+   ============================================================ */
+.aula-contenido { padding: 32px 40px; max-width: 760px; }
+.aula-contenido__titulo { margin: 0 0 6px; color: var(--neutral-950); }
+.aula-contenido__meta { color: var(--neutral-500); font-size: 14px; margin: 0 0 24px; }
+.aula-materiales { display: grid; gap: 10px; }
+.aula-material { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid var(--neutral-200); border-radius: 10px; }
+.aula-material__icono { flex: 0 0 32px; height: 32px; border-radius: 8px; background: var(--neutral-100); display: grid; place-items: center; }
+.aula-material__nombre { flex: 1; font-size: 14px; color: var(--neutral-800); }
+.aula-material__sin-descarga { font-size: 12px; color: var(--neutral-400); display: flex; align-items: center; gap: 4px; }
+</style>
+</head>
+<body>
+
+<div class="guia-equipo">
+  <div class="guia-equipo__titulo">PF-AULA · Panel de materiales de una lección</div>
+  <span class="guia-equipo__hu">HU-023 — Consultar materiales protegidos</span>
+
+  <h3>Qué es esta pantalla</h3>
+  <ul>
+    <li>Es el mismo panel derecho de la pantalla de HU-022 (<code>HU-022-PF-AULA-ingresar.html</code>)
+    — acá está aislado y agrandado para que se vea bien el detalle de los materiales, pero el archivo
+    real de Angular es <strong>el mismo</strong>: <code>features/aula/aula/aula.html</code>.</li>
+    <li>Importante: ningún material acá tiene un link directo a un archivo real — en la app, el botón
+    "Ver"/"Descargar" dispara una petición al backend que valida la matrícula <strong>en cada clic</strong>,
+    no solo una vez al cargar la página. No hace falta que simules eso en el HTML, es solo para que
+    entiendas por qué el botón no es un <code>&lt;a href="archivo.pdf"&gt;</code> normal.</li>
+    <li>Fijate en el tercer material: cuando <code>permiteDescarga = false</code>, el botón "Descargar"
+    <strong>no existe</strong> (no está deshabilitado, directamente no se dibuja) — solo queda "Ver".</li>
+  </ul>
+
+  <h3>Dónde poner tus estilos</h3>
+  <ul>
+    <li>Bloque <code>&lt;style&gt;</code> de acá arriba — clases <code>.aula-material*</code>. Si
+    HU-022 ya maquetó esto antes que ustedes, coordinen para no declarar la misma clase dos veces con
+    valores distintos.</li>
+  </ul>
+
+  <h3>Cuándo termines</h3>
+  <p>
+    Si HU-022 todavía no integró su parte, copiá el bloque de materiales dentro de
+    <code>&lt;main&gt;...&lt;/main&gt;</code> a <code>src/app/features/aula/aula/aula.html</code>,
+    reemplazando el panel de materiales que haya ahí. Si HU-022 ya integró, coordinen y hagan el merge
+    juntos en vez de pisarse el archivo.
+  </p>
+
+  <div class="guia-equipo__nuevo">
+    <strong>¿Necesitás un estilo que no existe ni en <code>estilos.css</code> ni acá arriba?</strong> Anotalo:
+    <br />— (vacío, tu equipo escribe acá) —
+  </div>
+</div>
+
+<header style="background: #101828; position: sticky; top: 0; z-index: 100">
+  <div class="header-fila" style="max-width: 1200px; margin: 0 auto; min-height: 72px; padding: 12px 24px; display: flex; align-items: center; gap: 24px; flex-wrap: wrap">
+    <a href="HU-022-PF-AULA-ingresar.html" style="background:#fff; border-radius:8px; padding:4px 10px; display:flex; align-items:center">
+      <img src="img/logo-esejur.png" alt="Escuela Jurídica" style="height: 36px; width: auto" />
+    </a>
+    <nav style="display: flex; align-items: stretch; gap: 2px; flex: 1 1 200px; flex-wrap: wrap">
+      <a href="#" style="font-size: 14px; padding: 20px 12px 17px; border-bottom: 3px solid #00d8d8; color: #fff; font-weight: 600">Mis cursos</a>
+      <span style="font-size: 14px; padding: 20px 12px 17px; color: rgba(255,255,255,.35)">Calendario</span>
+      <span style="font-size: 14px; padding: 20px 12px 17px; color: rgba(255,255,255,.35)">Mis certificados</span>
+      <a href="#" style="font-size: 14px; padding: 20px 12px 17px; color: rgba(255,255,255,.75)">Mi perfil</a>
+    </nav>
+    <div style="display: flex; align-items: center; gap: 12px">
+      <span class="avatar avatar--sm avatar--cuenta">LC</span>
+      <button type="button" style="display:flex; align-items:center; gap:7px; min-height:34px; padding:0 11px; border:1px solid rgba(255,255,255,.35); border-radius:8px; background:#b42318; color:#fff; font-weight:700; font-size:13px">Salir</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="aula-contenido">
+    <div class="eyebrow"><span class="eyebrow__dash"></span><span class="eyebrow__texto">Módulo 1 · Lección 3</span></div>
+    <h1 class="tipo-h1 aula-contenido__titulo">Independización, acumulación y subdivisión</h1>
+    <p class="aula-contenido__meta">3 materiales</p>
+
+    <div class="aula-materiales">
+      <div class="aula-material">
+        <span class="aula-material__icono">🎬</span>
+        <span class="aula-material__nombre">Video: Independización paso a paso</span>
+        <button type="button" class="btn btn--secundario" style="height: 36px; padding: 0 14px">Ver</button>
+        <button type="button" class="btn btn--primario" style="height: 36px; padding: 0 14px">Descargar</button>
+      </div>
+      <div class="aula-material">
+        <span class="aula-material__icono">📄</span>
+        <span class="aula-material__nombre">Guía de lectura (PDF)</span>
+        <button type="button" class="btn btn--secundario" style="height: 36px; padding: 0 14px">Ver</button>
+        <button type="button" class="btn btn--primario" style="height: 36px; padding: 0 14px">Descargar</button>
+      </div>
+      <!-- Este material NO permite descarga: fijate que no hay botón "Descargar", solo "Ver" + el aviso -->
+      <div class="aula-material">
+        <span class="aula-material__icono">📄</span>
+        <span class="aula-material__nombre">Formato oficial de solicitud (uso exclusivo en clase)</span>
+        <button type="button" class="btn btn--secundario" style="height: 36px; padding: 0 14px">Ver</button>
+        <span class="aula-material__sin-descarga">🔒 Sin descarga</span>
+      </div>
+      <div class="aula-material">
+        <span class="aula-material__icono">🔗</span>
+        <span class="aula-material__nombre">Modelo de resolución registral (enlace externo)</span>
+        <button type="button" class="btn btn--secundario" style="height: 36px; padding: 0 14px">Abrir</button>
+      </div>
+    </div>
+
+    <p class="pantalla-pendiente__codigo" style="margin: 32px 0 12px">Estado alterno · Descarga rechazada (si alguien intenta forzar la URL sin permiso)</p>
+    <div class="alerta alerta--error" role="alert">
+      <span class="alerta__icono">!</span>
+      <div><p class="alerta__titulo">No pudimos abrir este material</p><p class="alerta__texto">Este material no permite descarga, o tu acceso a este curso ya no es válido.</p></div>
+    </div>
+  </section>
+</main>
+
+<footer style="border-top: 1px solid var(--neutral-200); background: #ffffff; padding: 16px 24px">
+  <div style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--neutral-500)">
+    <span>© Escuela Jurídica · 2026</span>
+    <div style="display: flex; gap: 16px">
+      <a href="#" style="color: var(--neutral-500)">Términos del servicio</a>
+      <a href="#" style="color: var(--neutral-500)">Política de privacidad</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

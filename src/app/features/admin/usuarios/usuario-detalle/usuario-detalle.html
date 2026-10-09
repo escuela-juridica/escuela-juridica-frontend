@@ -1,189 +1,211 @@
-<!-- NO ES LA VERSIÓN FINAL: sin referencia de diseño (el Figma de HU-008 solo cubre el listado).
-     Ver el comentario de AdminUsuariosApiService: API real pero sin base de datos. -->
-<div class="contenedor-centrado" style="max-width: 640px; padding: 0">
-    <a routerLink="/admin/usuarios" class="usuario-detalle-volver">&larr; Volver a usuarios</a>
+@if (usuario() === undefined) {
+  <p class="usuario-detalle-estado">Cargando…</p>
+} @else if (usuario() === null) {
+  <div class="alerta alerta--error">
+    <span class="alerta__icono">!</span>
+    <div class="alerta__titulo">No encontramos esa cuenta.</div>
+  </div>
+} @else {
+  @let u = usuario()!;
 
-    @if (usuario() === undefined) {
-      <p>Cargando…</p>
-    } @else if (usuario() === null) {
-      <div class="alerta alerta--error">
-        <span class="alerta__icono">!</span>
-        <div class="alerta__titulo">No encontramos esa cuenta.</div>
-      </div>
+  <div class="usuario-detalle-encabezado">
+    <div>
+      <div class="usuario-detalle-nombre">{{ u.nombreCompleto }}</div>
+      <div class="usuario-detalle-correo">{{ u.correo }}</div>
+    </div>
+    <span class="badge" [class]="claseEstadoCuenta(u)">{{ etiquetaEstadoCuenta(u) }}</span>
+  </div>
+
+  @if (mensaje(); as m) {
+    <div class="alerta usuario-detalle-alerta" [class.alerta--error]="m.tipo === 'error'" [class.alerta--exito]="m.tipo === 'exito'">
+      <span class="alerta__icono">{{ m.tipo === 'error' ? '!' : '✓' }}</span>
+      <div class="alerta__titulo">{{ m.texto }}</div>
+    </div>
+  }
+
+  <div class="usuario-detalle-seccion">
+    <div class="usuario-detalle-seccion__cabecera">
+      <h3 class="usuario-detalle-seccion__titulo">Datos personales</h3>
+      @if (!editando()) {
+        <button type="button" class="btn btn--secundario" (click)="abrirEdicion()">Editar</button>
+      }
+    </div>
+
+    @if (editando()) {
+      <form [formGroup]="formDatos" (ngSubmit)="guardarDatos()" class="usuario-detalle-form">
+        <div class="usuario-detalle-campos usuario-detalle-campos--formulario">
+          <div>
+            <label class="label" for="ud-nombres">Nombres</label>
+            <input
+              id="ud-nombres"
+              class="input"
+              formControlName="nombres"
+              [class.input--error]="campoDatosInvalido('nombres')"
+            />
+            @if (campoDatosInvalido('nombres')) {
+              <div class="campo-error">Ingresa los nombres (solo letras).</div>
+            }
+          </div>
+          <div>
+            <label class="label" for="ud-paterno">Apellido paterno</label>
+            <input
+              id="ud-paterno"
+              class="input"
+              formControlName="apellidoPaterno"
+              [class.input--error]="campoDatosInvalido('apellidoPaterno')"
+            />
+            @if (campoDatosInvalido('apellidoPaterno')) {
+              <div class="campo-error">Ingresa el apellido paterno (solo letras).</div>
+            }
+          </div>
+          <div>
+            <label class="label"><span>Apellido materno</span><span class="nota-pill">Opcional</span></label>
+            <input
+              class="input"
+              formControlName="apellidoMaterno"
+              [class.input--error]="campoDatosInvalido('apellidoMaterno')"
+            />
+            @if (campoDatosInvalido('apellidoMaterno')) {
+              <div class="campo-error">Solo letras, espacios, apóstrofe y guion.</div>
+            }
+          </div>
+          <div>
+            <label class="label"><span>Teléfono</span><span class="nota-pill">Opcional</span></label>
+            <input
+              class="input"
+              formControlName="telefono"
+              placeholder="999 999 999"
+              [class.input--error]="campoDatosInvalido('telefono')"
+            />
+            @if (campoDatosInvalido('telefono')) {
+              <div class="campo-error">Debe tener entre 6 y 9 dígitos.</div>
+            }
+          </div>
+          <div class="usuario-detalle-campo--ancho">
+            <label class="label"><span>Documento de identidad</span><span class="nota-pill">Opcional</span></label>
+            <input
+              class="input"
+              formControlName="documentoIdentidad"
+              placeholder="45781203"
+              [class.input--error]="campoDatosInvalido('documentoIdentidad')"
+            />
+            @if (campoDatosInvalido('documentoIdentidad')) {
+              <div class="campo-error">
+                {{ formDatos.controls.documentoIdentidad.hasError('duplicado') ? 'Ese documento ya está en uso.' : 'Debe tener 8 dígitos.' }}
+              </div>
+            }
+          </div>
+        </div>
+        <div class="usuario-detalle-form__acciones">
+          <button type="submit" class="btn btn--primario" [disabled]="guardandoDatos()">
+            {{ guardandoDatos() ? 'Guardando…' : 'Guardar' }}
+          </button>
+          <button type="button" class="btn btn--secundario" (click)="cancelarEdicion()">Cancelar</button>
+        </div>
+      </form>
     } @else {
-      @let u = usuario()!;
-
-      <div class="eyebrow"><span class="eyebrow__dash"></span><span class="eyebrow__texto">Administración</span></div>
-      <h1 class="usuario-detalle-titulo">{{ u.nombreCompleto }}</h1>
-
-      <div class="usuario-detalle-badges">
-        <span class="badge" [class.badge--hibrido-suave]="u.rolPrincipal === 'ADMINISTRADOR'" [class.badge--virtual-suave]="u.rolPrincipal === 'ALUMNO'">
-          {{ u.rolPrincipal === 'ADMINISTRADOR' ? 'Administrador' : 'Alumno' }}
-        </span>
-        <span class="badge" [class]="servicioEstadoClase()">{{ servicioEstadoEtiqueta() }}</span>
-      </div>
-
-      @if (errorCambioEstado()) {
-        <div class="alerta alerta--error usuario-detalle-alerta">
-          <span class="alerta__icono">!</span>
-          <div class="alerta__titulo">{{ errorCambioEstado() }}</div>
+      <div class="usuario-detalle-campos">
+        <div>
+          <div class="usuario-detalle-etiqueta">Nombres</div>
+          <div class="usuario-detalle-valor">{{ u.nombres }}</div>
         </div>
-      }
-
-      @if (errorEliminar()) {
-        <div class="alerta alerta--error usuario-detalle-alerta">
-          <span class="alerta__icono">!</span>
-          <div class="alerta__titulo">{{ errorEliminar() }}</div>
+        <div>
+          <div class="usuario-detalle-etiqueta">Apellido paterno</div>
+          <div class="usuario-detalle-valor">{{ u.apellidoPaterno }}</div>
         </div>
-      }
-
-      @if (guardadoOk()) {
-        <div class="alerta alerta--exito usuario-detalle-alerta">
-          <span class="alerta__icono">✓</span>
-          <div class="alerta__titulo">Datos actualizados.</div>
+        <div>
+          <div class="usuario-detalle-etiqueta">Apellido materno</div>
+          <div class="usuario-detalle-valor">{{ u.apellidoMaterno || '—' }}</div>
         </div>
-      }
-
-      <div class="card card--acento-superior usuario-detalle-card">
-        <div class="usuario-detalle-card__cabecera">
-          <h2>Datos personales</h2>
-          @if (!editando()) {
-            <button type="button" class="btn btn--secundario" (click)="iniciarEdicion()">
-              Editar
-            </button>
-          }
+        <div>
+          <div class="usuario-detalle-etiqueta">Teléfono</div>
+          <div class="usuario-detalle-valor">{{ u.telefono || '—' }}</div>
         </div>
-
-        @if (!editando()) {
-          <div class="usuario-detalle-campos">
-            <div>
-              <div class="usuario-detalle-etiqueta">Nombres</div>
-              <div class="usuario-detalle-valor">{{ u.nombres }}</div>
-            </div>
-            <div>
-              <div class="usuario-detalle-etiqueta">Apellido paterno</div>
-              <div class="usuario-detalle-valor">{{ u.apellidoPaterno }}</div>
-            </div>
-            <div>
-              <div class="usuario-detalle-etiqueta">Apellido materno</div>
-              <div class="usuario-detalle-valor">{{ u.apellidoMaterno || '—' }}</div>
-            </div>
-            <div>
-              <div class="usuario-detalle-etiqueta">Correo</div>
-              <div class="usuario-detalle-valor">{{ u.correo }}</div>
-            </div>
-            <div>
-              <div class="usuario-detalle-etiqueta">Teléfono</div>
-              <div class="usuario-detalle-valor">{{ u.telefono || '—' }}</div>
-            </div>
-            <div>
-              <div class="usuario-detalle-etiqueta">Documento de identidad</div>
-              <div class="usuario-detalle-valor">{{ u.documentoIdentidad || '—' }}</div>
-            </div>
-            <div>
-              <div class="usuario-detalle-etiqueta">Origen</div>
-              <div class="usuario-detalle-valor">
-                @switch (u.origenRegistro) {
-                  @case ('FORMULARIO') { Formulario }
-                  @case ('GOOGLE') { Google }
-                  @case ('ADMINISTRATIVO') { Administrativo }
-                }
-              </div>
-            </div>
-            <div>
-              <div class="usuario-detalle-etiqueta">Perfil concedido por</div>
-              <div class="usuario-detalle-valor">
-                {{ etiquetaOtorgadoPor(u) }}
-                @if (u.concedidoPorNombre) {
-                  ({{ u.concedidoPorNombre }})
-                }
-              </div>
-            </div>
-          </div>
-
-          <div class="usuario-detalle-acciones">
-            @if (u.activo) {
-              <button
-                type="button"
-                class="btn btn--secundario"
-                [disabled]="cambiandoEstado()"
-                (click)="cambiarEstado(false)"
-              >
-                Deshabilitar cuenta
-              </button>
-            } @else {
-              <button
-                type="button"
-                class="btn btn--primario"
-                [disabled]="cambiandoEstado()"
-                (click)="cambiarEstado(true)"
-              >
-                Habilitar cuenta
-              </button>
+        <div>
+          <div class="usuario-detalle-etiqueta">Documento de identidad</div>
+          <div class="usuario-detalle-valor">{{ u.documentoIdentidad || '—' }}</div>
+        </div>
+        <div>
+          <div class="usuario-detalle-etiqueta">Origen</div>
+          <div class="usuario-detalle-valor">
+            @switch (u.origenRegistro) {
+              @case ('FORMULARIO') { Formulario }
+              @case ('GOOGLE') { Google }
+              @case ('ADMINISTRATIVO') { Administrativo }
             }
-            <button
-              type="button"
-              class="btn btn--secundario usuario-detalle-eliminar"
-              [disabled]="eliminando()"
-              (click)="eliminar()"
-            >
-              Eliminar permanentemente
-            </button>
           </div>
-        } @else {
-          <form [formGroup]="formulario" (ngSubmit)="guardarEdicion()">
-            @if (errorEdicion()) {
-              <div class="alerta alerta--error usuario-detalle-alerta">
-                <span class="alerta__icono">!</span>
-                <div class="alerta__titulo">{{ errorEdicion() }}</div>
-              </div>
-            }
-
-            <div class="usuario-detalle-campos">
-              <div>
-                <label class="label" for="e-nombres">Nombres</label>
-                <input
-                  id="e-nombres"
-                  class="input"
-                  formControlName="nombres"
-                  [class.input--error]="campoInvalido('nombres')"
-                />
-              </div>
-              <div>
-                <label class="label" for="e-apellidoPaterno">Apellido paterno</label>
-                <input
-                  id="e-apellidoPaterno"
-                  class="input"
-                  formControlName="apellidoPaterno"
-                  [class.input--error]="campoInvalido('apellidoPaterno')"
-                />
-              </div>
-              <div>
-                <label class="label"><span>Apellido materno</span><span class="nota-pill">Opcional</span></label>
-                <input id="e-apellidoMaterno" class="input" formControlName="apellidoMaterno" />
-              </div>
-              <div>
-                <label class="label"><span>Correo</span><span class="nota-pill nota-pill--neutra">No editable</span></label>
-                <input class="input input--solo-lectura" [value]="u.correo" readonly />
-              </div>
-              <div>
-                <label class="label"><span>Teléfono</span><span class="nota-pill">Opcional</span></label>
-                <input id="e-telefono" class="input" formControlName="telefono" placeholder="999 999 999" />
-              </div>
-              <div>
-                <label class="label"><span>Documento de identidad</span><span class="nota-pill">Opcional</span></label>
-                <input id="e-documentoIdentidad" class="input" formControlName="documentoIdentidad" placeholder="45781203" />
-              </div>
-            </div>
-
-            <div class="usuario-detalle-acciones">
-              <button type="submit" class="btn btn--primario" [disabled]="guardandoEdicion()">
-                Guardar cambios
-              </button>
-              <button type="button" class="btn btn--secundario" (click)="cancelarEdicion()">Cancelar</button>
-            </div>
-          </form>
+        </div>
+        @if (u.concedidoPorNombre) {
+          <div class="usuario-detalle-campo--ancho">
+            <div class="usuario-detalle-etiqueta">Rol Administrador concedido por</div>
+            <div class="usuario-detalle-valor">{{ u.concedidoPorNombre }}</div>
+          </div>
         }
       </div>
     }
-</div>
+  </div>
+
+  <div class="usuario-detalle-seccion">
+    <h3 class="usuario-detalle-seccion__titulo">Roles</h3>
+    <p class="usuario-detalle-seccion__ayuda">
+      Marca o desmarca los roles de la cuenta. No puedes dejarla sin ningún rol, ni retirarte tu
+      propio rol de administrador, ni al último administrador habilitado.
+    </p>
+    <div class="usuario-detalle-roles">
+      @for (rol of todosLosRoles; track rol) {
+        <label class="usuario-detalle-check">
+          <input
+            type="checkbox"
+            [checked]="tieneRol(rol)"
+            [disabled]="concediendoRol() !== null"
+            (change)="alternarRol(rol)"
+          />
+          <span>{{ etiquetaRol(rol) }}</span>
+          @if (concediendoRol() === rol) {
+            <span class="usuario-detalle-check__estado">Guardando…</span>
+          }
+        </label>
+      }
+    </div>
+  </div>
+
+  <div class="usuario-detalle-seccion">
+    <h3 class="usuario-detalle-seccion__titulo">Acceso</h3>
+    <div class="usuario-detalle-interruptor-fila">
+      <label class="interruptor">
+        <input
+          type="checkbox"
+          class="interruptor__entrada"
+          [checked]="u.activo"
+          [disabled]="cambiandoEstado()"
+          (change)="cambiarEstado(!u.activo)"
+        />
+        <span class="interruptor__pista"><span class="interruptor__perilla"></span></span>
+        <span class="interruptor__texto">{{ u.activo ? 'Cuenta habilitada' : 'Cuenta deshabilitada' }}</span>
+      </label>
+
+      @if (u.condicion !== 'NINGUNA' && u.condicion !== 'CAMBIO_PENDIENTE') {
+        <button type="button" class="btn btn--secundario" [disabled]="reenviando()" (click)="reenviarHabilitacion()">
+          Reenviar código de verificación
+        </button>
+      }
+      <button type="button" class="btn btn--secundario" [disabled]="reseteandoContrasena()" (click)="resetearContrasena()">
+        {{ reseteandoContrasena() ? 'Reseteando…' : 'Resetear contraseña' }}
+      </button>
+    </div>
+
+    @if (contrasenaTemporal(); as temporal) {
+      <div class="alerta alerta--exito usuario-detalle-alerta">
+        <span class="alerta__icono">✓</span>
+        <div>
+          <div class="alerta__titulo">Contraseña reseteada</div>
+          <div class="alerta__texto">
+            Nueva contraseña temporal: <strong>{{ temporal }}</strong>. Se envió por correo y se
+            pedirá cambiarla en el próximo ingreso. No vuelve a mostrarse después de cerrar esto.
+          </div>
+        </div>
+        <button type="button" class="alerta__cerrar" (click)="cerrarContrasenaTemporal()" aria-label="Cerrar">✕</button>
+      </div>
+    }
+  </div>
+}

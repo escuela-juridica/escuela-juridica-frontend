@@ -492,6 +492,29 @@
   line-height: 20px;
   color: var(--neutral-500);
 }
+.ficha-price__matriculado { margin: 20px 0 12px; text-align: left; }
+
+.confirmacion-matricula { display: grid; gap: 20px; }
+.confirmacion-matricula__intro { margin: 0; color: var(--neutral-600); line-height: 1.5; }
+.confirmacion-matricula__curso { display: flex; align-items: center; gap: 16px; padding: 16px; border: 1px solid var(--neutral-200); border-radius: var(--radio-md); background: var(--neutral-050); }
+.confirmacion-matricula__imagen { width: 88px; height: 68px; flex: 0 0 auto; object-fit: cover; border-radius: var(--radio-sm); }
+.confirmacion-matricula__etiqueta { color: var(--teal-700, #007b7b); font-size: 12px; font-weight: 700; text-transform: uppercase; }
+.confirmacion-matricula__curso h3 { margin: 4px 0; color: var(--neutral-950); font-size: 16px; }
+.confirmacion-matricula__curso p { margin: 0; color: var(--neutral-600); font-size: 13px; }
+.confirmacion-matricula__resumen { display: grid; gap: 12px; }
+.confirmacion-matricula__resumen > div { display: flex; justify-content: space-between; gap: 16px; color: var(--neutral-600); }
+.confirmacion-matricula__resumen strong { color: var(--neutral-950); text-align: right; }
+.confirmacion-matricula__tachado { text-decoration: line-through; }
+.confirmacion-matricula__nota { margin: 0; }
+.confirmacion-matricula__acciones { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 12px; padding-top: 16px; border-top: 1px solid var(--neutral-200); }
+
+@media (max-width: 520px) {
+  .confirmacion-matricula__curso { align-items: flex-start; padding: 12px; }
+  .confirmacion-matricula__imagen { width: 68px; height: 56px; }
+  .confirmacion-matricula__resumen > div { align-items: flex-start; }
+  .confirmacion-matricula__acciones { flex-direction: column-reverse; }
+  .confirmacion-matricula__acciones .btn { width: 100%; }
+}
 
 .ficha-cargando {
   padding-top: 40px;

@@ -1,18 +1,16 @@
-<!-- NO ES LA VERSIÓN FINAL: ver el comentario de AdminUsuariosApiService. -->
+<!-- HU-008: diseño según el Figma EP02-PF-010-HU-008-Gestión de usuarios. -->
 <div class="usuarios-admin-cabecera">
   <div>
     <h1 class="usuarios-admin-titulo">Usuarios</h1>
     <p class="usuarios-admin-subtitulo">La habilitación exige correo verificado y contraseña propia.</p>
   </div>
-  <button type="button" class="btn btn--primario" routerLink="/admin/usuarios/nuevo">
-    Crear usuario
-  </button>
+  <button type="button" class="btn btn--primario" (click)="abrirCrear()">Crear usuario</button>
 </div>
 
 <div class="usuarios-admin-filtros">
   <input
     class="input"
-    [ngModel]="busqueda()"
+    [ngModel]="texto()"
     (ngModelChange)="onBusquedaInput($event)"
     placeholder="Buscar por nombre o correo"
   />
@@ -43,10 +41,10 @@
       <span>Rol</span>
       <span>Origen</span>
       <span>Estado de cuenta</span>
-      <span>Perfil concedido por</span>
+      <span></span>
     </div>
     @for (usuario of usuarios(); track usuario.usuarioId) {
-      <a class="usuarios-admin-fila" [routerLink]="['/admin/usuarios', usuario.usuarioId]">
+      <div class="usuarios-admin-fila">
         <span class="usuarios-admin-fila__nombre">{{ usuario.nombreCompleto }}</span>
         <span class="usuarios-admin-fila__correo">{{ usuario.correo }}</span>
         <span>{{ usuario.rolPrincipal === 'ADMINISTRADOR' ? 'Administrador' : 'Alumno' }}</span>
@@ -62,8 +60,46 @@
             {{ etiquetaEstadoCuenta(usuario) }}
           </span>
         </span>
-        <span>{{ etiquetaOtorgadoPor(usuario) }}</span>
-      </a>
+        <button
+          type="button"
+          class="usuarios-admin-fila__ver"
+          (click)="abrirEditar(usuario.usuarioId)"
+          [attr.aria-label]="'Ver ' + usuario.nombreCompleto"
+        >
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z" />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
+          <span>Ver</span>
+        </button>
+      </div>
     }
   </div>
+
+  @if (totalPaginas() > 1) {
+    <div class="usuarios-admin-paginacion">
+      <button type="button" class="btn btn--secundario" [disabled]="pagina() === 0" (click)="irAPagina(pagina() - 1)">
+        Anterior
+      </button>
+      <span>Página {{ pagina() + 1 }} de {{ totalPaginas() }}</span>
+      <button
+        type="button"
+        class="btn btn--secundario"
+        [disabled]="pagina() + 1 >= totalPaginas()"
+        (click)="irAPagina(pagina() + 1)"
+      >
+        Siguiente
+      </button>
+    </div>
+  }
+}
+
+@if (modalAbierto() === 'nuevo') {
+  <app-modal titulo="Crear usuario" ancho="lg" (cerrar)="cerrarModal()">
+    <app-usuario-crear (cerrar)="cerrarModal()" (creado)="alCrear($event)" />
+  </app-modal>
+} @else if (idEnEdicion; as id) {
+  <app-modal titulo="Detalle del usuario" ancho="lg" (cerrar)="cerrarModal()">
+    <app-usuario-detalle [usuarioId]="id" (actualizado)="alActualizar()" />
+  </app-modal>
 }

@@ -1,0 +1,14 @@
+.requisitos { display: grid; gap: 20px; }
+.requisitos__cabecera, .requisitos__grupo { margin: 0; }
+.requisitos__cabecera .editor-card__titulo { margin-bottom: 8px; font-size: 20px; }
+.requisitos__cabecera .editor-material-info { margin: 0; }
+.requisitos__grupo h3 { margin: 0 0 18px; font-size: 16px; }
+.requisitos__condiciones { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.requisitos__condicion { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 84px; padding: 15px 16px; border: 1px solid var(--neutral-200); border-radius: var(--radio-md); background: var(--neutral-50); cursor: pointer; }
+.requisitos__condicion strong, .requisitos__condicion small { display: block; }
+.requisitos__condicion strong { color: var(--neutral-900); font-size: 14px; }
+.requisitos__condicion small { margin-top: 5px; color: var(--neutral-500); font-size: 12px; line-height: 1.35; }
+.requisitos__condicion--simple { min-height: 100%; }
+.requisitos__aviso { margin: 2px 0 0; padding: 10px 12px; border-radius: var(--radio-md); background: var(--advertencia-100, #fff7e6); color: var(--advertencia-700, #8a4b00); font-size: 13px; }
+
+@media (max-width: 1023px) { .requisitos__condiciones { grid-template-columns: 1fr; } }

@@ -1,0 +1,143 @@
+<section class="reporte">
+  <div class="reporte__cabecera">
+    <div>
+      <h1 class="reporte__titulo">Reporte de matrículas</h1>
+      <p>Una fila por matrícula, con acceso y situación académica separados.</p>
+    </div>
+    <div class="reporte__acciones-exportar">
+      <button type="button" class="btn btn--peligro reporte__btn-exportar" (click)="exportarPdf()">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+          <path d="M14 2v6h6" />
+          <path d="M9 15h6" />
+          <path d="M9 11h6" />
+        </svg>
+        Exportar PDF
+      </button>
+      <button type="button" class="btn btn--exito reporte__btn-exportar" (click)="exportarExcel()">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <line x1="3" y1="9" x2="21" y2="9" />
+          <line x1="3" y1="15" x2="21" y2="15" />
+          <line x1="9" y1="3" x2="9" y2="21" />
+          <line x1="15" y1="3" x2="15" y2="21" />
+        </svg>
+        Exportar Excel
+      </button>
+      <button type="button" class="btn btn--primario reporte__btn-exportar" (click)="exportar()">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3v12" />
+          <path d="M7 10l5 5 5-5" />
+          <path d="M5 21h14" />
+        </svg>
+        Exportar CSV
+      </button>
+    </div>
+  </div>
+
+  <div class="reporte__filtros">
+    <input class="input" [(ngModel)]="texto" (keyup.enter)="buscar()" placeholder="Alumno, correo o curso" />
+    <select class="input" [(ngModel)]="estado" (change)="buscar()">
+      <option value="">Todos los estados</option>
+      <option value="ACTIVA">Activa</option>
+      <option value="CANCELADA">Cancelada</option>
+      <option value="VENCIDA">Vencida</option>
+      <option value="PENDIENTE_PAGO">Pendiente de pago</option>
+    </select>
+    <select class="input" [(ngModel)]="cursoId">
+      <option [ngValue]="null">Todos los cursos</option>
+      @for (curso of cursos(); track curso.id) { <option [ngValue]="curso.id">{{ curso.titulo }}</option> }
+    </select>
+    <select class="input" [(ngModel)]="modalidad">
+      <option value="">Todas las modalidades</option>
+      <option value="VIRTUAL">Virtual</option>
+      <option value="EN_VIVO">En vivo</option>
+      <option value="HIBRIDO">Híbrido</option>
+    </select>
+    <label class="reporte__filtro-fecha">Desde<input class="input" type="date" [(ngModel)]="fechaDesde" [max]="fechaActual" /></label>
+    <label class="reporte__filtro-fecha">Hasta<input class="input" type="date" [(ngModel)]="fechaHasta" [min]="fechaDesde" [max]="fechaActual" /></label>
+    <div class="reporte__filtro-acciones">
+      <button class="btn btn--acento reporte__btn-filtro" type="button" (click)="buscar()">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        Buscar
+      </button>
+      <button class="btn reporte__btn-limpiar reporte__btn-filtro" type="button" (click)="limpiarFiltros()">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+        Limpiar
+      </button>
+    </div>
+  </div>
+
+  @if (cargando()) {
+    <p>Cargando reporte…</p>
+  } @else if (error(); as mensaje) {
+    <div class="alerta alerta--error">
+      <span class="alerta__icono">!</span>
+      <div class="alerta__titulo">{{ mensaje }}</div>
+    </div>
+  } @else if (filas().length === 0) {
+    <div class="estado-vacio">
+      <h3 class="estado-vacio__titulo">No encontramos matrículas</h3>
+      <p class="estado-vacio__texto">Prueba con otros filtros.</p>
+    </div>
+  } @else {
+    <div class="reporte__tabla">
+      <table>
+        <thead>
+          <tr>
+            <th>Alumno</th>
+            <th>Curso</th>
+            <th>Modalidad</th>
+            <th>Matrícula</th>
+            <th>Acceso</th>
+            <th>Origen</th>
+            <th>Situación académica</th>
+            <th>Certificado</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (fila of filas(); track fila.matriculaId) {
+            <tr>
+              <td><strong>{{ fila.alumno }}</strong><small>{{ fila.correo }}</small></td>
+              <td>{{ fila.curso }}</td>
+              <td>{{ fila.modalidad }}</td>
+              <td>
+                <div class="reporte__celda-matricula">
+                  <span>{{ fila.fechaMatricula | date:'dd/MM/yyyy, h:mm a' | lowercase }}</span>
+                  <span [class]="'badge ' + claseEstado(fila.estadoMatricula)">{{ etiquetaEstado(fila.estadoMatricula) }}</span>
+                </div>
+              </td>
+              <td>{{ fila.fechaActivacion ? (fila.fechaActivacion | date:'dd/MM/yyyy, h:mm a' | lowercase) : '—' }}</td>
+              <td><span [class]="'badge ' + claseIngreso(fila.formaIngreso)">{{ etiquetaIngreso(fila.formaIngreso) }}</span></td>
+              <td><span [class]="'badge ' + claseSituacion(fila.situacionAcademica)">{{ etiquetaSituacion(fila.situacionAcademica) }}</span></td>
+              <td>{{ etiquetaCertificado(fila.estadoCertificado) }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (totalPaginas() > 1) {
+      <div class="reporte__paginacion">
+        <button type="button" class="btn btn--secundario" [disabled]="pagina() === 0" (click)="irAPagina(pagina() - 1)">
+          Anterior
+        </button>
+        <span>Página {{ pagina() + 1 }} de {{ totalPaginas() }}</span>
+        <button
+          type="button"
+          class="btn btn--secundario"
+          [disabled]="pagina() + 1 >= totalPaginas()"
+          (click)="irAPagina(pagina() + 1)"
+        >
+          Siguiente
+        </button>
+      </div>
+    }
+  }
+</section>

@@ -1,8 +1,9 @@
 import { Component, ElementRef, HostListener, inject, signal, viewChild } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { FooterPublico } from '../footer-publico/footer-publico';
 import { obtenerIniciales } from '../../session/nombre-utils';
 import { Session } from '../../session/session';
+import { ConfirmacionService } from '../../dialogo/confirmacion.service';
 
 @Component({
   selector: 'app-layout-publico',
@@ -12,26 +13,26 @@ import { Session } from '../../session/session';
 })
 export class LayoutPublico {
   private readonly session = inject(Session);
+  private readonly router = inject(Router);
+  private readonly confirmacion = inject(ConfirmacionService);
+  private readonly menuCuentaRef = viewChild<ElementRef<HTMLElement>>('menuCuenta');
 
   protected readonly usuario = this.session.usuario;
   protected readonly estaAutenticado = this.session.estaAutenticado;
   protected readonly menuCuentaAbierto = signal(false);
 
-  private readonly cuentaMenuRef = viewChild<ElementRef<HTMLElement>>('cuentaMenu');
-
-  protected get iniciales(): string {
-    return obtenerIniciales(this.usuario()?.nombreCompleto);
+  @HostListener('document:click', ['$event'])
+  protected cerrarMenuAlHacerClicFuera(evento: MouseEvent): void {
+    const menu = this.menuCuentaRef()?.nativeElement;
+    if (menu && !menu.contains(evento.target as Node)) this.menuCuentaAbierto.set(false);
   }
 
-  /** Antes comparaba contra el host de todo el layout (header + contenido), así que casi
-   * cualquier clic en la página contaba como "adentro" y el menú nunca se cerraba solo. */
-  @HostListener('document:click', ['$event'])
-  protected alClicFuera(evento: MouseEvent): void {
-    if (this.cuentaMenuRef()?.nativeElement.contains(evento.target as Node)) return;
+  @HostListener('document:keydown.escape')
+  protected cerrarMenuConEscape(): void {
     this.menuCuentaAbierto.set(false);
   }
 
-  protected toggleMenuCuenta(): void {
+  protected alternarMenuCuenta(): void {
     this.menuCuentaAbierto.update((abierto) => !abierto);
   }
 
@@ -39,7 +40,21 @@ export class LayoutPublico {
     this.menuCuentaAbierto.set(false);
   }
 
-  protected cerrarSesion(): void {
-    this.session.cerrarSesion().subscribe(() => this.cerrarMenuCuenta());
+  protected get iniciales(): string {
+    return obtenerIniciales(this.usuario()?.nombreCompleto);
+  }
+
+  protected async cerrarSesion(): Promise<void> {
+    const confirmado = await this.confirmacion.preguntar({
+      titulo: 'Cerrar sesión',
+      mensaje: '¿Deseas salir de tu sesión ahora?',
+      textoConfirmar: 'Sí, cerrar sesión',
+      textoCancelar: 'Seguir aquí',
+      variante: 'peligro',
+    });
+    if (!confirmado) return;
+
+    this.cerrarMenuCuenta();
+    this.session.cerrarSesion().subscribe(() => void this.router.navigate(['/catalogo']));
   }
 }

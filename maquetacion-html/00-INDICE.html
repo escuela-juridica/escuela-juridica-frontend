@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Maquetación HTML — ESEJUR EP01</title>
+<title>Maquetación HTML — ESEJUR EP04</title>
 <link rel="stylesheet" href="estilos.css" />
 <style>
   .pagina { max-width: 900px; margin: 0 auto; padding: 48px 24px 80px; }
@@ -19,11 +19,13 @@
 <div class="pagina">
 
   <div class="eyebrow"><span class="eyebrow__dash"></span><span class="eyebrow__texto">Guía para el equipo</span></div>
-  <h1 class="tipo-h1" style="color: var(--neutral-950); margin: 0 0 8px">Maquetación HTML — ESEJUR (EP01)</h1>
+  <h1 class="tipo-h1" style="color: var(--neutral-950); margin: 0 0 8px">Maquetación HTML — ESEJUR (EP04)</h1>
   <p style="font-size: 16px; line-height: 24px; color: var(--neutral-600); margin: 0 0 32px">
-    Este paquete tiene las 11 pantallas del Épico 1 (Acceso y Descubrimiento) en HTML plano, para que el equipo pueda
-    proponer mejoras de maquetación sin tocar el proyecto Angular. No hace falta instalar nada: cada archivo se abre
-    con doble clic en el navegador.
+    Este paquete tiene las 4 pantallas de la Épica 4 (Aula, progreso y sesiones) que se están
+    construyendo ahora, en HTML plano, para que cada equipo pueda maquetar sin tocar el proyecto
+    Angular. No hace falta instalar nada: cada archivo se abre con doble clic en el navegador.
+    <strong>Reemplaza al paquete anterior de la Épica 1</strong> (ya implementada) — si necesitás
+    repasar esas pantallas, están en el proyecto Angular real, ya no acá.
   </p>
 
   <h2 class="tipo-h2" style="color: var(--neutral-950); margin: 32px 0 8px">Cómo funciona (leer antes de empezar)</h2>
@@ -40,15 +42,14 @@
     <div class="paso__num">2</div>
     <div>
       <strong>Editá el HTML/CSS con cualquier editor</strong> (VS Code, Notepad++, lo que uses) — pero fijate BIEN en
-      qué archivo escribís cada estilo, hay dos niveles, igual que en el proyecto Angular real:
+      qué archivo escribís cada estilo:
       <ul style="margin: 10px 0 0">
-        <li><code>estilos.css</code> (un solo archivo, compartido) — SOLO lo reusable: botones, tarjetas, badges,
-        inputs, colores, tipografía. Si tocás una clase acá, cambia en las <strong>11 pantallas a la vez</strong>.
-        No metas acá algo que solo aplica a tu pantalla.</li>
+        <li><code>estilos.css</code> (un solo archivo, compartido con TODA la app, no solo EP04) — SOLO lo reusable:
+        botones, tarjetas, badges, inputs, colores, tipografía. Si tocás una clase acá, cambia en todas las pantallas
+        que la usan, de cualquier épica. No metas acá algo que solo aplica a tu pantalla.</li>
         <li>El bloque <code>&lt;style&gt;</code> que cada <code>.html</code> tiene en su propio
         <code>&lt;head&gt;</code>, marcado <strong>"ESTILOS PROPIOS DE ESTA PANTALLA"</strong> — todo lo que arma el
-        layout específico de esa pantalla (el hero, las columnas, el panel de precio, etc.) y cualquier estilo NUEVO
-        que vos agregues mientras maquetás. Solo afecta a ese archivo.</li>
+        layout específico de esa pantalla, y cualquier estilo NUEVO que vos agregues mientras maquetás.</li>
       </ul>
       Si dudás dónde va algo: si lo necesitás en más de una pantalla → candidato a <code>estilos.css</code> (avisale
       a Enrique primero); si es solo de la tuya → al bloque <code>&lt;style&gt;</code> local.
@@ -57,181 +58,104 @@
   <div class="paso">
     <div class="paso__num">3</div>
     <div>
-      <strong>Probá en el navegador</strong> guardando y recargando la página (F5). Todos los links entre pantallas de
-      este paquete funcionan de verdad (te llevan a los otros archivos .html) — las 11 pantallas están acá, no hace
-      falta tener Angular corriendo para navegar entre ellas.
+      <strong>Probá en el navegador</strong> guardando y recargando la página (F5). El link al logo de cada pantalla
+      vuelve al Aula (<code>HU-022-PF-AULA-ingresar.html</code>) — no hace falta tener Angular corriendo.
     </div>
   </div>
   <div class="paso">
     <div class="paso__num">4</div>
     <div>
       <strong>Cuando termines, vos mismo/a copiás tu HTML y tu CSS al archivo real de Angular</strong> — el archivo
-      exacto está indicado en el recuadro de tu pantalla (ej.
-      <code>src/app/features/auth/acceso/acceso.html</code>). Son dos copias:
+      exacto está indicado en el recuadro de tu pantalla. Son dos copias:
       <ul style="margin: 10px 0 0">
-        <li>El contenido de la pantalla (o de <code>&lt;main&gt;</code>, según el archivo) → al archivo
-        <code>.html</code> real, reemplazando lo que tenga adentro.</li>
-        <li>El bloque <code>&lt;style&gt;</code> local (las clases que agregaste ahí) → al archivo <code>.scss</code>
-        real de esa misma pantalla (mismo nombre, al lado del <code>.html</code>).</li>
+        <li>El contenido de <code>&lt;main&gt;</code> → al archivo <code>.html</code> real (puede ser una carpeta
+        nueva: ver el recuadro de cada pantalla).</li>
+        <li>El bloque <code>&lt;style&gt;</code> local → al archivo <code>.scss</code> real de esa misma pantalla.</li>
       </ul>
-      No hace falta saber Angular ni Git para este paso: como las clases ya se llaman igual que en el proyecto real,
-      es básicamente copiar y pegar cada parte en su archivo. Lo único que tenés que ajustar antes de pegar el HTML
-      es la tabla de enlaces del paso 5.
     </div>
   </div>
   <div class="paso">
     <div class="paso__num">5</div>
     <div>
-      <strong>Antes de pegar, convertí los enlaces</strong> según la tabla de abajo. En este paquete los enlaces son
-      <code>href="..."</code> normales (para que funcionen sin Angular corriendo); en el archivo real de Angular esos
-      mismos enlaces se escriben distinto, con <code>routerLink="..."</code> en vez de <code>href="..."</code>. Si tu
-      pantalla usa un botón con <code>onclick="location.href='...'"</code>, en Angular se escribe igual pero con
-      <code>routerLink="..."</code> en vez de todo el <code>onclick</code>.
+      <strong>Antes de pegar, convertí los enlaces</strong> igual que en el paquete anterior: un
+      <code>href="archivo.html"</code> de acá se convierte en <code>routerLink="/la-ruta-real"</code> en Angular.
       <table class="tabla" style="margin-top: 12px">
         <thead><tr><th>En este paquete (HTML plano)</th><th>En Angular (pegá esto en su lugar)</th></tr></thead>
         <tbody>
-          <tr><td><code>href="HU-006-PF-001-catalogo.html"</code></td><td><code>routerLink="/catalogo"</code></td></tr>
-          <tr><td><code>href="HU-007-PF-002-ficha-curso.html"</code></td><td><code>routerLink="/cursos/1"</code> (el id no importa, es el mismo ejemplo fijo)</td></tr>
-          <tr><td><code>href="HU-001-PF-003-acceso.html"</code></td><td><code>routerLink="/acceso"</code></td></tr>
-          <tr><td><code>href="HU-002-PF-004-registro.html"</code></td><td><code>routerLink="/registro"</code></td></tr>
-          <tr><td><code>href="HU-003-PF-005-verificar-correo.html"</code></td><td><code>routerLink="/verificar-correo"</code></td></tr>
-          <tr><td><code>href="HU-004-PF-006-recuperar-password.html"</code></td><td><code>routerLink="/recuperar-password"</code></td></tr>
-          <tr><td><code>href="HU-004-PF-007-nueva-password.html"</code></td><td><code>routerLink="/nueva-password"</code></td></tr>
-          <tr><td><code>href="HU-001-PF-008-panel.html"</code></td><td><code>routerLink="/app/panel"</code></td></tr>
-          <tr><td><code>href="HU-005-PF-009-mi-perfil.html"</code></td><td><code>routerLink="/app/perfil"</code></td></tr>
-          <tr><td><code>href="HU-002-PF-011a-privacidad.html"</code></td><td><code>routerLink="/privacidad"</code></td></tr>
-          <tr><td><code>href="HU-002-PF-011b-terminos.html"</code></td><td><code>routerLink="/terminos"</code></td></tr>
+          <tr><td><code>href="HU-022-PF-AULA-ingresar.html"</code></td><td><code>routerLink="/aula/1"</code> (el id no importa, es el mismo ejemplo fijo)</td></tr>
+          <tr><td><code>href="HU-026-PF-CALENDARIO-calendario.html"</code></td><td><code>routerLink="/app/calendario"</code></td></tr>
         </tbody>
       </table>
       <p style="margin-top: 10px">
-        Ejemplo: si en tu archivo ves <code>&lt;a href="HU-002-PF-004-registro.html"&gt;Crear cuenta&lt;/a&gt;</code>,
-        en Angular queda <code>&lt;a routerLink="/registro"&gt;Crear cuenta&lt;/a&gt;</code>. Si es un botón con
-        <code>onclick</code>, hacés lo mismo: sacás el <code>onclick="location.href='...'"</code> y ponés
-        <code>routerLink="/lo-que-corresponda"</code> en el mismo botón.
-      </p>
-      <p style="margin-top: 10px">
         Si necesitaste un color/estilo que no existía en <code>estilos.css</code>, anotalo en el recuadro amarillo al
-        final de la guía de tu pantalla y avisale a Enrique antes de usarlo — eso sí es algo que se conversa, porque
-        afecta a las 11 pantallas.
+        final de la guía de tu pantalla y avisale a Enrique antes de usarlo.
       </p>
     </div>
   </div>
 
   <h2 class="tipo-h2" style="color: var(--neutral-950); margin: 40px 0 8px">Qué NO forma parte de este paquete</h2>
   <ul style="font-size: 15px; line-height: 24px; color: var(--neutral-600)">
-    <li><strong>El carrusel de fotos del catálogo (PF-001)</strong> — en Angular cambia de foto con una animación (código real); acá se ve fijo en una sola foto, con las flechas y los puntos solo de adorno. Es la única interactividad real de toda la Épica 1 y ya está resuelta — no hace falta tocarla.</li>
-    <li><strong>Nada más de lógica/funcionalidad</strong> — botones como "Mostrar" contraseña o el menú del avatar no hacen nada acá; en Angular sí funcionan. Esto es solo para maquetación visual.</li>
-    <li><strong>Los "Estado alterno"</strong> que ves en algunas pantallas (con esa etiqueta celeste) — son variantes que en la app real nunca se muestran juntas con el resto; están una debajo de la otra solo para que se vean todos los diseños de una vez.</li>
+    <li><strong>Nada de lógica/funcionalidad real</strong> — la navegación del calendario, el envío de los modales de
+    HU-027, el candado real de descarga: nada de eso funciona acá. Esto es solo para maquetación visual.</li>
+    <li><strong>Los "Estado alterno"</strong> que ves en algunas pantallas (con esa etiqueta celeste) — son variantes
+    que en la app real nunca se muestran juntas con el resto; están apiladas solo para que se vean todos los
+    diseños de una vez.</li>
+    <li><strong>El editor de curso completo de HU-027</strong> — esa pantalla ya existe en el admin real (la arma
+    HU-012); acá solo está la tabla de sesiones y los 3 modales que esta historia agrega.</li>
   </ul>
 
-  <h2 class="tipo-h2" style="color: var(--neutral-950); margin: 40px 0 8px">Las 11 pantallas</h2>
+  <h2 class="tipo-h2" style="color: var(--neutral-950); margin: 40px 0 8px">Las 4 pantallas</h2>
   <p style="font-size: 15px; line-height: 22px; color: var(--neutral-600); margin: 0 0 16px">
-    La columna <strong>"Componente reusable"</strong> dice qué parte del header/footer ya es una sola pieza
-    compartida en Angular — no la recreen, ya existe. La columna <strong>"En Angular"</strong> dice si esa pantalla
-    ya está armada (no la toquen) o si quedó con un <em>placeholder</em> a la espera de que el equipo pegue su
-    maquetación (buscá el comentario <code>PENDIENTE DE MAQUETACIÓN</code> en su archivo <code>.html</code> real).
+    HU-022 y HU-023 maquetan <strong>el mismo archivo real</strong> de Angular (la pantalla de Aula tiene temario +
+    contenido con materiales, todo junto) — están separadas acá solo para que cada equipo vea bien su parte, pero
+    hay que coordinar el merge. La columna <strong>"Equipo"</strong> es quién la maqueta según lo acordado.
   </p>
   <table class="tabla">
     <thead>
-      <tr><th>Archivo</th><th>PF</th><th>Historia de usuario</th><th>Header/Footer</th><th>Componente reusable</th><th>En Angular</th></tr>
+      <tr><th>Archivo</th><th>Historia de usuario</th><th>Header/Footer</th><th>Archivo real de Angular</th></tr>
     </thead>
     <tbody>
       <tr>
-        <td><a href="HU-006-PF-001-catalogo.html">HU-006-PF-001-catalogo.html</a></td>
-        <td>PF-001 · Catálogo</td>
-        <td>HU-006 — Explorar, buscar y filtrar cursos</td>
-        <td>Público completo (logo + botones) + footer</td>
-        <td>Footer: <code>&lt;app-footer-publico/&gt;</code></td>
-        <td><strong>Ya está armada</strong> — no la toquen, es la referencia</td>
+        <td><a href="HU-022-PF-AULA-ingresar.html">HU-022-PF-AULA-ingresar.html</a></td>
+        <td>HU-022 — Ingresar y continuar un curso</td>
+        <td>Área del alumno (logo + menú + cuenta) + footer</td>
+        <td><code>features/aula/aula/aula.html</code> (carpeta nueva)</td>
       </tr>
       <tr>
-        <td><a href="HU-007-PF-002-ficha-curso.html">HU-007-PF-002-ficha-curso.html</a></td>
-        <td>PF-002 · Ficha de curso</td>
-        <td>HU-007 — Consultar la ficha y vista previa de un curso</td>
-        <td>Público completo (logo + botones) + footer</td>
-        <td>Footer: <code>&lt;app-footer-publico/&gt;</code></td>
-        <td>Placeholder (pendiente)</td>
+        <td><a href="HU-023-PF-AULA-materiales.html">HU-023-PF-AULA-materiales.html</a></td>
+        <td>HU-023 — Consultar materiales protegidos</td>
+        <td>Área del alumno (logo + menú + cuenta) + footer</td>
+        <td><code>features/aula/aula/aula.html</code> (mismo archivo que HU-022, coordinar merge)</td>
       </tr>
       <tr>
-        <td><a href="HU-001-PF-003-acceso.html">HU-001-PF-003-acceso.html</a></td>
-        <td>PF-003 · Acceso</td>
-        <td>HU-001 — Iniciar sesión con correo o Google</td>
-        <td>Ninguno (pantalla completa)</td>
-        <td>Ninguno</td>
-        <td>Placeholder (pendiente)</td>
+        <td><a href="HU-026-PF-CALENDARIO-calendario.html">HU-026-PF-CALENDARIO-calendario.html</a></td>
+        <td>HU-026 — Participar en sesiones en vivo</td>
+        <td>Área del alumno (logo + menú + cuenta) + footer</td>
+        <td><code>features/aula/calendario/calendario.html</code> (carpeta nueva)</td>
       </tr>
       <tr>
-        <td><a href="HU-002-PF-004-registro.html">HU-002-PF-004-registro.html</a></td>
-        <td>PF-004 · Registro</td>
-        <td>HU-002 — Crear una cuenta con formulario o Google</td>
-        <td>Ninguno (pantalla completa)</td>
-        <td>Ninguno</td>
-        <td>Placeholder (pendiente)</td>
-      </tr>
-      <tr>
-        <td><a href="HU-003-PF-005-verificar-correo.html">HU-003-PF-005-verificar-correo.html</a></td>
-        <td>PF-005 · Verificar correo</td>
-        <td>HU-003 — Verificar mi correo electrónico</td>
-        <td>Público sin botones (solo logo) + footer</td>
-        <td>Footer: <code>&lt;app-footer-publico/&gt;</code></td>
-        <td>Placeholder (pendiente)</td>
-      </tr>
-      <tr>
-        <td><a href="HU-004-PF-006-recuperar-password.html">HU-004-PF-006-recuperar-password.html</a></td>
-        <td>PF-006 · Recuperar contraseña</td>
-        <td>HU-004 — Recuperar el acceso a mi cuenta</td>
-        <td>Público sin botones (solo logo) + footer</td>
-        <td>Footer: <code>&lt;app-footer-publico/&gt;</code></td>
-        <td>Placeholder (pendiente)</td>
-      </tr>
-      <tr>
-        <td><a href="HU-004-PF-007-nueva-password.html">HU-004-PF-007-nueva-password.html</a></td>
-        <td>PF-007 · Nueva contraseña</td>
-        <td>HU-004 — Recuperar el acceso a mi cuenta</td>
-        <td>Público sin botones (solo logo) + footer</td>
-        <td>Footer: <code>&lt;app-footer-publico/&gt;</code></td>
-        <td>Placeholder (pendiente)</td>
-      </tr>
-      <tr>
-        <td><a href="HU-001-PF-008-panel.html">HU-001-PF-008-panel.html</a></td>
-        <td>PF-008 · Panel inicial</td>
-        <td>HU-001 — (pantalla a la que llegás tras iniciar sesión)</td>
-        <td>Área del alumno (logo + menú + avatar) + footer</td>
-        <td>Footer propio del alumno (no es <code>&lt;app-footer-publico/&gt;</code>)</td>
-        <td>Placeholder (pendiente)</td>
-      </tr>
-      <tr>
-        <td><a href="HU-005-PF-009-mi-perfil.html">HU-005-PF-009-mi-perfil.html</a></td>
-        <td>PF-009 · Mi perfil</td>
-        <td>HU-005 — Consultar y actualizar mis datos personales</td>
-        <td>Área del alumno (logo + menú + avatar) + footer</td>
-        <td>Footer propio del alumno (no es <code>&lt;app-footer-publico/&gt;</code>)</td>
-        <td>Placeholder (pendiente)</td>
-      </tr>
-      <tr>
-        <td><a href="HU-002-PF-011a-privacidad.html">HU-002-PF-011a-privacidad.html</a></td>
-        <td>PF-011a · Privacidad</td>
-        <td>HU-002 — (documento legal enlazado desde el registro)</td>
-        <td>Público completo (logo + botones) + footer</td>
-        <td>Footer: <code>&lt;app-footer-publico/&gt;</code></td>
-        <td>Placeholder (pendiente)</td>
-      </tr>
-      <tr>
-        <td><a href="HU-002-PF-011b-terminos.html">HU-002-PF-011b-terminos.html</a></td>
-        <td>PF-011b · Términos</td>
-        <td>HU-002 — (documento legal enlazado desde el registro)</td>
-        <td>Público completo (logo + botones) + footer</td>
-        <td>Footer: <code>&lt;app-footer-publico/&gt;</code></td>
-        <td>Placeholder (pendiente)</td>
+        <td><a href="HU-027-PF-ADMIN-sesiones.html">HU-027-PF-ADMIN-sesiones.html</a></td>
+        <td>HU-027 — Administrar cambios en sesiones en vivo</td>
+        <td>Admin (navbar oscuro + riel lateral)</td>
+        <td><code>features/admin/cursos/curso-editor/sesiones-tab/</code> (agregado a la pestaña existente)</td>
       </tr>
     </tbody>
   </table>
 
+  <h2 class="tipo-h2" style="color: var(--neutral-950); margin: 40px 0 8px">Guía técnica (cómo programar, no solo maquetar)</h2>
+  <p style="font-size: 15px; line-height: 24px; color: var(--neutral-600)">
+    Este paquete es solo HTML/CSS. El "cómo se programa de verdad" (entidades, DTOs, servicios, controladores,
+    endpoints) está en <code>detalles/06-MAPA-TECNICO/EP04-AULA-PROGRESO-Y-SESIONES/</code>, un archivo
+    <code>HU-0XX-MAPA-TECNICO-*.md</code> por historia, con código Java/TypeScript real para copiar y adaptar — leanlo
+    antes de escribir el servicio de verdad, no solo la maqueta visual.
+  </p>
+
   <h2 class="tipo-h2" style="color: var(--neutral-950); margin: 40px 0 8px">Archivos de este paquete</h2>
   <ul style="font-size: 15px; line-height: 24px; color: var(--neutral-600)">
-    <li><code>estilos.css</code> — todos los colores, botones, tarjetas, etc. Compartido por las 11 pantallas. No renombrar clases.</li>
-    <li><code>img/</code> — las fotos e íconos que usan estas 11 pantallas.</li>
-    <li>Los 11 archivos <code>HU-XXX-PF-XXX-nombre.html</code> — una pantalla cada uno.</li>
+    <li><code>estilos.css</code> — todos los colores, botones, tarjetas, etc. Compartido por toda la app, no
+    renombrar clases.</li>
+    <li><code>img/</code> — logo y fotos que usan estas pantallas (reusa las de EP01).</li>
+    <li>Los 4 archivos <code>HU-0XX-...-nombre.html</code> — una pantalla cada uno.</li>
   </ul>
 
 </div>

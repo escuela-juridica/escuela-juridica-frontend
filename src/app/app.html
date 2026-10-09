@@ -1,1 +1,15 @@
 <router-outlet />
+
+<app-confirmacion-dialog />
+
+<ngx-spinner
+  name="esejur-carga-global"
+  type="ball-spin-clockwise-fade"
+  size="medium"
+  color="#ffffff"
+  bdColor="rgba(15, 35, 62, 0.56)"
+  [fullScreen]="true"
+  [zIndex]="100000"
+>
+  <p class="cargador-global__texto">Cargando…</p>
+</ngx-spinner>

@@ -5,6 +5,7 @@ import { Router, provideRouter } from '@angular/router';
 
 import { LayoutAlumno } from './layout-alumno';
 import { Session } from '../../session/session';
+import { ConfirmacionService } from '../../dialogo/confirmacion.service';
 
 describe('LayoutAlumno', () => {
   let component: LayoutAlumno;
@@ -29,9 +30,10 @@ describe('LayoutAlumno', () => {
     expect(component).toBeTruthy();
   });
 
-  it('cierra la sesión en el backend y navega al catálogo', () => {
+  it('cierra la sesión en el backend y navega al catálogo', async () => {
     const session = TestBed.inject(Session);
     const router = TestBed.inject(Router);
+    const confirmacion = TestBed.inject(ConfirmacionService);
     const navegar = vi.spyOn(router, 'navigate');
     session.iniciarSesion({
       nombreCompleto: 'Ana',
@@ -39,7 +41,13 @@ describe('LayoutAlumno', () => {
       rolPrincipal: 'ALUMNO',
     });
 
-    component.cerrarSesion();
+    // cerrarSesion() ahora espera primero la confirmación del diálogo (ver
+    // ConfirmacionService): sin el diálogo real montado en el test, hay que
+    // responderla manualmente para que la promesa avance.
+    const cierre = component.cerrarSesion();
+    confirmacion.responder(true);
+    await cierre;
+
     http.expectOne('http://localhost:8080/api/auth/cierre').flush(null);
 
     expect(session.estaAutenticado()).toBe(false);

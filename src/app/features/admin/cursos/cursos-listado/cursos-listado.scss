@@ -1,0 +1,138 @@
+.cursos-admin-cabecera {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.cursos-admin-titulo {
+  font-size: 22px;
+  line-height: 30px;
+  font-weight: 700;
+  color: var(--neutral-950);
+  margin: 0;
+}
+
+.cursos-admin-subtitulo {
+  color: var(--neutral-600);
+  margin: 4px 0 0;
+}
+
+.cursos-admin-btn-icono {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cursos-admin-filtros {
+  margin-bottom: 24px;
+  max-width: 360px;
+}
+
+.cursos-admin-buscador {
+  position: relative;
+}
+
+.cursos-admin-buscador__icono {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--neutral-400);
+  pointer-events: none;
+}
+
+.cursos-admin-buscador__input {
+  width: 100%;
+  padding-left: 38px;
+}
+
+.cursos-admin-tabla {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radio-lg);
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.cursos-admin-fila {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr 0.9fr 0.9fr 1fr 100px;
+  gap: 12px;
+  align-items: center;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--neutral-100);
+  font-size: 14px;
+}
+
+.cursos-admin-fila:last-child {
+  border-bottom: none;
+}
+
+.cursos-admin-fila:not(.cursos-admin-fila--cabecera):hover {
+  background: var(--neutral-050);
+}
+
+.cursos-admin-fila--cabecera {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--neutral-500);
+}
+
+.cursos-admin-fila__titulo {
+  font-weight: 600;
+  color: var(--neutral-950);
+}
+
+.cursos-admin-fila__precio--gratis {
+  color: var(--exito);
+  font-weight: 600;
+}
+
+.cursos-admin-fila__accion {
+  height: 32px;
+  padding: 0 14px;
+  font-size: 13px;
+}
+
+.cursos-admin-paginacion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+  font-size: 14px;
+  color: var(--neutral-600);
+}
+
+.cursos-admin-modal-texto {
+  margin: 0 0 16px;
+  color: var(--neutral-600);
+  font-size: 14px;
+}
+
+.cursos-admin-modal-alerta {
+  margin-bottom: 16px;
+}
+
+.cursos-admin-modal-acciones {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+@media (max-width: 900px) {
+  .cursos-admin-fila--cabecera {
+    display: none;
+  }
+
+  .cursos-admin-fila {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}
