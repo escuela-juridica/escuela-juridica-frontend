@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Admin · Reporte de matrículas — ESEJUR</title>
+<link rel="stylesheet" href="estilos.css" />
+<style>
+/* ============================================================
+   ESTILOS PROPIOS DE ESTA PANTALLA (HU-041 — Reporte de matrículas)
+   ============================================================
+   El header oscuro + riel lateral son layout-admin.html/.scss,
+   compartidos por todo el admin — acá están con estilo inline
+   porque este paquete no corre Angular, pero no se tocan.
+   ============================================================ */
+.reporte__titulo { font-size: 22px; line-height: 30px; font-weight: 700; color: var(--neutral-950); margin: 0; }
+.reporte__cabecera { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; }
+.reporte__cabecera p { margin: 4px 0 0; color: var(--neutral-600); }
+.reporte__acciones-exportar { display: flex; gap: 12px; flex-wrap: wrap; }
+.reporte__btn-exportar { display: inline-flex; align-items: center; gap: 8px; }
+.reporte__filtros { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 24px 0; }
+.reporte__filtros .input { min-width: 0; width: 100%; }
+.reporte__filtros select.input { width: 100%; }
+.reporte__filtro-fecha { color: var(--neutral-600); display: grid; font-size: 12px; font-weight: 600; gap: 5px; }
+.reporte__filtro-acciones { display: flex; align-items: end; gap: 12px; }
+.reporte__btn-filtro { display: inline-flex; align-items: center; gap: 8px; }
+.reporte__btn-limpiar { background: var(--neutral-600); color: var(--blanco); transition: background-color 0.15s ease; }
+.reporte__btn-limpiar:hover { background: var(--neutral-800); }
+.reporte__tabla { overflow: auto; border: 1px solid var(--neutral-200); border-radius: 10px; background: var(--blanco); }
+.reporte__tabla table { border-collapse: collapse; width: 100%; }
+.reporte__tabla th, .reporte__tabla td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--neutral-100); font-size: 14px; white-space: nowrap; }
+.reporte__tabla th { color: var(--neutral-500); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
+.reporte__tabla td strong { color: var(--neutral-950); font-weight: 600; }
+.reporte__tabla small { display: block; color: var(--neutral-500); font-size: 12px; margin-top: 2px; }
+.reporte__paginacion { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 20px; font-size: 14px; color: var(--neutral-600); }
+.reporte__celda-matricula { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+@media (max-width: 700px) {
+  .reporte__cabecera { flex-direction: column; align-items: stretch; }
+  .reporte__filtros { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 480px) {
+  .reporte__filtros { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<div class="guia-equipo">
+  <div class="guia-equipo__titulo">Admin · Reporte de matrículas</div>
+  <span class="guia-equipo__hu">HU-041 — Consultar el reporte de matrículas</span>
+
+  <h3>Qué es esta pantalla</h3>
+  <ul>
+    <li>Un reporte filtrable de matrículas (texto, estado, curso, modalidad y rango de fechas),
+    paginado server-side, con columnas de <strong>Acceso</strong> (fecha de activación) y
+    <strong>Situación académica</strong> separadas — no son lo mismo.</li>
+    <li>Tres botones de exportación en la cabecera: PDF, Excel y CSV. Siempre exportan
+    <strong>todo</strong> lo que coincide con el filtro, no solo la página visible.</li>
+  </ul>
+
+  <h3>Dónde poner tus estilos</h3>
+  <ul>
+    <li>Bloque <code>&lt;style&gt;</code> de acá arriba — clases <code>.reporte-*</code>.</li>
+  </ul>
+
+  <h3>Qué NO tocar</h3>
+  <ul>
+    <li>El header oscuro + riel lateral de íconos — son <code>layout-admin.html</code>, compartidos
+    por todo el admin.</li>
+  </ul>
+
+  <h3>Cuándo termines</h3>
+  <p>
+    Esto va en
+    <code>src/app/features/admin/reportes/reporte-matriculas/reporte-matriculas.html</code> (y
+    <code>.scss</code> al lado) — el archivo ya existe, solo tiene un placeholder
+    <code>.pantalla-pendiente</code> por ahora; reemplazalo, no crees un archivo nuevo.
+  </p>
+
+  <div class="guia-equipo__nuevo">
+    <strong>¿Necesitás un estilo que no existe ni en <code>estilos.css</code> ni acá arriba?</strong> Anotalo:
+    <br />— (vacío, tu equipo escribe acá) —
+  </div>
+</div>
+
+<div class="admin-shell" style="display:flex; flex-direction:column; min-height:100vh; background:var(--neutral-050)">
+  <header style="position:sticky; top:0; z-index:30; display:flex; align-items:center; gap:16px; height:60px; padding:0 20px; background:#101828">
+    <div style="background:#fff; border-radius:8px; padding:6px 12px; display:flex; align-items:center">
+      <img src="img/logo-esejur.png" alt="Escuela Jurídica" style="height:26px" />
+    </div>
+    <span style="flex:1"></span>
+    <span style="color:#fff; font-size:13px; font-weight:600">Ricardo Prada</span>
+    <span class="avatar avatar--sm avatar--cuenta">RP</span>
+    <button type="button" style="display:flex; align-items:center; gap:7px; min-height:34px; padding:0 11px; border:1px solid rgba(255,255,255,.35); border-radius:8px; background:#b42318; color:#fff; font-weight:700; font-size:13px">Salir</button>
+  </header>
+
+  <div style="display:flex; flex:1">
+    <aside style="width:232px; background:#101828; padding:16px 0; flex-shrink:0">
+      <div style="padding:10px 20px; color:rgba(255,255,255,.5); font-size:12px; text-transform:uppercase">Administración</div>
+      <div style="padding:10px 20px; color:rgba(255,255,255,.75); font-size:14px">Dashboard</div>
+      <div style="padding:10px 20px; color:rgba(255,255,255,.75); font-size:14px">Cursos</div>
+      <div style="padding:10px 20px; color:rgba(255,255,255,.75); font-size:14px">Usuarios</div>
+      <div style="padding:10px 20px; color:rgba(255,255,255,.75); font-size:14px">Matrículas y pagos</div>
+      <div style="padding:10px 20px; color:rgba(255,255,255,.35); font-size:14px">Operación académica</div>
+      <div style="padding:10px 20px; color:#fff; background:rgba(255,255,255,.08); border-left:3px solid #00d8d8; font-size:14px">Reportes</div>
+    </aside>
+
+    <main style="flex:1">
+      <div style="padding:32px; max-width:1200px; margin:0 auto">
+        <div class="reporte__cabecera">
+          <div>
+            <h1 class="reporte__titulo">Reporte de matrículas</h1>
+            <p>Una fila por matrícula, con acceso y situación académica separados.</p>
+          </div>
+          <div class="reporte__acciones-exportar">
+            <button type="button" class="btn btn--peligro reporte__btn-exportar">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <path d="M14 2v6h6" />
+                <path d="M9 15h6" />
+                <path d="M9 11h6" />
+              </svg>
+              Exportar PDF
+            </button>
+            <button type="button" class="btn btn--exito reporte__btn-exportar">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <line x1="3" y1="9" x2="21" y2="9" />
+                <line x1="3" y1="15" x2="21" y2="15" />
+                <line x1="9" y1="3" x2="9" y2="21" />
+                <line x1="15" y1="3" x2="15" y2="21" />
+              </svg>
+              Exportar Excel
+            </button>
+            <button type="button" class="btn btn--primario reporte__btn-exportar">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 3v12" />
+                <path d="M7 10l5 5 5-5" />
+                <path d="M5 21h14" />
+              </svg>
+              Exportar CSV
+            </button>
+          </div>
+        </div>
+
+        <div class="reporte__filtros">
+          <input class="input" placeholder="Alumno, correo o curso" />
+          <select class="input">
+            <option>Todos los estados</option>
+            <option>Activa</option>
+            <option>Cancelada</option>
+            <option>Vencida</option>
+            <option>Pendiente de pago</option>
+          </select>
+          <select class="input">
+            <option>Todos los cursos</option>
+            <option>Curso de Derecho Notarial y Función Notarial</option>
+            <option>Curso de Litigación Oral en el Proceso Penal</option>
+          </select>
+          <select class="input">
+            <option>Todas las modalidades</option>
+            <option>Virtual</option>
+            <option>En vivo</option>
+            <option>Híbrido</option>
+          </select>
+          <label class="reporte__filtro-fecha">Desde<input class="input" type="date" value="2026-09-09" /></label>
+          <label class="reporte__filtro-fecha">Hasta<input class="input" type="date" value="2026-10-09" /></label>
+          <div class="reporte__filtro-acciones">
+            <button class="btn btn--acento reporte__btn-filtro" type="button">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="7" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              Buscar
+            </button>
+            <button class="btn reporte__btn-limpiar reporte__btn-filtro" type="button">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+              Limpiar
+            </button>
+          </div>
+        </div>
+
+        <div class="reporte__tabla">
+          <table>
+            <thead>
+              <tr>
+                <th>Alumno</th>
+                <th>Curso</th>
+                <th>Modalidad</th>
+                <th>Matrícula</th>
+                <th>Acceso</th>
+                <th>Origen</th>
+                <th>Situación académica</th>
+                <th>Certificado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Joel Anthony Saldaña</strong><small>joel.saldana@escuelajuridica.edu.pe</small></td>
+                <td>Curso de Derecho Notarial y Función Notarial</td>
+                <td>Virtual</td>
+                <td>
+                  <div class="reporte__celda-matricula">
+                    <span>07/10/2026, 5:28 pm</span>
+                    <span class="badge badge--disp-inmediato">Activa</span>
+                  </div>
+                </td>
+                <td>07/10/2026, 5:28 pm</td>
+                <td><span class="badge badge--ingreso-pago">Pago en línea</span></td>
+                <td><span class="badge badge--disp-proximo">En curso</span></td>
+                <td>No emitido</td>
+              </tr>
+              <tr>
+                <td><strong>Gabriel Antonio Mayanga</strong><small>gabriel.mayanga@escuelajuridica.edu.pe</small></td>
+                <td>Curso de Litigación Oral en el Proceso Penal</td>
+                <td>Híbrido</td>
+                <td>
+                  <div class="reporte__celda-matricula">
+                    <span>07/10/2026, 5:28 pm</span>
+                    <span class="badge badge--disp-cancelado">Cancelada</span>
+                  </div>
+                </td>
+                <td>—</td>
+                <td><span class="badge badge--ingreso-manual">Asignación manual</span></td>
+                <td><span class="badge badge--disp-cerrado">Finalizado</span></td>
+                <td>Vigente</td>
+              </tr>
+              <tr>
+                <td><strong>Ana Lucía Pérez</strong><small>ana.perez@escuelajuridica.edu.pe</small></td>
+                <td>Curso de Derecho Registral</td>
+                <td>Virtual</td>
+                <td>
+                  <div class="reporte__celda-matricula">
+                    <span>03/10/2026, 11:02 am</span>
+                    <span class="badge badge--disp-inmediato">Activa</span>
+                  </div>
+                </td>
+                <td>03/10/2026, 11:02 am</td>
+                <td><span class="badge badge--ingreso-manual">Exonerada</span></td>
+                <td><span class="badge badge--disp-proximo">En curso</span></td>
+                <td>No emitido</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="reporte__paginacion">
+          <button type="button" class="btn btn--secundario" disabled>Anterior</button>
+          <span>Página 1 de 5</span>
+          <button type="button" class="btn btn--secundario">Siguiente</button>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+</body>
+</html>

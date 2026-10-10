@@ -1,3 +1,15 @@
+// HU-008 — Gestionar usuarios administrativamente.
+//
+// Esta historia se reasignó como ejercicio técnico del equipo: la mayoría de los tipos de este
+// archivo se retiraron a propósito (ver
+// docs/epica-4/HU-008-MAPA-TECNICO-GESTIONAR-USUARIOS.md, que trae el código íntegro para
+// reconstruirlos).
+//
+// NO borrar `RolUsuarioAdmin`, `CondicionCuentaAdmin`, `UsuarioAdminRespuesta` ni `PageResponse`:
+// HU-019 (matriculas-listado.ts, al matricular administrativamente) sigue usando
+// `AdminUsuariosApiService.listar(...)` para poblar el combo de alumnos. Revisa ese consumidor
+// antes de volver a tocar este archivo.
+
 export type RolUsuarioAdmin = 'ALUMNO' | 'ADMINISTRADOR';
 
 /** CAMBIO_PENDIENTE: falta reemplazar la contraseña temporal. PENDIENTE_VERIFICACION: falta
@@ -35,46 +47,4 @@ export interface PageResponse<T> {
   totalPages: number;
   first: boolean;
   last: boolean;
-}
-
-export interface CrearUsuarioAdminPeticion {
-  nombres: string;
-  apellidoPaterno: string;
-  apellidoMaterno: string | null;
-  correo: string;
-  telefono: string | null;
-  documentoIdentidad: string | null;
-  /** El rol principal no se elige: con un único rol, ese es el principal; con ambos,
-   * Administrador siempre gana. */
-  roles: RolUsuarioAdmin[];
-}
-
-export interface CrearUsuarioAdminRespuesta {
-  usuario: UsuarioAdminRespuesta;
-  /** true si el correo ya existía: se conservó la cuenta y no se generó contraseña temporal. */
-  reutilizada: boolean;
-  contrasenaTemporal: string | null;
-}
-
-export interface ConcederRolPeticion {
-  rol: RolUsuarioAdmin;
-}
-
-export interface CambiarActivoPeticion {
-  activo: boolean;
-  motivo: string | null;
-}
-
-export interface ResetearContrasenaRespuesta {
-  usuario: UsuarioAdminRespuesta;
-  /** Solo viene en esta respuesta puntual; no se puede volver a consultar después. */
-  contrasenaTemporal: string;
-}
-
-export interface ActualizarDatosPersonalesPeticion {
-  nombres: string;
-  apellidoPaterno: string;
-  apellidoMaterno: string | null;
-  telefono: string | null;
-  documentoIdentidad: string | null;
 }

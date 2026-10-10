@@ -1,9 +1,8 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { API_URL } from '../../core/api/api.config';
-import { PageResponse } from '../../core/api/page-response.model';
-import { AdvertenciaMatricula, Matricula, MatriculaAdministrativa, MatriculaDetalleAdministrativa } from './matricula.model';
+import { AdvertenciaMatricula, Matricula } from './matricula.model';
 
 export interface CrearMatriculaAdministrativa {
   usuarioId: number; cursoId: number; condicionEconomica: 'REGISTRADO_MANUAL' | 'EXONERADO';
@@ -25,14 +24,8 @@ export class MatriculaApiService {
     return this.http.post<Matricula>(`${API_URL}/cursos/${cursoId}/matricula-gratuita`, {});
   }
 
-  listarAdministrativas(texto = '', estado = '', page = 0, size = 20): Observable<PageResponse<MatriculaAdministrativa>> {
-    const params = new HttpParams().set('texto', texto).set('estado', estado).set('page', page).set('size', size);
-    return this.http.get<PageResponse<MatriculaAdministrativa>>(`${API_URL}/admin/matriculas`, { params });
-  }
-
-  cancelar(id: number, motivo: string): Observable<Matricula> {
-    return this.http.patch<Matricula>(`${API_URL}/admin/matriculas/${id}/cancelacion`, { motivo });
-  }
+  // HU-020 (listarAdministrativas, detalleAdministrativo, cancelar) se retiró deliberadamente —
+  // ver docs/epica-4/HU-020-MAPA-TECNICO-CONTROL-MATRICULAS.md en el backend para reconstruirla.
 
   crearAdministrativa(peticion: CrearMatriculaAdministrativa): Observable<Matricula> {
     return this.http.post<Matricula>(`${API_URL}/admin/matriculas`, peticion);
@@ -40,30 +33,11 @@ export class MatriculaApiService {
   advertenciaAcademica(cursoId: number): Observable<AdvertenciaMatricula> {
     return this.http.get<AdvertenciaMatricula>(`${API_URL}/admin/cursos/${cursoId}/matriculas/advertencia-academica`);
   }
-  detalleAdministrativo(id: number): Observable<MatriculaDetalleAdministrativa> {
-    return this.http.get<MatriculaDetalleAdministrativa>(`${API_URL}/admin/matriculas/${id}`);
-  }
   reenviarConfirmacion(id: number): Observable<{ enviado: boolean; mensaje: string }> {
     return this.http.post<{ enviado: boolean; mensaje: string }>(`${API_URL}/matriculas/${id}/reenviar-confirmacion`, {});
   }
-  reporte(filtros: FiltrosReporteMatricula, page = 0, size = 20): Observable<PageResponse<ReporteMatricula>> {
-    const params = this.parametrosReporte(filtros).set('page', page).set('size', size);
-    return this.http.get<PageResponse<ReporteMatricula>>(`${API_URL}/admin/reportes/matriculas`, { params });
-  }
-  urlExportacion(filtros: FiltrosReporteMatricula): string { return this.url('exportar', filtros); }
-  urlExportacionPdf(filtros: FiltrosReporteMatricula): string { return this.url('exportar-pdf', filtros); }
-  urlExportacionExcel(filtros: FiltrosReporteMatricula): string { return this.url('exportar-excel', filtros); }
 
-  private parametrosReporte(filtros: FiltrosReporteMatricula): HttpParams {
-    let params = new HttpParams().set('texto', filtros.texto ?? '').set('estado', filtros.estado ?? '')
-      .set('modalidad', filtros.modalidad ?? '');
-    if (filtros.cursoId) params = params.set('cursoId', filtros.cursoId);
-    if (filtros.fechaDesde) params = params.set('fechaDesde', filtros.fechaDesde);
-    if (filtros.fechaHasta) params = params.set('fechaHasta', filtros.fechaHasta);
-    return params;
-  }
-
-  private url(formato: string, filtros: FiltrosReporteMatricula): string {
-    return `${API_URL}/admin/reportes/matriculas/${formato}?${this.parametrosReporte(filtros).toString()}`;
-  }
+  // HU-041 (reporte, urlExportacion, urlExportacionPdf, urlExportacionExcel, y los helpers
+  // privados parametrosReporte/url) se retiró deliberadamente — ver
+  // docs/epica-4/HU-041-MAPA-TECNICO-REPORTE-MATRICULAS.md (en el backend) para reconstruirla.
 }
