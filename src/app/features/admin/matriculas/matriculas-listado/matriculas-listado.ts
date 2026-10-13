@@ -76,9 +76,9 @@ protected cargar(): void {
   )
   .subscribe({
     next: (respuesta) => {
-      this.filas.set(respuesta.content);
+      this.filas.set(respuesta.items);
       this.totalPaginas.set(Math.max(1, respuesta.totalPages));
-      this.pagina.set(respuesta.number);
+      this.pagina.set(respuesta.page);
     },
     error: () => {
       this.filas.set([]);
@@ -152,13 +152,13 @@ protected etiquetaEstado(valor: string): string {
 
 protected claseEstado(valor: string): string {
   const clases: Record<string, string> = {
-    ACTIVA: 'matriculas__estado matriculas__estado--activa',
-    CANCELADA: 'matriculas__estado matriculas__estado--cancelada',
-    FINALIZADA: 'matriculas__estado matriculas__estado--finalizada',
-    VENCIDA: 'matriculas__estado matriculas__estado--vencida'
+    ACTIVA: 'badge badge--disp-inmediato',
+    CANCELADA: 'badge badge--disp-cancelado',
+    FINALIZADA: 'badge badge--disp-cerrado',
+    VENCIDA: 'badge badge--advertencia-suave'
   };
 
-  return clases[valor] ?? 'matriculas__estado';
+  return clases[valor] ?? 'badge badge--disp-cerrado';
 }
 
   protected nueva: CrearMatriculaAdministrativa = {

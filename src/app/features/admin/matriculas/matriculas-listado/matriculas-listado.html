@@ -119,7 +119,7 @@
     </div>
 
     <div class="matriculas__paginacion">
-      <span> Página {{ pagina() }} de {{ totalPaginas() }} </span>
+      <span> Página {{ pagina() + 1 }} de {{ totalPaginas() }} </span>
 
       <div>
         <button
@@ -359,51 +359,6 @@
             (click)="cerrarDetalle()"
           >
             Cerrar
-          </button>
-        </div>
-      }
-    </div>
-  </app-modal>
-}
-
-@if (cancelacionAbierta()) {
-  <app-modal titulo="Cancelar matrícula" (cerrar)="cerrarCancelar()">
-    <div class="formulario-matricula">
-      @if (matriculaCancelar(); as m) {
-        <p>
-          Vas a cancelar la matrícula de <strong>{{ m.alumno }}</strong>
-          para el curso <strong>{{ m.cursoTitulo }}</strong>.
-        </p>
-
-        <label>
-          Motivo de cancelación
-          <textarea
-            class="input"
-            rows="4"
-            required
-            [ngModel]="motivoCancelacion()"
-            (ngModelChange)="motivoCancelacion.set($event)"
-            placeholder="Explica por qué se cancela esta matrícula"
-          ></textarea>
-        </label>
-
-        <div class="formulario-matricula__acciones">
-          <button
-            type="button"
-            class="btn btn--secundario"
-            [disabled]="cancelando()"
-            (click)="cerrarCancelar()"
-          >
-            Volver
-          </button>
-
-          <button
-            type="button"
-            class="btn btn--peligro"
-            [disabled]="cancelando() || !motivoCancelacion().trim()"
-            (click)="cancelarMatricula()"
-          >
-            {{ cancelando() ? 'Cancelando…' : 'Confirmar cancelación' }}
           </button>
         </div>
       }
