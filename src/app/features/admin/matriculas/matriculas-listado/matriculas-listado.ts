@@ -2,7 +2,7 @@ import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatriculaApiService } from '../../../matriculas/matricula-api.service';
-import { AdvertenciaMatricula } from '../../../matriculas/matricula.model';
+import {AdvertenciaMatricula,MatriculaAdministrativa,MatriculaDetalleAdministrativa} from '../../../matriculas/matricula.model';
 import { AlertaGlobalService } from '../../../../core/notificaciones/alerta-global.service';
 import { Modal } from '../../../../shared/ui/modal/modal';
 import { AdminUsuariosApiService } from '../../usuarios/admin-usuarios-api.service';
@@ -10,13 +10,15 @@ import { UsuarioAdminRespuesta } from '../../usuarios/usuario-admin.model';
 import { CursoAdminApiService } from '../../cursos/curso-admin-api.service';
 import { CursoResumenRespuesta } from '../../cursos/curso-admin.model';
 import { CrearMatriculaAdministrativa } from '../../../matriculas/matricula-api.service';
+import { NgClass } from '@angular/common';
+import { finalize } from 'rxjs';
 
 // HU-020 (listado, filtros, detalle, cancelar) se retiró deliberadamente — ver
 // docs/epica-4/HU-020-MAPA-TECNICO-CONTROL-MATRICULAS.md en el backend para reconstruirla.
 // Lo de HU-019 ("+ Nueva matrícula") se quedó funcionando tal cual estaba.
 @Component({
   selector: 'app-matriculas-listado',
-  imports: [FormsModule, Modal],
+  imports: [FormsModule, Modal, NgClass],
   templateUrl: './matriculas-listado.html',
   styleUrl: './matriculas-listado.scss',
 })
@@ -37,6 +39,128 @@ export class MatriculasListado {
   // Mismo patrón que examenes-tab.ts: se activa al intentar guardar, y recién ahí los campos
   // vacíos se marcan en rojo (.input--error) — no desde que se abre el formulario.
   protected readonly intentoRegistrar = signal(false);
+  protected readonly texto = signal('');
+  protected readonly estado = signal('');
+  protected readonly filas = signal<MatriculaAdministrativa[]>([]);
+  protected readonly cargando = signal(false);
+  protected readonly error = signal('');
+  protected readonly pagina = signal(0);
+  protected readonly totalPaginas = signal(1);
+  private readonly tamanoPagina = 10;
+  protected readonly detalle = signal<MatriculaDetalleAdministrativa | null>(null);
+  protected readonly detalleAbierto = signal(false);
+  protected readonly cargandoDetalle = signal(false);
+  protected readonly errorDetalle = signal('');
+  protected readonly cancelacionAbierta = signal(false);
+  protected readonly matriculaCancelar = signal<MatriculaAdministrativa | null>(null);
+  protected readonly motivoCancelacion = signal('');
+  protected readonly cancelando = signal(false);
+  
+ constructor() {
+  this.cargar();
+}
+
+protected cargar(): void {
+  this.cargando.set(true);
+  this.error.set('');
+
+  this.api.listarAdministrativas(
+    this.texto(),
+    this.estado(),
+    this.pagina(),
+    this.tamanoPagina
+  )
+  .pipe(
+    takeUntilDestroyed(this.destroyRef),
+    finalize(() => this.cargando.set(false))
+  )
+  .subscribe({
+    next: (respuesta) => {
+      this.filas.set(respuesta.content);
+      this.totalPaginas.set(Math.max(1, respuesta.totalPages));
+      this.pagina.set(respuesta.number);
+    },
+    error: () => {
+      this.filas.set([]);
+      this.error.set('No se pudieron cargar las matrículas. Intenta nuevamente.');
+    }
+  });
+}
+
+protected cambiarTexto(valor: string): void {
+  this.texto.set(valor);
+  this.pagina.set(0);
+  this.cargar();
+}
+
+protected cambiarEstado(valor: string): void {
+  this.estado.set(valor);
+  this.pagina.set(0);
+  this.cargar();
+}
+
+protected limpiarFiltros(): void {
+  this.texto.set('');
+  this.estado.set('');
+  this.pagina.set(0);
+  this.cargar();
+}
+
+protected irAPagina(numero: number): void {
+  if (numero < 0 || numero >= this.totalPaginas()) return;
+
+  this.pagina.set(numero);
+  this.cargar();
+}
+
+protected fecha(valor: string | null): string {
+  if (!valor) return '—';
+
+  const fecha = new Date(valor);
+
+  if (Number.isNaN(fecha.getTime())) return valor;
+
+  return new Intl.DateTimeFormat('es-PE', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  }).format(fecha);
+}
+
+protected etiquetaIngreso(valor: string): string {
+  const etiquetas: Record<string, string> = {
+    REGISTRADO_MANUAL: 'Pago manual',
+    EXONERADO: 'Exonerado',
+    GRATUITO: 'Gratuito',
+    COMPRA: 'Compra',
+    PAGO: 'Pago'
+  };
+
+  return etiquetas[valor] ?? valor ?? 'No especificado';
+}
+
+protected etiquetaEstado(valor: string): string {
+  const etiquetas: Record<string, string> = {
+    ACTIVA: 'Activa',
+    CANCELADA: 'Cancelada',
+    FINALIZADA: 'Finalizada',
+    VENCIDA: 'Vencida'
+  };
+
+  return etiquetas[valor] ?? valor ?? 'Sin estado';
+}
+
+protected claseEstado(valor: string): string {
+  const clases: Record<string, string> = {
+    ACTIVA: 'matriculas__estado matriculas__estado--activa',
+    CANCELADA: 'matriculas__estado matriculas__estado--cancelada',
+    FINALIZADA: 'matriculas__estado matriculas__estado--finalizada',
+    VENCIDA: 'matriculas__estado matriculas__estado--vencida'
+  };
+
+  return clases[valor] ?? 'matriculas__estado';
+}
+
   protected nueva: CrearMatriculaAdministrativa = {
     usuarioId: 0,
     cursoId: 0,
@@ -120,4 +244,98 @@ export class MatriculasListado {
         },
       });
   }
+  
+protected abrirDetalle(fila: MatriculaAdministrativa): void {
+  this.detalle.set(null);
+  this.errorDetalle.set('');
+  this.detalleAbierto.set(true);
+  this.cargandoDetalle.set(true);
+
+  this.api.obtenerDetalleAdministrativo(fila.id)
+    .pipe(
+      takeUntilDestroyed(this.destroyRef),
+      finalize(() => this.cargandoDetalle.set(false))
+    )
+    .subscribe({
+      next: (respuesta) => this.detalle.set(respuesta),
+      error: () => {
+        this.errorDetalle.set('No se pudo cargar el detalle de la matrícula.');
+      }
+    });
+}
+
+protected cerrarDetalle(): void {
+  this.detalleAbierto.set(false);
+  this.detalle.set(null);
+  this.errorDetalle.set('');
+}
+
+protected abrirCancelar(fila: MatriculaAdministrativa): void {
+  if (fila.estado !== 'ACTIVA') return;
+
+  this.matriculaCancelar.set(fila);
+  this.motivoCancelacion.set('');
+  this.cancelacionAbierta.set(true);
+}
+
+protected cerrarCancelar(): void {
+  if (this.cancelando()) return;
+
+  this.cancelacionAbierta.set(false);
+  this.matriculaCancelar.set(null);
+  this.motivoCancelacion.set('');
+}
+
+protected cancelarMatricula(): void {
+  const matricula = this.matriculaCancelar();
+  const motivo = this.motivoCancelacion().trim();
+
+  if (!matricula || matricula.estado !== 'ACTIVA') return;
+
+  if (!motivo) {
+    this.alertas.mostrar('error', 'Debes indicar el motivo de la cancelación.');
+    return;
+  }
+
+  this.cancelando.set(true);
+
+  this.api.cancelarAdministrativa(matricula.id, motivo)
+    .pipe(
+      takeUntilDestroyed(this.destroyRef),
+      finalize(() => this.cancelando.set(false))
+    )
+    .subscribe({
+      next: () => {
+        this.cancelacionAbierta.set(false);
+        this.matriculaCancelar.set(null);
+        this.motivoCancelacion.set('');
+        this.alertas.mostrar('exito', 'Matrícula cancelada correctamente.');
+        this.cargar();
+      },
+      error: (e) => {
+        this.alertas.mostrar(
+          'error',
+          e.error?.message ?? 'No se pudo cancelar la matrícula.'
+        );
+      }
+    });
+}
+
+protected reenviarConfirmacion(id: number): void {
+  this.api.reenviarConfirmacion(id)
+    .pipe(takeUntilDestroyed(this.destroyRef))
+    .subscribe({
+      next: (respuesta) => {
+        this.alertas.mostrar(
+          respuesta.enviado ? 'exito' : 'error',
+          respuesta.mensaje
+        );
+      },
+      error: () => {
+        this.alertas.mostrar('error', 'No se pudo reenviar la confirmación.');
+      }
+    });
+}
+
+  
 }
