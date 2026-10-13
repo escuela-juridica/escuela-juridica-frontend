@@ -1,7 +1,8 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { API_URL } from '../../core/api/api.config';
+import { PageResponse } from '../../core/api/page-response.model';
 import { AdvertenciaMatricula, Matricula } from './matricula.model';
 
 export interface CrearMatriculaAdministrativa {
@@ -40,4 +41,25 @@ export class MatriculaApiService {
   // HU-041 (reporte, urlExportacion, urlExportacionPdf, urlExportacionExcel, y los helpers
   // privados parametrosReporte/url) se retiró deliberadamente — ver
   // docs/epica-4/HU-041-MAPA-TECNICO-REPORTE-MATRICULAS.md (en el backend) para reconstruirla.
+
+  reporte(filtros: FiltrosReporteMatricula, page = 0, size = 20): Observable<PageResponse<ReporteMatricula>> {
+    const params = this.parametrosReporte(filtros).set('page', page).set('size', size);
+    return this.http.get<PageResponse<ReporteMatricula>>(`${API_URL}/admin/reportes/matriculas`, { params });
+  }
+  urlExportacion(filtros: FiltrosReporteMatricula): string { return this.url('exportar', filtros); }
+  urlExportacionPdf(filtros: FiltrosReporteMatricula): string { return this.url('exportar-pdf', filtros); }
+  urlExportacionExcel(filtros: FiltrosReporteMatricula): string { return this.url('exportar-excel', filtros); }
+
+  private parametrosReporte(filtros: FiltrosReporteMatricula): HttpParams {
+    let params = new HttpParams().set('texto', filtros.texto ?? '').set('estado', filtros.estado ?? '')
+      .set('modalidad', filtros.modalidad ?? '');
+    if (filtros.cursoId) params = params.set('cursoId', filtros.cursoId);
+    if (filtros.fechaDesde) params = params.set('fechaDesde', filtros.fechaDesde);
+    if (filtros.fechaHasta) params = params.set('fechaHasta', filtros.fechaHasta);
+    return params;
+  }
+
+  private url(formato: string, filtros: FiltrosReporteMatricula): string {
+    return `${API_URL}/admin/reportes/matriculas/${formato}?${this.parametrosReporte(filtros).toString()}`;
+  }
 }
