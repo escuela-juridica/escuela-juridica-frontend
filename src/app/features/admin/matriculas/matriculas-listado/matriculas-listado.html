@@ -7,13 +7,141 @@
     <button type="button" class="btn btn--primario" (click)="abrirFormulario()">+ Nueva matrícula</button>
   </div>
 
-  <div class="pantalla-pendiente">
-    <span class="pantalla-pendiente__codigo">HU-020</span>
-    <p>El listado, el detalle y la cancelación de matrículas se retiraron para que el equipo los
-      reconstruya ("+ Nueva matrícula" de arriba es de HU-019 y sigue funcionando igual).</p>
-    <p>Guía técnica: <code>docs/epica-4/HU-020-MAPA-TECNICO-CONTROL-MATRICULAS.md</code></p>
-    <p>Maqueta: <code>maquetacion-html/HU-020-PF-MATRICULAS-listado.html</code></p>
+    <div class="matriculas__filtros">
+    <label class="matriculas__busqueda">
+      <span>Buscar matrícula</span>
+      <input
+        class="input"
+        type="search"
+        placeholder="Buscar por alumno, correo o curso..."
+        [ngModel]="texto()"
+        (ngModelChange)="cambiarTexto($event)"
+      />
+    </label>
+
+    <label class="matriculas__estado-filtro">
+      <span>Estado</span>
+      <select
+        class="input"
+        [ngModel]="estado()"
+        (ngModelChange)="cambiarEstado($event)"
+      >
+        <option value="">Todos los estados</option>
+        <option value="ACTIVA">Activa</option>
+        <option value="CANCELADA">Cancelada</option>
+        <option value="FINALIZADA">Finalizada</option>
+        <option value="VENCIDA">Vencida</option>
+      </select>
+    </label>
+
+    <button
+      type="button"
+      class="btn btn--secundario"
+      (click)="limpiarFiltros()"
+    >
+      Limpiar
+    </button>
   </div>
+
+  @if (cargando()) {
+    <p class="matriculas__mensaje">Cargando matrículas...</p>
+  }
+
+  @if (error()) {
+    <div class="alerta alerta--error" role="alert">
+      {{ error() }}
+      <button type="button" class="btn btn--secundario" (click)="cargar()">
+        Reintentar
+      </button>
+    </div>
+  }
+
+  @if (!cargando() && !error()) {
+    <div class="matriculas__tabla-contenedor">
+      <table class="matriculas__tabla">
+        <thead>
+          <tr>
+            <th>Alumno</th>
+            <th>Curso</th>
+            <th>Fecha de matrícula</th>
+            <th>Forma de ingreso</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (fila of filas(); track fila.id) {
+            <tr>
+              <td>
+                <strong>{{ fila.alumno }}</strong>
+                <small>{{ fila.correo }}</small>
+              </td>
+              <td>{{ fila.cursoTitulo }}</td>
+              <td>{{ fecha(fila.fechaMatricula) }}</td>
+              <td>{{ etiquetaIngreso(fila.formaIngreso) }}</td>
+              <td>
+                <span [ngClass]="claseEstado(fila.estado)">
+                  {{ etiquetaEstado(fila.estado) }}
+                </span>
+              </td>
+              <td>
+                <div class="matriculas__acciones">
+                  <button
+                    type="button"
+                    class="btn btn--secundario"
+                    (click)="abrirDetalle(fila)"
+                  >
+                    Ver detalle
+                  </button>
+
+                  @if (fila.estado === 'ACTIVA') {
+                    <button
+                      type="button"
+                      class="btn btn--peligro"
+                      (click)="abrirCancelar(fila)"
+                    >
+                      Cancelar
+                    </button>
+                  }
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="matriculas__vacio">
+                No se encontraron matrículas con esos filtros.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="matriculas__paginacion">
+      <span> Página {{ pagina() + 1 }} de {{ totalPaginas() }} </span>
+
+      <div>
+        <button
+          type="button"
+          class="btn btn--secundario"
+          [disabled]="pagina() <= 0"
+          (click)="irAPagina(pagina() - 1)"
+        >
+          Anterior
+        </button>
+
+        <button
+          type="button"
+          class="btn btn--secundario"
+          [disabled]="pagina() + 1 >= totalPaginas()"
+          (click)="irAPagina(pagina() + 1)"
+        >
+          Siguiente
+        </button>
+      </div>
+    </div>
+  }
 </section>
 
 @if (formularioAbierto()) {
@@ -115,3 +243,171 @@
     </div>
   </app-modal>
 }
+@if (detalleAbierto()) {
+  <app-modal titulo="Detalle de matrícula" (cerrar)="cerrarDetalle()">
+    <div class="matriculas__detalle">
+      @if (cargandoDetalle()) {
+        <p>Cargando detalle de matrícula...</p>
+      }
+
+      @if (errorDetalle()) {
+        <div class="alerta alerta--error" role="alert">
+          {{ errorDetalle() }}
+        </div>
+      }
+
+      @if (detalle(); as d) {
+        <section>
+          <h3>Información de la matrícula</h3>
+          <p><strong>Alumno:</strong> {{ d.alumno }}</p>
+          <p><strong>Correo:</strong> {{ d.correo }}</p>
+          <p><strong>Curso:</strong> {{ d.cursoTitulo }}</p>
+          <p><strong>Estado:</strong> {{ etiquetaEstado(d.estado) }}</p>
+          <p><strong>Fecha de matrícula:</strong> {{ fecha(d.fechaMatricula) }}</p>
+          <p><strong>Fecha de activación:</strong> {{ fecha(d.fechaActivacion) }}</p>
+          <p><strong>Fecha de vencimiento:</strong> {{ fecha(d.fechaVencimiento) }}</p>
+          <p><strong>Responsable:</strong> {{ d.responsable || 'No especificado' }}</p>
+
+          @if (d.motivoCancelacion) {
+            <p><strong>Motivo de cancelación:</strong> {{ d.motivoCancelacion }}</p>
+          }
+        </section>
+
+        <section>
+          <h3>Historial económico</h3>
+
+          @if (d.pagos.length > 0) {
+            <div class="matriculas__tabla-contenedor">
+              <table class="matriculas__tabla">
+                <thead>
+                  <tr>
+                    <th>Origen</th>
+                    <th>Estado</th>
+                    <th>Importe</th>
+                    <th>Medio</th>
+                    <th>Referencia</th>
+                    <th>Registrado por</th>
+                    <th>Fecha</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (pago of d.pagos; track pago.pagoId) {
+                    <tr>
+                      <td>{{ pago.origen }}</td>
+                      <td>{{ pago.estado }}</td>
+                      <td>{{ pago.importe }} {{ pago.moneda }}</td>
+                      <td>{{ pago.medio || '—' }}</td>
+                      <td>{{ pago.referencia || '—' }}</td>
+                      <td>{{ pago.registradoPor || '—' }}</td>
+                      <td>{{ fecha(pago.resultadoEn) }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          } @else {
+            <p>No hay movimientos económicos registrados.</p>
+          }
+        </section>
+
+        <section>
+          <h3>Historial de acceso</h3>
+
+          @if (d.historialEstados.length > 0) {
+            <div class="matriculas__tabla-contenedor">
+              <table class="matriculas__tabla">
+                <thead>
+                  <tr>
+                    <th>Estado anterior</th>
+                    <th>Estado nuevo</th>
+                    <th>Motivo</th>
+                    <th>Realizado por</th>
+                    <th>Fecha</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (historial of d.historialEstados; track $index) {
+                    <tr>
+                      <td>{{ historial.estadoAnterior || '—' }}</td>
+                      <td>{{ historial.estadoNuevo }}</td>
+                      <td>{{ historial.motivo || '—' }}</td>
+                      <td>{{ historial.realizadoPor || '—' }}</td>
+                      <td>{{ fecha(historial.realizadoEn) }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          } @else {
+            <p>No hay cambios de estado registrados.</p>
+          }
+        </section>
+
+        <div class="matriculas__acciones">
+          <button
+            type="button"
+            class="btn btn--secundario"
+            [disabled]="!d.id"
+            (click)="reenviarConfirmacion(d.id)"
+          >
+            Reenviar confirmación
+          </button>
+
+          <button
+            type="button"
+            class="btn btn--secundario"
+            (click)="cerrarDetalle()"
+          >
+            Cerrar
+          </button>
+        </div>
+      }
+    </div>
+  </app-modal>
+}
+
+@if (cancelacionAbierta()) {
+  <app-modal titulo="Cancelar matrícula" (cerrar)="cerrarCancelar()">
+    <div class="formulario-matricula">
+      @if (matriculaCancelar(); as m) {
+        <p>
+          Vas a cancelar la matrícula de <strong>{{ m.alumno }}</strong>
+          para el curso <strong>{{ m.cursoTitulo }}</strong>.
+        </p>
+
+        <label>
+          Motivo de cancelación
+          <textarea
+            class="input"
+            rows="4"
+            required
+            [ngModel]="motivoCancelacion()"
+            (ngModelChange)="motivoCancelacion.set($event)"
+            placeholder="Explica por qué se cancela esta matrícula"
+          ></textarea>
+        </label>
+
+        <div class="formulario-matricula__acciones">
+          <button
+            type="button"
+            class="btn btn--secundario"
+            [disabled]="cancelando()"
+            (click)="cerrarCancelar()"
+          >
+            Volver
+          </button>
+
+          <button
+            type="button"
+            class="btn btn--peligro"
+            [disabled]="cancelando() || !motivoCancelacion().trim()"
+            (click)="cancelarMatricula()"
+          >
+            {{ cancelando() ? 'Cancelando…' : 'Confirmar cancelación' }}
+          </button>
+        </div>
+      }
+    </div>
+  </app-modal>
+}
+
