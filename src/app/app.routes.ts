@@ -1,5 +1,8 @@
 import { Routes } from '@angular/router';
 
+import { adminGuard } from './core/session/admin-guard';
+import { sessionGuard } from './core/session/session-guard';
+
 export const routes: Routes = [
   {
     path: '',
@@ -13,7 +16,7 @@ export const routes: Routes = [
           import('./features/cursos/catalogo/catalogo').then((m) => m.Catalogo),
       }, // PF-001
       {
-        path: 'cursos/:id',
+        path: 'cursos/:urlAmigable',
         loadComponent: () =>
           import('./features/cursos/ficha-curso/ficha-curso').then((m) => m.FichaCurso),
       }, // PF-002
@@ -69,6 +72,7 @@ export const routes: Routes = [
   },
   {
     path: 'app',
+    canActivate: [sessionGuard],
     loadComponent: () =>
       import('./core/layout/layout-alumno/layout-alumno').then((m) => m.LayoutAlumno),
     children: [
@@ -82,6 +86,58 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/cuenta/mi-perfil/mi-perfil').then((m) => m.MiPerfil),
       }, // PF-009
+    ],
+  },
+  // EP02: HU-008 (usuarios), HU-009 (información base, bajo "Configuración") y HU-010 (cursos).
+  // El resto del panel administrativo queda pendiente.
+  {
+    path: 'admin',
+    canActivate: [adminGuard],
+    loadComponent: () =>
+      import('./core/layout/layout-admin/layout-admin').then((m) => m.LayoutAdmin),
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'usuarios' },
+      {
+        // Crear y editar usuario se hacen en modales dentro del listado, no en rutas aparte.
+        path: 'usuarios',
+        loadComponent: () =>
+          import('./features/admin/usuarios/usuarios-listado/usuarios-listado').then(
+            (m) => m.UsuariosListado,
+          ),
+      },
+      {
+        path: 'informacion-base',
+        loadComponent: () =>
+          import('./features/admin/informacion-base/informacion-base').then(
+            (m) => m.InformacionBase,
+          ),
+      },
+      {
+        path: 'cursos',
+        loadComponent: () =>
+          import('./features/admin/cursos/cursos-listado/cursos-listado').then(
+            (m) => m.CursosListado,
+          ),
+      },
+      {
+        path: 'cursos/:id',
+        loadComponent: () =>
+          import('./features/admin/cursos/curso-editor/curso-editor').then((m) => m.CursoEditor),
+      },
+      {
+        path: 'matriculas',
+        loadComponent: () =>
+          import('./features/admin/matriculas/matriculas-listado/matriculas-listado').then(
+            (m) => m.MatriculasListado,
+          ),
+      },
+      {
+        path: 'reportes/matriculas',
+        loadComponent: () =>
+          import('./features/admin/reportes/reporte-matriculas/reporte-matriculas').then(
+            (m) => m.ReporteMatriculas,
+          ),
+      },
     ],
   },
 ];

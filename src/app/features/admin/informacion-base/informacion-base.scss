@@ -1,0 +1,244 @@
+.infobase-cabecera {
+  margin-bottom: 20px;
+}
+
+.infobase-titulo {
+  font-size: 22px;
+  line-height: 30px;
+  font-weight: 700;
+  color: var(--neutral-950);
+  margin: 0;
+}
+
+.infobase-subtitulo {
+  color: var(--neutral-600);
+  margin: 4px 0 0;
+}
+
+.infobase-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--neutral-200);
+  padding-bottom: 0;
+}
+
+.infobase-tab {
+  appearance: none;
+  border: none;
+  background: transparent;
+  padding: 10px 16px;
+  border-radius: var(--radio-md) var(--radio-md) 0 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--neutral-600);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.infobase-tab:hover {
+  background: var(--neutral-050);
+  color: var(--neutral-950);
+}
+
+.infobase-tab--activa,
+.infobase-tab--activa:hover {
+  background: var(--acento-100);
+  color: var(--acento-700);
+}
+
+.infobase-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.infobase-card__cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--neutral-100);
+}
+
+.infobase-card__titulo {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--neutral-950);
+}
+
+.infobase-card__acciones {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.infobase-interruptor {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--neutral-600);
+  cursor: pointer;
+  user-select: none;
+}
+
+.infobase-interruptor__entrada {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.infobase-interruptor__pista {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  border-radius: var(--radio-completo);
+  background: var(--neutral-200);
+  transition: background-color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.infobase-interruptor__perilla {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radio-completo);
+  background: var(--blanco);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.2);
+  transition: transform 0.15s ease;
+}
+
+.infobase-interruptor__entrada:checked + .infobase-interruptor__pista {
+  background: var(--acento-700);
+}
+
+.infobase-interruptor__entrada:checked + .infobase-interruptor__pista .infobase-interruptor__perilla {
+  transform: translateX(16px);
+}
+
+.infobase-interruptor__entrada:focus-visible + .infobase-interruptor__pista {
+  outline: 2px solid var(--input-anillo-foco);
+  outline-offset: 2px;
+}
+
+.infobase-interruptor__texto {
+  color: var(--neutral-700);
+}
+
+.infobase-estado {
+  padding: 32px 24px;
+  text-align: center;
+  color: var(--neutral-500);
+  margin: 0;
+}
+
+.infobase-paginacion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+  font-size: 14px;
+  color: var(--neutral-600);
+}
+
+.infobase-alerta {
+  margin: 20px 24px 0;
+}
+
+.infobase-alerta--pagina {
+  margin: 0 0 16px;
+}
+
+.infobase-fila {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--neutral-100);
+}
+
+.infobase-fila:last-child {
+  border-bottom: none;
+}
+
+.infobase-fila__principal {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.infobase-fila__nombre {
+  font-weight: 600;
+  color: var(--neutral-950);
+}
+
+.infobase-fila__subtitulo {
+  font-size: 13px;
+  color: var(--neutral-500);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.infobase-fila__acciones {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.infobase-fila__accion {
+  flex-shrink: 0;
+  height: 36px;
+  padding: 0 14px;
+  font-size: 13px;
+}
+
+.infobase-formulario {
+  padding: 24px;
+}
+
+.infobase-campos {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.infobase-campos--2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.infobase-campos--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.infobase-campo--ancho {
+  grid-column: 1 / -1;
+}
+
+.infobase-formulario__acciones {
+  display: flex;
+  gap: 12px;
+}
+
+@media (max-width: 720px) {
+  .infobase-campos--2,
+  .infobase-campos--3 {
+    grid-template-columns: 1fr;
+  }
+
+  .infobase-fila {
+    flex-wrap: wrap;
+  }
+}

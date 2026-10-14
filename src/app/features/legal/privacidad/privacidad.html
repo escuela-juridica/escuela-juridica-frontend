@@ -1,13 +1,93 @@
-<!-- PF-011a · Política de privacidad (HU-002). PENDIENTE DE MAQUETACIÓN.
-     El equipo arma esta pantalla copiando SOLO lo que está adentro de
-     <main>...</main> en: maquetacion-html/HU-002-PF-011a-privacidad.html
-     (las clases .legal-* de su bloque <style> van en privacidad.scss).
+<div class="contenedor-lectura">
+  <div class="legal-enlace-cruzado">
+    <a routerLink="/terminos">Ver también: Términos del servicio →</a>
+  </div>
+  <h1 class="tipo-h1 legal-titulo">Política de privacidad</h1>
+  <p class="legal-version">Versión vigente desde el 1 de julio de 2026</p>
 
-     Reusable: el header/footer de esa pantalla NO se copian — ya los pone
-     <app-layout-publico> por afuera (el footer es el componente compartido
-     <app-footer-publico/>). -->
-<div class="pantalla-pendiente">
-  <a routerLink="/catalogo" class="pantalla-pendiente__volver">&larr; Volver al inicio</a>
-  <p class="pantalla-pendiente__codigo">PF-011a · Política de privacidad</p>
-  <p>Pegar acá el contenido de <code>&lt;main&gt;</code> de <code>maquetacion-html/HU-002-PF-011a-privacidad.html</code>.</p>
+  <details class="card legal-indice" open>
+    <summary class="legal-indice__cabecera">
+      <span class="legal-indice__titulo">Índice del documento</span>
+      <span class="legal-indice__icono" aria-hidden="true">▴</span>
+    </summary>
+    <div class="legal-indice__lista">
+      <a
+        [routerLink]="[]"
+        fragment="seccion-1"
+        (click)="seccion1.scrollIntoView(); seccion1.focus()"
+        >1. Datos que recogemos</a
+      >
+      <a
+        [routerLink]="[]"
+        fragment="seccion-2"
+        (click)="seccion2.scrollIntoView(); seccion2.focus()"
+        >2. Finalidad del tratamiento</a
+      >
+      <a
+        [routerLink]="[]"
+        fragment="seccion-3"
+        (click)="seccion3.scrollIntoView(); seccion3.focus()"
+        >3. Conservación</a
+      >
+      <a
+        [routerLink]="[]"
+        fragment="seccion-4"
+        (click)="seccion4.scrollIntoView(); seccion4.focus()"
+        >4. Derechos del titular</a
+      >
+      <a
+        [routerLink]="[]"
+        fragment="seccion-5"
+        (click)="seccion5.scrollIntoView(); seccion5.focus()"
+        >5. Contacto</a
+      >
+    </div>
+  </details>
+
+  <div class="legal-secciones">
+    <div id="seccion-1" #seccion1 tabindex="-1">
+      <h2>1. Datos que recogemos</h2>
+      <p>
+        Recogemos los nombres, apellidos y correo electrónico que registras al crear tu cuenta. El
+        número de WhatsApp y el documento de identidad son opcionales y solo se usan para avisos
+        operativos.
+      </p>
+    </div>
+    <div id="seccion-2" #seccion2 tabindex="-1">
+      <h2>2. Finalidad del tratamiento</h2>
+      <p>
+        Usamos tus datos para darte acceso a los cursos, comunicarte cambios de sesiones, emitir tu
+        certificado y responder tus solicitudes. No los cedemos a terceros con fines comerciales.
+      </p>
+    </div>
+    <div id="seccion-3" #seccion3 tabindex="-1">
+      <h2>3. Conservación</h2>
+      <p>
+        Mantenemos tus datos de certificación de forma indefinida, porque un certificado emitido
+        debe poder verificarse en el futuro. El resto de la información se conserva mientras tu
+        cuenta esté activa.
+      </p>
+    </div>
+    <div id="seccion-4" #seccion4 tabindex="-1">
+      <h2>4. Derechos del titular</h2>
+      <p>
+        Puedes acceder, rectificar y solicitar la supresión de tus datos escribiendo a
+        informes&#64;esejur.pe. La supresión no alcanza los datos congelados en un certificado ya
+        emitido.
+      </p>
+    </div>
+    <div id="seccion-5" #seccion5 tabindex="-1">
+      <h2>5. Contacto</h2>
+      <p>
+        Para cualquier consulta sobre esta política, escribe a informes&#64;esejur.pe indicando el
+        asunto.
+      </p>
+    </div>
+  </div>
+
+  <div class="legal-pie">
+    <button type="button" class="btn btn--grande btn--primario" routerLink="/catalogo">
+      Ir al catálogo
+    </button>
+  </div>
 </div>

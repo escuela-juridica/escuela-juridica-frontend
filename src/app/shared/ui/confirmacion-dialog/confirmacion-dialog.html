@@ -1,0 +1,32 @@
+@if (solicitud(); as s) {
+  <div class="confirmacion-fondo">
+    <div class="confirmacion-caja" role="alertdialog" aria-modal="true">
+      <button type="button" class="confirmacion-cerrar" (click)="cancelar()" aria-label="Cerrar">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="5" y1="5" x2="19" y2="19" />
+          <line x1="19" y1="5" x2="5" y2="19" />
+        </svg>
+      </button>
+
+      <div class="confirmacion-icono" [class.confirmacion-icono--peligro]="s.variante === 'peligro'">
+        {{ s.variante === 'peligro' ? '!' : '?' }}
+      </div>
+
+      <h2 class="confirmacion-titulo">{{ s.titulo }}</h2>
+      <p class="confirmacion-mensaje">{{ s.mensaje }}</p>
+
+      <div class="confirmacion-acciones">
+        <button type="button" class="btn btn--secundario" (click)="cancelar()">{{ s.textoCancelar }}</button>
+        <button
+          type="button"
+          class="btn"
+          [class.btn--peligro]="s.variante === 'peligro'"
+          [class.btn--primario]="s.variante !== 'peligro'"
+          (click)="confirmar()"
+        >
+          {{ s.textoConfirmar }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

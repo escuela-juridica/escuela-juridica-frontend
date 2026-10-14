@@ -1,3 +1,103 @@
-// PF-011a · Estilos propios de esta pantalla.
-// PENDIENTE — pegar acá las clases .legal-* del bloque <style> de
-// maquetacion-html/HU-002-PF-011a-privacidad.html
+.legal-enlace-cruzado {
+  font-size: 14px;
+  line-height: 20px;
+  margin-bottom: 20px;
+}
+.legal-enlace-cruzado a {
+  font-weight: 600;
+}
+.legal-titulo {
+  font-family: var(--fuente-editorial);
+  color: var(--neutral-950);
+  margin: 0 0 8px;
+}
+.legal-version {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--neutral-500);
+  margin: 0 0 24px;
+}
+.legal-indice {
+  padding: 0;
+  margin-bottom: 24px;
+}
+.legal-indice__cabecera {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 56px;
+  padding: 14px 20px;
+  cursor: pointer;
+}
+.legal-indice__titulo {
+  flex: 1;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--neutral-950);
+}
+.legal-indice__icono {
+  width: 20px;
+  text-align: center;
+  font-size: 16px;
+  color: var(--neutral-500);
+}
+.legal-indice__lista {
+  border-top: 1px solid var(--neutral-200);
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.legal-indice__lista a {
+  font-size: 14px;
+  line-height: 20px;
+}
+.legal-secciones {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.legal-secciones h2 {
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 600;
+  color: var(--neutral-950);
+  margin: 0 0 8px;
+}
+.legal-secciones p {
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--neutral-600);
+  margin: 0;
+}
+.legal-pie {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--neutral-200);
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+:host {
+  display: block;
+}
+.legal-indice__cabecera {
+  list-style: none;
+}
+.legal-indice__cabecera::-webkit-details-marker {
+  display: none;
+}
+.legal-indice:not([open]) .legal-indice__icono {
+  transform: rotate(180deg);
+}
+.legal-secciones > div {
+  scroll-margin-top: 6rem;
+}
+a:focus-visible,
+summary:focus-visible,
+button:focus-visible {
+  outline: 3px solid var(--neutral-600);
+  outline-offset: 4px;
+}

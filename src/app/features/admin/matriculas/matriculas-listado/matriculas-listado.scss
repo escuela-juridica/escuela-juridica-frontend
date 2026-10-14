@@ -1,0 +1,217 @@
+// Sin padding propio: .admin-contenido (layout-admin) ya da los 32px, igual que en Cursos y
+// Usuarios — ponerlo aquí también duplicaba el espaciado.
+
+.matriculas__titulo {
+  font-size: 22px;
+  line-height: 30px;
+  font-weight: 700;
+  color: var(--neutral-950);
+  margin: 0;
+}
+
+.matriculas__cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.matriculas__cabecera p {
+  margin: 4px 0 0;
+  color: var(--neutral-600);
+}
+
+// ----------------------------------------------------------------- Filtros --
+
+.matriculas__filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+  margin: 24px 0;
+}
+
+.matriculas__busqueda {
+  display: grid;
+  gap: 6px;
+  flex: 1;
+  min-width: 240px;
+  color: var(--neutral-600);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.matriculas__estado-filtro {
+  display: grid;
+  gap: 6px;
+  color: var(--neutral-600);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.matriculas__estado-filtro .input {
+  width: auto;
+}
+
+.matriculas__mensaje {
+  color: var(--neutral-600);
+  margin: 24px 0;
+}
+
+// ------------------------------------------------------------------- Tabla --
+
+.matriculas__tabla-contenedor {
+  overflow: auto;
+  border: 1px solid var(--neutral-200);
+  border-radius: 10px;
+  background: var(--blanco);
+}
+
+.matriculas__tabla {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.matriculas__tabla th,
+.matriculas__tabla td {
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--neutral-100);
+  font-size: 14px;
+}
+
+.matriculas__tabla th {
+  color: var(--neutral-500);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.matriculas__tabla td strong {
+  color: var(--neutral-950);
+  font-weight: 600;
+}
+
+.matriculas__tabla small {
+  display: block;
+  color: var(--neutral-500);
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.matriculas__acciones {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.matriculas__vacio {
+  text-align: center;
+  color: var(--neutral-500);
+  padding: 32px 16px;
+}
+
+.matriculas__paginacion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+  font-size: 14px;
+  color: var(--neutral-600);
+}
+
+// ------------------------------------------------------------- Detalle (modal) --
+
+.matriculas__detalle {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.matriculas__detalle section {
+  border-bottom: 1px solid var(--neutral-200);
+  padding-bottom: 1rem;
+}
+
+.matriculas__detalle section:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.matriculas__detalle h3 {
+  color: var(--marca-900);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin: 0 0 0.75rem;
+}
+
+.matriculas__detalle p {
+  margin: 0.35rem 0;
+  font-size: 0.9rem;
+}
+
+// ----------------------------------------------------------- Formulario modal --
+
+.formulario-matricula {
+  display: grid;
+  gap: 16px;
+}
+
+.formulario-matricula label {
+  display: grid;
+  gap: 7px;
+  color: var(--neutral-800);
+  font-weight: 600;
+}
+
+.formulario-matricula__dos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.formulario-matricula__acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.matriculas__aviso-carga {
+  color: #475467;
+  font-size: 0.9rem;
+  margin: 0.25rem 0;
+}
+
+.matriculas__aviso-academico {
+  align-items: flex-start;
+  display: flex;
+  gap: 0.75rem;
+  margin-block: 0.25rem;
+}
+
+.matriculas__aviso-academico p {
+  margin: 0.35rem 0 0.65rem;
+}
+
+.matriculas__confirmacion-aviso {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 700px) {
+  .matriculas__cabecera,
+  .matriculas__filtros,
+  .formulario-matricula__dos {
+    flex-direction: column;
+    align-items: stretch;
+    display: flex;
+  }
+}

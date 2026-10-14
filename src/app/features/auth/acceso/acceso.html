@@ -4,8 +4,102 @@
      (las clases .acceso-* de su bloque <style> van en acceso.scss).
      Esta pantalla no tiene header ni footer compartido — es standalone,
      igual que Registro (PF-004). -->
-<div class="pantalla-pendiente">
-  <a routerLink="/catalogo" class="pantalla-pendiente__volver">&larr; Volver al inicio</a>
-  <p class="pantalla-pendiente__codigo">PF-003 · Acceso con correo o Google</p>
-  <p>Pegar acá el contenido de <code>maquetacion-html/HU-001-PF-003-acceso.html</code>.</p>
+
+<div class="acceso-fila">
+  <div class="acceso-form-col">
+    <div class="acceso-form-ancho">
+      <a routerLink="/catalogo" class="acceso-volver">&larr; Volver al inicio</a>
+      <div class="eyebrow">
+        <span class="eyebrow__dash"></span>
+        <span class="eyebrow__texto">Acceso a tu cuenta</span>
+      </div>
+      <h1 class="acceso-titulo">Iniciar sesión</h1>
+      <p class="acceso-subtitulo">Ingresa para continuar tus cursos y ver tus certificados.</p>
+
+      <form (ngSubmit)="onLogin()" #loginForm="ngForm" class="acceso-formulario">
+        @if (mensajeInfo) {
+          <div class="alerta alerta--info">
+            <span class="alerta__icono">i</span>
+            <div class="alerta__texto">{{ mensajeInfo }}</div>
+          </div>
+        }
+
+        <app-boton-google-pendiente mensaje="El acceso con Google todavía no está disponible." />
+
+        <!-- Mensaje de Error Dinámico -->
+        @if (mensajeError) {
+          <div class="alerta alerta--error">
+            <span class="alerta__icono">!</span>
+            <div>
+              <div class="alerta__titulo">Error al ingresar</div>
+              <div class="alerta__texto">{{ mensajeError }}</div>
+            </div>
+          </div>
+        }
+
+        <div class="divisor-con-texto">
+          <span class="divisor-con-texto__linea"></span>o con tu correo<span class="divisor-con-texto__linea"></span>
+        </div>
+
+        <div>
+          <label class="label">Correo electrónico</label>
+          <input 
+            type="email" 
+            name="correo" 
+            [(ngModel)]="credenciales.correo" 
+            required 
+            class="input" 
+            [class.input--error]="mensajeError" 
+            placeholder="nombre@correo.com"
+          />
+        </div>
+
+        <div>
+          <label class="label">Contraseña</label>
+          <div class="input-con-accion">
+            <input 
+              [type]="mostrarPassword ? 'text' : 'password'" 
+              name="contrasena" 
+              [(ngModel)]="credenciales.contrasena" 
+              required 
+              class="input" 
+              [class.input--error]="mensajeError" 
+              placeholder="Tu contraseña" 
+            />
+            <button type="button" (click)="togglePassword()" class="btn btn--neutro">
+              {{ mostrarPassword ? 'Ocultar' : 'Mostrar' }}
+            </button>
+          </div>
+        </div>
+
+        <div class="acceso-olvide">
+          <a routerLink="/recuperar-password">¿Olvidaste tu contraseña?</a>
+        </div>
+
+        <button type="submit" [disabled]="loginForm.invalid || cargando" class="btn btn--grande btn--primario">
+          {{ cargando ? 'Ingresando...' : 'Ingresar' }}
+        </button>
+
+        <div class="acceso-crear-cuenta">
+          ¿No tienes cuenta? <a routerLink="/registro">Crear cuenta</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="acceso-hero-col">
+    <div class="hero-media">
+      <div class="hero-media__imagen" style="background-image: url('img/catalogo/hero-1.jpg')"></div>
+    </div>
+    <div class="hero-overlay acceso-hero-overlay"></div>
+    <div class="acceso-hero-blob"></div>
+
+    <img src="img/logo-esejur.png" alt="Escuela Jurídica" class="acceso-hero-logo" />
+    <div class="eyebrow acceso-hero-eyebrow">
+      <span class="eyebrow__dash"></span>
+      <span class="eyebrow__texto eyebrow__texto--claro">Escuela Jurídica</span>
+    </div>
+    <h2 class="acceso-hero-titulo">Diplomados y cursos dictados por quienes ejercen el derecho</h2>
+    <p class="acceso-hero-texto">Registradores, procuradores y magistrados en ejercicio, con certificado verificable en línea.</p>
+  </div>
 </div>

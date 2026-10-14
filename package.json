@@ -1,12 +1,13 @@
 {
-  "name": "desarrollo-web-integrado-frontend",
+  "name": "escuela-juridica-frontend",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "test:hu002": "ng test --watch=false --include='src/app/features/auth/registro/**/*.spec.ts' --include='src/app/features/legal/**/*.spec.ts' --include='src/app/core/session/*.spec.ts' --include='src/app/core/layout/layout-alumno/*.spec.ts'"
   },
   "private": true,
   "packageManager": "npm@10.9.4",
@@ -17,6 +18,7 @@
     "@angular/forms": "^21.2.0",
     "@angular/platform-browser": "^21.2.0",
     "@angular/router": "^21.2.0",
+    "ngx-spinner": "^21.1.0",
     "rxjs": "~7.8.0",
     "swiper": "^14.2.0",
     "tslib": "^2.3.0"

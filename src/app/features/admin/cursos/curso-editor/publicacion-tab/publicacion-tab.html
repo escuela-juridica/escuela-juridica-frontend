@@ -1,0 +1,166 @@
+<section class="publicacion" aria-label="Publicación y ciclo de vida del curso">
+  <div class="publicacion__barra-estado">
+    <div class="publicacion__estado-info">
+      <span class="badge" [class]="claseEstado(estadoCodigo)">{{ estadoNombre }}</span>
+    </div>
+    <div class="publicacion__barra-acciones">
+      <label class="publicacion__destacado">
+        <span class="interruptor">
+          <input
+            class="interruptor__entrada"
+            type="checkbox"
+            [checked]="destacadoLocal()"
+            [disabled]="actualizandoDestacado()"
+            (change)="toggleDestacado()"
+          />
+          <span class="interruptor__pista"><span class="interruptor__perilla"></span></span>
+        </span>
+        Destacado
+      </label>
+      <button type="button" class="btn btn--secundario publicacion__duplicar" [disabled]="duplicando()" (click)="duplicar()">
+        {{ duplicando() ? 'Duplicando…' : 'Duplicar convocatoria' }}
+      </button>
+    </div>
+  </div>
+
+  @if (tieneMatriculas) {
+    <div class="alerta alerta--advertencia publicacion__aviso-matriculas">
+      <span class="alerta__icono">!</span>
+      <div class="alerta__titulo">Este curso ya tiene matrículas. Edita sus datos comerciales con cuidado.</div>
+    </div>
+  }
+
+  @if (estadoCodigo === 'BORRADOR') {
+    @if (error(); as mensaje) {
+      <div class="alerta alerta--error">
+        <span class="alerta__icono">!</span>
+        <div class="alerta__titulo">{{ mensaje }}</div>
+      </div>
+    }
+
+    <div class="card editor-card publicacion__cabecera">
+      <h2 class="editor-card__titulo">Validar y publicar</h2>
+      <p class="editor-material-info">
+        Revisa que el curso esté listo antes de publicarlo. Los errores bloquean la publicación; las advertencias no.
+      </p>
+      <div class="publicacion__acciones">
+        <button type="button" class="btn btn--secundario" [disabled]="cargando() || publicando()" (click)="validar()">
+          {{ cargando() ? 'Revisando…' : 'Revisar de nuevo' }}
+        </button>
+        <button
+          type="button"
+          class="btn btn--primario"
+          [disabled]="cargando() || publicando() || hayErrores()"
+          (click)="publicar()"
+        >
+          {{ publicando() ? 'Publicando…' : 'Publicar curso' }}
+        </button>
+      </div>
+    </div>
+
+    @if (cargando()) {
+      <p class="editor-estado">Revisando el curso…</p>
+    } @else if (resultado(); as r) {
+      @if (!hayErrores() && !hayAdvertencias()) {
+        <div class="estado-vacio estado-vacio--editor">
+          <span class="estado-vacio__icono" aria-hidden="true">✓</span>
+          <h3 class="estado-vacio__titulo">Todo listo</h3>
+          <p class="estado-vacio__texto">No encontramos pendientes. Puedes publicar el curso.</p>
+        </div>
+      } @else {
+        @for (grupo of grupos(); track grupo.seccion) {
+          <div class="card editor-card publicacion__grupo">
+            <div class="publicacion__grupo-encabezado">
+              <h3>{{ grupo.etiqueta }}</h3>
+              <button type="button" class="btn btn--secundario publicacion__ir" (click)="irA(grupo.pestanaDestino)">
+                Ir a corregir
+              </button>
+            </div>
+            <ul class="publicacion__lista">
+              @for (h of grupo.items; track h.codigo) {
+                <li class="publicacion__item" [class.publicacion__item--advertencia]="h.severidad === 'ADVERTENCIA'">
+                  <span class="publicacion__icono" aria-hidden="true">{{ h.severidad === 'ERROR' ? '✕' : '!' }}</span>
+                  {{ h.mensaje }}
+                </li>
+              }
+            </ul>
+          </div>
+        }
+      }
+    }
+
+    <div class="card editor-card publicacion__zona-riesgo">
+      <h3 class="publicacion__zona-riesgo-titulo">Zona de riesgo</h3>
+      <p class="editor-material-info">
+        Elimina el curso y todo su contenido de forma permanente. Solo es posible mientras sigue en borrador.
+      </p>
+      <div class="publicacion__acciones">
+        <button type="button" class="btn btn--peligro" [disabled]="eliminando()" (click)="eliminarCurso()">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+            <path d="M10 11v6" />
+            <path d="M14 11v6" />
+            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+          </svg>
+          {{ eliminando() ? 'Eliminando…' : 'Eliminar curso' }}
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (estadoCodigo === 'PUBLICADO') {
+    <div class="card editor-card publicacion__grupo">
+      <h3>Antes de iniciar</h3>
+      <p class="editor-material-info">Adelanta el inicio ahora mismo, o retrasa la fecha programada.</p>
+      <div class="publicacion__acciones">
+        <button type="button" class="btn btn--primario" [disabled]="adelantando()" (click)="adelantarInicio()">
+          {{ adelantando() ? 'Adelantando…' : 'Adelantar inicio' }}
+        </button>
+      </div>
+      <div class="publicacion__retraso">
+        <input
+          class="input"
+          type="date"
+          [min]="minFechaRetraso()"
+          [max]="fechaFin ?? ''"
+          [value]="fechaRetraso()"
+          (input)="fechaRetraso.set($any($event.target).value)"
+        />
+        <button type="button" class="btn btn--secundario" [disabled]="retrasando()" (click)="retrasarInicio()">
+          {{ retrasando() ? 'Guardando…' : 'Retrasar inicio' }}
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (estadoCodigo === 'PUBLICADO' || estadoCodigo === 'EN_CURSO') {
+    <div class="card editor-card publicacion__zona-riesgo">
+      <h3 class="publicacion__zona-riesgo-titulo">Zona de riesgo</h3>
+      <p class="editor-material-info">
+        Cerrar deja de ofrecer el curso para nuevas matrículas; quienes ya cursan conservan su acceso vigente.
+      </p>
+      <textarea
+        class="input"
+        placeholder="Motivo (opcional)"
+        rows="2"
+        [value]="motivoCierre()"
+        (input)="motivoCierre.set($any($event.target).value)"
+      ></textarea>
+      <div class="publicacion__acciones">
+        <button type="button" class="btn btn--peligro" [disabled]="cerrando()" (click)="cerrar()">
+          {{ cerrando() ? 'Cerrando…' : 'Cerrar curso' }}
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (estadoCodigo === 'CERRADO') {
+    <div class="card editor-card">
+      <div class="alerta alerta--info">
+        <span class="alerta__icono">i</span>
+        <div class="alerta__titulo">Este curso está cerrado. No admite nuevas matrículas; duplícalo para una nueva convocatoria.</div>
+      </div>
+    </div>
+  }
+</section>

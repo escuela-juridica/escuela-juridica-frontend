@@ -1,0 +1,1018 @@
+@if (curso() === undefined) {
+  <p class="editor-estado">Cargando…</p>
+} @else if (curso() === null) {
+  <div class="alerta alerta--error">
+    <span class="alerta__icono">!</span>
+    <div class="alerta__titulo">No encontramos ese curso.</div>
+  </div>
+} @else {
+  @let c = curso()!;
+
+  <div class="editor-migas">
+    <a routerLink="/admin/cursos" class="editor-migas__enlace">Cursos</a>
+    <span>/</span>
+    <span>Editor</span>
+  </div>
+  <div class="editor-titulo-fila">
+    <button type="button" class="editor-volver" (click)="volverAlListado()" aria-label="Volver a cursos">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5" />
+        <path d="M12 19l-7-7 7-7" />
+      </svg>
+      Volver
+    </button>
+    <h1 class="editor-titulo">{{ c.titulo }}</h1>
+  </div>
+
+  @if (mensaje(); as m) {
+    @if (!hayModalContenidoAbierto) {
+      <div class="alerta editor-alerta" [class.alerta--error]="m.tipo === 'error'" [class.alerta--exito]="m.tipo === 'exito'">
+        <span class="alerta__icono">{{ m.tipo === 'error' ? '!' : '✓' }}</span>
+        <div class="alerta__titulo">{{ m.texto }}</div>
+        <button type="button" class="alerta__cerrar" (click)="cerrarMensaje()" aria-label="Cerrar">✕</button>
+      </div>
+    }
+  }
+
+  <app-alerta-global />
+
+  <div class="editor-tabs" role="tablist">
+    @for (pestana of pestanasVisibles(); track pestana.id) {
+      <button
+        type="button"
+        role="tab"
+        class="editor-tab"
+        [class.editor-tab--activa]="tabActiva() === pestana.id"
+        [attr.aria-selected]="tabActiva() === pestana.id"
+        (click)="cambiarPestana(pestana.id)"
+      >
+        {{ pestana.etiqueta }}
+      </button>
+    }
+  </div>
+
+  @switch (tabActiva()) {
+    @case ('informacion') {
+      <form class="editor-form" [formGroup]="formInformacion" (ngSubmit)="guardarTodo()">
+        @if (errorInformacion()) {
+          <div class="alerta alerta--error editor-card__alerta">
+            <span class="alerta__icono">!</span>
+            <div class="alerta__titulo">{{ errorInformacion() }}</div>
+          </div>
+        }
+
+        <div class="card editor-card">
+          <h2 class="editor-card__titulo">Datos generales</h2>
+          <div class="editor-campos editor-campos--2">
+            <div class="editor-campo--ancho">
+              <label class="label" for="ed-titulo">Título del curso</label>
+              <input id="ed-titulo" class="input" formControlName="titulo" [class.input--error]="campoInvalido('titulo')" />
+              @if (campoInvalido('titulo')) {
+                <div class="campo-error">Ingresa el título del curso.</div>
+              }
+            </div>
+            <div>
+              <label class="label"><span>URL amigable</span><span class="nota-pill">Opcional</span></label>
+              <input class="input" formControlName="urlAmigable" placeholder="diplomado-derecho-registral" />
+            </div>
+            <div>
+              <label class="label">Tipo de programa</label>
+              <select class="input" formControlName="tipoCursoId">
+                <option [ngValue]="null">Sin tipo</option>
+                @for (tipo of tiposCurso(); track tipo.id) {
+                  <option [ngValue]="tipo.id">{{ tipo.nombre }}</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label class="label">Categoría temática</label>
+              <select class="input" formControlName="categoriaTematicaId">
+                <option [ngValue]="null">Sin categoría</option>
+                @for (categoria of categorias(); track categoria.id) {
+                  <option [ngValue]="categoria.id">{{ categoria.nombre }}</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label class="label">Entidad certificadora</label>
+              <select class="input" formControlName="entidadCertificadoraId">
+                <option [ngValue]="null">Sin entidad</option>
+                @for (entidad of entidades(); track entidad.id) {
+                  <option [ngValue]="entidad.id">{{ entidad.nombre }}</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label class="label"><span>Portada</span><span class="nota-pill">Opcional</span></label>
+              <input class="input" formControlName="imagenPortadaUrl" placeholder="img/cursos/..." />
+            </div>
+            <div class="editor-campo--ancho">
+              <label class="label"><span>Descripción</span><span class="nota-pill">Opcional</span></label>
+              <textarea class="input" rows="3" formControlName="descripcion"></textarea>
+            </div>
+            <div>
+              <label class="interruptor">
+                <input type="checkbox" class="interruptor__entrada" formControlName="destacado" />
+                <span class="interruptor__pista"><span class="interruptor__perilla"></span></span>
+                <span class="interruptor__texto">Destacado en el catálogo</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="card editor-card">
+          <h2 class="editor-card__titulo">Condición comercial</h2>
+          <div class="editor-campos editor-campos--3">
+            <div>
+              <label class="label">Condición</label>
+              <select class="input" formControlName="tipoVenta">
+                <option value="GRATUITO">Gratuito</option>
+                <option value="PAGADO">Pagado</option>
+              </select>
+            </div>
+            <div>
+              <label class="label">Precio regular (S/)</label>
+              <input class="input" type="number" min="0" step="0.01" formControlName="precioRegular" [class.input--error]="campoInvalido('precioRegular')" />
+              @if (campoInvalido('precioRegular')) {
+                <div class="campo-error">El precio no puede ser negativo.</div>
+              }
+            </div>
+            <div>
+              <label class="label"><span>Precio promocional (S/)</span><span class="nota-pill">Opcional</span></label>
+              <input class="input" type="number" min="0" step="0.01" formControlName="precioPromocional" />
+            </div>
+            <div>
+              <label class="label"><span>Promoción desde</span><span class="nota-pill">Opcional</span></label>
+              <input class="input" type="datetime-local" formControlName="promocionInicioEn" />
+            </div>
+            <div>
+              <label class="label"><span>Promoción hasta</span><span class="nota-pill">Opcional</span></label>
+              <input class="input" type="datetime-local" formControlName="promocionFinEn" />
+            </div>
+            <div></div>
+            <div>
+              <label class="label"><span>Capacidad (cupos)</span><span class="nota-pill">Opcional</span></label>
+              <input class="input" type="number" min="1" formControlName="cupoMaximo" placeholder="Sin límite" [class.input--error]="campoInvalido('cupoMaximo')" />
+              @if (campoInvalido('cupoMaximo')) {
+                <div class="campo-error">Debe ser mayor que cero.</div>
+              }
+            </div>
+            <div>
+              <label class="label"><span>Vigencia de acceso (días)</span><span class="nota-pill">Opcional</span></label>
+              <input class="input" type="number" min="1" formControlName="vigenciaAccesoDias" placeholder="Permanente" [class.input--error]="campoInvalido('vigenciaAccesoDias')" />
+              @if (campoInvalido('vigenciaAccesoDias')) {
+                <div class="campo-error">Debe ser mayor que cero.</div>
+              }
+            </div>
+            <div>
+              <label class="label"><span>Horas académicas</span><span class="nota-pill">Opcional</span></label>
+              <input class="input" type="number" min="0" step="0.5" formControlName="horasAcademicas" />
+            </div>
+          </div>
+        </div>
+
+        <div class="card editor-card">
+          <h2 class="editor-card__titulo">Modalidad y fechas</h2>
+          <div class="editor-campos editor-campos--3">
+            <div>
+              <label class="label">Modalidad</label>
+              <select class="input" formControlName="modalidad">
+                <option value="VIRTUAL">Virtual</option>
+                <option value="EN_VIVO">En vivo</option>
+                <option value="HIBRIDO">Híbrido</option>
+              </select>
+            </div>
+            <div>
+              <label class="label">{{ esVirtual ? 'Inicio (opcional)' : 'Fecha de inicio' }}</label>
+              <input class="input" type="date" formControlName="fechaInicio" [class.input--error]="campoInvalido('fechaInicio')" />
+              @if (campoInvalido('fechaInicio')) {
+                <div class="campo-error">Obligatoria para esta modalidad.</div>
+              }
+            </div>
+            @if (!esVirtual) {
+              <div>
+                <label class="label">Fecha de fin</label>
+                <input class="input" type="date" formControlName="fechaFin" [class.input--error]="campoInvalido('fechaFin')" />
+                @if (campoInvalido('fechaFin')) {
+                  <div class="campo-error">Obligatoria para esta modalidad.</div>
+                }
+              </div>
+              <div>
+                <label class="label"><span>Cierre de matrícula</span><span class="nota-pill">Opcional</span></label>
+                <input class="input" type="date" formControlName="fechaCierreMatricula" />
+              </div>
+            }
+          </div>
+          <div class="alerta alerta--info editor-nota">
+            <span class="alerta__icono">i</span>
+            <div class="alerta__texto">
+              @if (esVirtual) {
+                Un curso virtual no exige fecha de fin. El inicio es opcional.
+              } @else {
+                Las modalidades en vivo o híbridas exigen inicio y fin. El cierre de matrícula se puede
+                dejar vacío por ahora; más adelante se ajusta según la asistencia obligatoria.
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="card editor-card">
+          <h2 class="editor-card__titulo">Beneficios</h2>
+          <p class="editor-card__ayuda">
+            Se muestran en la ficha pública del curso. Máximo {{ beneficiosMaximo }}
+            ({{ beneficios().length }}/{{ beneficiosMaximo }}).
+          </p>
+          <div class="editor-beneficio-agregar editor-buscador">
+            <input
+              class="input"
+              [value]="nuevoBeneficio()"
+              [attr.maxlength]="beneficioLongitudMaxima"
+              (input)="actualizarBusquedaBeneficio($any($event.target).value)"
+              placeholder="Certificado digital incluido"
+            />
+            <button
+              type="button"
+              class="btn btn--secundario"
+              [disabled]="beneficios().length >= beneficiosMaximo"
+              (click)="agregarBeneficio()"
+            >
+              Agregar
+            </button>
+            @if (sugerenciasBeneficio().length > 0) {
+              <div class="editor-sugerencias">
+                @for (sugerencia of sugerenciasBeneficio(); track sugerencia) {
+                  <button type="button" class="editor-sugerencia" (click)="elegirSugerenciaBeneficio(sugerencia)">
+                    <span class="editor-sugerencia__texto">{{ sugerencia }}</span>
+                    <span class="editor-sugerencia__agregar">Usar</span>
+                  </button>
+                }
+              </div>
+            }
+          </div>
+          @if (beneficios().length > 0) {
+            <ul class="editor-beneficios">
+              @for (beneficio of beneficios(); track beneficio; let i = $index) {
+                <li class="editor-beneficios__item">
+                  <span>{{ beneficio }}</span>
+                  <button type="button" class="editor-beneficios__quitar" (click)="quitarBeneficio(i)" aria-label="Quitar">✕</button>
+                </li>
+              }
+            </ul>
+          } @else {
+            <div class="estado-vacio estado-vacio--editor estado-vacio--compact">
+              <span class="estado-vacio__icono" aria-hidden="true">+</span>
+              <h3 class="estado-vacio__titulo">Sin beneficios agregados</h3>
+              <p class="estado-vacio__texto">Escribe uno arriba para sumarlo al curso.</p>
+            </div>
+          }
+        </div>
+
+        <div class="card editor-card">
+          <h2 class="editor-card__titulo">Docentes</h2>
+          <p class="editor-card__ayuda">Busca y agrega los docentes; el orden de la lista es el de presentación.</p>
+
+          <div class="editor-buscador">
+            <input
+              class="input"
+              [value]="busquedaDocente()"
+              (input)="busquedaDocente.set($any($event.target).value)"
+              placeholder="Buscar docente por nombre…"
+            />
+            @if (mostrarSugerenciasDocente()) {
+              <div class="editor-sugerencias">
+                @if (docentesFiltrados().length === 0) {
+                  <p class="editor-sugerencias__vacio">Sin coincidencias.</p>
+                } @else {
+                  @for (docente of docentesFiltrados(); track docente.personaId) {
+                    <button type="button" class="editor-sugerencia" (click)="agregarDocente(docente.personaId)">
+                      <span class="editor-sugerencia__texto">
+                        <span>{{ docente.nombreCompleto }}</span>
+                        <span class="editor-fila-seleccion__cargo">{{ docente.cargoProfesional }}</span>
+                      </span>
+                      <span class="editor-sugerencia__agregar">Agregar</span>
+                    </button>
+                  }
+                }
+              </div>
+            }
+          </div>
+
+          @if (docentesSeleccionados().length > 0) {
+            <div class="editor-lista">
+              @for (id of docentesSeleccionados(); track id; let i = $index) {
+                <div class="editor-fila-seleccion">
+                  <span class="editor-fila-seleccion__principal">
+                    <span class="editor-fila-seleccion__numero">{{ i + 1 }}</span>
+                    <span>{{ datosDocente(id)?.nombreCompleto }}</span>
+                    <span class="editor-fila-seleccion__cargo">{{ datosDocente(id)?.cargoProfesional }}</span>
+                  </span>
+                  <span class="editor-fila-seleccion__orden">
+                    <button type="button" class="editor-orden-boton" [disabled]="i === 0" (click)="moverDocente(i, -1)" aria-label="Subir">↑</button>
+                    <button type="button" class="editor-orden-boton" [disabled]="i === docentesSeleccionados().length - 1" (click)="moverDocente(i, 1)" aria-label="Bajar">↓</button>
+                    <button type="button" class="editor-orden-boton editor-orden-boton--quitar" (click)="quitarDocente(id)" aria-label="Quitar">✕</button>
+                  </span>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="estado-vacio estado-vacio--editor estado-vacio--compact">
+              <span class="estado-vacio__icono" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3"/><path d="M5 21a7 7 0 0 1 14 0"/></svg></span>
+              <h3 class="estado-vacio__titulo">Sin docentes asignados</h3>
+              <p class="estado-vacio__texto">Busca y agrega los docentes que aparecerán en el curso.</p>
+            </div>
+          }
+        </div>
+
+        <div class="card editor-card">
+          <h2 class="editor-card__titulo">Firmantes</h2>
+          <p class="editor-card__ayuda">Personas autorizadas para firmar el certificado de este curso.</p>
+
+          <div class="editor-buscador">
+            <input
+              class="input"
+              [value]="busquedaFirmante()"
+              (input)="busquedaFirmante.set($any($event.target).value)"
+              placeholder="Buscar firmante por nombre…"
+            />
+            @if (mostrarSugerenciasFirmante()) {
+              <div class="editor-sugerencias">
+                @if (firmantesFiltrados().length === 0) {
+                  <p class="editor-sugerencias__vacio">Sin coincidencias.</p>
+                } @else {
+                  @for (firmante of firmantesFiltrados(); track firmante.id) {
+                    <button type="button" class="editor-sugerencia" (click)="agregarFirmante(firmante.id)">
+                      <span class="editor-sugerencia__texto">
+                        <span>{{ firmante.nombreCompleto }}</span>
+                        <span class="editor-fila-seleccion__cargo">{{ firmante.cargoFirma }}</span>
+                      </span>
+                      <span class="editor-sugerencia__agregar">Agregar</span>
+                    </button>
+                  }
+                }
+              </div>
+            }
+          </div>
+
+          @if (firmantesSeleccionados().length > 0) {
+            <div class="editor-lista">
+              @for (id of firmantesSeleccionados(); track id; let i = $index) {
+                <div class="editor-fila-seleccion">
+                  <span class="editor-fila-seleccion__principal">
+                    <span class="editor-fila-seleccion__numero">{{ i + 1 }}</span>
+                    <span>{{ datosFirmante(id)?.nombreCompleto }}</span>
+                    <span class="editor-fila-seleccion__cargo">{{ datosFirmante(id)?.cargoFirma }}</span>
+                  </span>
+                  <span class="editor-fila-seleccion__orden">
+                    <button type="button" class="editor-orden-boton" [disabled]="i === 0" (click)="moverFirmante(i, -1)" aria-label="Subir">↑</button>
+                    <button type="button" class="editor-orden-boton" [disabled]="i === firmantesSeleccionados().length - 1" (click)="moverFirmante(i, 1)" aria-label="Bajar">↓</button>
+                    <button type="button" class="editor-orden-boton editor-orden-boton--quitar" (click)="quitarFirmante(id)" aria-label="Quitar">✕</button>
+                  </span>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="estado-vacio estado-vacio--editor estado-vacio--compact">
+              <span class="estado-vacio__icono" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m14 4 6 6M4 20l5-1 10-10a2.1 2.1 0 0 0-3-3L6 16l-2 4Z"/></svg></span>
+              <h3 class="estado-vacio__titulo">Sin firmantes asignados</h3>
+              <p class="estado-vacio__texto">Agrega los firmantes que correspondan al certificado.</p>
+            </div>
+          }
+        </div>
+
+        <div class="editor-form__acciones">
+          <button type="submit" class="btn btn--primario btn--grande" [disabled]="guardando()">
+            {{ guardando() ? 'Guardando…' : 'Guardar cambios' }}
+          </button>
+        </div>
+      </form>
+    }
+    @case ('contenido') {
+      <div class="editor-contenido">
+        @if (erroContenido()) {
+          <div class="alerta alerta--error editor-card__alerta">
+            <span class="alerta__icono">!</span>
+            <div class="alerta__titulo">{{ erroContenido() }}</div>
+          </div>
+        }
+
+        @if (cargandoContenido() && !contenidoCargado()) {
+          <p class="editor-estado">Cargando contenido…</p>
+        } @else {
+          <div class="editor-contenido__acciones">
+            <button type="button" class="btn btn--secundario" (click)="abrirCrearModulo()">+ Nuevo módulo</button>
+            <button type="button" class="btn btn--secundario" (click)="abrirModuloExistente()">+ Agregar módulo existente</button>
+            <label class="editor-ver-inactivos">
+              <span class="interruptor">
+                <input
+                  class="interruptor__entrada"
+                  type="checkbox"
+                  [checked]="verInactivosContenido()"
+                  (change)="verInactivosContenido.set($any($event.target).checked)"
+                />
+                <span class="interruptor__pista"><span class="interruptor__perilla"></span></span>
+              </span>
+              Ver inactivos
+            </label>
+          </div>
+
+          @if (modulos().length === 0) {
+            <div class="estado-vacio estado-vacio--editor">
+              <span class="estado-vacio__icono" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v2H4V5Z"/><path d="M4 9h16v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9Z"/><path d="M12 12v6M9 15h6"/></svg>
+              </span>
+              <h3 class="estado-vacio__titulo">El contenido del curso está vacío</h3>
+              <p class="estado-vacio__texto">Crea el primer módulo para comenzar a organizar lecciones, materiales y evaluaciones.</p>
+              <button type="button" class="btn btn--primario" (click)="abrirCrearModulo()">Crear primer módulo</button>
+            </div>
+          } @else if (modulosVisibles().length === 0) {
+            <div class="estado-vacio estado-vacio--editor estado-vacio--compact">
+              <span class="estado-vacio__icono" aria-hidden="true">≡</span>
+              <h3 class="estado-vacio__titulo">Todos los módulos están inactivos</h3>
+              <p class="estado-vacio__texto">Activa "Ver inactivos" para revisarlos.</p>
+            </div>
+          }
+
+          @for (modulo of modulosVisibles(); track modulo.id; let iM = $index) {
+            <div class="card editor-card editor-modulo card--acento-superior" [class.editor-modulo--inactivo]="!modulo.activo">
+              <div class="editor-modulo__cabecera" (click)="alternarModulo(modulo.id)">
+                <button type="button" class="editor-expandir" [class.editor-expandir--abierto]="moduloExpandido(modulo.id)" aria-label="Expandir módulo">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+                </button>
+                <span class="editor-modulo__icono">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                    <polyline points="2 17 12 22 22 17" />
+                    <polyline points="2 12 12 17 22 12" />
+                  </svg>
+                </span>
+                <div class="editor-modulo__titulo">
+                  <span class="editor-modulo__eyebrow">Módulo {{ iM + 1 }}</span>
+                  <span class="editor-modulo__nombre">
+                    {{ modulo.titulo }}
+                    @if (!modulo.activo) { <span class="badge badge--disp-cerrado">Inactivo</span> }
+                    @if (modulo.moduloOrigenId) { <span class="nota-pill">Copiado</span> }
+                  </span>
+                </div>
+                <span class="editor-modulo__meta">{{ modulo.lecciones.length }} lección(es)</span>
+                <div class="editor-fila-seleccion__orden" (click)="$event.stopPropagation()">
+                  <button type="button" class="editor-orden-boton" [disabled]="indiceRealModulo(modulo) === 0" (click)="moverModulo(indiceRealModulo(modulo), -1)" aria-label="Subir">↑</button>
+                  <button type="button" class="editor-orden-boton" [disabled]="indiceRealModulo(modulo) === modulos().length - 1" (click)="moverModulo(indiceRealModulo(modulo), 1)" aria-label="Bajar">↓</button>
+                  <button type="button" class="btn btn--acento editor-boton-chico" (click)="abrirEditarModulo(modulo)">Editar</button>
+                  <button
+                    type="button"
+                    class="btn editor-boton-chico"
+                    [class.btn--exito]="!modulo.activo"
+                    [class.btn--neutro]="modulo.activo"
+                    (click)="cambiarActivoModulo(modulo)"
+                  >
+                    {{ modulo.activo ? 'Desactivar' : 'Activar' }}
+                  </button>
+                  @if (puedeEliminarContenido()) {
+                    <button type="button" class="btn btn--peligro editor-boton-icono" (click)="eliminarModulo(modulo)" aria-label="Eliminar módulo" title="Eliminar módulo">
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                        <path d="M10 11v6" />
+                        <path d="M14 11v6" />
+                        <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                      </svg>
+                    </button>
+                  }
+                </div>
+              </div>
+
+              @if (moduloExpandido(modulo.id)) {
+                <div class="editor-modulo__cuerpo">
+                  @if (modulo.descripcion) {
+                    <p class="editor-card__ayuda">{{ modulo.descripcion }}</p>
+                  }
+
+                  @if (modulo.lecciones.length === 0) {
+                    <div class="estado-vacio estado-vacio--editor estado-vacio--compact">
+                      <span class="estado-vacio__icono" aria-hidden="true">≡</span>
+                      <h3 class="estado-vacio__titulo">Sin lecciones todavía</h3>
+                      <p class="estado-vacio__texto">Agrega una lección grabada o en vivo para continuar el módulo.</p>
+                    </div>
+                  }
+
+                  @for (leccion of leccionesVisibles(modulo); track leccion.id; let iL = $index) {
+                    <div class="editor-leccion" [class.editor-leccion--inactiva]="!leccion.activo">
+                      <div class="editor-leccion__cabecera" (click)="alternarLeccion(leccion.id)">
+                        <button type="button" class="editor-expandir" [class.editor-expandir--abierto]="leccionExpandida(leccion.id)" aria-label="Expandir lección">
+                          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+                        </button>
+                        <span class="editor-leccion__icono" [class.editor-leccion__icono--vivo]="leccion.tipo === 'EN_VIVO'">
+                          @if (leccion.tipo === 'EN_VIVO') {
+                            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                              <circle cx="12" cy="12" r="2" />
+                              <path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14" />
+                            </svg>
+                          } @else {
+                            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                              <circle cx="12" cy="12" r="10" />
+                              <polygon points="10 8 16 12 10 16 10 8" />
+                            </svg>
+                          }
+                        </span>
+                        <div class="editor-leccion__titulo">
+                          <span>{{ leccion.titulo }}</span>
+                          <span class="nota-pill">{{ etiquetaTipoLeccion(leccion.tipo) }}</span>
+                          @if (leccion.esObligatoria) { <span class="nota-pill">Obligatoria</span> }
+                          @if (leccion.esVistaPrevia) { <span class="nota-pill">Vista previa</span> }
+                          @if (leccion.tipo === 'EN_VIVO') {
+                            @if (leccion.fechaHoraInicio) {
+                              <span class="badge badge--disp-inmediato">{{ etiquetaSesion(leccion) }}</span>
+                            } @else {
+                              <span class="badge badge--disp-proximo">Sin programar</span>
+                            }
+                          }
+                          @if (!leccion.activo) { <span class="badge badge--disp-cerrado">Inactiva</span> }
+                        </div>
+                        <span class="editor-leccion__meta">{{ leccion.materiales.length }} material(es)</span>
+                        <div class="editor-fila-seleccion__orden" (click)="$event.stopPropagation()">
+                          <button type="button" class="editor-orden-boton" [disabled]="indiceRealLeccion(modulo, leccion) === 0" (click)="moverLeccion(modulo.id, indiceRealLeccion(modulo, leccion), -1)" aria-label="Subir">↑</button>
+                          <button type="button" class="editor-orden-boton" [disabled]="indiceRealLeccion(modulo, leccion) === modulo.lecciones.length - 1" (click)="moverLeccion(modulo.id, indiceRealLeccion(modulo, leccion), 1)" aria-label="Bajar">↓</button>
+                          @if (leccion.tipo === 'EN_VIVO') {
+                            <button type="button" class="btn btn--secundario editor-boton-chico" (click)="abrirProgramarSesion(leccion)">Programar sesión</button>
+                          }
+                          <button type="button" class="btn btn--acento editor-boton-chico" (click)="abrirEditarLeccion(modulo.id, leccion)">Editar</button>
+                          <button
+                            type="button"
+                            class="btn editor-boton-chico"
+                            [class.btn--exito]="!leccion.activo"
+                            [class.btn--neutro]="leccion.activo"
+                            (click)="cambiarActivoLeccion(modulo.id, leccion)"
+                          >
+                            {{ leccion.activo ? 'Desactivar' : 'Activar' }}
+                          </button>
+                          @if (puedeEliminarContenido()) {
+                            <button type="button" class="btn btn--peligro editor-boton-icono" (click)="eliminarLeccion(modulo.id, leccion)" aria-label="Eliminar lección" title="Eliminar lección">
+                              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="3 6 5 6 21 6" />
+                                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                                <path d="M10 11v6" />
+                                <path d="M14 11v6" />
+                                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                              </svg>
+                            </button>
+                          }
+                        </div>
+                      </div>
+
+                      @if (leccionExpandida(leccion.id)) {
+                        <div class="editor-leccion__cuerpo">
+                          @if (leccion.materiales.length === 0) {
+                            <div class="estado-vacio estado-vacio--editor estado-vacio--compact">
+                              <span class="estado-vacio__icono" aria-hidden="true">↗</span>
+                              <h3 class="estado-vacio__titulo">Sin materiales todavía</h3>
+                              <p class="estado-vacio__texto">Adjunta un archivo, video o enlace para esta lección.</p>
+                            </div>
+                          } @else {
+                            <div class="editor-materiales">
+                              @for (material of materialesVisibles(leccion); track material.id; let iMat = $index) {
+                                <div class="editor-material" [class.editor-material--inactivo]="!material.activo">
+                                  <span class="editor-material__icono" [attr.data-origen]="material.recurso.origen">
+                                    @switch (material.recurso.origen) {
+                                      @case ('YOUTUBE') {
+                                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                          <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+                                          <polygon points="23 7 16 12 23 17 23 7" />
+                                        </svg>
+                                      }
+                                      @case ('EXTERNO') {
+                                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                                          <polyline points="15 3 21 3 21 9" />
+                                          <line x1="10" y1="14" x2="21" y2="3" />
+                                        </svg>
+                                      }
+                                      @default {
+                                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                          <polyline points="14 2 14 8 20 8" />
+                                        </svg>
+                                      }
+                                    }
+                                  </span>
+                                  <span class="editor-material__principal">
+                                    <span class="editor-material__titulo">{{ material.titulo }}</span>
+                                    <span class="editor-material__detalle">
+                                      {{ etiquetaOrigenMaterial(material.recurso.origen) }}
+                                      @if (material.recurso.tamanoBytes) { · {{ formatearTamano(material.recurso.tamanoBytes) }} }
+                                      @if (material.permiteDescarga) { · Descargable }
+                                      @if (!material.activo) { · Inactivo }
+                                    </span>
+                                  </span>
+                                  <span class="editor-fila-seleccion__orden">
+                                    <button type="button" class="editor-orden-boton" [disabled]="indiceRealMaterial(leccion, material) === 0" (click)="moverMaterial(leccion.id, modulo.id, indiceRealMaterial(leccion, material), -1)" aria-label="Subir">↑</button>
+                                    <button type="button" class="editor-orden-boton" [disabled]="indiceRealMaterial(leccion, material) === leccion.materiales.length - 1" (click)="moverMaterial(leccion.id, modulo.id, indiceRealMaterial(leccion, material), 1)" aria-label="Bajar">↓</button>
+                                    <button type="button" class="btn btn--acento editor-boton-chico" (click)="abrirEditarMaterial(leccion.id, material)">Editar</button>
+                                    <button
+                                      type="button"
+                                      class="btn editor-boton-chico"
+                                      [class.btn--exito]="!material.activo"
+                                      [class.btn--neutro]="material.activo"
+                                      (click)="cambiarActivoMaterial(leccion.id, material)"
+                                    >
+                                      {{ material.activo ? 'Desactivar' : 'Activar' }}
+                                    </button>
+                                    @if (puedeEliminarContenido()) {
+                                      <button type="button" class="btn btn--peligro editor-boton-icono" (click)="eliminarMaterial(leccion.id, material)" aria-label="Eliminar material" title="Eliminar material">
+                                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="3 6 5 6 21 6" />
+                                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                                        <path d="M10 11v6" />
+                                        <path d="M14 11v6" />
+                                        <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                                      </svg>
+                                    </button>
+                                    }
+                                  </span>
+                                </div>
+                              }
+                            </div>
+                          }
+
+                          <button type="button" class="btn btn--secundario editor-boton-chico" (click)="abrirCrearMaterial(leccion.id)">+ Agregar material</button>
+                        </div>
+                      }
+                    </div>
+                  }
+
+                  <button type="button" class="btn btn--secundario editor-boton-chico" (click)="abrirCrearLeccion(modulo.id)">+ Nueva lección</button>
+                </div>
+              }
+            </div>
+          }
+        }
+      </div>
+
+      @if (modalModuloExistenteAbierto()) {
+        <app-modal titulo="Agregar módulo existente" ancho="lg" (cerrar)="cerrarModuloExistente()">
+          @if (mensaje(); as m) {
+            <div class="alerta editor-alerta" [class.alerta--error]="m.tipo === 'error'" [class.alerta--exito]="m.tipo === 'exito'">
+              <span class="alerta__icono">{{ m.tipo === 'error' ? '!' : '✓' }}</span><div class="alerta__titulo">{{ m.texto }}</div><button type="button" class="alerta__cerrar" (click)="cerrarMensaje()" aria-label="Cerrar">✕</button>
+            </div>
+          }
+          <div class="editor-buscador">
+            <input
+              class="input"
+              [value]="busquedaModuloExistente()"
+              (input)="buscarModuloExistente($any($event.target).value)"
+              placeholder="Buscar módulo por título…"
+            />
+          </div>
+          @if (buscandoModuloExistente()) {
+            <p class="editor-estado">Buscando…</p>
+          } @else if (resultadosModuloExistente().length === 0) {
+            <p class="editor-sugerencias__vacio">
+              {{ busquedaModuloExistente().trim() ? 'Sin coincidencias.' : 'Escribe para buscar módulos de otros cursos.' }}
+            </p>
+          } @else {
+            <div class="editor-lista">
+              @for (resultado of resultadosModuloExistente(); track resultado.id) {
+                <div class="editor-fila-seleccion">
+                  <span class="editor-fila-seleccion__principal">
+                    <span>{{ resultado.titulo }}</span>
+                    <span class="editor-fila-seleccion__cargo">{{ resultado.cursoTitulo }} · {{ resultado.cantidadLecciones }} lecciones</span>
+                  </span>
+                  <button type="button" class="btn btn--primario editor-boton-chico" (click)="copiarModulo(resultado.id)">Copiar aquí</button>
+                </div>
+              }
+            </div>
+          }
+        </app-modal>
+      }
+
+      @if (mostrarFormModulo()) {
+        <app-modal [titulo]="moduloEditId() ? 'Editar módulo' : 'Nuevo módulo'" (cerrar)="cancelarFormModulo()">
+          @if (mensaje(); as m) {
+            <div class="alerta editor-alerta" [class.alerta--error]="m.tipo === 'error'" [class.alerta--exito]="m.tipo === 'exito'"><span class="alerta__icono">{{ m.tipo === 'error' ? '!' : '✓' }}</span><div class="alerta__titulo">{{ m.texto }}</div><button type="button" class="alerta__cerrar" (click)="cerrarMensaje()" aria-label="Cerrar">✕</button></div>
+          }
+          <div class="editor-campos editor-campos--1">
+            <div>
+              <label class="label">Título</label>
+              <input class="input" [value]="moduloTitulo()" (input)="moduloTitulo.set($any($event.target).value)" />
+            </div>
+            <div>
+              <label class="label"><span>Descripción</span><span class="nota-pill">Opcional</span></label>
+              <textarea class="input" rows="3" [value]="moduloDescripcion()" (input)="moduloDescripcion.set($any($event.target).value)"></textarea>
+            </div>
+          </div>
+          <div class="editor-form__acciones">
+            <button type="button" class="btn btn--secundario" (click)="cancelarFormModulo()">Cancelar</button>
+            <button type="button" class="btn btn--primario" [disabled]="guardandoModulo()" (click)="guardarModulo()">
+              {{ guardandoModulo() ? 'Guardando…' : 'Guardar módulo' }}
+            </button>
+          </div>
+        </app-modal>
+      }
+
+      @if (leccionFormModuloId() !== null) {
+        <app-modal [titulo]="leccionEditId() ? 'Editar lección' : 'Nueva lección'" (cerrar)="cancelarFormLeccion()">
+          @if (mensaje(); as m) {
+            <div class="alerta editor-alerta" [class.alerta--error]="m.tipo === 'error'" [class.alerta--exito]="m.tipo === 'exito'"><span class="alerta__icono">{{ m.tipo === 'error' ? '!' : '✓' }}</span><div class="alerta__titulo">{{ m.texto }}</div><button type="button" class="alerta__cerrar" (click)="cerrarMensaje()" aria-label="Cerrar">✕</button></div>
+          }
+          <div class="editor-campos editor-campos--1">
+            <div>
+              <label class="label">Título</label>
+              <input class="input" [value]="leccionTitulo()" (input)="leccionTitulo.set($any($event.target).value)" />
+            </div>
+            <div>
+              <label class="label"><span>Descripción</span><span class="nota-pill">Opcional</span></label>
+              <textarea class="input" rows="2" [value]="leccionDescripcion()" (input)="leccionDescripcion.set($any($event.target).value)"></textarea>
+            </div>
+            <div class="editor-campos editor-campos--2">
+              <div>
+                <label class="label">Tipo</label>
+                <select class="input" [value]="leccionTipo()" (change)="cambiarTipoLeccionForm($any($event.target).value)">
+                  <option value="GRABADA">Grabada</option>
+                  <option value="EN_VIVO">En vivo</option>
+                </select>
+              </div>
+              <div class="editor-subform__switches">
+                <label class="interruptor">
+                  <input type="checkbox" class="interruptor__entrada" [checked]="leccionObligatoria()" (change)="leccionObligatoria.set($any($event.target).checked)" />
+                  <span class="interruptor__pista"><span class="interruptor__perilla"></span></span>
+                  <span class="interruptor__texto">Obligatoria</span>
+                </label>
+                @if (leccionTipo() !== 'EN_VIVO') {
+                  <label class="interruptor">
+                    <input type="checkbox" class="interruptor__entrada" [checked]="leccionVistaPrevia()" (change)="leccionVistaPrevia.set($any($event.target).checked)" />
+                    <span class="interruptor__pista"><span class="interruptor__perilla"></span></span>
+                    <span class="interruptor__texto">Vista previa pública</span>
+                  </label>
+                }
+              </div>
+            </div>
+            @if (leccionTipo() === 'EN_VIVO') {
+              <p class="editor-material-info">
+                La fecha, hora y enlace de la sesión se programan aparte, con "Programar sesión" sobre la lección ya creada.
+              </p>
+            }
+          </div>
+          <div class="editor-form__acciones">
+            <button type="button" class="btn btn--secundario" (click)="cancelarFormLeccion()">Cancelar</button>
+            <button type="button" class="btn btn--primario" [disabled]="guardandoLeccion()" (click)="guardarLeccion()">
+              {{ guardandoLeccion() ? 'Guardando…' : 'Guardar lección' }}
+            </button>
+          </div>
+        </app-modal>
+      }
+
+      @if (materialFormLeccionId() !== null) {
+        <app-modal [titulo]="materialEditId() ? 'Editar material' : 'Nuevo material'" ancho="lg" (cerrar)="cancelarFormMaterial()">
+          @if (mensaje(); as m) {
+            <div class="alerta editor-alerta" [class.alerta--error]="m.tipo === 'error'" [class.alerta--exito]="m.tipo === 'exito'"><span class="alerta__icono">{{ m.tipo === 'error' ? '!' : '✓' }}</span><div class="alerta__titulo">{{ m.texto }}</div><button type="button" class="alerta__cerrar" (click)="cerrarMensaje()" aria-label="Cerrar">✕</button></div>
+          }
+          @if (materialEditId()) {
+            <div class="editor-campos editor-campos--1">
+              <p class="editor-material-info">
+                <strong>Origen:</strong> {{ materialOrigenActual() }} · <strong>Tipo:</strong> {{ materialTipoNombreActual() }}
+              </p>
+              <div>
+                <label class="label">Título</label>
+                <input class="input" [value]="materialTitulo()" (input)="materialTitulo.set($any($event.target).value)" />
+              </div>
+              @if (materialOrigenCodigo() !== 'SUBIDO') {
+                <div>
+                  <label class="label">{{ materialOrigenCodigo() === 'YOUTUBE' ? 'URL del video' : 'URL del enlace' }}</label>
+                  <input class="input" [value]="materialReferencia()" (input)="materialReferencia.set($any($event.target).value)" />
+                </div>
+                @if (materialOrigenCodigo() === 'YOUTUBE') {
+                  <div>
+                    <label class="interruptor">
+                      <input type="checkbox" class="interruptor__entrada" [checked]="materialYoutubeNoListado()" (change)="materialYoutubeNoListado.set($any($event.target).checked)" />
+                      <span class="interruptor__pista"><span class="interruptor__perilla"></span></span>
+                      <span class="interruptor__texto">Confirmo que el video es "no listado"</span>
+                    </label>
+                  </div>
+                }
+              } @else {
+                <p class="editor-material-info">Este material es un archivo subido; para reemplazarlo, desactívalo y agrega uno nuevo.</p>
+              }
+              <div>
+                <label class="interruptor">
+                  <input type="checkbox" class="interruptor__entrada" [checked]="materialPermiteDescarga()" (change)="materialPermiteDescarga.set($any($event.target).checked)" />
+                  <span class="interruptor__pista"><span class="interruptor__perilla"></span></span>
+                  <span class="interruptor__texto">Permite descarga</span>
+                </label>
+              </div>
+            </div>
+          } @else {
+            <div class="editor-modo-selector">
+              <button type="button" class="editor-modo-opcion" [class.editor-modo-opcion--activa]="materialModo() === 'enlace'" (click)="elegirModoMaterial('enlace')">
+                <span class="editor-modo-opcion__icono">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                    <polyline points="15 3 21 3 21 9" />
+                    <line x1="10" y1="14" x2="21" y2="3" />
+                  </svg>
+                </span>
+                <span class="editor-modo-opcion__texto">
+                  <strong>Enlace</strong>
+                  <small>YouTube o un enlace externo</small>
+                </span>
+              </button>
+              <button type="button" class="editor-modo-opcion" [class.editor-modo-opcion--activa]="materialModo() === 'archivo'" (click)="elegirModoMaterial('archivo')">
+                <span class="editor-modo-opcion__icono">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                  </svg>
+                </span>
+                <span class="editor-modo-opcion__texto">
+                  <strong>Archivo</strong>
+                  <small>Subir un PDF, documento u otro archivo</small>
+                </span>
+              </button>
+            </div>
+
+            <div class="editor-campos editor-campos--1">
+              <div>
+                <label class="label">Título</label>
+                <input class="input" [value]="materialTitulo()" (input)="materialTitulo.set($any($event.target).value)" />
+              </div>
+              <div>
+                <label class="label">Tipo de material</label>
+                <select class="input" [value]="materialTipoMaterialId()" (change)="cambiarTipoMaterialForm(+$any($event.target).value)">
+                  @for (tipo of tiposMaterial(); track tipo.id) {
+                    <option [value]="tipo.id">{{ tipo.nombre }}</option>
+                  }
+                </select>
+              </div>
+
+              @if (materialModo() === 'enlace') {
+                @if (tipoMaterialEsVideo()) {
+                  <div class="editor-campos editor-campos--2">
+                    <div>
+                      <label class="label">Origen</label>
+                      <select class="input" [value]="materialOrigen()" (change)="materialOrigen.set($any($event.target).value)">
+                        <option value="YOUTUBE">YouTube</option>
+                        <option value="EXTERNO">Enlace externo</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label class="label">{{ materialOrigen() === 'YOUTUBE' ? 'URL del video' : 'URL del enlace' }}</label>
+                      <input class="input" [value]="materialReferencia()" (input)="materialReferencia.set($any($event.target).value)" />
+                    </div>
+                  </div>
+                  @if (materialOrigen() === 'YOUTUBE') {
+                    <div>
+                      <label class="interruptor">
+                        <input type="checkbox" class="interruptor__entrada" [checked]="materialYoutubeNoListado()" (change)="materialYoutubeNoListado.set($any($event.target).checked)" />
+                        <span class="interruptor__pista"><span class="interruptor__perilla"></span></span>
+                        <span class="interruptor__texto">Confirmo que el video es "no listado"</span>
+                      </label>
+                    </div>
+                  }
+                } @else {
+                  <div>
+                    <label class="label">URL del enlace</label>
+                    <input class="input" [value]="materialReferencia()" (input)="materialReferencia.set($any($event.target).value)" />
+                  </div>
+                }
+              } @else {
+                <div>
+                  <label class="label">Archivo</label>
+                  <input class="input" type="file" (change)="archivoSeleccionado($event)" />
+                  @if (materialArchivo()) {
+                    <p class="editor-material-info">Seleccionado: {{ materialArchivo()!.name }}</p>
+                  }
+                </div>
+              }
+
+              <div>
+                <label class="interruptor">
+                  <input type="checkbox" class="interruptor__entrada" [checked]="materialPermiteDescarga()" (change)="materialPermiteDescarga.set($any($event.target).checked)" />
+                  <span class="interruptor__pista"><span class="interruptor__perilla"></span></span>
+                  <span class="interruptor__texto">Permite descarga</span>
+                </label>
+              </div>
+            </div>
+          }
+          <div class="editor-form__acciones">
+            <button type="button" class="btn btn--secundario" (click)="cancelarFormMaterial()">Cancelar</button>
+            <button type="button" class="btn btn--primario" [disabled]="guardandoMaterial()" (click)="guardarMaterial()">
+              {{ guardandoMaterial() ? 'Guardando…' : 'Guardar material' }}
+            </button>
+          </div>
+        </app-modal>
+      }
+    }
+    @case ('examenes') {
+      <app-examenes-tab [cursoId]="cursoId" [modalidad]="c.modalidad" [modulosDisponibles]="modulosActivosParaExamen()" [estadoCodigo]="c.estadoCodigo" />
+    }
+    @case ('sesiones') {
+      <section class="editor-sesiones" aria-label="Sesiones en vivo del curso">
+        <div class="editor-sesiones__encabezado">
+          <div>
+            <h2 class="editor-card__titulo">Sesiones en vivo</h2>
+            <p class="editor-sesiones__ayuda">Programa las lecciones en vivo creadas en el contenido del curso.</p>
+          </div>
+        </div>
+
+        @if (cargandoContenido() && !contenidoCargado()) {
+          <p class="editor-estado">Cargando sesiones…</p>
+        } @else if (esVirtual) {
+          <div class="estado-vacio estado-vacio--editor">
+            <span class="estado-vacio__icono" aria-hidden="true">◷</span>
+            <h3 class="estado-vacio__titulo">Este curso es virtual</h3>
+            <p class="estado-vacio__texto">Los cursos virtuales no programan sesiones en vivo.</p>
+          </div>
+        } @else if (sesionesEnVivo().length === 0) {
+          <div class="estado-vacio estado-vacio--editor">
+            <span class="estado-vacio__icono" aria-hidden="true">◷</span>
+            <h3 class="estado-vacio__titulo">Aún no hay lecciones en vivo</h3>
+            <p class="estado-vacio__texto">Crea una lección de tipo “En vivo” desde Contenido para poder programarla.</p>
+            <button type="button" class="btn btn--primario" (click)="cambiarPestana('contenido')">Crear lección en vivo</button>
+          </div>
+        } @else {
+          <div class="editor-sesiones__lista">
+            @for (sesion of sesionesEnVivo(); track sesion.leccion.id) {
+              <article class="editor-sesion">
+                <span class="editor-sesion__icono" aria-hidden="true">◉</span>
+                <div class="editor-sesion__principal">
+                  <span class="editor-sesion__modulo">Módulo: {{ sesion.moduloTitulo }}</span>
+                  <h3 class="editor-sesion__titulo">{{ sesion.leccion.titulo }}</h3>
+                  @if (sesion.leccion.fechaHoraInicio && sesion.leccion.fechaHoraFin) {
+                    <span class="editor-sesion__fecha">{{ etiquetaSesion(sesion.leccion) }}</span>
+                    @if (sesion.leccion.enlaceReunion) {
+                      <span class="editor-sesion__enlace">Enlace registrado</span>
+                    } @else {
+                      <span class="editor-sesion__enlace editor-sesion__enlace--pendiente">Sin enlace registrado</span>
+                    }
+                  } @else {
+                    <span class="badge badge--disp-proximo">Sin programar</span>
+                  }
+                </div>
+                <button type="button" class="btn btn--acento" (click)="abrirProgramarSesion(sesion.leccion)">
+                  {{ sesion.leccion.fechaHoraInicio ? 'Editar programación' : 'Programar sesión' }}
+                </button>
+              </article>
+            }
+          </div>
+        }
+      </section>
+    }
+    @case ('certificacion') {
+      <app-requisitos-tab
+        [cursoId]="cursoId"
+        [modalidad]="c.modalidad"
+        [fechaInicio]="c.fechaInicio"
+        [fechaFin]="c.fechaFin"
+        (guardado)="recargarDespuesDeReglas()"
+      />
+    }
+    @case ('publicacion') {
+      <app-publicacion-tab
+        [cursoId]="cursoId"
+        [estadoCodigo]="c.estadoCodigo"
+        [estadoNombre]="c.estadoNombre"
+        [destacado]="c.destacado"
+        [tieneMatriculas]="c.tieneMatriculas"
+        [fechaInicio]="c.fechaInicio"
+        [fechaFin]="c.fechaFin"
+        (irAPestana)="irAPestanaDesdePublicacion($event)"
+        (publicado)="recargarDespuesDePublicar()"
+        (actualizado)="recargarDespuesDePublicar()"
+      />
+    }
+    @default {
+      <div class="card editor-card">
+        <p class="editor-pendiente">Esta pestaña se habilita en una historia aparte.</p>
+      </div>
+    }
+  }
+
+  @if (sesionLeccionId() !== null) {
+    <app-modal titulo="Programar sesión" (cerrar)="cancelarSesion()">
+      @if (mensaje(); as m) {
+        <div class="alerta editor-alerta" [class.alerta--error]="m.tipo === 'error'" [class.alerta--exito]="m.tipo === 'exito'"><span class="alerta__icono">{{ m.tipo === 'error' ? '!' : '✓' }}</span><div class="alerta__titulo">{{ m.texto }}</div><button type="button" class="alerta__cerrar" (click)="cerrarMensaje()" aria-label="Cerrar">✕</button></div>
+      }
+      <div class="editor-campos editor-campos--1">
+        <p class="editor-material-info">Escuela Juridica no crea ni administra la reunión; conserva el enlace que registras para los alumnos.</p>
+        <div class="editor-campos editor-campos--2">
+          <div>
+            <label class="label">Inicio</label>
+            <input class="input" type="datetime-local" [value]="sesionFechaInicio()" (input)="sesionFechaInicio.set($any($event.target).value)" />
+          </div>
+          <div>
+            <label class="label">Fin</label>
+            <input class="input" type="datetime-local" [value]="sesionFechaFin()" (input)="sesionFechaFin.set($any($event.target).value)" />
+          </div>
+        </div>
+        <div>
+          <label class="label">Enlace de la reunión</label>
+          <input class="input" [value]="sesionEnlace()" (input)="sesionEnlace.set($any($event.target).value)" placeholder="https://..." />
+        </div>
+      </div>
+      <div class="editor-form__acciones">
+        <button type="button" class="btn btn--secundario" (click)="cancelarSesion()">Cancelar</button>
+        <button type="button" class="btn btn--primario" [disabled]="guardandoSesion()" (click)="guardarSesion()">
+          {{ guardandoSesion() ? 'Guardando…' : 'Guardar sesión' }}
+        </button>
+      </div>
+    </app-modal>
+  }
+}

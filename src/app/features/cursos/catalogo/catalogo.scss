@@ -1,5 +1,11 @@
 // PF-001 · Estilos propios de esta pantalla.
 
+.catalogo-ancla {
+  // Respaldo para la cabecera de escritorio, incluido su borde.
+  // Al paginar se ajusta a la altura real del header (tambien en movil).
+  scroll-margin-top: 73px;
+}
+
 .hero-catalogo {
   color: #ffffff;
   padding: 64px 24px;
@@ -226,6 +232,29 @@
   border: 1px solid var(--neutral-300);
   background: #fff;
   color: var(--neutral-800);
+}
+button.catalogo-paginacion__pagina {
+  cursor: pointer;
+  font-family: inherit;
+}
+button.catalogo-paginacion__pagina--activa {
+  border: 1px solid var(--marca-900);
+}
+
+.catalogo-esqueleto__linea {
+  height: 14px;
+  margin-bottom: 10px;
+}
+.catalogo-esqueleto__linea--corta {
+  width: 45%;
+}
+.catalogo-esqueleto__linea--media {
+  width: 70%;
+}
+
+.catalogo-error {
+  align-items: center;
+  gap: 16px;
 }
 
 .catalogo-vacio-icono {

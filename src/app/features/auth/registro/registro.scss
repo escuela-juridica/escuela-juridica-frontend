@@ -1,3 +1,260 @@
-// PF-004 · Estilos propios de esta pantalla.
-// PENDIENTE — pegar acá las clases .registro-* del bloque <style> de
-// maquetacion-html/HU-002-PF-004-registro.html
+// PF-004 · Estilos propios de la pantalla de creación de cuenta.
+
+.registro-fila {
+  display: flex;
+  align-items: stretch;
+  min-height: 100vh;
+  flex-wrap: wrap;
+}
+
+.registro-hero-col {
+  flex: 1 1 360px;
+  min-width: 280px;
+  color: #ffffff;
+  padding: 96px 48px 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  position: relative;
+  overflow: hidden;
+}
+
+.registro-hero-overlay {
+  background: linear-gradient(
+    160deg,
+    rgba(11, 23, 40, 0.92) 0%,
+    rgba(16, 56, 96, 0.88) 55%,
+    rgba(11, 23, 40, 0.8) 100%
+  );
+}
+
+.registro-hero-blob {
+  position: absolute;
+  bottom: -120px;
+  left: -60px;
+  width: 260px;
+  height: 260px;
+  border-radius: 999px;
+  background: rgba(200, 62, 77, 0.14);
+}
+
+.registro-hero-cita {
+  max-width: 360px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.registro-hero-comillas {
+  font-family: var(--fuente-editorial);
+  font-size: 48px;
+  line-height: 1;
+  color: var(--acento-500);
+  margin-bottom: 12px;
+}
+
+.registro-hero-texto {
+  font-family: var(--fuente-editorial);
+  font-size: 24px;
+  line-height: 34px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.registro-hero-firma {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.registro-hero-firma span:last-child {
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #9fd9db;
+}
+
+.registro-form-col {
+  flex: 1 1 480px;
+  min-width: 300px;
+  display: grid;
+  place-items: center;
+  padding: 48px 24px;
+  background: #ffffff;
+}
+
+.registro-form-ancho {
+  width: 100%;
+  max-width: 440px;
+}
+
+.registro-volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  color: var(--neutral-600);
+  margin-bottom: 28px;
+}
+
+.registro-titulo {
+  font-size: 32px;
+  line-height: 40px;
+  font-weight: 700;
+  color: var(--neutral-950);
+  margin: 0 0 8px;
+}
+
+.registro-subtitulo {
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--neutral-600);
+  margin: 0 0 24px;
+}
+
+app-boton-google-pendiente {
+  display: block;
+  margin-bottom: 20px;
+}
+
+.registro-divisor {
+  margin-bottom: 24px;
+}
+
+.registro-formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.registro-bloque__titulo {
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 700;
+  color: var(--neutral-950);
+  margin-bottom: 14px;
+}
+
+.registro-bloque__campos {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.registro-legales {
+  display: flex;
+  flex-direction: column;
+}
+
+.registro-legales a {
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.registro-antirobot {
+  margin-top: 8px;
+}
+
+.registro-antirobot--error {
+  border-color: var(--error);
+  background: var(--error-fondo);
+}
+
+.registro-checkbox--error {
+  color: var(--error);
+}
+
+.registro-checkbox-error {
+  margin-top: -6px;
+  margin-bottom: 6px;
+}
+
+.registro-reintentar-google {
+  align-self: center;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+}
+
+.registro-inicia-sesion {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--neutral-600);
+  text-align: center;
+  margin-top: -8px;
+}
+
+.registro-inicia-sesion a {
+  font-weight: 600;
+}
+
+.registro-whatsapp {
+  border-top: 1px solid var(--neutral-200);
+  margin-top: 8px;
+  padding-top: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.registro-whatsapp__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: var(--acento-050);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  color: var(--acento-700);
+}
+
+@media (max-width: 767px) {
+  .registro-hero-col {
+    flex-basis: 100%;
+    min-height: 280px;
+    padding: 56px 24px 40px;
+  }
+
+  .registro-hero-cita {
+    margin: auto 0;
+  }
+
+  .registro-form-col {
+    flex-basis: 100%;
+    min-width: 0;
+    padding: 32px 20px 48px;
+  }
+
+  .registro-volver {
+    margin-bottom: 24px;
+  }
+
+  .registro-titulo {
+    font-size: 28px;
+    line-height: 36px;
+  }
+}
+
+@media (max-width: 479px) {
+  .input-con-accion {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .input-con-accion .btn {
+    width: 100%;
+  }
+
+  .requisitos-pass-lista--horizontal {
+    flex-direction: column;
+  }
+}

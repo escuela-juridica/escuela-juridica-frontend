@@ -1,3 +1,144 @@
 // PF-009 · Estilos propios de esta pantalla.
 // PENDIENTE — pegar acá las clases .perfil-* del bloque <style> de
 // maquetacion-html/HU-005-PF-009-mi-perfil.html
+
+.perfil-titulo {
+    color: var(--neutral-950);
+    margin: 0 0 24px;
+    font-size: 28px;
+    line-height: 36px;
+    font-weight: 700;
+}
+
+.perfil-layout {
+    display: flex;
+    gap: 32px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.perfil-sidebar {
+    flex: 0 1 260px;
+    width: min(260px, 100%);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.perfil-tarjeta-usuario {
+    text-align: center;
+}
+
+.perfil-tarjeta-usuario__nombre {
+    font-size: 16px;
+    line-height: 22px;
+    font-weight: 600;
+    color: var(--neutral-950);
+}
+
+.perfil-tarjeta-usuario__correo {
+    font-size: 13px;
+    line-height: 18px;
+    color: var(--neutral-500);
+    margin-top: 2px;
+    word-break: break-word;
+}
+
+.perfil-tabs {
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.perfil-tab {
+    height: 44px;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    border-radius: var(--radio-md);
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 20px;
+    border-left: 3px solid transparent;
+    color: var(--neutral-600);
+    font-weight: 400;
+}
+
+.perfil-tab--activa {
+    border-left-color: var(--rojo-marca-600);
+    background: var(--neutral-050);
+    color: var(--rojo-marca-600);
+    font-weight: 600;
+}
+
+.perfil-contenido {
+    flex: 1 1 420px;
+    min-width: min(300px, 100%);
+    max-width: 720px;
+}
+
+.perfil-contenido h2 {
+    font-size: 20px;
+    line-height: 28px;
+    font-weight: 600;
+    color: var(--neutral-950);
+    margin: 0 0 20px;
+}
+
+.perfil-alerta {
+    margin-bottom: 20px;
+}
+
+.perfil-campos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+    gap: 20px;
+}
+
+.perfil-guardado {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 600;
+    color: var(--exito);
+    margin-top: 20px;
+}
+
+.perfil-acciones {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 24px;
+    flex-wrap: wrap;
+}
+
+.perfil-seguridad h2 {
+    margin: 0 0 6px;
+}
+
+.perfil-seguridad__texto {
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--neutral-600);
+    margin: 0 0 20px;
+}
+
+.perfil-seguridad__exito {
+    background: var(--exito-fondo);
+    border: 1px solid var(--exito-borde);
+    border-radius: var(--radio-md);
+    padding: var(--esp-04);
+    margin-bottom: 20px;
+    max-width: 420px;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 600;
+    color: var(--exito);
+}
+
+.perfil-seguridad__formulario {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 420px;
+}

@@ -1,3 +1,88 @@
 // PF-005 · Estilos propios de esta pantalla.
-// PENDIENTE — pegar acá las clases .verif-* del bloque <style> de
-// maquetacion-html/HU-003-PF-005-verificar-correo.html
+.verif-max {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.verif-tarjeta {
+  width: 100%;
+  max-width: 410px;
+  margin: 0 auto;
+  padding: 24px;
+  text-align: center;
+
+  h1 {
+    margin: 0 0 8px;
+    font-size: 26px;
+    line-height: 32px;
+    color: var(--neutral-950);
+  }
+
+  p {
+    margin: 0 0 16px;
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--neutral-600);
+  }
+}
+
+.verif-alerta {
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.verif-input-wrap {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.verif-input {
+  width: 100%;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 8px;
+}
+
+.verif-boton {
+  width: auto;
+  min-width: 100px;
+  margin: 0 auto 16px;
+}
+
+.verif-reenviar {
+  font-size: 12px;
+  color: var(--neutral-600);
+  text-align: center;
+}
+
+.verif-reenviar a,
+.verif-reenviar__boton {
+  color: var(--marca-700);
+}
+
+.verif-reenviar__boton {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+@media (max-width: 480px) {
+  .verif-max {
+    padding: 16px;
+  }
+
+  .verif-tarjeta {
+    padding: 20px 16px;
+
+    h1 {
+      font-size: 22px;
+      line-height: 28px;
+    }
+  }
+}
+

@@ -22,8 +22,12 @@
       magistrados en ejercicio.
     </p>
     <div class="hero-catalogo__buscador">
-      <input class="input" placeholder="Busca por título o descripción del curso" />
-      <button type="button" class="btn btn--grande btn--acento">Buscar</button>
+      <input
+        class="input"
+        [formControl]="filtros.controls.texto"
+        placeholder="Busca por título o descripción del curso"
+      />
+      <button type="button" class="btn btn--grande btn--acento" (click)="reintentar()">Buscar</button>
     </div>
     <div class="hero-catalogo__puntos">
       @for (img of heroImgs; track img; let i = $index) {
@@ -38,199 +42,189 @@
 </div>
 
 <!-- Filtros y grilla -->
-<div class="contenedor">
-  <div class="catalogo-filtros">
+<div class="contenedor catalogo-ancla" #anclaCatalogo>
+  <div class="catalogo-filtros" [formGroup]="filtros">
     <div class="catalogo-filtro">
-      <label class="label">Tipo de curso</label>
-      <select class="catalogo-select">
-        <option>Todos</option>
-        <option>Diplomado</option>
-        <option>Especialización</option>
-        <option>Curso</option>
-        <option>Actualización</option>
+      <label class="label" for="catalogo-tipo">Tipo de curso</label>
+      <select id="catalogo-tipo" class="catalogo-select" formControlName="tipo">
+        <option value="">Todos</option>
+        @for (tipo of tipos(); track tipo.codigo) {
+          <option [value]="tipo.codigo">{{ tipo.nombre }}</option>
+        }
       </select>
     </div>
     <div class="catalogo-filtro catalogo-filtro--ancho">
-      <label class="label">Categoría temática</label>
-      <select class="catalogo-select">
-        <option>Todos</option>
-        <option>Derecho Registral</option>
-        <option>Contrataciones del Estado</option>
-        <option>Derecho Penal</option>
-        <option>Derecho Laboral</option>
-        <option>Derecho Tributario</option>
-        <option>Derecho Administrativo</option>
-        <option>Litigación</option>
-        <option>Arbitraje</option>
-        <option>Gestión Pública</option>
+      <label class="label" for="catalogo-categoria">Categoría temática</label>
+      <select id="catalogo-categoria" class="catalogo-select" formControlName="categoria">
+        <option value="">Todos</option>
+        @for (categoria of categorias(); track categoria.codigo) {
+          <option [value]="categoria.codigo">{{ categoria.nombre }}</option>
+        }
       </select>
     </div>
-    <button type="button" class="btn btn--secundario">Limpiar todo</button>
+    <button
+      type="button"
+      class="btn btn--secundario"
+      [disabled]="!hayFiltrosAplicados()"
+      (click)="limpiarTodo()"
+    >
+      Limpiar todo
+    </button>
   </div>
 
   <div class="catalogo-resultados-cabecera">
     <h2 class="tipo-h2" style="color: var(--neutral-950); margin: 0">Todos los cursos</h2>
-    <span class="catalogo-resultados-conteo">9 cursos</span>
+    @if (estado() === 'listo' || estado() === 'vacio') {
+      <span class="catalogo-resultados-conteo">
+        {{ totalElementos() }} {{ totalElementos() === 1 ? 'curso' : 'cursos' }}
+      </span>
+    }
   </div>
 
-  <div class="catalogo-grid">
-    <!-- Tarjeta 1 · Diplomado en Derecho Registral y Notarial (destacado, virtual, inicio inmediato) -->
-    <article class="card tarjeta-curso">
-      <div class="tarjeta-curso__imagen" style="background-image: linear-gradient(180deg, rgba(16, 24, 40, 0.45) 0%, rgba(16, 24, 40, 0) 55%), url('/img/catalogo/curso-1.jpg')">
-        <span class="badge badge--modalidad-virtual badge--punto badge--sobre-foto">Virtual</span>
-        <div style="flex: 1"></div>
-        <span class="badge badge--destacado badge--sobre-foto">★ Destacado</span>
+  @switch (estado()) {
+    @case ('cargando') {
+      <div class="catalogo-grid">
+        @for (esqueleto of [0, 1, 2, 3, 4, 5]; track esqueleto) {
+          <article class="card tarjeta-curso">
+            <div class="tarjeta-curso__imagen catalogo-esqueleto"></div>
+            <div class="tarjeta-curso__info">
+              <div class="catalogo-esqueleto catalogo-esqueleto__linea catalogo-esqueleto__linea--corta"></div>
+              <div class="catalogo-esqueleto catalogo-esqueleto__linea"></div>
+              <div class="catalogo-esqueleto catalogo-esqueleto__linea catalogo-esqueleto__linea--media"></div>
+            </div>
+          </article>
+        }
       </div>
-      <div class="tarjeta-curso__info">
-        <div class="tarjeta-curso__categoria">Diplomado · Derecho Registral</div>
-        <h3 class="tarjeta-curso__nombre">Diplomado en Derecho Registral y Notarial</h3>
-        <div class="tarjeta-curso__docentes">
-          <div class="tarjeta-curso__avatares">
-            <span class="avatar avatar--sm tarjeta-curso__avatar">MC</span>
-            <span class="avatar avatar--sm tarjeta-curso__avatar tarjeta-curso__avatar--superpuesto">AM</span>
-          </div>
-          <span class="tarjeta-curso__docentes-nombres">Dra. Mariela Cárdenas Ruiz · Dr. Alfonso Miranda Cueto</span>
-        </div>
-        <div class="tarjeta-curso__horas">120 horas académicas</div>
-        <div class="tarjeta-curso__pie">
-          <div>
-            <div class="tarjeta-curso__precio-antes">S/ 650.00</div>
-            <div class="tarjeta-curso__precio">S/ 450.00</div>
-          </div>
-          <span class="badge badge--disp-inmediato">Inicio inmediato</span>
-        </div>
-        <button type="button" class="btn btn--primario btn--ancho-completo tarjeta-curso__boton" routerLink="/cursos/registral-notarial">Ver detalles</button>
-      </div>
-    </article>
+    }
 
-    <!-- Tarjeta 2 · Especialización en Contrataciones del Estado (destacado, híbrido, próximo) -->
-    <article class="card tarjeta-curso">
-      <div class="tarjeta-curso__imagen" style="background-image: linear-gradient(180deg, rgba(16, 24, 40, 0.45) 0%, rgba(16, 24, 40, 0) 55%), url('/img/catalogo/curso-2.jpg')">
-        <span class="badge badge--modalidad-hibrido badge--punto badge--sobre-foto">Híbrido</span>
-        <div style="flex: 1"></div>
-        <span class="badge badge--destacado badge--sobre-foto">★ Destacado</span>
-      </div>
-      <div class="tarjeta-curso__info">
-        <div class="tarjeta-curso__categoria">Especialización · Contrataciones del Estado</div>
-        <h3 class="tarjeta-curso__nombre">Especialización en Contrataciones del Estado</h3>
-        <div class="tarjeta-curso__docentes">
-          <span class="avatar avatar--sm tarjeta-curso__avatar">OV</span>
-          <span class="tarjeta-curso__docentes-nombres">Dr. Óscar Villanueva Paz</span>
+    @case ('error') {
+      <div class="alerta alerta--error catalogo-error">
+        <span class="alerta__icono">!</span>
+        <div>
+          <p class="alerta__titulo">No pudimos cargar el catálogo</p>
+          <p class="alerta__texto">Revisa tu conexión e inténtalo nuevamente.</p>
         </div>
-        <div class="tarjeta-curso__horas">96 horas académicas</div>
-        <div class="tarjeta-curso__pie">
-          <div class="tarjeta-curso__precio">S/ 380.00</div>
-          <span class="badge badge--disp-proximo">Inicia el 15 de setiembre de 2026</span>
-        </div>
-        <button type="button" class="btn btn--primario btn--ancho-completo tarjeta-curso__boton" routerLink="/cursos/registral-notarial">Ver detalles</button>
+        <button type="button" class="btn btn--secundario" (click)="reintentar()">Reintentar</button>
       </div>
-    </article>
+    }
 
-    <!-- Tarjeta 3 · Litigación Oral en el Proceso Penal (en vivo, próximo) -->
-    <article class="card tarjeta-curso">
-      <div class="tarjeta-curso__imagen" style="background-image: linear-gradient(180deg, rgba(16, 24, 40, 0.45) 0%, rgba(16, 24, 40, 0) 55%), url('/img/catalogo/curso-3.jpg')">
-        <span class="badge badge--modalidad-vivo badge--punto badge--sobre-foto">En vivo</span>
+    @case ('vacio') {
+      <div class="estado-vacio">
+        <div class="catalogo-vacio-icono"></div>
+        <h3 class="estado-vacio__titulo">Ningún curso coincide con estos filtros</h3>
+        <p class="estado-vacio__texto">
+          Hay cursos publicados, pero ninguno cumple la búsqueda y los filtros aplicados.
+        </p>
+        <button type="button" class="btn btn--primario" (click)="limpiarTodo()">Limpiar filtros</button>
       </div>
-      <div class="tarjeta-curso__info">
-        <div class="tarjeta-curso__categoria">Curso · Derecho Penal</div>
-        <h3 class="tarjeta-curso__nombre">Curso de Litigación Oral en el Proceso Penal</h3>
-        <div class="tarjeta-curso__docentes">
-          <span class="avatar avatar--sm tarjeta-curso__avatar">JR</span>
-          <span class="tarjeta-curso__docentes-nombres">Dr. Julio Ramírez Alcántara</span>
-        </div>
-        <div class="tarjeta-curso__horas">48 horas académicas</div>
-        <div class="tarjeta-curso__pie">
-          <div class="tarjeta-curso__precio">S/ 290.00</div>
-          <span class="badge badge--disp-proximo">Inicia el 2 de setiembre de 2026</span>
-        </div>
-        <button type="button" class="btn btn--primario btn--ancho-completo tarjeta-curso__boton" routerLink="/cursos/registral-notarial">Ver detalles</button>
-      </div>
-    </article>
+    }
 
-    <!-- Tarjeta 4 · Derecho Laboral y Procesal Laboral (destacado, virtual, inmediato) -->
-    <article class="card tarjeta-curso">
-      <div class="tarjeta-curso__imagen" style="background-image: linear-gradient(180deg, rgba(16, 24, 40, 0.45) 0%, rgba(16, 24, 40, 0) 55%), url('/img/catalogo/curso-4.jpg')">
-        <span class="badge badge--modalidad-virtual badge--punto badge--sobre-foto">Virtual</span>
-        <div style="flex: 1"></div>
-        <span class="badge badge--destacado badge--sobre-foto">★ Destacado</span>
+    @default {
+      <div class="catalogo-grid">
+        @for (curso of cursos(); track curso.urlAmigable) {
+          <article class="card tarjeta-curso">
+            <div
+              class="tarjeta-curso__imagen"
+              [style.background-image]="fondoTarjeta(curso.imagenPortadaUrl)"
+            >
+              <span
+                class="badge badge--punto badge--sobre-foto"
+                [ngClass]="claseModalidad(curso.modalidad)"
+              >
+                {{ etiquetaModalidad(curso.modalidad) }}
+              </span>
+              @if (curso.destacado) {
+                <div style="flex: 1"></div>
+                <span class="badge badge--destacado badge--sobre-foto">★ Destacado</span>
+              }
+            </div>
+            <div class="tarjeta-curso__info">
+              <div class="tarjeta-curso__categoria">
+                {{ curso.tipoCursoNombre }} · {{ curso.categoriaNombre }}
+              </div>
+              <h3 class="tarjeta-curso__nombre">{{ curso.titulo }}</h3>
+              @if (curso.docentes.length > 0) {
+                <div class="tarjeta-curso__docentes">
+                  <div class="tarjeta-curso__avatares">
+                    @for (docente of curso.docentes; track docente.personaId; let i = $index) {
+                      <span
+                        class="avatar avatar--sm tarjeta-curso__avatar"
+                        [class.tarjeta-curso__avatar--superpuesto]="i > 0"
+                      >
+                        {{ docente.iniciales }}
+                      </span>
+                    }
+                  </div>
+                  <span class="tarjeta-curso__docentes-nombres">{{ nombresDocentes(curso) }}</span>
+                </div>
+              }
+              @if (curso.horasAcademicas) {
+                <div class="tarjeta-curso__horas">{{ curso.horasAcademicas }} horas académicas</div>
+              }
+              <div class="tarjeta-curso__pie">
+                <div>
+                  @if (curso.tipoVenta === 'GRATUITO') {
+                    <div class="tarjeta-curso__precio">Gratis</div>
+                  } @else {
+                    @if (curso.estadoComercial.promocionActiva) {
+                      <div class="tarjeta-curso__precio-antes">
+                        {{ formatearPrecio(curso.estadoComercial.precioRegular) }}
+                      </div>
+                    }
+                    <div class="tarjeta-curso__precio">
+                      {{ formatearPrecio(curso.estadoComercial.precioActual) }}
+                    </div>
+                  }
+                </div>
+                <span class="badge" [ngClass]="claseDisponibilidad(curso.estadoComercial.codigo)">
+                  {{ etiquetaDisponibilidad(curso) }}
+                </span>
+              </div>
+              <button
+                type="button"
+                class="btn btn--primario btn--ancho-completo tarjeta-curso__boton"
+                [routerLink]="['/cursos', curso.urlAmigable]"
+              >
+                Ver detalles
+              </button>
+            </div>
+          </article>
+        }
       </div>
-      <div class="tarjeta-curso__info">
-        <div class="tarjeta-curso__categoria">Diplomado · Derecho Laboral</div>
-        <h3 class="tarjeta-curso__nombre">Diplomado en Derecho Laboral y Procesal Laboral</h3>
-        <div class="tarjeta-curso__docentes">
-          <span class="avatar avatar--sm tarjeta-curso__avatar">AT</span>
-          <span class="tarjeta-curso__docentes-nombres">Dra. Ana Lucía Torres Bermúdez</span>
-        </div>
-        <div class="tarjeta-curso__horas">132 horas académicas</div>
-        <div class="tarjeta-curso__pie">
-          <div>
-            <div class="tarjeta-curso__precio-antes">S/ 700.00</div>
-            <div class="tarjeta-curso__precio">S/ 520.00</div>
-          </div>
-          <span class="badge badge--disp-inmediato">Inicio inmediato</span>
-        </div>
-        <button type="button" class="btn btn--primario btn--ancho-completo tarjeta-curso__boton" routerLink="/cursos/registral-notarial">Ver detalles</button>
-      </div>
-    </article>
 
-    <!-- Tarjeta 5 · Actualización en Tributación Municipal (gratuito, virtual, inmediato) -->
-    <article class="card tarjeta-curso">
-      <div class="tarjeta-curso__imagen" style="background-image: linear-gradient(180deg, rgba(16, 24, 40, 0.45) 0%, rgba(16, 24, 40, 0) 55%), url('/img/catalogo/curso-5.jpg')">
-        <span class="badge badge--modalidad-virtual badge--punto badge--sobre-foto">Virtual</span>
-      </div>
-      <div class="tarjeta-curso__info">
-        <div class="tarjeta-curso__categoria">Actualización · Derecho Tributario</div>
-        <h3 class="tarjeta-curso__nombre">Actualización en Tributación Municipal</h3>
-        <div class="tarjeta-curso__docentes">
-          <span class="avatar avatar--sm tarjeta-curso__avatar">CP</span>
-          <span class="tarjeta-curso__docentes-nombres">Mg. Carlos Peña Solórzano</span>
+      @if (totalPaginas() > 1) {
+        <div class="catalogo-paginacion">
+          <button
+            type="button"
+            class="btn btn--neutro"
+            [disabled]="pagina() === 0"
+            (click)="paginaAnterior()"
+          >
+            Anterior
+          </button>
+          @for (indice of paginasVisibles(); track indice) {
+            <button
+              type="button"
+              class="catalogo-paginacion__pagina"
+              [class.catalogo-paginacion__pagina--activa]="indice === pagina()"
+              [class.catalogo-paginacion__pagina--inactiva]="indice !== pagina()"
+              (click)="irAPagina(indice)"
+            >
+              {{ indice + 1 }}
+            </button>
+          }
+          <button
+            type="button"
+            class="btn btn--neutro"
+            [disabled]="pagina() >= totalPaginas() - 1"
+            (click)="paginaSiguiente()"
+          >
+            Siguiente
+          </button>
         </div>
-        <div class="tarjeta-curso__horas">24 horas académicas</div>
-        <div class="tarjeta-curso__pie">
-          <div class="tarjeta-curso__precio">Gratis</div>
-          <span class="badge badge--disp-inmediato">Inicio inmediato</span>
-        </div>
-        <button type="button" class="btn btn--primario btn--ancho-completo tarjeta-curso__boton" routerLink="/cursos/registral-notarial">Ver detalles</button>
-      </div>
-    </article>
-
-    <!-- Tarjeta 6 · Derecho Administrativo Sancionador (híbrido, en progreso) -->
-    <article class="card tarjeta-curso">
-      <div class="tarjeta-curso__imagen" style="background-image: linear-gradient(180deg, rgba(16, 24, 40, 0.45) 0%, rgba(16, 24, 40, 0) 55%), url('/img/catalogo/curso-6.jpg')">
-        <span class="badge badge--modalidad-hibrido badge--punto badge--sobre-foto">Híbrido</span>
-      </div>
-      <div class="tarjeta-curso__info">
-        <div class="tarjeta-curso__categoria">Especialización · Derecho Administrativo</div>
-        <h3 class="tarjeta-curso__nombre">Especialización en Derecho Administrativo Sancionador</h3>
-        <div class="tarjeta-curso__docentes">
-          <span class="avatar avatar--sm tarjeta-curso__avatar">FZ</span>
-          <span class="tarjeta-curso__docentes-nombres">Dr. Fernando Zegarra Lima</span>
-        </div>
-        <div class="tarjeta-curso__horas">88 horas académicas</div>
-        <div class="tarjeta-curso__pie">
-          <div class="tarjeta-curso__precio">S/ 410.00</div>
-          <span class="badge badge--disp-proximo">En progreso</span>
-        </div>
-        <button type="button" class="btn btn--primario btn--ancho-completo tarjeta-curso__boton" routerLink="/cursos/registral-notarial">Ver detalles</button>
-      </div>
-    </article>
-  </div>
-
-  <div class="catalogo-paginacion">
-    <button type="button" class="btn btn--neutro" disabled>Anterior</button>
-    <span class="catalogo-paginacion__pagina catalogo-paginacion__pagina--activa">1</span>
-    <span class="catalogo-paginacion__pagina catalogo-paginacion__pagina--inactiva">2</span>
-    <button type="button" class="btn btn--neutro">Siguiente</button>
-  </div>
-
-  <!-- Estado alterno: sinResultados -->
-  <p class="pantalla-pendiente__codigo" style="margin: 40px 0 16px">Estado alterno · Sin resultados</p>
-  <div class="estado-vacio">
-    <div class="catalogo-vacio-icono"></div>
-    <h3 class="estado-vacio__titulo">Ningún curso coincide con estos filtros</h3>
-    <p class="estado-vacio__texto">Hay cursos publicados, pero ninguno cumple la búsqueda y los filtros aplicados.</p>
-    <button type="button" class="btn btn--primario">Limpiar filtros</button>
-  </div>
+      }
+    }
+  }
 </div>
 
 <!-- Por qué Escuela Jurídica -->
