@@ -20,11 +20,37 @@ export interface LeccionAulaRespuesta {
   grabacionDisponible: boolean;
 }
 
+/** HU-025 — Examen de un módulo. Rendirlo es Épica 5; aquí solo se informa su estado. */
+export interface ExamenAulaRespuesta {
+  id: number;
+  titulo: string;
+  tipo: string;
+  bloqueaSiguienteModulo: boolean;
+  aprobado: boolean;
+  mejorNota: number | null;
+}
+
+/** HU-025 — Una condición activa del certificado con su valor real y su meta. */
+export interface CondicionAvance {
+  codigo: 'PROGRESO' | 'EXAMENES' | 'NOTA' | 'ASISTENCIA';
+  titulo: string;
+  valorActual: string;
+  meta: string;
+  cumplida: boolean;
+}
+
+export interface AvanceCertificado {
+  condiciones: CondicionAvance[];
+  cumpleTodo: boolean;
+  fraseAccionable: string;
+}
+
 export interface ModuloAulaRespuesta {
   id: number;
   titulo: string;
   orden: number;
   lecciones: LeccionAulaRespuesta[];
+  examenes: ExamenAulaRespuesta[];
 }
 
 export interface AulaRespuesta {
@@ -35,4 +61,5 @@ export interface AulaRespuesta {
   porcentaje: number;
   modulos: ModuloAulaRespuesta[];
   ultimaLeccionIdValida: number | null;
+  avanceCertificado: AvanceCertificado;
 }

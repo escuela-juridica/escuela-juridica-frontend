@@ -257,3 +257,143 @@
     width: 100%;
   }
 }
+
+// ------------------------------------------- HU-025 · Tu avance hacia el certificado --
+.aula-avance {
+  padding: 20px 24px;
+}
+
+.aula-avance__titulo {
+  margin: 0 0 12px;
+  color: var(--neutral-950);
+}
+
+.aula-avance__lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.aula-avance__item {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--neutral-100);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.aula-avance__item:first-child {
+  border-top: 0;
+}
+
+.aula-avance__icono {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--neutral-300);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--blanco);
+}
+
+.aula-avance__item--cumplida .aula-avance__icono {
+  background: var(--exito);
+  border-color: var(--exito);
+}
+
+.aula-avance__nombre {
+  color: var(--neutral-800);
+  font-weight: 600;
+}
+
+.aula-avance__valor {
+  color: var(--neutral-950);
+  font-weight: 700;
+}
+
+.aula-avance__meta {
+  color: var(--neutral-500);
+  font-size: 13px;
+  min-width: 110px;
+  text-align: right;
+}
+
+.aula-avance__frase {
+  margin: 12px 0 0;
+  padding: 10px 14px;
+  border-radius: var(--radio-md);
+  background: var(--advertencia-fondo);
+  color: var(--advertencia);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.aula-avance__frase--ok {
+  background: var(--exito-fondo);
+  color: var(--exito);
+}
+
+// --------------------------------------------------- HU-025 · Exámenes del módulo --
+.aula-examenes {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 12px 0 0;
+  border-top: 1px dashed var(--neutral-200);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.aula-examen {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radio-md);
+  background: var(--neutral-050);
+}
+
+.aula-examen__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.aula-examen__titulo {
+  font-weight: 600;
+  color: var(--neutral-950);
+}
+
+.aula-examen__ayuda {
+  font-size: 13px;
+  color: var(--neutral-500);
+}
+
+.aula-examen__ayuda--alerta {
+  color: var(--advertencia);
+}
+
+@media (max-width: 560px) {
+  .aula-avance__item {
+    grid-template-columns: 22px minmax(0, 1fr) auto;
+  }
+
+  .aula-avance__meta {
+    grid-column: 2 / -1;
+    text-align: left;
+    min-width: 0;
+  }
+
+  .aula-examen {
+    flex-wrap: wrap;
+  }
+}

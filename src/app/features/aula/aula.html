@@ -39,6 +39,27 @@
       <button type="button" class="btn btn--primario" routerLink="/app/panel">Volver a mis cursos</button>
     </div>
   } @else if (datos()) {
+    <section class="aula-avance card" aria-labelledby="aula-avance-titulo">
+      <h2 id="aula-avance-titulo" class="aula-avance__titulo tipo-h3">Tu avance hacia el certificado</h2>
+      <ul class="aula-avance__lista">
+        @for (condicion of datos()!.avanceCertificado.condiciones; track condicion.codigo) {
+          <li class="aula-avance__item" [class.aula-avance__item--cumplida]="condicion.cumplida">
+            <span class="aula-avance__icono" aria-hidden="true">
+              @if (condicion.cumplida) {
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
+              }
+            </span>
+            <span class="aula-avance__nombre">{{ condicion.titulo }}</span>
+            <span class="aula-avance__valor">{{ condicion.valorActual }}</span>
+            <span class="aula-avance__meta">{{ condicion.meta }}</span>
+          </li>
+        }
+      </ul>
+      <p class="aula-avance__frase" [class.aula-avance__frase--ok]="datos()!.avanceCertificado.cumpleTodo">
+        {{ datos()!.avanceCertificado.fraseAccionable }}
+      </p>
+    </section>
+
     @for (modulo of datos()!.modulos; track modulo.id) {
       <section class="aula-modulo card">
         <h2 class="aula-modulo__titulo tipo-h3">{{ modulo.titulo }}</h2>
@@ -128,6 +149,29 @@
             </li>
           }
         </ul>
+
+        @if (modulo.examenes.length > 0) {
+          <ul class="aula-examenes" aria-label="Exámenes del módulo">
+            @for (examen of modulo.examenes; track examen.id) {
+              <li class="aula-examen">
+                <div class="aula-examen__info">
+                  <span class="aula-examen__titulo">{{ examen.titulo }}</span>
+                  @if (examen.tipo === 'PRACTICA') {
+                    <span class="aula-examen__ayuda">Práctica: no bloquea el avance.</span>
+                  } @else if (examen.bloqueaSiguienteModulo && !examen.aprobado) {
+                    <span class="aula-examen__ayuda aula-examen__ayuda--alerta">Debes aprobarlo para liberar el siguiente módulo.</span>
+                  }
+                </div>
+                @if (examen.aprobado) {
+                  <span class="badge badge--disp-inmediato">Aprobado{{ examen.mejorNota !== null ? ' · ' + examen.mejorNota : '' }}</span>
+                } @else if (examen.tipo !== 'PRACTICA') {
+                  <span class="badge badge--disp-cerrado">Pendiente</span>
+                }
+                <button type="button" class="btn btn--secundario aula-leccion__accion" disabled title="Rendir exámenes estará disponible próximamente">Rendir examen</button>
+              </li>
+            }
+          </ul>
+        }
       </section>
     } @empty {
       <div class="estado-vacio">

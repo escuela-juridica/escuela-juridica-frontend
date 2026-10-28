@@ -124,11 +124,23 @@ export class LeccionReproductor implements OnInit {
           this.completando.set(false);
           const cursoId = this.cursoId();
           const siguiente = this.siguienteLeccionId();
-          if (siguiente != null) {
-            this.router.navigate(['/aula', cursoId, 'lecciones', siguiente]);
-          } else {
+          if (siguiente == null) {
             this.router.navigate(['/aula', cursoId]);
+            return;
           }
+          // HU-025: completar esta lección puede dejar la siguiente bloqueada (p. ej. por un
+          // examen del módulo): en ese caso se vuelve al aula, que explica qué falta.
+          this.aulaApi
+            .temario(cursoId)
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe({
+              next: (respuesta) => {
+                const planas = respuesta.modulos.flatMap((modulo) => modulo.lecciones);
+                const bloqueada = planas.find((leccion) => leccion.id === siguiente)?.estado === 'BLOQUEADA';
+                this.router.navigate(bloqueada ? ['/aula', cursoId] : ['/aula', cursoId, 'lecciones', siguiente]);
+              },
+              error: () => this.router.navigate(['/aula', cursoId, 'lecciones', siguiente]),
+            });
         },
         error: (error: HttpErrorResponse) => {
           this.completando.set(false);
