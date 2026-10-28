@@ -1,0 +1,119 @@
+<section class="rev">
+  <a class="rev__volver" routerLink="/admin/evaluaciones/pendientes">
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6" /></svg>
+    Evaluaciones por revisar
+  </a>
+
+  @if (cargando()) {
+    <p class="rev__estado">Cargando intento…</p>
+  } @else if (error(); as mensaje) {
+    <div class="alerta alerta--error" role="alert"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div>
+  } @else if (intento(); as it) {
+    <header class="card rev__cabecera">
+      <div>
+        <span class="rev__eyebrow">Revisión · intento {{ it.numeroIntento }}</span>
+        <h1 class="rev__titulo">{{ it.examen }}</h1>
+        <p class="rev__meta"><strong>{{ it.alumno }}</strong> · {{ it.correo }}</p>
+        <p class="rev__meta">{{ it.curso }} · enviado el {{ it.enviadoEn | date:'dd/MM/yyyy, h:mm a' | lowercase }}</p>
+      </div>
+      <div class="rev__estado-plazo">
+        @if (soloLectura()) {
+          <span class="badge badge--disp-inmediato">Calificado</span>
+          @if (it.calificadoEn) { <small>el {{ it.calificadoEn | date:'dd/MM/yyyy, h:mm a' | lowercase }}</small> }
+        } @else {
+          <span [class]="'badge ' + clasePlazo(it.plazo)">{{ etiquetaPlazo(it.plazo) }}</span>
+          @if (it.fechaLimite) { <small>Límite: {{ it.fechaLimite | date:'dd/MM/yyyy, h:mm a' | lowercase }}</small> }
+        }
+      </div>
+    </header>
+
+    @if (!soloLectura() && it.plazo === 'VENCIDO') {
+      <div class="alerta alerta--advertencia" role="status">
+        <span class="alerta__icono">!</span>
+        <div><p class="alerta__titulo">La fecha límite ya pasó</p><p class="alerta__texto">Sigue pendiente: el alumno espera su nota y no puede continuar. Califícalo cuanto antes; la demora no cambia su respuesta.</p></div>
+      </div>
+    }
+
+    <section class="card rev__objetivo" aria-label="Puntaje de las preguntas objetivas">
+      <div><span>Preguntas objetivas</span><strong>{{ it.puntajeObjetivo | number:'1.0-2' }} pts</strong></div>
+      <div><span>Puntaje total del examen</span><strong>{{ it.puntajeTotal | number:'1.0-2' }} pts</strong></div>
+      <div><span>Nota mínima</span><strong>{{ it.notaMinima | number:'1.0-2' }} / 20</strong></div>
+    </section>
+
+    @for (p of it.preguntas; track p.respuestaId) {
+      <article class="card rev__pregunta">
+        <div class="rev__pregunta-cab">
+          <span class="rev__eyebrow">Pregunta {{ p.posicion }}</span>
+          <span class="rev__maximo">Máximo {{ p.puntajeMaximo | number:'1.0-2' }} pts</span>
+        </div>
+        <h2 class="rev__enunciado">{{ p.enunciado }}</h2>
+        <p class="rev__etiqueta">Respuesta del alumno</p>
+        <p class="rev__respuesta">{{ p.texto }}</p>
+
+        @if (p.estadoRevision === 'REVISADA') {
+          <div class="rev__resultado">
+            <strong>Puntaje: {{ p.puntajeAsignado | number:'1.0-2' }} / {{ p.puntajeMaximo | number:'1.0-2' }}</strong>
+            @if (p.observacion) { <p class="rev__observacion">“{{ p.observacion }}”</p> } @else { <p class="rev__atenuado">Sin observación para el alumno.</p> }
+          </div>
+        } @else {
+          <div class="rev__captura">
+            <div class="rev__campo">
+              <label class="label" [for]="'puntaje-' + p.respuestaId">Puntaje (0 a {{ p.puntajeMaximo | number:'1.0-2' }})</label>
+              <input class="input" [class.input--error]="errores()[p.respuestaId] && captura(p).puntaje" [id]="'puntaje-' + p.respuestaId"
+                inputmode="decimal" autocomplete="off" [value]="captura(p).puntaje" (input)="escribirPuntaje(p, $any($event.target).value)" />
+              @if (errores()[p.respuestaId] && captura(p).puntaje) { <p class="campo-error">{{ errores()[p.respuestaId] }}</p> }
+            </div>
+            <div class="rev__campo rev__campo--ancho">
+              <label class="label" [for]="'obs-' + p.respuestaId">Observación para el alumno (opcional)</label>
+              <textarea class="input" rows="3" maxlength="2000" [id]="'obs-' + p.respuestaId"
+                [value]="captura(p).observacion" (input)="escribirObservacion(p, $any($event.target).value)"
+                placeholder="El alumno la verá junto con su resultado"></textarea>
+            </div>
+          </div>
+        }
+      </article>
+    } @empty {
+      <p class="rev__estado">Este intento no tiene respuestas abiertas para revisar.</p>
+    }
+
+    @if (soloLectura()) {
+      <section class="card rev__nota rev__nota--{{ it.aprobado ? 'ok' : 'mal' }}">
+        <span>Nota definitiva</span>
+        <strong>{{ it.nota | number:'1.0-2' }} / 20</strong>
+        <span>{{ it.aprobado ? 'Aprobado' : 'No aprobado' }}</span>
+      </section>
+      <div class="rev__acciones">
+        <button type="button" class="btn btn--secundario" [disabled]="reenviando()" (click)="reenviarAviso()">
+          {{ reenviando() ? 'Reenviando…' : 'Reenviar aviso al alumno' }}
+        </button>
+        <a class="btn btn--acento" routerLink="/admin/evaluaciones/pendientes">Volver a la bandeja</a>
+      </div>
+    } @else {
+      <section class="card rev__publicar">
+        <div class="rev__nota-prevista" aria-live="polite">
+          @if (notaResultante(); as nota) {
+            <span>Nota que resultaría</span>
+            <strong>{{ nota | number:'1.0-2' }} / 20</strong>
+            <span>{{ nota >= it.notaMinima ? 'Aprobaría' : 'No aprobaría' }} (mínimo {{ it.notaMinima | number:'1.0-2' }})</span>
+          } @else {
+            <span>Asigna un puntaje a cada respuesta abierta para ver la nota resultante.</span>
+          }
+        </div>
+        <button type="button" class="btn btn--acento" [disabled]="!completo()" (click)="abrirConfirmacion()">Publicar calificación</button>
+      </section>
+
+      @if (confirmando()) {
+        <app-modal titulo="Publicar la calificación" (cerrar)="cerrarConfirmacion()">
+          @if (errorPublicar(); as mensaje) {
+            <div class="alerta alerta--error rev__alerta-modal"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div>
+          }
+          <p class="rev__confirmar">El intento de <strong>{{ it.alumno }}</strong> quedará <strong>calificado con {{ notaResultante() | number:'1.0-2' }} / 20</strong>. No se podrá volver a publicar y se avisará al alumno por correo.</p>
+          <div class="editor-form__acciones">
+            <button type="button" class="btn btn--secundario" [disabled]="publicando()" (click)="cerrarConfirmacion()">Seguir revisando</button>
+            <button type="button" class="btn btn--primario" [disabled]="publicando()" (click)="publicar()">{{ publicando() ? 'Publicando…' : 'Publicar ahora' }}</button>
+          </div>
+        </app-modal>
+      }
+    }
+  }
+</section>

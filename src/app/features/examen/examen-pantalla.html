@@ -105,9 +105,9 @@
                   <div class="examen__intento-texto">
                     <span class="examen__intento-titulo">Intento {{ i.numero }}</span>
                     <span class="examen__intento-meta">
-                      {{ (i.enviadoEn ?? i.iniciadoEn) | date:'d MMM y, h:mm a' | lowercase }}
+                      {{ formatearFechaHoraCorta(i.enviadoEn ?? i.iniciadoEn) }}
                       @if (i.estado === 'PENDIENTE_REVISION' && i.fechaLimiteRevision) {
-                        · calificación máxima el {{ i.fechaLimiteRevision | date:'d MMM' }}
+                        · calificación máxima el {{ formatearDiaMes(i.fechaLimiteRevision) }}
                       }
                     </span>
                   </div>
@@ -283,7 +283,7 @@
             <p class="examen__nota-etiqueta">Tu intento está en revisión</p>
             <p class="examen__nota-ayuda">Incluye respuestas abiertas que califica un administrador. Tu nota definitiva aparecerá aquí cuando termine la revisión.</p>
             @if (it.fechaLimiteRevision) {
-              <p class="examen__nota-fecha">Fecha máxima de calificación: <strong>{{ it.fechaLimiteRevision | date:"d 'de' MMMM 'de' y" }}</strong></p>
+              <p class="examen__nota-fecha">Fecha máxima de calificación: <strong>{{ formatearFechaLarga(it.fechaLimiteRevision) }}</strong></p>
             }
             <p class="examen__nota-ayuda">Mientras tanto no puedes iniciar otro intento de este examen.@if (it.afectaCertificacion) { Tampoco se puede finalizar el curso ni emitir tu certificado hasta que exista tu nota. }</p>
           </section>
@@ -303,6 +303,27 @@
           <button type="button" class="btn btn--secundario" (click)="volverALaFicha()">Ver intentos y opciones</button>
           <a class="btn btn--acento" [routerLink]="['/aula', it.cursoId]">Volver al curso</a>
         </div>
+
+        @if (abiertasRevisadas().length > 0) {
+          <section class="card examen__revision" aria-labelledby="examen-abiertas">
+            <h2 id="examen-abiertas" class="examen__subtitulo">Calificación de tus respuestas abiertas</h2>
+            <ol class="examen__revision-lista">
+              @for (p of abiertasRevisadas(); track p.id) {
+                <li class="examen__revision-item">
+                  <div class="examen__pregunta-cab">
+                    <span class="examen__pregunta-numero">Pregunta {{ p.posicion }}</span>
+                    <span class="examen__pregunta-puntos">{{ p.puntajeObtenido | number:'1.0-2' }} / {{ p.puntaje | number:'1.0-2' }} pts</span>
+                  </div>
+                  <p class="examen__enunciado examen__enunciado--chico">{{ p.enunciado }}</p>
+                  <p class="examen__respuesta-abierta">{{ p.texto || 'Sin respuesta' }}</p>
+                  @if (p.observacion) {
+                    <p class="examen__observacion"><strong>Observación del revisor:</strong> {{ p.observacion }}</p>
+                  }
+                </li>
+              }
+            </ol>
+          </section>
+        }
 
         @if (it.respuestasVisibles) {
           <section class="card examen__revision" aria-labelledby="examen-revision">

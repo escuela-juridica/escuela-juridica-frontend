@@ -1,4 +1,4 @@
-import { DatePipe, DecimalPipe, LowerCasePipe } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -8,6 +8,7 @@ import { Observable, distinctUntilChanged, forkJoin, map, of } from 'rxjs';
 import { AlertaGlobalService } from '../../core/notificaciones/alerta-global.service';
 import { Modal } from '../../shared/ui/modal/modal';
 import { AulaSesionService } from '../aula/aula-sesion.service';
+import { formatearDiaMes, formatearFechaHoraCorta, formatearFechaLarga } from '../cursos/curso-formato.util';
 import { ExamenApiService } from './examen-api.service';
 import { ExamenFicha, Intento, IntentoResumen, PreguntaIntento } from './examen.model';
 
@@ -29,7 +30,7 @@ const ESPERA_GUARDADO_TEXTO_MS = 700;
  */
 @Component({
   selector: 'app-examen-pantalla',
-  imports: [RouterLink, DatePipe, DecimalPipe, LowerCasePipe, Modal],
+  imports: [RouterLink, DecimalPipe, Modal],
   templateUrl: './examen-pantalla.html',
   styleUrl: './examen-pantalla.scss',
 })
@@ -39,6 +40,10 @@ export class ExamenPantalla {
   private readonly alertas = inject(AlertaGlobalService);
   private readonly destroyRef = inject(DestroyRef);
   protected readonly aula = inject(AulaSesionService);
+
+  protected readonly formatearFechaLarga = formatearFechaLarga;
+  protected readonly formatearFechaHoraCorta = formatearFechaHoraCorta;
+  protected readonly formatearDiaMes = formatearDiaMes;
 
   protected readonly ficha = signal<ExamenFicha | null>(null);
   protected readonly intento = signal<Intento | null>(null);
@@ -74,6 +79,11 @@ export class ExamenPantalla {
 
   protected readonly totalRespondidas = computed(
     () => (this.intento()?.preguntas ?? []).filter((p) => this.estaRespondida(p)).length,
+  );
+
+  /** Respuestas abiertas ya calificadas por un revisor (puntaje y observación): el alumno siempre las ve. */
+  protected readonly abiertasRevisadas = computed(() =>
+    (this.intento()?.preguntas ?? []).filter((p) => p.tipo === 'RESPUESTA_ABIERTA' && p.estadoRevision === 'REVISADA'),
   );
 
   protected readonly sinResponder = computed(() => (this.intento()?.preguntas ?? []).filter((p) => !this.estaRespondida(p)));

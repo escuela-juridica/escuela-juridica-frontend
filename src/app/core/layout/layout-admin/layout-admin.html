@@ -79,14 +79,14 @@
           <span class="admin-sidebar__etiqueta">Matrículas y pagos</span>
         </a>
 
-        <span class="admin-sidebar__item admin-sidebar__item--deshabilitado" title="Operación académica">
+        <a routerLink="/admin/evaluaciones" routerLinkActive="admin-sidebar__item--activo" class="admin-sidebar__item" title="Operación académica" (click)="cerrarMenuMovil()">
           <svg class="admin-sidebar__icono" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M9 2h6a1 1 0 0 1 1 1v1H8V3a1 1 0 0 1 1-1z" />
             <rect x="5" y="4" width="14" height="18" rx="2" />
             <path d="M9 12l2 2 4-4" />
           </svg>
           <span class="admin-sidebar__etiqueta">Operación académica</span>
-        </span>
+        </a>
 
         <span class="admin-sidebar__item admin-sidebar__item--deshabilitado" title="Certificados">
           <svg class="admin-sidebar__icono" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

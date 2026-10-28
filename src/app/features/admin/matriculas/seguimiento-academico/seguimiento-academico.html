@@ -137,7 +137,7 @@
                   <div class="seg__fila-texto">
                     <span class="seg__fila-titulo">{{ s.titulo }}</span>
                     <span class="seg__fila-meta">
-                      {{ s.inicio ? (s.inicio | date:"d MMM y, h:mm a" | lowercase) : 'Sin fecha' }}
+                      {{ s.inicio ? formatearFechaHoraCorta(s.inicio) : 'Sin fecha' }}
                       @if (s.estadoSesion === 'CANCELADA') { · sesión cancelada: no cuenta }
                       @else if (!s.elegible) { · anterior a su matrícula: no cuenta }
                       @if (s.motivoCorreccion) { · corregida: “{{ s.motivoCorreccion }}” }

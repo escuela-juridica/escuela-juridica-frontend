@@ -66,6 +66,8 @@ export interface PreguntaIntento {
   puntajeObtenido: number | null;
   correcta: boolean | null;
   estadoRevision: 'NO_APLICA' | 'PENDIENTE' | 'REVISADA' | null;
+  /** Retroalimentación del revisor en una respuesta abierta ya calificada. */
+  observacion: string | null;
 }
 
 export interface Intento {

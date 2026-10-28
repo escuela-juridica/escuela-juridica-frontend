@@ -53,6 +53,25 @@ export function formatearFechaHora(fechaHoraIso: string): string {
   }).format(new Date(fechaHoraIso));
 }
 
+/** "31 de octubre de 2026": una instancia (fecha y hora ISO) mostrada como fecha larga en hora de Lima. */
+export function formatearFechaLarga(fechaHoraIso: string): string {
+  return new Intl.DateTimeFormat('es-PE', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'America/Lima' })
+    .format(new Date(fechaHoraIso));
+}
+
+/** "31 oct 2026, 2:01 p. m.": fecha y hora cortas, en hora de Lima. */
+export function formatearFechaHoraCorta(fechaHoraIso: string): string {
+  return new Intl.DateTimeFormat('es-PE', {
+    day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'America/Lima',
+  }).format(new Date(fechaHoraIso));
+}
+
+/** "31 oct": solo día y mes abreviado, en hora de Lima. */
+export function formatearDiaMes(fechaHoraIso: string): string {
+  return new Intl.DateTimeFormat('es-PE', { day: 'numeric', month: 'short', timeZone: 'America/Lima' })
+    .format(new Date(fechaHoraIso));
+}
+
 export function formatearHora(fechaHoraIso: string): string {
   return new Intl.DateTimeFormat('es-PE', {
     hour: 'numeric',

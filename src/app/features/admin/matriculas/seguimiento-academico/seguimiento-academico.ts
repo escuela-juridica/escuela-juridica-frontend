@@ -10,6 +10,7 @@ import { AlertaGlobalService } from '../../../../core/notificaciones/alerta-glob
 import { Modal } from '../../../../shared/ui/modal/modal';
 import { AvanceCertificadoBloque } from '../../../aula/avance-certificado/avance-certificado';
 import { AvanceCertificado } from '../../../aula/aula.model';
+import { formatearFechaHoraCorta } from '../../../cursos/curso-formato.util';
 import { SeguimientoAcademicoApiService } from './seguimiento-academico-api.service';
 import {
   ExamenSeguimiento,
@@ -39,6 +40,7 @@ export class SeguimientoAcademico {
   private readonly ruta = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
 
+  protected readonly formatearFechaHoraCorta = formatearFechaHoraCorta;
   protected readonly detalle = signal<SeguimientoAcademicoDetalle | null>(null);
   protected readonly cargando = signal(true);
   protected readonly error = signal<string | null>(null);

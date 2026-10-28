@@ -282,3 +282,16 @@
 .reporte__linea {
   display: block;
 }
+
+// Columnas con contenido largo: la lista de pendientes (valor y meta) necesita aire para no apilarse.
+.reporte__tabla th:nth-child(1) {
+  min-width: 230px;
+}
+
+.reporte__tabla th:nth-child(3) {
+  min-width: 150px;
+}
+
+.reporte__tabla th:nth-child(6) {
+  min-width: 270px;
+}

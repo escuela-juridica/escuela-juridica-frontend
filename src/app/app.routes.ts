@@ -174,6 +174,21 @@ export const routes: Routes = [
             (m) => m.ReporteAsistenciaPantalla,
           ),
       }, // PF-039 (HU-045)
+      { path: 'evaluaciones', pathMatch: 'full', redirectTo: 'evaluaciones/pendientes' },
+      {
+        path: 'evaluaciones/pendientes',
+        loadComponent: () =>
+          import('./features/admin/evaluaciones/bandeja-pendientes/bandeja-pendientes').then(
+            (m) => m.BandejaPendientes,
+          ),
+      }, // HU-030
+      {
+        path: 'evaluaciones/intentos/:intentoId',
+        loadComponent: () =>
+          import('./features/admin/evaluaciones/revision-intento/revision-intento').then(
+            (m) => m.RevisionIntentoPantalla,
+          ),
+      }, // HU-030
       {
         path: 'reportes/academico',
         loadComponent: () =>

@@ -618,6 +618,16 @@
   color: var(--error);
 }
 
+.examen__observacion {
+  margin: 10px 0 0;
+  padding: 10px 14px;
+  border-left: 3px solid var(--acento-500);
+  background: var(--acento-050);
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--neutral-800);
+}
+
 .examen__respuesta-abierta {
   margin: 8px 0 0;
   padding: 12px 16px;
