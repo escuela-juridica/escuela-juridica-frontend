@@ -1,28 +1,28 @@
-import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, ViewChild, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
+import { FullCalendarComponent, FullCalendarModule } from '@fullcalendar/angular';
+import dayGridPlugin from '@fullcalendar/angular/daygrid';
+import timeGridPlugin from '@fullcalendar/angular/timegrid';
+import interactionPlugin from '@fullcalendar/angular/interaction';
+import type { CalendarOptions, DatesSetInfo, EventClickInfo } from '@fullcalendar/angular';
+
+import { Modal } from '../../shared/ui/modal/modal';
 import { AlertaGlobalService } from '../../core/notificaciones/alerta-global.service';
-import { formatearFecha, formatearHora } from '../cursos/curso-formato.util';
+import { formatearHora } from '../cursos/curso-formato.util';
 import { EstadoSesion, SesionCalendarioRespuesta } from '../sesiones/sesion-alumno.model';
 import { SesionAlumnoApiService } from '../sesiones/sesion-alumno-api.service';
 
-/** Un día del calendario con sus sesiones, ya ordenadas. */
-interface GrupoDiaSesiones {
-  clave: string;
-  etiqueta: string;
-  sesiones: SesionCalendarioRespuesta[];
-}
-
 /** HU-026 — Participar en sesiones en vivo.
  *
- * Lista de próximas sesiones agrupadas por día, con navegación de mes
- * anterior/siguiente y botón "Hoy" (en vez de una grilla de calendario
- * completa: con pocas sesiones por mes, una grilla deja la mayoría de
- * casillas vacías y agrega complejidad sin aportar claridad). Vive dentro
- * de <app-layout-alumno>, por lo que no trae su propio header/footer. */
+ * Grilla mensual tipo Google Calendar (FullCalendar) en vez de la lista agrupada por día de la
+ * primera ola: navegación prev/hoy/siguiente con los botones propios de ESEJUR (headerToolbar de
+ * FullCalendar desactivado) y recarga de datos en cada `datesSet` (se dispara solo al montar y
+ * en cada prev/next/today). Vive dentro de <app-layout-alumno>, por lo que no trae su propio
+ * header/footer. */
 @Component({
   selector: 'app-calendario',
-  imports: [],
+  imports: [FullCalendarModule, Modal],
   templateUrl: './calendario.html',
   styleUrl: './calendario.scss',
 })
@@ -31,79 +31,79 @@ export class Calendario {
   private readonly alertas = inject(AlertaGlobalService);
   private readonly destroyRef = inject(DestroyRef);
 
+  @ViewChild(FullCalendarComponent) private fc?: FullCalendarComponent;
+
   protected readonly cargando = signal(true);
   protected readonly error = signal(false);
   protected readonly sesiones = signal<SesionCalendarioRespuesta[]>([]);
+  protected readonly sesionSeleccionada = signal<SesionCalendarioRespuesta | null>(null);
   protected readonly ingresando = signal<number | null>(null);
-  protected readonly mesBase = signal<Date>(Calendario.primerDiaDe(new Date()));
+  protected readonly etiquetaMes = signal('');
+  protected readonly esMesActual = signal(true);
 
   protected readonly formatearHora = formatearHora;
 
-  protected readonly etiquetaMes = computed(() => {
-    const texto = new Intl.DateTimeFormat('es-PE', {
-      month: 'long',
-      year: 'numeric',
-      timeZone: 'America/Lima',
-    }).format(this.mesBase());
-    return texto.charAt(0).toUpperCase() + texto.slice(1);
-  });
+  /** Pista discreta bajo la grilla: se muestra cada vez que el mes visible no tiene sesiones
+   * (una grilla vacía ya comunica eso visualmente, pero un alumno de primera vez necesita saber
+   * por qué está vacía). */
+  protected readonly mostrarPistaVacio = computed(
+    () => !this.cargando() && !this.error() && this.sesiones().length === 0,
+  );
 
-  protected readonly esMesActual = computed(() => {
-    const base = this.mesBase();
-    const hoy = Calendario.primerDiaDe(new Date());
-    return base.getFullYear() === hoy.getFullYear() && base.getMonth() === hoy.getMonth();
-  });
+  /** Último rango pedido por FullCalendar (lo guarda `datesSet`); lo reutiliza "Reintentar" sin
+   * tener que recalcular fechas a mano. */
+  private ultimoRango: DatesSetInfo | null = null;
 
-  protected readonly grupos = computed<GrupoDiaSesiones[]>(() => {
-    const lista = [...this.sesiones()].sort((a, b) =>
-      (a.fechaHoraInicio ?? '').localeCompare(b.fechaHoraInicio ?? ''),
-    );
-    const mapa = new Map<string, GrupoDiaSesiones>();
-    for (const sesion of lista) {
-      const clave = sesion.fechaHoraInicio ? this.claveDiaLima(sesion.fechaHoraInicio) : 'sin-fecha';
-      let grupo = mapa.get(clave);
-      if (!grupo) {
-        grupo = {
-          clave,
-          etiqueta: clave === 'sin-fecha' ? 'Fecha por confirmar' : formatearFecha(clave),
-          sesiones: [],
-        };
-        mapa.set(clave, grupo);
+  protected readonly calendarOptions = signal<CalendarOptions>({
+    plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
+    initialView: 'dayGridMonth',
+    headerToolbar: false,
+    locale: 'es',
+    height: 'auto',
+    firstDay: 1,
+    fixedWeekCount: false,
+    dayMaxEvents: 3,
+    eventTimeFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
+    events: [],
+    datesSet: (arg: DatesSetInfo) => this.alCambiarRango(arg),
+    eventClick: (arg: EventClickInfo) => this.alHacerClicEnEvento(arg),
+    // El "today" resaltado y los chips de evento se marcan con clases propias de ESEJUR (ver
+    // nota de diseño en calendario.scss): FullCalendar v7 ya no expone clases estables como
+    // `.fc-day-today`/`.fc-event` para temizar sin un theme, así que usamos los hooks de ciclo de
+    // vida `dayCellDidMount`/`eventDidMount`, que entregan el elemento real del DOM.
+    dayCellDidMount: (arg) => {
+      if (arg.isToday) arg.el.classList.add('calendario-dia-hoy');
+      if (arg.isOther) arg.el.classList.add('calendario-dia-otro-mes');
+    },
+    eventDidMount: (arg) => {
+      arg.el.classList.add('calendario-evento');
+      const sesion = arg.event.extendedProps['sesion'] as SesionCalendarioRespuesta | undefined;
+      if (sesion) {
+        arg.el.title = `${sesion.cursoTitulo} · ${sesion.titulo}`;
       }
-      grupo.sesiones.push(sesion);
-    }
-    return Array.from(mapa.values());
+      if (sesion?.estadoSesion === 'CANCELADA') {
+        arg.el.classList.add('calendario-evento--cancelado');
+      }
+    },
   });
-
-  constructor() {
-    this.cargar();
-  }
-
-  protected cargar(): void {
-    this.cargando.set(true);
-    this.error.set(false);
-    const { desde, hasta } = this.rangoMes();
-    this.api.calendario(desde, hasta).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (lista) => {
-        this.sesiones.set(lista);
-        this.cargando.set(false);
-      },
-      error: () => {
-        this.error.set(true);
-        this.cargando.set(false);
-      },
-    });
-  }
 
   protected cambiarMes(delta: number): void {
-    const base = this.mesBase();
-    this.mesBase.set(new Date(base.getFullYear(), base.getMonth() + delta, 1, 12));
-    this.cargar();
+    const api = this.fc?.getApi();
+    if (!api) return;
+    if (delta < 0) api.prev();
+    else api.next();
   }
 
   protected irAHoy(): void {
-    this.mesBase.set(Calendario.primerDiaDe(new Date()));
-    this.cargar();
+    this.fc?.getApi().today();
+  }
+
+  protected reintentar(): void {
+    if (this.ultimoRango) this.cargar(this.ultimoRango);
+  }
+
+  protected cerrarModal(): void {
+    this.sesionSeleccionada.set(null);
   }
 
   protected ingresar(sesion: SesionCalendarioRespuesta): void {
@@ -114,7 +114,8 @@ export class Calendario {
         this.ingresando.set(null);
         window.open(respuesta.enlaceReunion, '_blank');
         this.alertas.mostrar('exito', 'Asistencia registrada.');
-        this.cargar();
+        this.sesionSeleccionada.set(null);
+        if (this.ultimoRango) this.cargar(this.ultimoRango);
       },
       error: () => {
         this.ingresando.set(null);
@@ -152,26 +153,73 @@ export class Calendario {
     }
   }
 
-  private rangoMes(): { desde: string; hasta: string } {
-    const base = this.mesBase();
-    const primerDia = new Date(base.getFullYear(), base.getMonth(), 1);
-    const ultimoDia = new Date(base.getFullYear(), base.getMonth() + 1, 0);
-    return { desde: Calendario.formatoFechaLocal(primerDia), hasta: Calendario.formatoFechaLocal(ultimoDia) };
+  /** Se dispara automáticamente al montar la grilla y en cada prev()/next()/today() de la API. */
+  private alCambiarRango(arg: DatesSetInfo): void {
+    this.ultimoRango = arg;
+    this.etiquetaMes.set(Calendario.capitalizar(arg.view.title));
+    const hoy = new Date();
+    this.esMesActual.set(hoy >= arg.view.currentStart && hoy < arg.view.currentEnd);
+    this.cargar(arg);
   }
 
-  /** Día calendario (yyyy-MM-dd) de un instante ISO, según la hora de Lima — evita que una
-   * sesión cerca de la medianoche quede agrupada en el día equivocado por el huso del navegador. */
-  private claveDiaLima(iso: string): string {
-    return new Intl.DateTimeFormat('en-CA', {
-      timeZone: 'America/Lima',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    }).format(new Date(iso));
+  private alHacerClicEnEvento(arg: EventClickInfo): void {
+    const sesion = arg.event.extendedProps['sesion'] as SesionCalendarioRespuesta;
+    this.sesionSeleccionada.set(sesion);
   }
 
-  private static primerDiaDe(fecha: Date): Date {
-    return new Date(fecha.getFullYear(), fecha.getMonth(), 1, 12);
+  private cargar(arg: DatesSetInfo): void {
+    this.cargando.set(true);
+    this.error.set(false);
+    const desde = Calendario.formatoFechaLocal(arg.start);
+    const hasta = Calendario.formatoFechaLocal(arg.end);
+    this.api.calendario(desde, hasta).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (lista) => {
+        this.cargando.set(false);
+        this.sesiones.set(lista);
+        this.calendarOptions.update((opciones) => ({
+          ...opciones,
+          events: lista
+            .filter((sesion) => sesion.fechaHoraInicio)
+            .map((sesion) => {
+              const colores = Calendario.coloresPorEstado(sesion.estadoSesion);
+              return {
+                id: String(sesion.leccionId),
+                title: sesion.titulo,
+                start: sesion.fechaHoraInicio!,
+                end: sesion.fechaHoraFin ?? undefined,
+                // v7 ya no tiene backgroundColor/borderColor/textColor por evento (ese trío es de
+                // v5/v6): ahora es `color`/`contrastColor`, que FullCalendar expone como las
+                // variables CSS --fc-event-color/--fc-event-contrast-color sobre el elemento del
+                // evento — las consumimos en calendario.scss vía `.calendario-evento`.
+                color: colores.fondo,
+                contrastColor: colores.texto,
+                extendedProps: { sesion },
+              };
+            }),
+        }));
+      },
+      error: () => {
+        this.cargando.set(false);
+        this.error.set(true);
+      },
+    });
+  }
+
+  private static coloresPorEstado(estado: EstadoSesion): { fondo: string; texto: string } {
+    switch (estado) {
+      case 'FUTURA':
+        return { fondo: 'var(--celeste-050)', texto: 'var(--celeste-700)' };
+      case 'EN_VENTANA':
+        return { fondo: 'var(--exito-fondo)', texto: 'var(--exito)' };
+      case 'REALIZADA':
+        return { fondo: 'var(--neutral-100)', texto: 'var(--neutral-600)' };
+      case 'CANCELADA':
+        return { fondo: 'var(--error-fondo)', texto: 'var(--error)' };
+    }
+  }
+
+  private static capitalizar(texto: string): string {
+    return texto.charAt(0).toUpperCase() + texto.slice(1);
   }
 
   private static formatoFechaLocal(fecha: Date): string {

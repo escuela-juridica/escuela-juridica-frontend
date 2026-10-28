@@ -32,6 +32,7 @@
             ],
             "styles": [
               "node_modules/ngx-spinner/animations/ball-spin-clockwise-fade.css",
+              "node_modules/@fullcalendar/angular/skeleton.css",
               "src/styles.scss"
             ]
           },
