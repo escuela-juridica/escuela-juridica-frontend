@@ -10,6 +10,7 @@ export interface ReporteAsistencia {
   modalidad: 'EN_VIVO' | 'HIBRIDO';
   leccionId: number;
   sesion: string;
+  modulo: string;
   fechaSesion: string;
   alumno: string;
   correo: string;

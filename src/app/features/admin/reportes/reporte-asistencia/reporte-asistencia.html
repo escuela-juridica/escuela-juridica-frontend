@@ -33,7 +33,7 @@
     <select class="input" [(ngModel)]="sesionId" (change)="buscar()" [disabled]="!cursoId" aria-label="Sesión">
       <option [ngValue]="null">{{ cursoId ? 'Todas las sesiones' : 'Elige un curso para filtrar por sesión' }}</option>
       @for (sesion of sesiones(); track sesion.id) {
-        <option [ngValue]="sesion.id">{{ sesion.etiqueta }} · {{ sesion.fecha | date:'dd/MM/yyyy' }}</option>
+        <option [ngValue]="sesion.id">{{ sesion.detalle }} · {{ sesion.etiqueta }} · {{ sesion.fecha | date:'dd/MM/yyyy' }}</option>
       }
     </select>
     <select class="input" [(ngModel)]="modalidad" (change)="buscar()" aria-label="Modalidad">
@@ -100,7 +100,6 @@
         <tr>
           <th>Curso</th>
           <th>Sesión</th>
-          <th>Fecha</th>
           <th>Alumno</th>
           <th>Asistió</th>
           <th>Origen</th>
@@ -115,8 +114,10 @@
             <strong>{{ fila.curso }}</strong>
             <small>{{ etiquetaModalidad(fila.modalidad) }}</small>
           </td>
-          <td>{{ fila.sesion }}</td>
-          <td>{{ fila.fechaSesion | date:'dd/MM/yyyy, h:mm a' | lowercase }}</td>
+          <td>
+            <strong>{{ fila.sesion }}</strong>
+            <small>{{ fila.modulo }} · {{ fila.fechaSesion | date:'dd/MM/yyyy, h:mm a' | lowercase }}</small>
+          </td>
           <td><strong>{{ fila.alumno }}</strong><small>{{ fila.correo }}</small></td>
           <td><span [class]="'badge ' + claseAsistencia(fila.asistencia)">{{ etiquetaAsistencia(fila.asistencia) }}</span></td>
           <td>

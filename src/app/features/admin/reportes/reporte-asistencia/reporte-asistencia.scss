@@ -189,3 +189,31 @@
     color: var(--neutral-500);
     font-size: 13px;
 }
+
+// Diez controles de filtro: cinco por fila en escritorio.
+.reporte__filtros {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+// La tabla debe caber junto al menú lateral: las celdas pueden partir línea.
+.reporte__tabla th,
+.reporte__tabla td {
+    padding: 12px 12px;
+    white-space: normal;
+}
+
+.reporte__tabla td .badge {
+    white-space: nowrap;
+}
+
+@media (max-width: 1100px) {
+    .reporte__filtros {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 700px) {
+    .reporte__filtros {
+        grid-template-columns: 1fr;
+    }
+}
