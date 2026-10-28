@@ -5,6 +5,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 
 import { resolverUrlApi } from '../../../core/api/api.config';
+import { AlertaGlobalService } from '../../../core/notificaciones/alerta-global.service';
 import { DiplomaMiniatura } from '../../../shared/ui/diploma-miniatura/diploma-miniatura';
 import { formatearFechaLarga } from '../../cursos/curso-formato.util';
 import { CertificacionApiService } from '../certificacion-api.service';
@@ -21,6 +22,7 @@ import { MiCertificado } from '../certificacion.model';
 export class MisCertificados {
   private readonly api = inject(CertificacionApiService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly alertas = inject(AlertaGlobalService);
 
   protected readonly formatearFechaLarga = formatearFechaLarga;
   protected readonly certificados = signal<MiCertificado[]>([]);
@@ -49,6 +51,10 @@ export class MisCertificados {
   }
 
   protected descargar(certificado: MiCertificado): void {
-    if (certificado.descargaUrl) window.open(resolverUrlApi(certificado.descargaUrl), '_blank');
+    if (!certificado.descargaUrl) return;
+    this.api
+      .descargarPdf(certificado.descargaUrl, certificado.codigo)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({ error: () => this.alertas.mostrar('error', 'No pudimos descargar tu certificado. Inténtalo nuevamente.') });
   }
 }

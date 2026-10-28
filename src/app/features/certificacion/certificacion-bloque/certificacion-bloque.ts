@@ -173,8 +173,12 @@ export class CertificacionBloque {
   }
 
   protected descargar(): void {
-    const url = this.cert()?.certificado?.descargaUrl;
-    if (url) window.open(resolverUrlApi(url), '_blank');
+    const emitido = this.cert()?.certificado;
+    if (!emitido?.descargaUrl) return;
+    this.api
+      .descargarPdf(emitido.descargaUrl, emitido.codigo)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({ error: () => this.alertas.mostrar('error', 'No pudimos descargar tu certificado. Inténtalo nuevamente.') });
   }
 
   /** Paso actual del recorrido (0..3); con el certificado emitido, todos quedan completos. */
