@@ -79,8 +79,13 @@
               </div>
 
               @if (leccion.tipo === 'GRABADA') {
-                <button type="button" class="btn btn--secundario aula-leccion__accion" disabled title="Disponible próximamente">
-                  Próximamente
+                <button
+                  type="button"
+                  class="btn btn--acento aula-leccion__accion"
+                  [disabled]="leccion.estado === 'BLOQUEADA'"
+                  (click)="irALeccion(leccion.id)"
+                >
+                  {{ leccion.estado === 'COMPLETADA' ? 'Revisar' : 'Abrir lección' }}
                 </button>
               } @else {
                 <div class="aula-sesion">
@@ -103,7 +108,9 @@
                     }
                     @case ('REALIZADA') {
                       @if (leccion.grabacionDisponible) {
-                        <span class="badge badge--disp-inmediato" title="Disponible en el reproductor">Grabación disponible</span>
+                        <button type="button" class="badge badge--disp-inmediato aula-leccion__badge-accion" (click)="irALeccion(leccion.id)">
+                          Grabación disponible
+                        </button>
                       } @else {
                         <span class="badge badge--disp-cerrado">Grabación pendiente</span>
                       }

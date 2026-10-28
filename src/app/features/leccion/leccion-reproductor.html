@@ -1,0 +1,106 @@
+<!-- HU-023 — Consultar materiales protegidos. HU-024 — Completar lecciones y registrar progreso.
+     Pantalla inmersiva propia (sin layout-alumno), igual criterio que `aula.html`. -->
+<header class="leccion-header">
+  <a [routerLink]="['/aula', cursoId()]" class="leccion-header__volver">
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M15 18l-6-6 6-6" />
+    </svg>
+    <span>Volver al aula</span>
+  </a>
+  @if (leccionActual(); as leccion) {
+    <h1 class="leccion-header__titulo">{{ leccion.titulo }}</h1>
+  }
+</header>
+
+<main class="leccion-main">
+  @if (cargando()) {
+    <p class="leccion-cargando">Cargando lección...</p>
+  } @else if (errorMensaje() && !leccionActual()) {
+    <div class="estado-vacio leccion-error">
+      <h3 class="estado-vacio__titulo">No pudimos abrir esta lección</h3>
+      <p class="estado-vacio__texto">{{ errorMensaje() }}</p>
+      <button type="button" class="btn btn--primario" [routerLink]="['/aula', cursoId()]">Volver al aula</button>
+    </div>
+  } @else if (leccionActual(); as leccion) {
+    @if (leccion.estado === 'BLOQUEADA') {
+      <div class="estado-vacio leccion-error">
+        <h3 class="estado-vacio__titulo">Lección bloqueada</h3>
+        <p class="estado-vacio__texto">{{ leccion.motivoBloqueo }}</p>
+        <button type="button" class="btn btn--primario" [routerLink]="['/aula', cursoId()]">Volver al aula</button>
+      </div>
+    } @else if (leccion.tipo === 'EN_VIVO' && leccion.estadoSesion !== 'REALIZADA') {
+      <div class="estado-vacio leccion-error">
+        <h3 class="estado-vacio__titulo">Esta sesión se gestiona desde el aula</h3>
+        <p class="estado-vacio__texto">
+          Para unirte a la sesión en vivo o ver su horario, volvé a la tarjeta de esta lección en el aula del curso.
+        </p>
+        <button type="button" class="btn btn--primario" [routerLink]="['/aula', cursoId()]">Volver al aula</button>
+      </div>
+    } @else {
+      @if (cargandoMateriales()) {
+        <p class="leccion-cargando">Cargando materiales...</p>
+      } @else {
+        <ul class="leccion-materiales">
+          @for (material of materiales() ?? []; track material.id) {
+            <li class="leccion-material card">
+              <span class="leccion-material__titulo">{{ material.titulo }}</span>
+
+              @if (material.tipoRecurso === 'VIDEO' && material.origen === 'SUBIDO') {
+                <video
+                  class="leccion-material__video"
+                  controls
+                  [src]="resolverUrlApi(material.verUrl)"
+                  (loadedmetadata)="onLoadedMetadata($event, material.id)"
+                  (timeupdate)="onTimeUpdate($event, material.id)"
+                  (pause)="onPauseOFin($event, material.id)"
+                  (ended)="onPauseOFin($event, material.id)"
+                ></video>
+              } @else if (material.tipoRecurso === 'VIDEO' && material.origen === 'YOUTUBE') {
+                <a class="btn btn--secundario" [href]="material.verUrl" target="_blank" rel="noopener">
+                  Ver video en YouTube
+                </a>
+              } @else {
+                <a class="btn btn--secundario" [href]="resolverUrlApi(material.verUrl)" target="_blank" rel="noopener">
+                  Ver {{ material.titulo }}
+                </a>
+              }
+
+              @if (material.descargarUrl) {
+                <a class="leccion-material__descarga" [href]="resolverUrlApi(material.descargarUrl)">Descargar</a>
+              }
+            </li>
+          } @empty {
+            <li class="estado-vacio estado-vacio--compact">
+              <p class="estado-vacio__texto">Esta lección todavía no tiene materiales.</p>
+            </li>
+          }
+        </ul>
+      }
+
+      <div class="leccion-completado card">
+        @if (leccion.estado === 'COMPLETADA') {
+          <div class="leccion-completado__estado leccion-completado__estado--ok">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M20 6L9 17l-5-5" />
+            </svg>
+            <span>Lección completada</span>
+          </div>
+          @if (!esUltimaLeccion() && siguienteLeccionId()) {
+            <a class="leccion-completado__siguiente" [routerLink]="['/aula', cursoId(), 'lecciones', siguienteLeccionId()]">
+              Ir a la siguiente lección →
+            </a>
+          }
+        } @else if (esFinalizacionAutomatica()) {
+          <div class="leccion-completado__estado">
+            <span class="leccion-completado__punto" aria-hidden="true"></span>
+            <span>Se completa automáticamente al ver el video</span>
+          </div>
+        } @else {
+          <button type="button" class="btn btn--acento" [disabled]="completando()" (click)="completar()">
+            {{ completando() ? 'Guardando...' : (esUltimaLeccion() ? 'Completar lección' : 'Siguiente') }}
+          </button>
+        }
+      </div>
+    }
+  }
+</main>

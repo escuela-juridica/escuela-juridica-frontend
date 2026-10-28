@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, OnInit, afterRenderEffect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { distinctUntilChanged, map } from 'rxjs';
 
 import { AlertaGlobalService } from '../../core/notificaciones/alerta-global.service';
@@ -25,6 +25,7 @@ interface ErrorApiAula {
 })
 export class Aula implements OnInit {
   private readonly ruta = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly aulaApi = inject(AulaApiService);
   private readonly sesionAlumnoApi = inject(SesionAlumnoApiService);
   private readonly alertas = inject(AlertaGlobalService);
@@ -34,6 +35,7 @@ export class Aula implements OnInit {
   protected readonly errorMensaje = signal<string | null>(null);
   protected readonly datos = signal<AulaRespuesta | null>(null);
   protected readonly ingresandoLeccionId = signal<number | null>(null);
+  private cursoId = 0;
 
   private yaEnfocado = false;
 
@@ -60,6 +62,7 @@ export class Aula implements OnInit {
   }
 
   protected cargar(cursoId: number): void {
+    this.cursoId = cursoId;
     this.cargando.set(true);
     this.errorMensaje.set(null);
     this.yaEnfocado = false;
@@ -94,6 +97,10 @@ export class Aula implements OnInit {
           this.alertas.mostrar('error', this.mensajeError(error) ?? 'No pudimos ingresar a la sesión.');
         },
       });
+  }
+
+  protected irALeccion(leccionId: number): void {
+    this.router.navigate(['/aula', this.cursoId, 'lecciones', leccionId]);
   }
 
   protected rangoFechaHora(inicio: string, fin: string | null): string {

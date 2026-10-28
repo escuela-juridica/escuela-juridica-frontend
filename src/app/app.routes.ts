@@ -99,6 +99,13 @@ export const routes: Routes = [
     canActivate: [sessionGuard],
     loadComponent: () => import('./features/aula/aula').then((m) => m.Aula),
   }, // PF-020
+  // HU-023/HU-024 — Reproductor de una lección del aula: materiales protegidos y completado.
+  {
+    path: 'aula/:cursoId/lecciones/:leccionId',
+    canActivate: [sessionGuard],
+    loadComponent: () =>
+      import('./features/leccion/leccion-reproductor').then((m) => m.LeccionReproductor),
+  }, // PF-021
   // EP02: HU-008 (usuarios), HU-009 (información base, bajo "Configuración") y HU-010 (cursos).
   // El resto del panel administrativo queda pendiente.
   {

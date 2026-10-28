@@ -236,6 +236,17 @@
   white-space: nowrap;
 }
 
+// Badge "Grabación disponible" convertido en acción clicable hacia el reproductor de la lección.
+.aula-leccion__badge-accion {
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.aula-leccion__badge-accion:hover {
+  filter: brightness(0.96);
+}
+
 @media (max-width: 560px) {
   .aula-leccion {
     flex-wrap: wrap;
