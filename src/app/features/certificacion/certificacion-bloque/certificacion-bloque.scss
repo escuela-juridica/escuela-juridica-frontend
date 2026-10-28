@@ -1,0 +1,176 @@
+// HU-032 · Bloque "Tu certificado" del resumen del curso.
+
+:host {
+  display: block;
+}
+
+.cert {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cert__estado {
+  margin: 0;
+  color: var(--neutral-600);
+}
+
+.cert__cabecera {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cert__titulo {
+  margin: 0 0 4px;
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 600;
+  color: var(--neutral-950);
+}
+
+.cert__mensaje {
+  margin: 0;
+  max-width: 720px;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--neutral-800);
+}
+
+.cert__nota {
+  margin: 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--neutral-600);
+}
+
+.cert__subtitulo {
+  margin: 0;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--neutral-950);
+}
+
+.cert__proyeccion {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px 24px;
+  padding: 14px 16px;
+  border-radius: var(--radio-md);
+  background: var(--neutral-050);
+}
+
+.cert__proyeccion dt,
+.cert__emitido-datos span {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--neutral-600);
+}
+
+.cert__proyeccion dd {
+  margin: 2px 0 0;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--neutral-950);
+}
+
+.cert__formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radio-md);
+}
+
+.cert__campos {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.cert__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.cert__datos-confirmados {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--neutral-800);
+}
+
+.cert__emitido {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--exito);
+  border-radius: var(--radio-md);
+  background: var(--exito-050, #ecfdf3);
+}
+
+.cert__emitido-datos {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px 24px;
+}
+
+.cert__emitido-datos div {
+  display: flex;
+  flex-direction: column;
+}
+
+.cert__emitido-datos strong {
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--neutral-950);
+  overflow-wrap: anywhere;
+}
+
+.cert__emitido-ancho {
+  grid-column: 1 / -1;
+}
+
+.cert__alerta-modal {
+  margin: 0 0 16px;
+}
+
+.cert__confirmar {
+  margin: 0 0 16px;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--neutral-800);
+}
+
+@media (max-width: 767px) {
+  .cert__cabecera {
+    flex-direction: column;
+  }
+
+  .cert__campos {
+    grid-template-columns: 1fr;
+  }
+
+  .cert__acciones .btn,
+  .cert__emitido .btn,
+  .cert__datos-confirmados .btn {
+    width: 100%;
+  }
+}

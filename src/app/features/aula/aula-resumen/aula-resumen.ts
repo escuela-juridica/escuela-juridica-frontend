@@ -5,6 +5,7 @@ import { RouterLink } from '@angular/router';
 import { AlertaGlobalService } from '../../../core/notificaciones/alerta-global.service';
 import { formatearFechaHora } from '../../cursos/curso-formato.util';
 import { SesionAlumnoApiService } from '../../sesiones/sesion-alumno-api.service';
+import { CertificacionBloque } from '../../certificacion/certificacion-bloque/certificacion-bloque';
 import { AvanceCertificadoBloque } from '../avance-certificado/avance-certificado';
 import { AulaSesionService, LeccionDelCurso } from '../aula-sesion.service';
 import { ExamenAulaRespuesta } from '../aula.model';
@@ -19,7 +20,7 @@ export interface ExamenDelCurso {
  * próximas sesiones en vivo. Es lo que se ve al entrar al aula, antes de abrir una lección. */
 @Component({
   selector: 'app-aula-resumen',
-  imports: [RouterLink, AvanceCertificadoBloque],
+  imports: [RouterLink, AvanceCertificadoBloque, CertificacionBloque],
   templateUrl: './aula-resumen.html',
   styleUrl: './aula-resumen.scss',
 })

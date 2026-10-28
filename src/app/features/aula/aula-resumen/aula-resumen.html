@@ -47,6 +47,10 @@
       }
     </section>
 
+    <section class="card resumen__bloque" aria-label="Tu certificado">
+      <app-certificacion-bloque [cursoId]="aula.cursoId" />
+    </section>
+
     @if (examenes().length > 0) {
       <section class="card resumen__bloque" aria-labelledby="resumen-examenes">
         <h2 id="resumen-examenes" class="resumen__subtitulo">Evaluaciones</h2>
