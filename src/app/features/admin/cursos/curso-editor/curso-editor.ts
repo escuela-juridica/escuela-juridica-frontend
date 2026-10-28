@@ -39,6 +39,9 @@ import { AlertaGlobalComponent } from '../../../../shared/ui/alerta-global/alert
 import { ExamenesTab } from './examenes-tab/examenes-tab';
 import { PublicacionTab } from './publicacion-tab/publicacion-tab';
 import { RequisitosTab } from './requisitos-tab/requisitos-tab';
+import { ModalCancelarSesion } from './sesiones-tab/modal-cancelar';
+import { ModalCorregirSesion } from './sesiones-tab/modal-corregir';
+import { ModalReprogramarSesion } from './sesiones-tab/modal-reprogramar';
 import { ConfirmacionService } from '../../../../core/dialogo/confirmacion.service';
 import { AlertaGlobalService } from '../../../../core/notificaciones/alerta-global.service';
 
@@ -61,7 +64,18 @@ interface SesionEnVivoEditor {
  * juntos con un único botón, aunque internamente llamen a tres endpoints distintos. */
 @Component({
   selector: 'app-curso-editor',
-  imports: [ReactiveFormsModule, RouterLink, Modal, ExamenesTab, RequisitosTab, PublicacionTab, AlertaGlobalComponent],
+  imports: [
+    ReactiveFormsModule,
+    RouterLink,
+    Modal,
+    ExamenesTab,
+    RequisitosTab,
+    PublicacionTab,
+    AlertaGlobalComponent,
+    ModalReprogramarSesion,
+    ModalCancelarSesion,
+    ModalCorregirSesion,
+  ],
   templateUrl: './curso-editor.html',
   styleUrl: './curso-editor.scss',
 })
@@ -165,6 +179,11 @@ export class CursoEditor implements OnInit {
   protected readonly sesionFechaFin = signal('');
   protected readonly sesionEnlace = signal('');
   protected readonly guardandoSesion = signal(false);
+
+  // -- HU-027: reprogramar / cancelar / corregir una sesión en vivo --
+  protected readonly reprogramarLeccion = signal<LeccionRespuesta | null>(null);
+  protected readonly cancelarLeccion = signal<LeccionRespuesta | null>(null);
+  protected readonly corregirLeccion = signal<LeccionRespuesta | null>(null);
 
   protected readonly materialFormLeccionId = signal<number | null>(null);
   protected readonly materialEditId = signal<number | null>(null);
@@ -401,7 +420,7 @@ export class CursoEditor implements OnInit {
 
   // ---------------------------------------------------------------- HU-011 Contenido --
 
-  private cargarContenido(): void {
+  protected cargarContenido(): void {
     this.cargandoContenido.set(true);
     this.erroContenido.set(null);
     this.contenidoApi
@@ -827,6 +846,63 @@ export class CursoEditor implements OnInit {
           this.mostrarMensaje('error', this.mensajeError(error) ?? 'No pudimos guardar la sesión.');
         },
       });
+  }
+
+  // HU-027: una sesión futura (fechaHoraFin nula o posterior a ahora) admite Reprogramar/Cancelar;
+  // una realizada (ya pasó, y no está cancelada) solo admite Corregir; una cancelada no admite nada.
+  protected esSesionFutura(leccion: LeccionRespuesta): boolean {
+    if (leccion.estado === 'CANCELADA') {
+      return false;
+    }
+    return !leccion.fechaHoraFin || new Date(leccion.fechaHoraFin).getTime() > Date.now();
+  }
+
+  protected esSesionRealizada(leccion: LeccionRespuesta): boolean {
+    if (leccion.estado === 'CANCELADA') {
+      return false;
+    }
+    return !!leccion.fechaHoraFin && new Date(leccion.fechaHoraFin).getTime() <= Date.now();
+  }
+
+  protected esSesionCancelada(leccion: LeccionRespuesta): boolean {
+    return leccion.estado === 'CANCELADA';
+  }
+
+  protected abrirReprogramarSesion(leccion: LeccionRespuesta): void {
+    this.cerrarMensaje();
+    this.reprogramarLeccion.set(leccion);
+  }
+
+  protected cerrarReprogramarSesion(): void {
+    this.reprogramarLeccion.set(null);
+  }
+
+  protected abrirCancelarSesion(leccion: LeccionRespuesta): void {
+    this.cerrarMensaje();
+    this.cancelarLeccion.set(leccion);
+  }
+
+  protected cerrarCancelarSesion(): void {
+    this.cancelarLeccion.set(null);
+  }
+
+  protected abrirCorregirSesion(leccion: LeccionRespuesta): void {
+    this.cerrarMensaje();
+    this.corregirLeccion.set(leccion);
+  }
+
+  protected cerrarCorregirSesion(): void {
+    this.corregirLeccion.set(null);
+  }
+
+  /** Reprogramar/cancelar/corregir no devuelven la lección completa (algunas respuestas son
+   * void), así que en vez de actualizar el signal `modulos` a mano, simplemente se recarga el
+   * contenido — igual de válido que la actualización en el sitio que usa guardarSesion(). */
+  protected sesionActualizada(): void {
+    this.reprogramarLeccion.set(null);
+    this.cancelarLeccion.set(null);
+    this.corregirLeccion.set(null);
+    this.cargarContenido();
   }
 
   protected moverLeccion(moduloId: number, indice: number, direccion: -1 | 1): void {

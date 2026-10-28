@@ -937,7 +937,12 @@
                   <h3 class="editor-sesion__titulo">{{ sesion.leccion.titulo }}</h3>
                   @if (sesion.leccion.fechaHoraInicio && sesion.leccion.fechaHoraFin) {
                     <span class="editor-sesion__fecha">{{ etiquetaSesion(sesion.leccion) }}</span>
-                    @if (sesion.leccion.enlaceReunion) {
+                    @if (esSesionCancelada(sesion.leccion)) {
+                      <span class="badge badge--disp-cancelado">Cancelada</span>
+                      @if (sesion.leccion.motivoCancelacion) {
+                        <span class="editor-sesion__enlace">{{ sesion.leccion.motivoCancelacion }}</span>
+                      }
+                    } @else if (sesion.leccion.enlaceReunion) {
                       <span class="editor-sesion__enlace">Enlace registrado</span>
                     } @else {
                       <span class="editor-sesion__enlace editor-sesion__enlace--pendiente">Sin enlace registrado</span>
@@ -946,9 +951,17 @@
                     <span class="badge badge--disp-proximo">Sin programar</span>
                   }
                 </div>
-                <button type="button" class="btn btn--acento" (click)="abrirProgramarSesion(sesion.leccion)">
-                  {{ sesion.leccion.fechaHoraInicio ? 'Editar programación' : 'Programar sesión' }}
-                </button>
+                <div class="editor-sesion__acciones">
+                  @if (!sesion.leccion.fechaHoraInicio) {
+                    <button type="button" class="btn btn--acento" (click)="abrirProgramarSesion(sesion.leccion)">Programar sesión</button>
+                  } @else if (esSesionRealizada(sesion.leccion)) {
+                    <button type="button" class="btn btn--neutro" (click)="abrirCorregirSesion(sesion.leccion)">Corregir</button>
+                  } @else if (!esSesionCancelada(sesion.leccion)) {
+                    <button type="button" class="btn btn--acento" (click)="abrirProgramarSesion(sesion.leccion)">Editar programación</button>
+                    <button type="button" class="btn btn--secundario" (click)="abrirReprogramarSesion(sesion.leccion)">Reprogramar</button>
+                    <button type="button" class="btn btn--peligro" (click)="abrirCancelarSesion(sesion.leccion)">Cancelar</button>
+                  }
+                </div>
               </article>
             }
           </div>
@@ -1014,5 +1027,22 @@
         </button>
       </div>
     </app-modal>
+  }
+
+  @if (reprogramarLeccion(); as leccion) {
+    <app-modal-reprogramar-sesion
+      [leccion]="leccion"
+      [cursoId]="cursoId"
+      (cerrado)="cerrarReprogramarSesion()"
+      (guardado)="sesionActualizada()"
+    />
+  }
+
+  @if (cancelarLeccion(); as leccion) {
+    <app-modal-cancelar-sesion [leccion]="leccion" (cerrado)="cerrarCancelarSesion()" (guardado)="sesionActualizada()" />
+  }
+
+  @if (corregirLeccion(); as leccion) {
+    <app-modal-corregir-sesion [leccion]="leccion" (cerrado)="cerrarCorregirSesion()" (guardado)="sesionActualizada()" />
   }
 }

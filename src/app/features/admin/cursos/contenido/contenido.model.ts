@@ -39,6 +39,9 @@ export interface LeccionRespuesta {
   activo: boolean;
   leccionOrigenId: number | null;
   materiales: MaterialRespuesta[];
+  /** HU-027 — estado de la sesión en vivo ("PROGRAMADA"/"REALIZADA"/"CANCELADA", entre otros). */
+  estado: string;
+  motivoCancelacion: string | null;
 }
 
 export interface ModuloRespuesta {
@@ -97,4 +100,54 @@ export interface ActualizarMaterialPeticion {
 
 export interface OrdenPeticion {
   ids: number[];
+}
+
+// ---------------------------------------------------------------- HU-027 Cambios en sesiones --
+
+export interface ReprogramarSesionPeticion {
+  nuevaFechaHoraInicio: string;
+  nuevaFechaHoraFin: string;
+  motivo: string;
+}
+
+export interface ReprogramarSesionRespuesta {
+  aplicado: boolean;
+  requiereAmpliarFinDeCurso: boolean;
+  /** LocalDate "yyyy-MM-dd", presente solo cuando requiereAmpliarFinDeCurso es true. */
+  fechaFinCursoSugerida: string | null;
+}
+
+export interface CancelarSesionPeticion {
+  motivo: string;
+}
+
+export interface CorregirEnlaceSesionPeticion {
+  enlaceReunion: string;
+}
+
+export type EstadoAsistencia = 'PENDIENTE' | 'PRESENTE' | 'AUSENTE' | 'JUSTIFICADA';
+
+export interface AsistenciaSesionRespuesta {
+  asistenciaId: number;
+  matriculaId: number;
+  alumnoNombre: string;
+  estado: EstadoAsistencia;
+}
+
+export interface CorregirAsistenciaPeticion {
+  nuevoEstado: EstadoAsistencia;
+  motivoCorreccion: string;
+}
+
+export type AccionHistorialSesion = 'REPROGRAMACION' | 'CANCELACION';
+
+export interface HistorialSesionRespuesta {
+  accion: AccionHistorialSesion;
+  inicioAnterior: string | null;
+  finAnterior: string | null;
+  inicioNuevo: string | null;
+  finNuevo: string | null;
+  motivo: string;
+  realizadoPorUsuarioId: number;
+  realizadoEn: string;
 }

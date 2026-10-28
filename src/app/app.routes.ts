@@ -86,8 +86,19 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/cuenta/mi-perfil/mi-perfil').then((m) => m.MiPerfil),
       }, // PF-009
+      {
+        path: 'calendario',
+        loadComponent: () =>
+          import('./features/calendario/calendario').then((m) => m.Calendario),
+      }, // PF-022 (HU-026)
     ],
   },
+  // HU-022 — Aula del curso: pantalla inmersiva propia, sin layout-alumno (header/footer propios).
+  {
+    path: 'aula/:cursoId',
+    canActivate: [sessionGuard],
+    loadComponent: () => import('./features/aula/aula').then((m) => m.Aula),
+  }, // PF-020
   // EP02: HU-008 (usuarios), HU-009 (información base, bajo "Configuración") y HU-010 (cursos).
   // El resto del panel administrativo queda pendiente.
   {

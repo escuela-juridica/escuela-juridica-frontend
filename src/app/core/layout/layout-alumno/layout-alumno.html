@@ -8,8 +8,10 @@
       <a routerLink="/app/panel" routerLinkActive="nav-enlace--activo" class="nav-enlace"
         >Mis cursos</a
       >
-      <!-- Calendario y Mis certificados pertenecen a EP03/EP04: fuera del alcance de este mockup -->
-      <span class="header-nav__deshabilitado">Calendario</span>
+      <a routerLink="/app/calendario" routerLinkActive="nav-enlace--activo" class="nav-enlace"
+        >Calendario</a
+      >
+      <!-- Mis certificados pertenece a EP05: fuera del alcance de EP04 -->
       <span class="header-nav__deshabilitado">Mis certificados</span>
       <a routerLink="/app/perfil" routerLinkActive="nav-enlace--activo" class="nav-enlace"
         >Mi perfil</a
@@ -64,8 +66,14 @@
         (click)="cerrarMenuMovil()"
         >Mis cursos</a
       >
-      <!-- Calendario y Mis certificados pertenecen a EP03/EP04: fuera del alcance de este mockup -->
-      <span class="menu-movil__item menu-movil__item--deshabilitado">Calendario</span>
+      <a
+        routerLink="/app/calendario"
+        routerLinkActive="menu-movil__item--activo"
+        class="menu-movil__item"
+        (click)="cerrarMenuMovil()"
+        >Calendario</a
+      >
+      <!-- Mis certificados pertenece a EP05: fuera del alcance de EP04 -->
       <span class="menu-movil__item menu-movil__item--deshabilitado">Mis certificados</span>
       <a
         routerLink="/app/perfil"

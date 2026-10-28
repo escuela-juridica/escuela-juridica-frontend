@@ -1,0 +1,88 @@
+<main>
+  <div class="contenedor">
+    <div class="eyebrow"><span class="eyebrow__dash"></span><span class="eyebrow__texto">Sesiones en vivo</span></div>
+    <h1 class="tipo-h1 calendario-titulo">Calendario</h1>
+    <p class="calendario-subtitulo">
+      Tus sesiones en vivo e híbridas, organizadas por fecha. El horario se muestra en hora de Perú (Lima).
+    </p>
+
+    <div class="calendario-nav">
+      <button type="button" class="btn btn--secundario calendario-nav__flecha" (click)="cambiarMes(-1)" aria-label="Mes anterior">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6" /></svg>
+      </button>
+      <div class="calendario-nav__centro">
+        <span class="calendario-nav__mes">{{ etiquetaMes() }}</span>
+        <button type="button" class="btn btn--neutro calendario-nav__hoy" (click)="irAHoy()" [disabled]="esMesActual()">Hoy</button>
+      </div>
+      <button type="button" class="btn btn--secundario calendario-nav__flecha" (click)="cambiarMes(1)" aria-label="Mes siguiente">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
+      </button>
+    </div>
+
+    @if (cargando()) {
+      <p class="calendario-subtitulo">Cargando sesiones...</p>
+    } @else if (error()) {
+      <div class="estado-vacio">
+        <h3 class="estado-vacio__titulo">No pudimos cargar tu calendario</h3>
+        <p class="estado-vacio__texto">Ocurrió un problema al consultar tus sesiones. Intenta nuevamente.</p>
+        <button type="button" class="btn btn--primario" (click)="cargar()">Reintentar</button>
+      </div>
+    } @else if (grupos().length > 0) {
+      @for (grupo of grupos(); track grupo.clave) {
+        <div class="calendario-dia">
+          <h2 class="tipo-h2 calendario-dia__titulo">{{ grupo.etiqueta }}</h2>
+
+          @for (sesion of grupo.sesiones; track sesion.leccionId) {
+            <div class="card calendario-sesion">
+              <div class="calendario-sesion__info">
+                <div class="calendario-sesion__curso">{{ sesion.cursoTitulo }}</div>
+                <h3 class="calendario-sesion__titulo">{{ sesion.titulo }}</h3>
+                <div class="calendario-sesion__horario">
+                  @if (sesion.fechaHoraInicio && sesion.fechaHoraFin) {
+                    {{ formatearHora(sesion.fechaHoraInicio) }} – {{ formatearHora(sesion.fechaHoraFin) }}
+                  } @else {
+                    Horario por confirmar
+                  }
+                </div>
+              </div>
+
+              <div class="calendario-sesion__estado">
+                <span class="badge" [class]="claseEstado(sesion.estadoSesion)">{{ etiquetaEstado(sesion.estadoSesion) }}</span>
+
+                @switch (sesion.estadoSesion) {
+                  @case ('FUTURA') {
+                    <button type="button" class="btn btn--secundario calendario-sesion__boton" disabled>Ingresar</button>
+                  }
+                  @case ('EN_VENTANA') {
+                    <button
+                      type="button"
+                      class="btn btn--acento calendario-sesion__boton"
+                      [disabled]="ingresando() === sesion.leccionId"
+                      (click)="ingresar(sesion)"
+                    >
+                      {{ ingresando() === sesion.leccionId ? 'Ingresando…' : 'Ingresar ahora' }}
+                    </button>
+                  }
+                  @case ('REALIZADA') {
+                    <p class="calendario-sesion__nota">
+                      {{ sesion.grabacionDisponible ? 'Grabación disponible' : 'Grabación pendiente' }}
+                    </p>
+                  }
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    } @else {
+      <div class="estado-vacio">
+        <span class="avatar avatar--lg" style="margin: 0 auto 20px">▤</span>
+        <h3 class="estado-vacio__titulo">No tienes sesiones en vivo este mes</h3>
+        <p class="estado-vacio__texto">
+          Este calendario se llena automáticamente cuando tienes una matrícula activa en un curso con
+          sesiones en vivo o híbridas. Si ya tienes una, probá revisar otro mes con las flechas de arriba.
+        </p>
+      </div>
+    }
+  </div>
+</main>

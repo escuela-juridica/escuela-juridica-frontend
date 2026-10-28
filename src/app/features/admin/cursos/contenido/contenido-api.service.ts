@@ -6,14 +6,21 @@ import { API_URL } from '../../../../core/api/api.config';
 import {
   ActualizarMaterialPeticion,
   ActualizarSesionPeticion,
+  AsistenciaSesionRespuesta,
+  CancelarSesionPeticion,
+  CorregirAsistenciaPeticion,
+  CorregirEnlaceSesionPeticion,
   CrearLeccionPeticion,
   CrearMaterialEnlacePeticion,
   CrearModuloPeticion,
+  HistorialSesionRespuesta,
   LeccionRespuesta,
   MaterialRespuesta,
   ModuloDisponibleRespuesta,
   ModuloRespuesta,
   OrdenPeticion,
+  ReprogramarSesionPeticion,
+  ReprogramarSesionRespuesta,
 } from './contenido.model';
 
 /** HU-011 — Organizar el contenido de un curso. Consume `/api/admin/.../modulos|lecciones|materiales`. */
@@ -112,5 +119,36 @@ export class ContenidoApiService {
 
   eliminarMaterial(materialId: number): Observable<void> {
     return this.http.delete<void>(`${this.base}/materiales/${materialId}`);
+  }
+
+  // ---------------------------------------------------------------- HU-027 Cambios en sesiones --
+
+  reprogramarSesion(leccionId: number, p: ReprogramarSesionPeticion): Observable<ReprogramarSesionRespuesta> {
+    return this.http.patch<ReprogramarSesionRespuesta>(`${this.base}/lecciones/${leccionId}/sesion/reprogramar`, p);
+  }
+
+  ampliarFinDeCurso(cursoId: number, nuevaFechaFin: string): Observable<void> {
+    const params = new HttpParams().set('nuevaFechaFin', nuevaFechaFin);
+    return this.http.patch<void>(`${this.base}/cursos/${cursoId}/fecha-fin`, {}, { params });
+  }
+
+  cancelarSesion(leccionId: number, p: CancelarSesionPeticion): Observable<void> {
+    return this.http.patch<void>(`${this.base}/lecciones/${leccionId}/sesion/cancelar`, p);
+  }
+
+  corregirEnlaceSesion(leccionId: number, p: CorregirEnlaceSesionPeticion): Observable<void> {
+    return this.http.patch<void>(`${this.base}/lecciones/${leccionId}/sesion/enlace`, p);
+  }
+
+  listarAsistenciasSesion(leccionId: number): Observable<AsistenciaSesionRespuesta[]> {
+    return this.http.get<AsistenciaSesionRespuesta[]>(`${this.base}/lecciones/${leccionId}/sesion/asistencias`);
+  }
+
+  corregirAsistencia(asistenciaId: number, p: CorregirAsistenciaPeticion): Observable<void> {
+    return this.http.patch<void>(`${this.base}/asistencias/${asistenciaId}`, p);
+  }
+
+  historialSesion(leccionId: number): Observable<HistorialSesionRespuesta[]> {
+    return this.http.get<HistorialSesionRespuesta[]>(`${this.base}/lecciones/${leccionId}/sesion/historial`);
   }
 }

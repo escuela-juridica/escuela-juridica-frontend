@@ -1,0 +1,76 @@
+.modal-corregir__alerta {
+  margin: 0 0 16px;
+}
+
+.modal-corregir__subtitulo {
+  margin: 20px 0 10px;
+  font-size: 14px;
+}
+
+.modal-corregir__asistencias {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modal-corregir__fila {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.modal-corregir__alumno {
+  flex: 1;
+  min-width: 160px;
+  font-size: 14px;
+  color: var(--neutral-950);
+}
+
+.modal-corregir__select {
+  width: 160px;
+  flex-shrink: 0;
+}
+
+.modal-corregir__motivo {
+  flex: 1 0 100%;
+}
+
+.modal-corregir__historial {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-corregir__historial-item {
+  display: flex;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--neutral-100);
+  font-size: 13px;
+}
+
+.modal-corregir__historial-item:last-child {
+  border-bottom: none;
+}
+
+.modal-corregir__historial-accion {
+  flex: 0 0 120px;
+  font-weight: 700;
+  color: var(--acento-700);
+}
+
+.modal-corregir__historial-detalle {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: var(--neutral-700);
+}
+
+.modal-corregir__historial-motivo {
+  color: var(--neutral-500);
+}
+
+.modal-corregir__historial-fecha {
+  color: var(--neutral-500);
+  font-size: 12px;
+}
