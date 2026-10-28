@@ -87,10 +87,30 @@ export const routes: Routes = [
           import('./features/cuenta/mi-perfil/mi-perfil').then((m) => m.MiPerfil),
       }, // PF-009
       {
+        path: 'certificados',
+        loadComponent: () =>
+          import('./features/certificacion/mis-certificados/mis-certificados').then((m) => m.MisCertificados),
+      }, // HU-033
+      {
         path: 'calendario',
         loadComponent: () =>
           import('./features/calendario/calendario').then((m) => m.Calendario),
       }, // PF-022 (HU-026)
+    ],
+  },
+  // HU-034 — Verificación pública de certificados: sin sesión, por código o por el QR del documento.
+  {
+    path: 'verificar-certificado',
+    loadComponent: () =>
+      import('./core/layout/layout-publico/layout-publico').then((m) => m.LayoutPublico),
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./features/certificacion/verificar-certificado/verificar-certificado').then(
+            (m) => m.VerificarCertificado,
+          ),
+      },
     ],
   },
   // HU-022/023/024 — Aula del curso: dentro del layout del alumno (navbar principal), con el temario
@@ -189,6 +209,13 @@ export const routes: Routes = [
             (m) => m.RevisionIntentoPantalla,
           ),
       }, // HU-030
+      {
+        path: 'reportes/certificados',
+        loadComponent: () =>
+          import('./features/admin/reportes/reporte-certificados/reporte-certificados').then(
+            (m) => m.ReporteCertificadosPantalla,
+          ),
+      }, // HU-044
       {
         path: 'reportes/academico',
         loadComponent: () =>

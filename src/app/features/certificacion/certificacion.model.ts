@@ -57,3 +57,30 @@ export interface ConfirmarDatos {
   apellidoPaterno: string;
   apellidoMaterno: string;
 }
+
+/** HU-033 — Un certificado del alumno. Solo uno VIGENTE trae `descargaUrl`. */
+export interface MiCertificado {
+  codigo: string;
+  cursoId: number;
+  curso: string;
+  nivel: 'NORMAL' | 'REFRENDADO';
+  entidad: string | null;
+  horas: number;
+  emitidoEn: string;
+  estado: 'VIGENTE' | 'ANULADO';
+  anuladoEn: string | null;
+  descargaUrl: string | null;
+}
+
+/** HU-034 — Lo único que se muestra públicamente de un certificado. */
+export interface VerificacionCertificado {
+  estado: 'VIGENTE' | 'ANULADO';
+  codigo: string;
+  titular: string;
+  curso: string;
+  horas: number;
+  nivel: 'NORMAL' | 'REFRENDADO';
+  entidad: string | null;
+  emitidoEn: string;
+  anuladoEn: string | null;
+}

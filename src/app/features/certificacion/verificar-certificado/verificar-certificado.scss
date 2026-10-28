@@ -1,0 +1,142 @@
+// HU-034 · Verificación pública de certificados.
+
+.verificar {
+  max-width: 760px;
+}
+
+.verificar__titulo {
+  font-size: 28px;
+  line-height: 36px;
+  color: var(--neutral-950);
+  margin: 0 0 8px;
+}
+
+.verificar__subtitulo {
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--neutral-600);
+  margin: 0 0 24px;
+}
+
+.verificar__formulario {
+  padding: 20px 24px;
+}
+
+.verificar__fila {
+  display: flex;
+  gap: 12px;
+}
+
+.verificar__fila .input {
+  flex: 1;
+  min-width: 0;
+  text-transform: uppercase;
+}
+
+.verificar__resultado {
+  margin-top: 20px;
+}
+
+.verificar__tarjeta {
+  padding: 24px;
+}
+
+.verificar__tarjeta--vigente {
+  border-color: var(--exito);
+}
+
+.verificar__tarjeta--anulado {
+  border-color: var(--error);
+}
+
+.verificar__sello {
+  margin: 0 0 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 700;
+  color: var(--exito);
+}
+
+.verificar__sello--anulado {
+  color: var(--error);
+}
+
+.verificar__sello--neutro {
+  color: var(--neutral-950);
+  margin-bottom: 8px;
+}
+
+.verificar__ayuda {
+  margin: 0;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--neutral-600);
+}
+
+.verificar__datos {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 24px;
+}
+
+.verificar__ancho {
+  grid-column: 1 / -1;
+}
+
+.verificar__datos dt {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--neutral-600);
+}
+
+.verificar__datos dd {
+  margin: 2px 0 0;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--neutral-950);
+  overflow-wrap: anywhere;
+}
+
+.verificar__titular {
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 700;
+}
+
+.verificar__codigo {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.verificar__privacidad {
+  margin: 20px 0 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--neutral-600);
+}
+
+@media (max-width: 560px) {
+  .verificar__fila {
+    flex-direction: column;
+  }
+
+  .verificar__fila .btn {
+    width: 100%;
+  }
+
+  .verificar__datos {
+    grid-template-columns: 1fr;
+  }
+
+  .verificar__formulario,
+  .verificar__tarjeta {
+    padding: 16px;
+  }
+}

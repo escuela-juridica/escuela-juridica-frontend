@@ -1,0 +1,129 @@
+// HU-033 · Mis certificados.
+
+// Mismo tamaño de título de pantalla que Panel y Mi perfil (28/36 px).
+.certificados-titulo {
+  font-size: 28px;
+  line-height: 36px;
+  color: var(--neutral-950);
+  margin: 0 0 8px;
+}
+
+.certificados-subtitulo {
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--neutral-600);
+  margin: 0 0 24px;
+}
+
+.certificados-estado {
+  color: var(--neutral-600);
+}
+
+.certificados-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.certificado {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 20px;
+  padding: 20px 24px;
+}
+
+.certificado--anulado {
+  background: var(--neutral-050);
+}
+
+.certificado__icono {
+  width: 56px;
+  height: 56px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radio-lg);
+  background: var(--acento-050);
+  color: var(--acento-700);
+}
+
+.certificado--anulado .certificado__icono {
+  background: var(--neutral-100);
+  color: var(--neutral-500);
+}
+
+.certificado__cabecera {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.certificado__curso {
+  margin: 0;
+  font-size: 18px;
+  line-height: 28px;
+  font-weight: 700;
+  color: var(--neutral-950);
+}
+
+.certificado__datos {
+  margin: 8px 0 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 8px 20px;
+}
+
+.certificado__datos dt {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--neutral-600);
+}
+
+.certificado__datos dd {
+  margin: 0;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--neutral-950);
+  overflow-wrap: anywhere;
+}
+
+.certificado__codigo {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.certificado__aviso {
+  margin: 10px 0 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--error);
+}
+
+.certificado__acciones {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+@media (max-width: 767px) {
+  .certificado {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+
+  .certificado__icono {
+    display: none;
+  }
+
+  .certificado__acciones .btn {
+    width: 100%;
+  }
+}

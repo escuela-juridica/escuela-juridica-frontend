@@ -1,0 +1,56 @@
+<main>
+  <div class="contenedor">
+    <div class="eyebrow"><span class="eyebrow__dash"></span><span class="eyebrow__texto">Tu acreditación</span></div>
+    <h1 class="tipo-h1 certificados-titulo">Mis certificados</h1>
+    <p class="certificados-subtitulo">
+      Aquí están los certificados de los cursos que completaste. Son privados: solo tú puedes descargarlos.
+    </p>
+
+    @if (cargando()) {
+      <p class="certificados-estado">Cargando tus certificados…</p>
+    } @else if (error(); as mensaje) {
+      <div class="alerta alerta--error" role="alert"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div>
+    } @else if (certificados().length === 0) {
+      <div class="estado-vacio">
+        <h3 class="estado-vacio__titulo">Todavía no tienes certificados</h3>
+        <p class="estado-vacio__texto">Cuando completes un curso y emitas tu certificado, aparecerá aquí.</p>
+        <a class="btn btn--acento" routerLink="/app/panel">Ir a mis cursos</a>
+      </div>
+    } @else {
+      <ul class="certificados-lista">
+        @for (c of certificados(); track c.codigo) {
+          <li class="card certificado" [class.certificado--anulado]="c.estado === 'ANULADO'">
+            <div class="certificado__icono" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6" /><path d="M8.5 14.5L7 22l5-3 5 3-1.5-7.5" /></svg>
+            </div>
+            <div class="certificado__cuerpo">
+              <div class="certificado__cabecera">
+                <h2 class="certificado__curso">{{ c.curso }}</h2>
+                @if (c.estado === 'VIGENTE') {
+                  <span class="badge badge--disp-inmediato">Vigente</span>
+                } @else {
+                  <span class="badge badge--disp-cancelado">Anulado · no válido</span>
+                }
+              </div>
+              <dl class="certificado__datos">
+                <div><dt>Nivel</dt><dd>{{ c.nivel === 'REFRENDADO' ? 'Refrendado' : 'Normal' }}@if (c.entidad) { · {{ c.entidad }} }</dd></div>
+                <div><dt>Emitido el</dt><dd>{{ formatearFechaLarga(c.emitidoEn) }}</dd></div>
+                <div><dt>Horas</dt><dd>{{ c.horas | number:'1.0-2' }} h académicas</dd></div>
+                <div><dt>Código</dt><dd class="certificado__codigo">{{ c.codigo }}</dd></div>
+              </dl>
+              @if (c.estado === 'ANULADO') {
+                <p class="certificado__aviso">Este certificado fue anulado{{ c.anuladoEn ? ' el ' + formatearFechaLarga(c.anuladoEn) : '' }}. Ya no es válido y su documento no está disponible.</p>
+              }
+            </div>
+            <div class="certificado__acciones">
+              @if (c.descargaUrl) {
+                <button type="button" class="btn btn--acento" (click)="descargar(c)">Descargar PDF</button>
+              }
+              <a class="btn btn--secundario" [routerLink]="['/aula', c.cursoId]">Ver curso</a>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+</main>
