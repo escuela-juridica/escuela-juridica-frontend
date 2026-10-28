@@ -1,0 +1,61 @@
+:host {
+  display: inline-block;
+  line-height: 0;
+}
+
+.anillo {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  --anillo-pista: var(--neutral-200);
+  --anillo-arco: var(--acento-500);
+  --anillo-texto: var(--neutral-950);
+  --anillo-etiqueta: var(--neutral-600);
+}
+
+.anillo--oscuro {
+  --anillo-pista: rgba(255, 255, 255, 0.22);
+  --anillo-texto: #fff;
+  --anillo-etiqueta: rgba(255, 255, 255, 0.78);
+}
+
+.anillo--exito {
+  --anillo-arco: var(--exito);
+}
+
+.anillo--error {
+  --anillo-arco: var(--error);
+}
+
+.anillo svg {
+  position: absolute;
+  inset: 0;
+}
+
+.anillo__pista {
+  stroke: var(--anillo-pista);
+}
+
+.anillo__arco {
+  stroke: var(--anillo-arco);
+  transition: stroke-dashoffset 600ms ease;
+}
+
+.anillo__centro {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.1;
+}
+
+.anillo__valor {
+  font-weight: 700;
+  color: var(--anillo-texto);
+}
+
+.anillo__etiqueta {
+  margin-top: 2px;
+  color: var(--anillo-etiqueta);
+}

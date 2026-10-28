@@ -76,4 +76,6 @@ export interface AulaRespuesta {
   ultimaLeccionIdValida: number | null;
   avanceCertificado: AvanceCertificado;
   examenesFinales: ExamenAulaRespuesta[];
+  imagenPortadaUrl: string | null;
+  horasAcademicas: number | null;
 }

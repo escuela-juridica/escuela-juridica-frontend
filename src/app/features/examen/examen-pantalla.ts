@@ -6,10 +6,13 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Observable, distinctUntilChanged, forkJoin, map, of } from 'rxjs';
 
 import { AlertaGlobalService } from '../../core/notificaciones/alerta-global.service';
+import { AnilloProgreso } from '../../shared/ui/anillo-progreso/anillo-progreso';
 import { Modal } from '../../shared/ui/modal/modal';
 import { AulaSesionService } from '../aula/aula-sesion.service';
 import { formatearDiaMes, formatearFechaHoraCorta, formatearFechaLarga } from '../cursos/curso-formato.util';
 import { ExamenApiService } from './examen-api.service';
+import { ExamenFichaCabecera } from './ficha-cabecera/examen-ficha-cabecera';
+import { EstadoGuardado, ExamenNavegador } from './navegador/examen-navegador';
 import { ExamenFicha, Intento, IntentoResumen, PreguntaIntento } from './examen.model';
 
 /** Lo que el alumno lleva escrito/marcado en una pregunta (se sincroniza con el servidor al vuelo). */
@@ -17,8 +20,6 @@ interface RespuestaLocal {
   opciones: number[];
   texto: string;
 }
-
-type EstadoGuardado = 'idle' | 'guardando' | 'ok' | 'error';
 
 const ESPERA_GUARDADO_TEXTO_MS = 700;
 
@@ -30,7 +31,7 @@ const ESPERA_GUARDADO_TEXTO_MS = 700;
  */
 @Component({
   selector: 'app-examen-pantalla',
-  imports: [RouterLink, DecimalPipe, Modal],
+  imports: [RouterLink, DecimalPipe, Modal, AnilloProgreso, ExamenFichaCabecera, ExamenNavegador],
   templateUrl: './examen-pantalla.html',
   styleUrl: './examen-pantalla.scss',
 })
@@ -75,6 +76,10 @@ export class ExamenPantalla {
 
   protected readonly preguntaActual = computed<PreguntaIntento | null>(
     () => this.intento()?.preguntas[this.indice()] ?? null,
+  );
+
+  protected readonly respondidas = computed<ReadonlySet<number>>(
+    () => new Set((this.intento()?.preguntas ?? []).filter((p) => this.estaRespondida(p)).map((p) => p.id)),
   );
 
   protected readonly totalRespondidas = computed(

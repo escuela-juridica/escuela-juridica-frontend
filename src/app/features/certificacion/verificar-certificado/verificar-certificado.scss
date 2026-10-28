@@ -1,25 +1,67 @@
 // HU-034 · Verificación pública de certificados.
 
+.verificar-hero {
+  background:
+    radial-gradient(circle at 88% 30%, rgba(0, 216, 216, 0.22), transparent 42%),
+    linear-gradient(115deg, var(--marca-900) 0%, var(--marca-700) 60%, var(--acento-700) 100%);
+  color: #fff;
+}
+
+.verificar-hero__interior {
+  max-width: 800px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding-top: 44px;
+  padding-bottom: 72px;
+}
+
+.verificar-hero__escudo {
+  flex: none;
+  width: 84px;
+  height: 84px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: var(--acento-500);
+}
+
 .verificar {
-  max-width: 760px;
+  max-width: 800px;
+  margin-top: -44px;
+  padding-bottom: 48px;
 }
 
 .verificar__titulo {
   font-size: 28px;
   line-height: 36px;
-  color: var(--neutral-950);
+  color: #fff;
   margin: 0 0 8px;
 }
 
 .verificar__subtitulo {
+  max-width: 620px;
   font-size: 16px;
   line-height: 24px;
-  color: var(--neutral-600);
-  margin: 0 0 24px;
+  color: rgba(255, 255, 255, 0.86);
+  margin: 0;
+}
+
+// El eyebrow de marca (rojo) no se lee sobre azul: versión clara.
+:host ::ng-deep .eyebrow--claro .eyebrow__dash {
+  background: var(--acento-500);
+}
+
+:host ::ng-deep .eyebrow--claro .eyebrow__texto {
+  color: var(--acento-500);
 }
 
 .verificar__formulario {
-  padding: 20px 24px;
+  padding: 22px 24px;
+  box-shadow: 0 10px 28px rgba(16, 24, 40, 0.14);
 }
 
 .verificar__fila {
@@ -38,7 +80,8 @@
 }
 
 .verificar__tarjeta {
-  padding: 24px;
+  padding: 28px;
+  border-top-width: 5px;
 }
 
 .verificar__tarjeta--vigente {
@@ -58,6 +101,23 @@
   line-height: 28px;
   font-weight: 700;
   color: var(--exito);
+}
+
+.verificar__sello-icono {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--exito);
+  color: #fff;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.verificar__sello--anulado .verificar__sello-icono {
+  background: var(--error);
 }
 
 .verificar__sello--anulado {
@@ -120,6 +180,21 @@
   font-size: 13px;
   line-height: 18px;
   color: var(--neutral-600);
+}
+
+@media (max-width: 767px) {
+  .verificar-hero__interior {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    padding-top: 32px;
+    padding-bottom: 64px;
+  }
+
+  .verificar-hero__escudo {
+    width: 64px;
+    height: 64px;
+  }
 }
 
 @media (max-width: 560px) {

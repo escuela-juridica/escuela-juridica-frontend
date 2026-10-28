@@ -8,206 +8,470 @@
   gap: 20px;
 }
 
-.resumen__hero {
-  padding: 24px;
+// =============================================================== Portada ==
+// Imagen del curso bajo un degradado de marca: da identidad y deja el texto siempre legible.
+.hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radio-xl);
+  background-color: var(--marca-900);
+  background-image: var(--portada, none);
+  background-size: cover;
+  background-position: center;
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(16, 24, 40, 0.16);
 }
 
-// Mismo tamaño de título de pantalla que Panel y Mi perfil (28/36 px).
-.resumen__titulo {
-  margin: 4px 0 20px;
-  font-size: 28px;
-  line-height: 36px;
-  font-weight: 700;
-  color: var(--neutral-950);
+.hero__velo {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, rgba(10, 32, 56, 0.96) 0%, rgba(16, 56, 96, 0.9) 48%, rgba(0, 111, 115, 0.72) 100%);
 }
 
-.resumen__avance {
+.hero__contenido {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 16px;
+  justify-content: space-between;
+  gap: 32px;
+  padding: 32px 36px 24px;
 }
 
-// Guía §23: 12 px en resumen destacado.
-.resumen__pista {
-  flex: 1;
-  height: 12px;
-  border-radius: var(--radio-completo);
-  background: var(--neutral-200);
-  overflow: hidden;
+.hero__texto {
+  min-width: 0;
+  max-width: 640px;
 }
 
-.resumen__relleno {
-  height: 100%;
+.hero__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.hero__chip {
+  padding: 4px 12px;
   border-radius: var(--radio-completo);
   background: var(--acento-500);
-  transition: width 250ms ease;
-}
-
-.resumen__porcentaje {
-  min-width: 48px;
-  text-align: right;
-  font-size: 18px;
-  line-height: 28px;
+  color: var(--marca-900);
+  font-size: 12px;
+  line-height: 16px;
   font-weight: 700;
-  color: var(--neutral-950);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
-.resumen__detalle {
-  margin: 8px 0 0;
+.hero__chip--suave {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+}
+
+.hero__titulo {
+  margin: 0 0 16px;
+  font-size: 32px;
+  line-height: 40px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.hero__datos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
   font-size: 14px;
   line-height: 20px;
-  color: var(--neutral-600);
+  color: rgba(255, 255, 255, 0.88);
 }
 
-.resumen__continuar {
-  margin-top: 24px;
+.hero__datos li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hero__progreso {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.hero__lecciones {
+  margin: 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.hero__paso {
+  position: relative;
+  margin: 0 20px 20px;
   padding: 16px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  border: 1px solid var(--acento-100);
-  border-radius: var(--radio-md);
-  background: var(--acento-050);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radio-lg);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(6px);
 }
 
-.resumen__continuar-texto {
+.hero__paso:empty {
+  display: none;
+}
+
+.hero__paso-texto {
   min-width: 0;
   display: flex;
   flex-direction: column;
 }
 
-.resumen__continuar-etiqueta {
+.hero__paso-etiqueta {
   font-size: 12px;
   line-height: 16px;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--acento-700);
+  color: var(--acento-500);
 }
 
-.resumen__continuar-leccion {
-  font-size: 18px;
+.hero__paso-titulo {
+  font-size: 20px;
   line-height: 28px;
   font-weight: 700;
-  color: var(--neutral-950);
+  color: #fff;
 }
 
-.resumen__continuar-modulo {
+.hero__paso-titulo--normal {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 500;
+}
+
+.hero__paso-detalle {
   font-size: 14px;
   line-height: 20px;
-  color: var(--neutral-600);
+  color: rgba(255, 255, 255, 0.8);
 }
 
-.resumen__boton {
+.hero__cta {
   flex: none;
+  // Sobre el degradado oscuro el botón turquesa de marca (texto azul) es el que más contrasta.
+  background: var(--acento-500);
+  border-color: var(--acento-500);
+  color: var(--marca-900);
 }
 
-.resumen__aviso {
-  margin-top: 24px;
+.hero__cta:hover {
+  background: #6ff0f0;
+  border-color: #6ff0f0;
+  color: var(--marca-900);
+}
+
+// ============================================================== Pestañas ==
+.pestanas {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--neutral-200);
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.pestana {
+  position: relative;
+  flex: none;
+  min-height: 48px;
+  padding: 0 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -1px;
+  background: transparent;
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 600;
+  color: var(--neutral-600);
+  cursor: pointer;
+}
+
+.pestana:hover {
+  color: var(--marca-900);
+}
+
+.pestana--activa {
+  color: var(--marca-900);
+  border-bottom-color: var(--acento-500);
+}
+
+.pestana__contador {
+  min-width: 22px;
+  padding: 0 6px;
+  border-radius: var(--radio-completo);
+  background: var(--neutral-100);
+  font-size: 12px;
+  line-height: 22px;
+  text-align: center;
+  color: var(--neutral-800);
+}
+
+.pestana__punto {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--exito);
+}
+
+// ============================================================ Contenido ==
+.resumen__rejilla {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
 }
 
 .resumen__bloque {
   padding: 20px 24px;
 }
 
+.resumen__bloque--certificado {
+  padding: 24px;
+}
+
 .resumen__subtitulo {
-  margin: 0 0 12px;
+  margin: 0 0 14px;
   font-size: 20px;
   line-height: 28px;
   font-weight: 600;
   color: var(--neutral-950);
 }
 
-.resumen__sesiones {
+.resumen__vacio {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--neutral-600);
+}
+
+// Sesiones en vivo con "ficha de calendario" a la izquierda.
+.sesiones {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
+  gap: 12px;
 }
 
-.resumen__sesion {
+.sesion {
   display: flex;
   align-items: center;
   gap: 14px;
-  min-height: 60px;
-  padding: 10px 0;
-  border-top: 1px solid var(--neutral-100);
 }
 
-.resumen__sesion:first-child {
-  border-top: 0;
-}
-
-.resumen__sesion-icono {
+.sesion__fecha {
   flex: none;
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radio-md);
+  width: 52px;
+  height: 56px;
   display: inline-flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  border-radius: var(--radio-md);
   background: var(--celeste-050);
   color: var(--celeste-700);
+  line-height: 1.1;
 }
 
-.resumen__sesion-icono--examen {
-  background: var(--violeta-050);
-  color: var(--violeta-700);
+.sesion__dia {
+  font-size: 22px;
+  font-weight: 700;
 }
 
-.resumen__aviso-accion {
-  margin-top: 12px;
+.sesion__mes {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
-.resumen__sesion-texto {
+.sesion__texto {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
 }
 
-.resumen__sesion-titulo {
+.sesion__titulo {
   font-size: 16px;
   line-height: 24px;
   font-weight: 600;
   color: var(--neutral-950);
 }
 
-.resumen__sesion-fecha {
+.sesion__detalle {
   font-size: 13px;
   line-height: 18px;
   color: var(--neutral-600);
 }
 
+// Evaluaciones: tarjeta con franja de color según el estado.
+.examenes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 480px), 1fr));
+  gap: 16px;
+}
+
+.examen-tarjeta {
+  --franja: var(--neutral-300);
+  --icono-fondo: var(--neutral-100);
+  --icono-color: var(--neutral-500);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  border: 1px solid var(--tarjeta-borde);
+  border-left: 5px solid var(--franja);
+  border-radius: var(--radio-lg);
+  background: var(--blanco);
+  box-shadow: var(--tarjeta-sombra);
+}
+
+.examen-tarjeta--exito {
+  --franja: var(--exito);
+  --icono-fondo: var(--exito-fondo);
+  --icono-color: var(--exito);
+}
+
+.examen-tarjeta--error {
+  --franja: var(--error);
+  --icono-fondo: var(--error-fondo);
+  --icono-color: var(--error);
+}
+
+.examen-tarjeta--revision {
+  --franja: var(--violeta-700);
+  --icono-fondo: var(--violeta-050);
+  --icono-color: var(--violeta-700);
+}
+
+.examen-tarjeta--curso,
+.examen-tarjeta--pendiente {
+  --franja: var(--acento-500);
+  --icono-fondo: var(--acento-050);
+  --icono-color: var(--acento-700);
+}
+
+.examen-tarjeta__icono {
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radio-lg);
+  background: var(--icono-fondo);
+  color: var(--icono-color);
+}
+
+.examen-tarjeta__linea {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.examen-tarjeta__titulo {
+  margin: 0;
+  font-size: 17px;
+  line-height: 24px;
+  font-weight: 700;
+  color: var(--neutral-950);
+}
+
+.examen-tarjeta__meta {
+  margin: 2px 0 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--neutral-600);
+}
+
+.examen-tarjeta__motivo {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--advertencia);
+}
+
+.examen-tarjeta__nota {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+// ============================================================ Responsivo ==
+@media (max-width: 1023px) {
+  .resumen__rejilla {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 @media (max-width: 767px) {
-  .resumen__hero {
-    padding: 20px 16px;
+  .hero__contenido {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 24px 20px 16px;
+  }
+
+  .hero__titulo {
+    font-size: 26px;
+    line-height: 34px;
+  }
+
+  .hero__progreso {
+    flex-direction: row;
+    gap: 16px;
+  }
+
+  .hero__paso {
+    margin: 0 12px 12px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hero__cta {
+    width: 100%;
   }
 
   .resumen__bloque {
     padding: 16px;
   }
 
-  .resumen__titulo {
-    margin-bottom: 16px;
+  .examen-tarjeta {
+    grid-template-columns: auto minmax(0, 1fr);
   }
 
-  .resumen__continuar {
-    flex-direction: column;
-    align-items: stretch;
+  .examen-tarjeta__nota {
+    grid-column: 1 / -1;
+    justify-content: space-between;
   }
 
-  .resumen__boton {
-    width: 100%;
+  .examen-tarjeta__nota .btn {
+    flex: 1;
   }
 
-  .resumen__sesion {
+  .sesion {
     flex-wrap: wrap;
-  }
-
-  .resumen__sesion .btn {
-    width: 100%;
   }
 }

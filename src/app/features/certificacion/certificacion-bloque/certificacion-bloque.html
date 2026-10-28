@@ -4,44 +4,76 @@
   <div class="alerta alerta--error" role="alert"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div>
 } @else if (cert(); as c) {
   <div class="cert">
-    <div class="cert__cabecera">
-      <div>
-        <h2 class="cert__titulo">Tu certificado</h2>
-        <p class="cert__mensaje">{{ c.mensaje }}</p>
-      </div>
-      <span [class]="'badge ' + claseEstado(c)">{{ etiquetaEstado(c) }}</span>
-    </div>
+    <!-- Recorrido: el alumno siempre sabe en qué paso está y qué sigue. -->
+    <ol class="cert__pasos" aria-label="Pasos para obtener tu certificado">
+      @for (paso of pasos; track paso; let i = $index) {
+        <li class="cert__paso" [class.cert__paso--hecho]="i < pasoActual(c)" [class.cert__paso--actual]="i === pasoActual(c)"
+          [attr.aria-current]="i === pasoActual(c) ? 'step' : null">
+          <span class="cert__paso-marca">
+            @if (i < pasoActual(c)) {
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5" /></svg>
+            } @else { {{ i + 1 }} }
+          </span>
+          <span class="cert__paso-texto">{{ paso }}</span>
+        </li>
+      }
+    </ol>
 
     @if (c.certificado; as e) {
-      <div class="cert__emitido">
-        <div class="cert__emitido-datos">
-          <div><span>Código</span><strong>{{ e.codigo }}</strong></div>
-          <div><span>Emitido el</span><strong>{{ formatearFechaLarga(e.emitidoEn) }}</strong></div>
-          <div><span>Nivel</span><strong>{{ e.nivel === 'REFRENDADO' ? 'Refrendado' : 'Normal' }}</strong></div>
-          @if (e.nota !== null) { <div><span>Nota final</span><strong>{{ e.nota | number:'1.0-2' }}</strong></div> }
-          @if (e.entidad) { <div><span>Entidad</span><strong>{{ e.entidad }}</strong></div> }
-          <div class="cert__emitido-ancho"><span>A nombre de</span><strong>{{ e.nombresImpresos }}</strong></div>
+      <!-- ===================================================== Emitido == -->
+      <div class="cert__celebracion" [class.cert__celebracion--anulado]="e.estado !== 'VIGENTE'">
+        <div class="cert__celebracion-texto">
+          <span class="badge cert__badge" [class]="'badge ' + claseEstado(c)">{{ etiquetaEstado(c) }}</span>
+          <h2 class="cert__celebracion-titulo">
+            @if (e.estado === 'VIGENTE') { ¡Felicitaciones! Obtuviste tu certificado } @else { Este certificado fue anulado }
+          </h2>
+          <p class="cert__celebracion-detalle">{{ c.curso }}</p>
+          <dl class="cert__celebracion-datos">
+            <div><dt>Código</dt><dd>{{ e.codigo }}</dd></div>
+            <div><dt>Emitido el</dt><dd>{{ formatearFechaLarga(e.emitidoEn) }}</dd></div>
+            <div><dt>Nivel</dt><dd>{{ e.nivel === 'REFRENDADO' ? 'Refrendado' : 'Normal' }}</dd></div>
+            @if (e.nota !== null) { <div><dt>Nota final</dt><dd>{{ e.nota | number:'1.0-2' }}</dd></div> }
+          </dl>
+          @if (e.estado === 'VIGENTE') {
+            <div class="cert__acciones cert__acciones--izquierda">
+              <button type="button" class="btn btn--acento btn--grande cert__cta" (click)="descargar()">Descargar PDF</button>
+              <button type="button" class="btn cert__ghost" (click)="ver()">Ver certificado</button>
+              <button type="button" class="btn cert__ghost" (click)="copiarEnlace(e.codigo)">{{ enlaceCopiado() ? '✓ Copiado' : 'Copiar enlace' }}</button>
+              <a class="btn cert__ghost" [routerLink]="['/verificar-certificado']" [queryParams]="{ codigo: e.codigo }" target="_blank">Verificar</a>
+            </div>
+          }
+          <p class="cert__celebracion-nota">Tu nota, nivel y datos son definitivos. Los exámenes calificados ya no admiten nuevos intentos; las prácticas siguen disponibles.</p>
         </div>
-        @if (e.estado === 'VIGENTE') {
-          <button type="button" class="btn btn--acento" (click)="descargar()">Descargar certificado (PDF)</button>
-        }
-        <p class="cert__nota">Tu nota, nivel y datos quedaron definitivos. Los exámenes calificados ya no admiten nuevos intentos; las prácticas siguen disponibles.</p>
+        <div class="cert__celebracion-vista">
+          <app-diploma-miniatura [titular]="e.nombresImpresos" [curso]="c.curso" [nivel]="e.nivel" [entidad]="e.entidad" [anulado]="e.estado !== 'VIGENTE'" />
+        </div>
       </div>
     } @else {
+      <!-- ================================================ Aún sin emitir == -->
+      <div class="cert__estado-tarjeta" [class.cert__estado-tarjeta--listo]="c.estado === 'LISTO_PARA_EMITIR'">
+        <div class="cert__estado-texto">
+          <span [class]="'badge ' + claseEstado(c)">{{ etiquetaEstado(c) }}</span>
+          <p class="cert__mensaje">{{ c.mensaje }}</p>
+        </div>
+      </div>
+
       @if (mostrarProyeccion(c)) {
         <dl class="cert__proyeccion">
           @if (c.exigeExamenes && c.notaFinal !== null) {
-            <div><dt>Tu promedio</dt><dd>{{ c.notaFinal | number:'1.0-2' }}</dd></div>
-            <div>
+            <div class="cert__ficha">
+              <dt>Tu promedio</dt>
+              <dd class="cert__ficha-grande">{{ c.notaFinal | number:'1.0-2' }}</dd>
+            </div>
+            <div class="cert__ficha">
               <dt>Nivel</dt>
-              <dd>{{ c.nivelProyectado === 'REFRENDADO' ? 'Refrendado' : 'Normal' }}@if (c.entidadProyectada) { · {{ c.entidadProyectada }} }</dd>
+              <dd>{{ c.nivelProyectado === 'REFRENDADO' ? 'Refrendado' : 'Normal' }}@if (c.entidadProyectada) { <small>{{ c.entidadProyectada }}</small> }</dd>
             </div>
           } @else {
-            <div><dt>Nivel</dt><dd>Normal</dd></div>
+            <div class="cert__ficha"><dt>Nivel</dt><dd>Normal</dd></div>
           }
-          @if (c.fechaFinalizacion) { <div><dt>Finalizaste</dt><dd>{{ formatearFechaLarga(c.fechaFinalizacion) }}</dd></div> }
+          @if (c.fechaFinalizacion) { <div class="cert__ficha"><dt>Finalizaste</dt><dd>{{ formatearFechaLarga(c.fechaFinalizacion) }}</dd></div> }
           @if (c.fechaEmisionProgramada) {
-            <div><dt>{{ c.emisionAutomatica ? 'Emisión automática' : 'Disponible desde' }}</dt><dd>{{ formatearFechaLarga(c.fechaEmisionProgramada) }}</dd></div>
+            <div class="cert__ficha"><dt>{{ c.emisionAutomatica ? 'Emisión automática' : 'Disponible desde' }}</dt><dd>{{ formatearFechaLarga(c.fechaEmisionProgramada) }}</dd></div>
           }
         </dl>
         @if (c.estado === 'PROGRAMADO' && c.emisionAutomatica) {
@@ -103,7 +135,7 @@
           </div>
         </div>
         <div class="cert__acciones">
-          <button type="button" class="btn btn--acento" (click)="pedirEmision()">Generar certificado ahora</button>
+          <button type="button" class="btn btn--acento btn--grande" (click)="pedirEmision()">Generar certificado ahora</button>
         </div>
       }
     }

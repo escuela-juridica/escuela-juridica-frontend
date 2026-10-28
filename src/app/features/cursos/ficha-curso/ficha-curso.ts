@@ -19,7 +19,7 @@ import { FichaCursoDetalle, LeccionFicha, VistaPrevia } from '../curso.model';
 import { Session } from '../../../core/session/session';
 import { MatriculaApiService } from '../../matriculas/matricula-api.service';
 import { AlertaGlobalService } from '../../../core/notificaciones/alerta-global.service';
-import { Modal } from '../../../shared/ui/modal/modal';
+import { ConfirmacionMatricula } from './confirmacion-matricula/confirmacion-matricula';
 
 const LARGO_MAXIMO_DESCRIPCION = 260;
 
@@ -28,7 +28,7 @@ type EstadoVistaPrevia = 'inactiva' | 'cargando' | 'lista' | 'error';
 
 @Component({
   selector: 'app-ficha-curso',
-  imports: [RouterLink, NgClass, Modal],
+  imports: [RouterLink, NgClass, ConfirmacionMatricula],
   templateUrl: './ficha-curso.html',
   styleUrl: './ficha-curso.scss',
 })
@@ -182,10 +182,6 @@ export class FichaCurso implements OnInit {
   protected claseDisponibilidad(): string {
     const estado = this.ficha()?.estadoComercial;
     return estado ? claseDisponibilidad(estado.codigo) : '';
-  }
-
-  protected formatearFecha(fecha: string): string {
-    return formatearFecha(fecha);
   }
 
   protected formatearFechaHora(fechaHoraIso: string): string {

@@ -14,57 +14,11 @@
   @case ('ficha') {
     @if (ficha(); as f) {
       <article class="examen">
-        <header>
-          <div class="examen__etiquetas">
-            <span class="examen__ruta">{{ f.modulo ? f.modulo + ' · Examen del módulo' : 'Examen final' }}</span>
-            <span class="badge" [class.badge--disp-proximo]="f.tipo === 'PRACTICA'" [class.badge--hibrido-suave]="f.tipo === 'CALIFICADO'">
-              {{ f.tipo === 'PRACTICA' ? 'Práctica' : 'Calificado' }}
-            </span>
-          </div>
-          <h1 class="examen__titulo">{{ f.titulo }}</h1>
-          @if (f.descripcion) { <p class="examen__descripcion">{{ f.descripcion }}</p> }
-        </header>
+        <app-examen-ficha-cabecera [ficha]="f" />
 
-        @if (f.soloLectura) {
-          <div class="alerta alerta--info" role="status">
-            <span class="alerta__icono">i</span>
-            <div><p class="alerta__titulo">Curso cancelado</p><p class="alerta__texto">Puedes consultar el examen, pero ya no se rinde.</p></div>
-          </div>
-        } @else if (f.agotadoSinAprobar) {
-          <div class="alerta alerta--error" role="alert">
-            <span class="alerta__icono">!</span>
-            <div><p class="alerta__titulo">No puedes seguir intentando</p><p class="alerta__texto">{{ f.motivoNoPuedeIniciar }}</p></div>
-          </div>
-        } @else if (f.motivoNoPuedeIniciar) {
-          <div class="alerta alerta--info" role="status">
-            <span class="alerta__icono">i</span>
-            <div><p class="alerta__titulo">{{ f.habilitado ? 'Por ahora no puedes iniciar otro intento' : 'Este examen aún no está habilitado' }}</p><p class="alerta__texto">{{ f.motivoNoPuedeIniciar }}</p></div>
-          </div>
-        } @else if (f.aprobado) {
-          <div class="alerta alerta--exito" role="status">
-            <span class="alerta__icono">✓</span>
-            <div><p class="alerta__titulo">Aprobaste este examen</p><p class="alerta__texto">Tu mejor nota es {{ f.mejorNota | number:'1.0-2' }}.@if (f.bloqueaSiguienteModulo) { Ya puedes continuar con el siguiente módulo. }</p></div>
-          </div>
-        }
-
-        <section class="card examen__datos" aria-label="Reglas del examen">
-          <dl class="examen__lista">
-            <div><dt>Preguntas</dt><dd>{{ f.totalPreguntas }}</dd></div>
-            <div><dt>Puntaje total</dt><dd>{{ f.puntajeTotal | number:'1.0-2' }} pts</dd></div>
-            <div><dt>Tiempo límite</dt><dd>{{ f.tiempoLimiteMinutos ? f.tiempoLimiteMinutos + ' minutos' : 'Sin límite' }}</dd></div>
-            <div>
-              <dt>Intentos</dt>
-              <dd>
-                @if (f.intentosMaximos === null) { Ilimitados · usaste {{ f.intentosUsados }} }
-                @else { {{ f.intentosUsados }} de {{ f.intentosMaximos }} }
-              </dd>
-            </div>
-            @if (f.tipo === 'CALIFICADO') {
-              <div><dt>Nota mínima</dt><dd>{{ f.notaMinima | number:'1.0-2' }} de 20</dd></div>
-            }
-            <div><dt>Respuestas correctas</dt><dd>{{ etiquetaMostrar(f.mostrarRespuestas) }}</dd></div>
-          </dl>
-          <ul class="examen__avisos">
+        <section class="card examen__datos" aria-label="Antes de empezar">
+          <h2 class="examen__subtitulo">Antes de empezar</h2>
+          <ul class="examen__avisos examen__avisos--sin-borde">
             @if (f.tipo === 'PRACTICA') {
               <li>Es una práctica: tu nota no afecta tu certificación ni bloquea tu avance.</li>
             } @else {
@@ -76,6 +30,7 @@
             @if (f.tieneRespuestaAbierta) {
               <li>Incluye preguntas de respuesta abierta: las califica un administrador, por eso tu nota quedará pendiente de revisión.</li>
             }
+            <li>Respuestas correctas: {{ etiquetaMostrar(f.mostrarRespuestas).toLowerCase() }}.</li>
           </ul>
         </section>
 
@@ -150,36 +105,8 @@
           </div>
         }
 
-        <nav class="card examen__navegador" aria-label="Navegación entre preguntas">
-          <div class="examen__navegador-cab">
-            <span>{{ totalRespondidas() }} de {{ it.preguntas.length }} respondidas</span>
-            <span class="examen__guardado" [attr.data-estado]="guardado()" aria-live="polite">
-              @switch (guardado()) {
-                @case ('guardando') { Guardando… }
-                @case ('ok') { ✓ Guardado }
-                @case ('error') { No se pudo guardar; reintentaremos al enviar }
-              }
-            </span>
-          </div>
-          <ol class="examen__numeros">
-            @for (p of it.preguntas; track p.id; let i = $index) {
-              <li>
-                <button type="button" class="examen__numero"
-                  [class.examen__numero--actual]="i === indice()"
-                  [class.examen__numero--respondida]="estaRespondida(p)"
-                  [class.examen__numero--marcada]="marcadas().has(p.id)"
-                  [attr.aria-current]="i === indice() ? 'step' : null"
-                  [attr.aria-label]="'Pregunta ' + (i + 1) + (estaRespondida(p) ? ', respondida' : ', sin responder') + (marcadas().has(p.id) ? ', marcada para revisar' : '')"
-                  (click)="irA(i)">{{ i + 1 }}</button>
-              </li>
-            }
-          </ol>
-          <p class="examen__leyenda">
-            <span><i class="examen__muestra examen__muestra--respondida"></i> Respondida</span>
-            <span><i class="examen__muestra"></i> Sin responder</span>
-            <span><i class="examen__muestra examen__muestra--marcada"></i> Para revisar</span>
-          </p>
-        </nav>
+        <app-examen-navegador [preguntas]="it.preguntas" [indice]="indice()" [respondidas]="respondidas()" [marcadas]="marcadas()"
+          [guardado]="guardado()" (ir)="irA($event)" />
 
         @if (preguntaActual(); as p) {
           <section class="card examen__pregunta" [attr.aria-labelledby]="'pregunta-' + p.id">
@@ -290,7 +217,8 @@
         } @else {
           <section class="card examen__nota" [class.examen__nota--ok]="it.aprobado" [class.examen__nota--mal]="!it.aprobado">
             <p class="examen__nota-etiqueta">Tu nota</p>
-            <p class="examen__nota-valor">{{ it.nota | number:'1.0-2' }}<small> / 20</small></p>
+            <app-anillo-progreso [valor]="(it.nota ?? 0) * 5" [texto]="'' + (it.nota | number:'1.0-2')" [tamano]="156" [grosor]="14"
+              [estado]="it.aprobado ? 'exito' : 'error'" etiqueta="de 20" descripcion="Tu nota" />
             <p class="examen__nota-estado">{{ it.aprobado ? 'Aprobado' : 'No aprobado' }}</p>
             <p class="examen__nota-ayuda">
               Obtuviste {{ it.puntajeObtenido | number:'1.0-2' }} de {{ it.puntajeTotal | number:'1.0-2' }} puntos. @if (it.tipo === 'CALIFICADO') { La nota mínima es {{ it.notaMinima | number:'1.0-2' }}. }

@@ -61,6 +61,8 @@ export interface ConfirmarDatos {
 /** HU-033 — Un certificado del alumno. Solo uno VIGENTE trae `descargaUrl`. */
 export interface MiCertificado {
   codigo: string;
+  /** Nombre tal como quedó impreso. */
+  titular: string;
   cursoId: number;
   curso: string;
   nivel: 'NORMAL' | 'REFRENDADO';

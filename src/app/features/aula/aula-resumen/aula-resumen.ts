@@ -3,6 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 
 import { AlertaGlobalService } from '../../../core/notificaciones/alerta-global.service';
+import { AnilloProgreso } from '../../../shared/ui/anillo-progreso/anillo-progreso';
 import { formatearFechaHora } from '../../cursos/curso-formato.util';
 import { SesionAlumnoApiService } from '../../sesiones/sesion-alumno-api.service';
 import { CertificacionBloque } from '../../certificacion/certificacion-bloque/certificacion-bloque';
@@ -16,11 +17,14 @@ export interface ExamenDelCurso {
   modulo: string | null;
 }
 
-/** HU-022 / HU-025 — Resumen del curso: avance, dónde continuar, qué falta para el certificado y
- * próximas sesiones en vivo. Es lo que se ve al entrar al aula, antes de abrir una lección. */
+export type PestanaResumen = 'resumen' | 'evaluaciones' | 'certificado';
+
+/** HU-022 / HU-025 — Resumen del curso: portada con el avance y el siguiente paso, y pestañas con lo
+ * que sigue (sesiones y requisitos), las evaluaciones y el certificado. Es lo que se ve al entrar al
+ * aula, antes de abrir una lección. */
 @Component({
   selector: 'app-aula-resumen',
-  imports: [RouterLink, AvanceCertificadoBloque, CertificacionBloque],
+  imports: [RouterLink, AvanceCertificadoBloque, CertificacionBloque, AnilloProgreso],
   templateUrl: './aula-resumen.html',
   styleUrl: './aula-resumen.scss',
 })
@@ -30,6 +34,7 @@ export class AulaResumen {
   private readonly alertas = inject(AlertaGlobalService);
 
   protected readonly ingresando = signal<number | null>(null);
+  protected readonly pestana = signal<PestanaResumen>('resumen');
   protected readonly formatearFechaHora = formatearFechaHora;
 
   /** La lección donde seguir, solo si todavía hay algo por hacer en ella. */
@@ -59,6 +64,23 @@ export class AulaResumen {
     () => this.examenes().find((e) => e.examen.bloqueaSiguienteModulo && !e.examen.aprobado)?.examen ?? null,
   );
 
+  /** Cifras del curso para la portada. */
+  protected readonly cifras = computed(() => {
+    const aula = this.estado.aula();
+    const lecciones = this.estado.lecciones();
+    return {
+      modulos: aula?.modulos.length ?? 0,
+      lecciones: lecciones.length,
+      sesiones: lecciones.filter((l) => l.leccion.tipo === 'EN_VIVO').length,
+      evaluaciones: this.examenes().length,
+      horas: aula?.horasAcademicas ?? null,
+    };
+  });
+
+  protected readonly examenesPendientes = computed(
+    () => this.examenes().filter((e) => e.examen.estado !== 'APROBADO' && e.examen.tipo === 'CALIFICADO').length,
+  );
+
   protected readonly terminoLecciones = computed(
     () => this.estado.lecciones().length > 0 && this.estado.totalCompletadas() === this.estado.lecciones().length,
   );
@@ -74,6 +96,28 @@ export class AulaResumen {
 
   constructor() {
     this.estado.leccionActualId.set(null);
+  }
+
+  protected etiquetaModalidad(modalidad: string): string {
+    return modalidad === 'EN_VIVO' ? 'En vivo' : modalidad === 'HIBRIDO' ? 'Híbrido' : 'Virtual';
+  }
+
+  protected diaDe(iso: string): string {
+    return new Intl.DateTimeFormat('es-PE', { day: 'numeric', timeZone: 'America/Lima' }).format(new Date(iso));
+  }
+
+  protected mesDe(iso: string): string {
+    return new Intl.DateTimeFormat('es-PE', { month: 'short', timeZone: 'America/Lima' }).format(new Date(iso)).replace('.', '');
+  }
+
+  protected claseTarjetaExamen(e: ExamenAulaRespuesta): string {
+    switch (e.estado) {
+      case 'APROBADO': return 'examen-tarjeta--exito';
+      case 'NO_APROBADO': return 'examen-tarjeta--error';
+      case 'EN_REVISION': return 'examen-tarjeta--revision';
+      case 'EN_CURSO': return 'examen-tarjeta--curso';
+      default: return e.habilitado ? 'examen-tarjeta--pendiente' : 'examen-tarjeta--bloqueado';
+    }
   }
 
   protected etiquetaEstadoExamen(e: ExamenAulaRespuesta): string {

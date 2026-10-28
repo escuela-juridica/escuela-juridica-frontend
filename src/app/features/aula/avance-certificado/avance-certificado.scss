@@ -1,5 +1,7 @@
 :host {
   display: block;
+  // El listado se acomoda al ancho de SU tarjeta (no al de la pantalla): así no se amontona en columnas angostas.
+  container-type: inline-size;
 }
 
 .avance__lista {
@@ -87,7 +89,7 @@
   color: var(--exito);
 }
 
-@media (max-width: 560px) {
+@container (max-width: 540px) {
   .avance__item {
     grid-template-columns: 22px minmax(0, 1fr) auto;
     row-gap: 2px;

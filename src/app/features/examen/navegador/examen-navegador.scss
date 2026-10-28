@@ -1,0 +1,110 @@
+// Cuadrícula de navegación entre preguntas con estado de guardado y leyenda.
+
+:host {
+  display: block;
+}
+
+.examen__navegador {
+  padding: 14px 16px;
+}
+
+.examen__navegador-cab {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  color: var(--neutral-800);
+}
+
+.examen__guardado {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--neutral-600);
+}
+
+.examen__guardado[data-estado='ok'] {
+  color: var(--exito);
+}
+
+.examen__guardado[data-estado='error'] {
+  color: var(--error);
+}
+
+.examen__numeros {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 44px);
+  gap: 8px;
+}
+
+.examen__numero {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--neutral-300);
+  border-radius: var(--radio-md);
+  background: var(--blanco);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--neutral-800);
+  cursor: pointer;
+}
+
+.examen__numero:hover {
+  border-color: var(--marca-900);
+}
+
+.examen__numero--respondida {
+  background: var(--acento-050);
+  border-color: var(--acento-500);
+  color: var(--acento-700);
+}
+
+.examen__numero--marcada {
+  box-shadow: inset 0 -4px 0 var(--advertencia);
+}
+
+.examen__numero--actual {
+  background: var(--marca-900);
+  border-color: var(--marca-900);
+  color: var(--blanco);
+}
+
+.examen__leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin: 12px 0 0;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--neutral-600);
+}
+
+.examen__leyenda span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.examen__muestra {
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--neutral-300);
+  border-radius: 4px;
+  background: var(--blanco);
+}
+
+.examen__muestra--respondida {
+  background: var(--acento-050);
+  border-color: var(--acento-500);
+}
+
+.examen__muestra--marcada {
+  box-shadow: inset 0 -4px 0 var(--advertencia);
+}

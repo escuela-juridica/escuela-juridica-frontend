@@ -5,6 +5,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 
 import { resolverUrlApi } from '../../../core/api/api.config';
+import { DiplomaMiniatura } from '../../../shared/ui/diploma-miniatura/diploma-miniatura';
 import { formatearFechaLarga } from '../../cursos/curso-formato.util';
 import { CertificacionApiService } from '../certificacion-api.service';
 import { MiCertificado } from '../certificacion.model';
@@ -13,7 +14,7 @@ import { MiCertificado } from '../certificacion.model';
  * sigue listado como no válido y sin descarga. Vencer o cancelar la matrícula no los quita. */
 @Component({
   selector: 'app-mis-certificados',
-  imports: [RouterLink, DecimalPipe],
+  imports: [RouterLink, DecimalPipe, DiplomaMiniatura],
   templateUrl: './mis-certificados.html',
   styleUrl: './mis-certificados.scss',
 })
@@ -41,6 +42,10 @@ export class MisCertificados {
           this.cargando.set(false);
         },
       });
+  }
+
+  protected ver(certificado: MiCertificado): void {
+    if (certificado.descargaUrl) window.open(`${resolverUrlApi(certificado.descargaUrl)}?enLinea=true`, '_blank');
   }
 
   protected descargar(certificado: MiCertificado): void {

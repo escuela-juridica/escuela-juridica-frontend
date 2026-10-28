@@ -1,108 +1,171 @@
 @if (estado.aula(); as aula) {
   <div class="resumen">
-    <section class="card resumen__hero">
-      <div class="eyebrow"><span class="eyebrow__dash"></span><span class="eyebrow__texto">Tu curso</span></div>
-      <h1 class="resumen__titulo">{{ aula.cursoTitulo }}</h1>
-
-      <div class="resumen__avance">
-        <div class="resumen__pista" role="progressbar" aria-label="Avance del curso" [attr.aria-valuenow]="aula.porcentaje" aria-valuemin="0" aria-valuemax="100">
-          <div class="resumen__relleno" [style.width.%]="aula.porcentaje"></div>
-        </div>
-        <span class="resumen__porcentaje">{{ aula.porcentaje }} %</span>
-      </div>
-      <p class="resumen__detalle">{{ estado.totalCompletadas() }} de {{ estado.lecciones().length }} lecciones completadas</p>
-
-      @if (continuar(); as destino) {
-        <div class="resumen__continuar">
-          <div class="resumen__continuar-texto">
-            <span class="resumen__continuar-etiqueta">{{ estado.totalCompletadas() === 0 ? 'Empieza por' : 'Continúa con' }}</span>
-            <span class="resumen__continuar-leccion">{{ destino.leccion.titulo }}</span>
-            <span class="resumen__continuar-modulo">{{ destino.modulo.titulo }}</span>
+    <!-- ============================================================ Portada == -->
+    <section class="hero" [style.--portada]="aula.imagenPortadaUrl ? 'url(' + aula.imagenPortadaUrl + ')' : 'none'" aria-labelledby="hero-titulo">
+      <div class="hero__velo"></div>
+      <div class="hero__contenido">
+        <div class="hero__texto">
+          <div class="hero__chips">
+            <span class="hero__chip">{{ etiquetaModalidad(aula.modalidad) }}</span>
+            @if (cifras().horas) { <span class="hero__chip hero__chip--suave">{{ cifras().horas }} h académicas</span> }
           </div>
-          <a class="btn btn--acento resumen__boton" [routerLink]="['/aula', aula.cursoId, 'lecciones', destino.leccion.id]">
+          <h1 id="hero-titulo" class="hero__titulo">{{ aula.cursoTitulo }}</h1>
+          <ul class="hero__datos">
+            <li>
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9 5-9 5-9-5 9-5z" /><path d="M3 13l9 5 9-5" /></svg>
+              {{ cifras().modulos }} {{ cifras().modulos === 1 ? 'módulo' : 'módulos' }}
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>
+              {{ cifras().lecciones }} {{ cifras().lecciones === 1 ? 'lección' : 'lecciones' }}
+            </li>
+            @if (cifras().sesiones > 0) {
+              <li>
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3" /><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4" /></svg>
+                {{ cifras().sesiones }} {{ cifras().sesiones === 1 ? 'sesión en vivo' : 'sesiones en vivo' }}
+              </li>
+            }
+            <li>
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg>
+              {{ cifras().evaluaciones }} {{ cifras().evaluaciones === 1 ? 'evaluación' : 'evaluaciones' }}
+            </li>
+          </ul>
+        </div>
+        <div class="hero__progreso">
+          <app-anillo-progreso [valor]="aula.porcentaje" [tamano]="136" [grosor]="12" tono="oscuro" etiqueta="completado" descripcion="Avance del curso" />
+          <p class="hero__lecciones">{{ estado.totalCompletadas() }} de {{ estado.lecciones().length }} lecciones</p>
+        </div>
+      </div>
+
+      <!-- Siguiente paso: lo único que el alumno necesita decidir al entrar. -->
+      <div class="hero__paso">
+        @if (continuar(); as destino) {
+          <div class="hero__paso-texto">
+            <span class="hero__paso-etiqueta">{{ estado.totalCompletadas() === 0 ? 'Empieza por' : 'Continúa con' }}</span>
+            <span class="hero__paso-titulo">{{ destino.leccion.titulo }}</span>
+            <span class="hero__paso-detalle">{{ destino.modulo.titulo }}</span>
+          </div>
+          <a class="btn btn--acento btn--grande hero__cta" [routerLink]="['/aula', aula.cursoId, 'lecciones', destino.leccion.id]">
             {{ estado.totalCompletadas() === 0 ? 'Empezar curso' : 'Continuar curso' }}
           </a>
-        </div>
-      } @else if (bloqueo(); as motivo) {
-        <div class="alerta alerta--info resumen__aviso" role="status">
-          <span class="alerta__icono">i</span>
-          <div>
-            <p class="alerta__titulo">Para seguir avanzando</p>
-            <p class="alerta__texto">{{ motivo }}</p>
-            @if (examenBloqueante(); as examen) {
-              <a class="btn btn--acento resumen__aviso-accion" [routerLink]="['/aula', aula.cursoId, 'examenes', examen.id]">
-                {{ accionExamen(examen) === 'Continuar' ? 'Continuar el examen' : 'Ir al examen' }}
-              </a>
+        } @else if (bloqueo(); as motivo) {
+          <div class="hero__paso-texto">
+            <span class="hero__paso-etiqueta">Para seguir avanzando</span>
+            <span class="hero__paso-titulo hero__paso-titulo--normal">{{ motivo }}</span>
+          </div>
+          @if (examenBloqueante(); as examen) {
+            <a class="btn btn--acento btn--grande hero__cta" [routerLink]="['/aula', aula.cursoId, 'examenes', examen.id]">
+              {{ accionExamen(examen) === 'Continuar' ? 'Continuar el examen' : 'Ir al examen' }}
+            </a>
+          }
+        } @else if (terminoLecciones()) {
+          <div class="hero__paso-texto">
+            <span class="hero__paso-etiqueta">¡Buen trabajo!</span>
+            <span class="hero__paso-titulo">Completaste todas las lecciones</span>
+            <span class="hero__paso-detalle">{{ aula.avanceCertificado.cumpleTodo ? 'Cumples los requisitos de tu certificado.' : 'Revisa qué te falta para tu certificado.' }}</span>
+          </div>
+          <button type="button" class="btn btn--acento btn--grande hero__cta" (click)="pestana.set(aula.avanceCertificado.cumpleTodo ? 'certificado' : 'evaluaciones')">
+            {{ aula.avanceCertificado.cumpleTodo ? 'Ver mi certificado' : 'Ver evaluaciones' }}
+          </button>
+        }
+      </div>
+    </section>
+
+    <!-- ========================================================== Pestañas == -->
+    <nav class="pestanas" role="tablist" aria-label="Secciones del curso">
+      <button type="button" role="tab" class="pestana" [class.pestana--activa]="pestana() === 'resumen'" [attr.aria-selected]="pestana() === 'resumen'" (click)="pestana.set('resumen')">Resumen</button>
+      <button type="button" role="tab" class="pestana" [class.pestana--activa]="pestana() === 'evaluaciones'" [attr.aria-selected]="pestana() === 'evaluaciones'" (click)="pestana.set('evaluaciones')">
+        Evaluaciones @if (cifras().evaluaciones > 0) { <span class="pestana__contador">{{ cifras().evaluaciones }}</span> }
+      </button>
+      <button type="button" role="tab" class="pestana" [class.pestana--activa]="pestana() === 'certificado'" [attr.aria-selected]="pestana() === 'certificado'" (click)="pestana.set('certificado')">
+        Mi certificado @if (aula.avanceCertificado.cumpleTodo) { <span class="pestana__punto" aria-label="Disponible"></span> }
+      </button>
+    </nav>
+
+    @switch (pestana()) {
+      @case ('resumen') {
+        <div class="resumen__rejilla">
+          <section class="card resumen__bloque" aria-labelledby="resumen-avance">
+            <h2 id="resumen-avance" class="resumen__subtitulo">Tu avance hacia el certificado</h2>
+            <app-avance-certificado [avance]="aula.avanceCertificado" />
+          </section>
+
+          <section class="card resumen__bloque" aria-labelledby="resumen-sesiones">
+            <h2 id="resumen-sesiones" class="resumen__subtitulo">Próximas sesiones en vivo</h2>
+            @if (proximasSesiones().length > 0) {
+              <ul class="sesiones">
+                @for (item of proximasSesiones(); track item.leccion.id) {
+                  <li class="sesion">
+                    <span class="sesion__fecha" aria-hidden="true">
+                      <span class="sesion__dia">{{ diaDe(item.leccion.fechaHoraInicio!) }}</span>
+                      <span class="sesion__mes">{{ mesDe(item.leccion.fechaHoraInicio!) }}</span>
+                    </span>
+                    <div class="sesion__texto">
+                      <span class="sesion__titulo">{{ item.leccion.titulo }}</span>
+                      <span class="sesion__detalle">{{ item.modulo.titulo }} · {{ formatearFechaHora(item.leccion.fechaHoraInicio!) }}</span>
+                    </div>
+                    @if (item.leccion.estadoSesion === 'EN_VENTANA') {
+                      <button type="button" class="btn btn--acento" [disabled]="ingresando() === item.leccion.id" (click)="ingresar(item)">
+                        {{ ingresando() === item.leccion.id ? 'Ingresando…' : 'Ingresar ahora' }}
+                      </button>
+                    } @else {
+                      <span class="badge badge--disp-proximo">Próxima</span>
+                    }
+                  </li>
+                }
+              </ul>
+            } @else {
+              <p class="resumen__vacio">No tienes sesiones en vivo programadas por ahora.</p>
             }
-          </div>
-        </div>
-      } @else if (terminoLecciones()) {
-        <div class="alerta alerta--exito resumen__aviso" role="status">
-          <span class="alerta__icono">✓</span>
-          <div>
-            <p class="alerta__titulo">Completaste todas las lecciones</p>
-            <p class="alerta__texto">Puedes revisarlas cuando quieras desde el contenido del curso.</p>
-          </div>
+          </section>
         </div>
       }
-    </section>
 
-    <section class="card resumen__bloque" aria-label="Tu certificado">
-      <app-certificacion-bloque [cursoId]="aula.cursoId" />
-    </section>
-
-    @if (examenes().length > 0) {
-      <section class="card resumen__bloque" aria-labelledby="resumen-examenes">
-        <h2 id="resumen-examenes" class="resumen__subtitulo">Evaluaciones</h2>
-        <ul class="resumen__sesiones">
-          @for (item of examenes(); track item.examen.id) {
-            <li class="resumen__sesion">
-              <span class="resumen__sesion-icono resumen__sesion-icono--examen" aria-hidden="true">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg>
-              </span>
-              <div class="resumen__sesion-texto">
-                <span class="resumen__sesion-titulo">{{ item.examen.titulo }}</span>
-                <span class="resumen__sesion-fecha">
-                  {{ item.modulo ?? 'Evaluación final' }} · {{ item.examen.tipo === 'PRACTICA' ? 'Práctica' : 'Calificado' }}@if (item.examen.mejorNota !== null) { · nota {{ item.examen.mejorNota }} }
+      @case ('evaluaciones') {
+        @if (examenes().length === 0) {
+          <div class="estado-vacio"><h3 class="estado-vacio__titulo">Este curso no tiene evaluaciones</h3><p class="estado-vacio__texto">Avanzas completando las lecciones.</p></div>
+        } @else {
+          <ul class="examenes">
+            @for (item of examenes(); track item.examen.id) {
+              <li [class]="'examen-tarjeta ' + claseTarjetaExamen(item.examen)">
+                <span class="examen-tarjeta__icono" aria-hidden="true">
+                  @if (item.examen.estado === 'APROBADO') {
+                    <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
+                  } @else if (!item.examen.habilitado) {
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>
+                  } @else {
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg>
+                  }
                 </span>
-              </div>
-              <span [class]="'badge ' + claseEstadoExamen(item.examen)">{{ etiquetaEstadoExamen(item.examen) }}</span>
-              <a class="btn btn--secundario" [routerLink]="['/aula', aula.cursoId, 'examenes', item.examen.id]">{{ accionExamen(item.examen) }}</a>
-            </li>
-          }
-        </ul>
-      </section>
-    }
+                <div class="examen-tarjeta__cuerpo">
+                  <div class="examen-tarjeta__linea">
+                    <h3 class="examen-tarjeta__titulo">{{ item.examen.titulo }}</h3>
+                    <span [class]="'badge ' + claseEstadoExamen(item.examen)">{{ etiquetaEstadoExamen(item.examen) }}</span>
+                  </div>
+                  <p class="examen-tarjeta__meta">
+                    {{ item.modulo ?? 'Evaluación final' }} · {{ item.examen.tipo === 'PRACTICA' ? 'Práctica' : 'Calificado' }}
+                    · {{ item.examen.intentosUsados }}{{ item.examen.intentosMaximos === null ? ' intentos (ilimitados)' : ' de ' + item.examen.intentosMaximos + ' intentos' }}
+                  </p>
+                  @if (!item.examen.habilitado && item.examen.motivoNoHabilitado) { <p class="examen-tarjeta__motivo">{{ item.examen.motivoNoHabilitado }}</p> }
+                </div>
+                <div class="examen-tarjeta__nota">
+                  @if (item.examen.mejorNota !== null) {
+                    <app-anillo-progreso [valor]="item.examen.mejorNota * 5" [texto]="'' + item.examen.mejorNota" [tamano]="64" [grosor]="6"
+                      [estado]="item.examen.aprobado ? 'exito' : 'error'" descripcion="Mejor nota" />
+                  }
+                  <a class="btn btn--secundario" [routerLink]="['/aula', aula.cursoId, 'examenes', item.examen.id]">{{ accionExamen(item.examen) }}</a>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      }
 
-    <section class="card resumen__bloque" aria-labelledby="resumen-avance">
-      <h2 id="resumen-avance" class="resumen__subtitulo">Tu avance hacia el certificado</h2>
-      <app-avance-certificado [avance]="aula.avanceCertificado" />
-    </section>
-
-    @if (proximasSesiones().length > 0) {
-      <section class="card resumen__bloque" aria-labelledby="resumen-sesiones">
-        <h2 id="resumen-sesiones" class="resumen__subtitulo">Próximas sesiones en vivo</h2>
-        <ul class="resumen__sesiones">
-          @for (item of proximasSesiones(); track item.leccion.id) {
-            <li class="resumen__sesion">
-              <span class="resumen__sesion-icono" aria-hidden="true">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
-              </span>
-              <div class="resumen__sesion-texto">
-                <span class="resumen__sesion-titulo">{{ item.leccion.titulo }}</span>
-                <span class="resumen__sesion-fecha">{{ item.modulo.titulo }} · {{ formatearFechaHora(item.leccion.fechaHoraInicio!) }}</span>
-              </div>
-              @if (item.leccion.estadoSesion === 'EN_VENTANA') {
-                <button type="button" class="btn btn--acento" [disabled]="ingresando() === item.leccion.id" (click)="ingresar(item)">
-                  {{ ingresando() === item.leccion.id ? 'Ingresando…' : 'Ingresar a la sesión' }}
-                </button>
-              } @else {
-                <span class="badge badge--disp-proximo">Próxima</span>
-              }
-            </li>
-          }
-        </ul>
-      </section>
+      @case ('certificado') {
+        <section class="card resumen__bloque resumen__bloque--certificado" aria-label="Tu certificado">
+          <app-certificacion-bloque [cursoId]="aula.cursoId" />
+        </section>
+      }
     }
   </div>
 }

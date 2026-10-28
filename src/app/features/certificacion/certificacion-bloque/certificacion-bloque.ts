@@ -3,9 +3,11 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, effect, inject, input, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 
 import { resolverUrlApi } from '../../../core/api/api.config';
 import { AlertaGlobalService } from '../../../core/notificaciones/alerta-global.service';
+import { DiplomaMiniatura } from '../../../shared/ui/diploma-miniatura/diploma-miniatura';
 import { Modal } from '../../../shared/ui/modal/modal';
 import { AulaSesionService } from '../../aula/aula-sesion.service';
 import { formatearFechaLarga } from '../../cursos/curso-formato.util';
@@ -20,7 +22,7 @@ import { Certificacion } from '../certificacion.model';
  */
 @Component({
   selector: 'app-certificacion-bloque',
-  imports: [ReactiveFormsModule, DecimalPipe, Modal],
+  imports: [ReactiveFormsModule, DecimalPipe, Modal, RouterLink, DiplomaMiniatura],
   templateUrl: './certificacion-bloque.html',
   styleUrl: './certificacion-bloque.scss',
 })
@@ -43,6 +45,9 @@ export class CertificacionBloque {
   protected readonly confirmandoEmision = signal(false);
   protected readonly emitiendo = signal(false);
   protected readonly errorEmision = signal<string | null>(null);
+  protected readonly enlaceCopiado = signal(false);
+
+  protected readonly pasos = ['Cumplir requisitos', 'Confirmar datos', 'Generar certificado', 'Descargar'];
 
   protected readonly formulario = new FormGroup({
     nombres: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(120)] }),
@@ -161,9 +166,40 @@ export class CertificacionBloque {
       });
   }
 
+  /** Visor privado: abre el PDF en el navegador sin descargarlo. */
+  protected ver(): void {
+    const url = this.cert()?.certificado?.descargaUrl;
+    if (url) window.open(`${resolverUrlApi(url)}?enLinea=true`, '_blank');
+  }
+
   protected descargar(): void {
     const url = this.cert()?.certificado?.descargaUrl;
     if (url) window.open(resolverUrlApi(url), '_blank');
+  }
+
+  /** Paso actual del recorrido (0..3); con el certificado emitido, todos quedan completos. */
+  protected pasoActual(c: Certificacion): number {
+    switch (c.estado) {
+      case 'PENDIENTE_REQUISITOS': return 0;
+      case 'PROGRAMADO':
+      case 'PENDIENTE_DATOS': return 1;
+      case 'LISTO_PARA_EMITIR': return 2;
+      default: return 4;
+    }
+  }
+
+  protected urlVerificacion(codigo: string): string {
+    return `${window.location.origin}/verificar-certificado?codigo=${encodeURIComponent(codigo)}`;
+  }
+
+  protected copiarEnlace(codigo: string): void {
+    void navigator.clipboard
+      ?.writeText(this.urlVerificacion(codigo))
+      .then(() => {
+        this.enlaceCopiado.set(true);
+        setTimeout(() => this.enlaceCopiado.set(false), 2500);
+      })
+      .catch(() => this.alertas.mostrar('error', 'No pudimos copiar el enlace. Cópialo desde la barra de direcciones de la verificación.'));
   }
 
   protected etiquetaEstado(c: Certificacion): string {
