@@ -153,3 +153,28 @@
         grid-template-columns: minmax(0, 1fr);
     }
 }
+// Pestañas del centro de reportes (Matrículas | Asistencia).
+.reporte__secciones {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--neutral-200);
+}
+
+.reporte__seccion {
+    padding: 10px 16px;
+    font-weight: 600;
+    color: var(--neutral-600);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    text-decoration: none;
+}
+
+.reporte__seccion:hover {
+    color: var(--marca-900);
+}
+
+.reporte__seccion--activa {
+    color: var(--marca-900);
+    border-bottom-color: var(--acento-500);
+}

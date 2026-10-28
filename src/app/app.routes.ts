@@ -150,6 +150,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'reportes/asistencia',
+        loadComponent: () =>
+          import('./features/admin/reportes/reporte-asistencia/reporte-asistencia').then(
+            (m) => m.ReporteAsistenciaPantalla,
+          ),
+      }, // PF-039 (HU-045)
+      {
         path: 'reportes/matriculas',
         loadComponent: () =>
           import('./features/admin/reportes/reporte-matriculas/reporte-matriculas').then(

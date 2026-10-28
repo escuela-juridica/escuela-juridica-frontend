@@ -94,7 +94,7 @@
                 <span class="aula-leccion__titulo">{{ leccion.titulo }}</span>
                 @if (leccion.estado === 'BLOQUEADA' && leccion.motivoBloqueo) {
                   <span class="aula-leccion__motivo">{{ leccion.motivoBloqueo }}</span>
-                } @else if (leccion.id === datos()!.ultimaLeccionIdValida) {
+                } @else if (leccion.id === datos()!.ultimaLeccionIdValida && leccion.estado !== 'COMPLETADA') {
                   <span class="aula-leccion__continuar">Continuar aquí</span>
                 }
               </div>
