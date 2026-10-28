@@ -9,9 +9,16 @@ import type { CalendarOptions, DatesSetInfo, EventClickInfo } from '@fullcalenda
 
 import { Modal } from '../../shared/ui/modal/modal';
 import { AlertaGlobalService } from '../../core/notificaciones/alerta-global.service';
-import { formatearHora } from '../cursos/curso-formato.util';
+import { formatearFecha, formatearHora } from '../cursos/curso-formato.util';
 import { EstadoSesion, SesionCalendarioRespuesta } from '../sesiones/sesion-alumno.model';
 import { SesionAlumnoApiService } from '../sesiones/sesion-alumno-api.service';
+
+/** Un día de la vista Lista con sus sesiones, ya ordenadas. */
+interface GrupoDiaSesiones {
+  clave: string;
+  etiqueta: string;
+  sesiones: SesionCalendarioRespuesta[];
+}
 
 /** HU-026 — Participar en sesiones en vivo.
  *
@@ -40,6 +47,36 @@ export class Calendario {
   protected readonly ingresando = signal<number | null>(null);
   protected readonly etiquetaMes = signal('');
   protected readonly esMesActual = signal(true);
+
+  /** Guía §26: Mes y Lista son vistas alternas (nunca ambas a la vez). La Lista es la alternativa
+   * obligatoria para móvil y accesibilidad, así que arranca así en pantallas angostas. */
+  protected readonly vista = signal<'mes' | 'lista'>(
+    typeof window !== 'undefined' && window.innerWidth <= 560 ? 'lista' : 'mes',
+  );
+  private readonly rangoMes = signal<{ inicio: Date; fin: Date } | null>(null);
+
+  protected readonly grupos = computed<GrupoDiaSesiones[]>(() => {
+    const rango = this.rangoMes();
+    const delMes = this.sesiones()
+      .filter((sesion) => sesion.fechaHoraInicio)
+      .filter((sesion) => {
+        if (!rango) return true;
+        const inicio = new Date(sesion.fechaHoraInicio!);
+        return inicio >= rango.inicio && inicio < rango.fin;
+      })
+      .sort((a, b) => a.fechaHoraInicio!.localeCompare(b.fechaHoraInicio!));
+    const mapa = new Map<string, GrupoDiaSesiones>();
+    for (const sesion of delMes) {
+      const clave = this.claveDiaLima(sesion.fechaHoraInicio!);
+      let grupo = mapa.get(clave);
+      if (!grupo) {
+        grupo = { clave, etiqueta: formatearFecha(clave), sesiones: [] };
+        mapa.set(clave, grupo);
+      }
+      grupo.sesiones.push(sesion);
+    }
+    return Array.from(mapa.values());
+  });
 
   protected readonly formatearHora = formatearHora;
 
@@ -86,6 +123,11 @@ export class Calendario {
       }
     },
   });
+
+  protected cambiarVista(vista: 'mes' | 'lista'): void {
+    // La grilla se oculta (no se destruye) en la Lista, así que prev/next/hoy siguen cargando datos.
+    this.vista.set(vista);
+  }
 
   protected cambiarMes(delta: number): void {
     const api = this.fc?.getApi();
@@ -156,6 +198,7 @@ export class Calendario {
   /** Se dispara automáticamente al montar la grilla y en cada prev()/next()/today() de la API. */
   private alCambiarRango(arg: DatesSetInfo): void {
     this.ultimoRango = arg;
+    this.rangoMes.set({ inicio: arg.view.currentStart, fin: arg.view.currentEnd });
     this.etiquetaMes.set(Calendario.capitalizar(arg.view.title));
     const hoy = new Date();
     this.esMesActual.set(hoy >= arg.view.currentStart && hoy < arg.view.currentEnd);
@@ -216,6 +259,17 @@ export class Calendario {
       case 'CANCELADA':
         return { fondo: 'var(--error-fondo)', texto: 'var(--error)' };
     }
+  }
+
+  /** Día calendario (yyyy-MM-dd) de un instante según la hora de Lima: una sesión cercana a la
+   * medianoche no debe caer en el día equivocado por el huso del navegador. */
+  private claveDiaLima(iso: string): string {
+    return new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'America/Lima',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(new Date(iso));
   }
 
   private static capitalizar(texto: string): string {

@@ -35,6 +35,9 @@ export class ReporteAsistenciaPantalla {
   protected readonly totalPaginas = signal(0);
   protected readonly totalFilas = signal(0);
 
+  /** Guía §32: en la primera línea solo rango, curso y búsqueda; el resto va en "Más filtros". */
+  protected readonly masFiltros = signal(false);
+
   protected texto = '';
   protected cursoId: number | null = null;
   protected sesionId: number | null = null;
@@ -48,6 +51,10 @@ export class ReporteAsistenciaPantalla {
   constructor() {
     this.api.cursos().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({ next: (c) => this.cursos.set(c) });
     this.cargar();
+  }
+
+  protected get filtrosAvanzadosActivos(): number {
+    return [this.sesionId, this.modalidad, this.asistencia, this.origen, this.cumplimiento].filter(Boolean).length;
   }
 
   protected buscar(): void {

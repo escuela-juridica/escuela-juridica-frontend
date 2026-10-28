@@ -19,9 +19,38 @@
       </button>
     </div>
 
-    <div class="calendario-grilla">
+    <div class="calendario-vistas" role="group" aria-label="Vista del calendario">
+      <button type="button" class="calendario-vistas__boton" [class.calendario-vistas__boton--activo]="vista() === 'mes'" [attr.aria-pressed]="vista() === 'mes'" (click)="cambiarVista('mes')">Mes</button>
+      <button type="button" class="calendario-vistas__boton" [class.calendario-vistas__boton--activo]="vista() === 'lista'" [attr.aria-pressed]="vista() === 'lista'" (click)="cambiarVista('lista')">Lista</button>
+    </div>
+
+    <div class="calendario-grilla" [class.calendario-oculto]="vista() !== 'mes'">
       <full-calendar [options]="calendarOptions()" />
     </div>
+
+    @if (vista() === 'lista') {
+      <div class="calendario-lista">
+        @for (grupo of grupos(); track grupo.clave) {
+          <h2 class="calendario-lista__dia">{{ grupo.etiqueta }}</h2>
+          @for (sesion of grupo.sesiones; track sesion.leccionId) {
+            <button type="button" class="card calendario-lista__sesion" (click)="sesionSeleccionada.set(sesion)">
+              <span class="calendario-lista__hora">
+                {{ sesion.fechaHoraInicio ? formatearHora(sesion.fechaHoraInicio) : '' }}
+              </span>
+              <span class="calendario-lista__info">
+                <span class="calendario-lista__titulo">{{ sesion.titulo }}</span>
+                <span class="calendario-lista__curso">{{ sesion.cursoTitulo }}</span>
+              </span>
+              <span class="badge" [class]="claseEstado(sesion.estadoSesion)">{{ etiquetaEstado(sesion.estadoSesion) }}</span>
+            </button>
+          }
+        } @empty {
+          @if (!cargando() && !error()) {
+            <p class="calendario-estado">No tienes sesiones en este mes.</p>
+          }
+        }
+      </div>
+    }
 
     @if (cargando()) {
       <p class="calendario-estado" aria-live="polite">Cargando sesiones…</p>

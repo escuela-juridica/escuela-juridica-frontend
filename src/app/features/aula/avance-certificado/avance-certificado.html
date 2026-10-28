@@ -1,0 +1,16 @@
+<ul class="avance__lista">
+  @for (condicion of avance().condiciones; track condicion.codigo) {
+    <li class="avance__item" [class.avance__item--cumplida]="condicion.cumplida">
+      <span class="avance__icono" aria-hidden="true">
+        @if (condicion.cumplida) {
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
+        }
+      </span>
+      <span class="avance__nombre">{{ condicion.titulo }}</span>
+      <span class="avance__valor">{{ condicion.valorActual }}</span>
+      <span class="avance__meta">{{ condicion.meta }}</span>
+      <span class="avance__estado">{{ condicion.cumplida ? 'Cumplido' : 'Pendiente' }}</span>
+    </li>
+  }
+</ul>
+<p class="avance__frase" [class.avance__frase--ok]="avance().cumpleTodo">{{ avance().fraseAccionable }}</p>

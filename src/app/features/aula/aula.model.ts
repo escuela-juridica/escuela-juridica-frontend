@@ -18,6 +18,9 @@ export interface LeccionAulaRespuesta {
   fechaHoraFin: string | null;
   estadoSesion: EstadoSesion | null;
   grabacionDisponible: boolean;
+  descripcion: string | null;
+  /** Duración del video más largo de la lección, si se conoce. */
+  duracionSegundos: number | null;
 }
 
 /** HU-025 — Examen de un módulo. Rendirlo es Épica 5; aquí solo se informa su estado. */

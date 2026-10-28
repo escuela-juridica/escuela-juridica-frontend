@@ -1,0 +1,76 @@
+@if (estado.aula(); as aula) {
+  <div class="resumen">
+    <section class="card resumen__hero">
+      <div class="eyebrow"><span class="eyebrow__dash"></span><span class="eyebrow__texto">Tu curso</span></div>
+      <h1 class="resumen__titulo">{{ aula.cursoTitulo }}</h1>
+
+      <div class="resumen__avance">
+        <div class="resumen__pista" role="progressbar" aria-label="Avance del curso" [attr.aria-valuenow]="aula.porcentaje" aria-valuemin="0" aria-valuemax="100">
+          <div class="resumen__relleno" [style.width.%]="aula.porcentaje"></div>
+        </div>
+        <span class="resumen__porcentaje">{{ aula.porcentaje }} %</span>
+      </div>
+      <p class="resumen__detalle">{{ estado.totalCompletadas() }} de {{ estado.lecciones().length }} lecciones completadas</p>
+
+      @if (continuar(); as destino) {
+        <div class="resumen__continuar">
+          <div class="resumen__continuar-texto">
+            <span class="resumen__continuar-etiqueta">{{ estado.totalCompletadas() === 0 ? 'Empieza por' : 'Continúa con' }}</span>
+            <span class="resumen__continuar-leccion">{{ destino.leccion.titulo }}</span>
+            <span class="resumen__continuar-modulo">{{ destino.modulo.titulo }}</span>
+          </div>
+          <a class="btn btn--acento resumen__boton" [routerLink]="['/aula', aula.cursoId, 'lecciones', destino.leccion.id]">
+            {{ estado.totalCompletadas() === 0 ? 'Empezar curso' : 'Continuar curso' }}
+          </a>
+        </div>
+      } @else if (bloqueo(); as motivo) {
+        <div class="alerta alerta--info resumen__aviso" role="status">
+          <span class="alerta__icono">i</span>
+          <div>
+            <p class="alerta__titulo">Para seguir avanzando</p>
+            <p class="alerta__texto">{{ motivo }}</p>
+          </div>
+        </div>
+      } @else if (terminoLecciones()) {
+        <div class="alerta alerta--exito resumen__aviso" role="status">
+          <span class="alerta__icono">✓</span>
+          <div>
+            <p class="alerta__titulo">Completaste todas las lecciones</p>
+            <p class="alerta__texto">Puedes revisarlas cuando quieras desde el contenido del curso.</p>
+          </div>
+        </div>
+      }
+    </section>
+
+    <section class="card resumen__bloque" aria-labelledby="resumen-avance">
+      <h2 id="resumen-avance" class="resumen__subtitulo">Tu avance hacia el certificado</h2>
+      <app-avance-certificado [avance]="aula.avanceCertificado" />
+    </section>
+
+    @if (proximasSesiones().length > 0) {
+      <section class="card resumen__bloque" aria-labelledby="resumen-sesiones">
+        <h2 id="resumen-sesiones" class="resumen__subtitulo">Próximas sesiones en vivo</h2>
+        <ul class="resumen__sesiones">
+          @for (item of proximasSesiones(); track item.leccion.id) {
+            <li class="resumen__sesion">
+              <span class="resumen__sesion-icono" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
+              </span>
+              <div class="resumen__sesion-texto">
+                <span class="resumen__sesion-titulo">{{ item.leccion.titulo }}</span>
+                <span class="resumen__sesion-fecha">{{ item.modulo.titulo }} · {{ formatearFechaHora(item.leccion.fechaHoraInicio!) }}</span>
+              </div>
+              @if (item.leccion.estadoSesion === 'EN_VENTANA') {
+                <button type="button" class="btn btn--acento" [disabled]="ingresando() === item.leccion.id" (click)="ingresar(item)">
+                  {{ ingresando() === item.leccion.id ? 'Ingresando…' : 'Ingresar a la sesión' }}
+                </button>
+              } @else {
+                <span class="badge badge--disp-proximo">Próxima</span>
+              }
+            </li>
+          }
+        </ul>
+      </section>
+    }
+  </div>
+}

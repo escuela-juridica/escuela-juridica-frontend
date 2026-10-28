@@ -1,7 +1,10 @@
 // HU-026 · Calendario de sesiones en vivo del alumno — grilla mensual tipo Google Calendar
 // (FullCalendar v7, sin theme: ver nota abajo sobre por qué se estiliza con ::ng-deep).
 
+// Mismo tamaño de título de pantalla que Panel y Mi perfil (28/36 px), en escritorio y móvil.
 .calendario-titulo {
+  font-size: 28px;
+  line-height: 36px;
   color: var(--neutral-950);
   margin: 0 0 8px;
 }
@@ -23,8 +26,8 @@
 
 .calendario-nav__flecha {
   padding: 0;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   flex: none;
   display: inline-flex;
   align-items: center;
@@ -47,7 +50,7 @@
 }
 
 .calendario-nav__hoy {
-  min-height: 32px;
+  min-height: 44px;
   padding: 0 14px;
   font-size: 13px;
 }
@@ -247,7 +250,7 @@
   }
 
   .calendario-grilla ::ng-deep [role='columnheader'] {
-    font-size: 10px;
+    font-size: 12px;
     padding: 8px 0;
   }
 
@@ -267,5 +270,120 @@
 
   .calendario-grilla ::ng-deep .calendario-evento > div {
     display: none;
+  }
+}
+
+// Guía §26 — alternar entre Mes y Lista (vistas alternas, nunca ambas a la vez).
+.calendario-vistas {
+  display: flex;
+  width: fit-content;
+  margin: 0 auto 16px;
+  padding: 4px;
+  gap: 4px;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radio-md);
+  background: var(--blanco);
+}
+
+.calendario-vistas__boton {
+  min-height: 44px;
+  min-width: 88px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--radio-sm);
+  background: transparent;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  color: var(--neutral-600);
+  cursor: pointer;
+}
+
+.calendario-vistas__boton:hover {
+  color: var(--marca-900);
+}
+
+.calendario-vistas__boton--activo,
+.calendario-vistas__boton--activo:hover {
+  background: var(--marca-900);
+  color: var(--blanco);
+}
+
+.calendario-oculto {
+  display: none;
+}
+
+// Vista Lista: sesiones del mes agrupadas por día.
+.calendario-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.calendario-lista__dia {
+  margin: 14px 0 0;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 700;
+  color: var(--neutral-950);
+}
+
+.calendario-lista__sesion {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 60px;
+  padding: 12px 16px;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.calendario-lista__sesion:hover {
+  box-shadow: var(--sombra-sm);
+}
+
+.calendario-lista__hora {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 700;
+  color: var(--celeste-700);
+  white-space: nowrap;
+}
+
+.calendario-lista__info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.calendario-lista__titulo {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--neutral-950);
+}
+
+.calendario-lista__curso {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--neutral-600);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 560px) {
+  .calendario-lista__sesion {
+    grid-template-columns: 80px minmax(0, 1fr);
+  }
+
+  .calendario-lista__sesion .badge {
+    grid-column: 2;
+    justify-self: start;
   }
 }

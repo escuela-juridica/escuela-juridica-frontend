@@ -1,160 +1,390 @@
-// HU-023/HU-024 · Reproductor de lección — pantalla inmersiva (no usa layout-alumno: mini-encabezado propio).
+// HU-023/HU-024 · Lección dentro del aula: contenido principal, acciones y pestañas.
 
 :host {
   display: block;
-  min-height: 100vh;
-  background: var(--neutral-050);
 }
 
-// ------------------------------------------------------------- Encabezado --
-.leccion-header {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: var(--blanco);
-  border-bottom: 1px solid var(--neutral-200);
-  padding: 16px 24px;
+.leccion {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 16px;
 }
 
-.leccion-header__volver {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  align-self: flex-start;
-  color: var(--neutral-600);
-  font-size: 14px;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.leccion-header__volver:hover {
-  color: var(--marca-900);
-}
-
-.leccion-header__titulo {
-  max-width: 1200px;
-  width: 100%;
-  margin: 0 auto;
-  font-size: 20px;
-  line-height: 28px;
-  font-weight: 700;
-  color: var(--neutral-950);
-}
-
-@media (max-width: 560px) {
-  .leccion-header {
-    padding: 12px 16px;
-  }
-}
-
-// ------------------------------------------------------------------ Main --
-.leccion-main {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 32px 24px 64px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-@media (max-width: 767px) {
-  .leccion-main {
-    padding: 24px 16px 48px;
-  }
-}
-
-.leccion-cargando {
-  color: var(--neutral-600);
-  font-size: 16px;
-}
-
-.leccion-error {
+.leccion__vacio {
   max-width: 560px;
   margin: 32px auto;
 }
 
-// -------------------------------------------------------------- Material --
-.leccion-materiales {
+// ------------------------------------------------------------- Cabecera --
+.leccion__etiquetas {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.leccion__ruta {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--eyebrow-color);
+}
+
+.leccion__duracion {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--neutral-600);
+}
+
+// Mismo tamaño de título de pantalla que Panel y Mi perfil (28/36 px).
+.leccion__titulo {
+  margin: 0;
+  font-size: 28px;
+  line-height: 36px;
+  font-weight: 700;
+  color: var(--neutral-950);
+}
+
+// ---------------------------------------------------------------- Medio --
+// Guía §25.2: proporción 16:9 sobre fondo azul muy oscuro.
+.leccion__video,
+.leccion__marco {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radio-lg);
+  background: var(--neutral-950);
+  overflow: hidden;
+}
+
+.leccion__video {
+  height: auto;
+  object-fit: contain;
+}
+
+.leccion__marco iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+.leccion__marco--poster {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  text-align: center;
+  background: linear-gradient(135deg, var(--neutral-950) 0%, var(--marca-900) 100%);
+  color: var(--blanco);
+}
+
+.leccion__marco--poster .btn {
+  min-height: 44px;
+}
+
+.leccion__poster-icono {
+  width: 72px;
+  height: 72px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--blanco);
+}
+
+.leccion__poster-texto {
+  margin: 0;
+  max-width: 560px;
+  font-size: 18px;
+  line-height: 28px;
+  font-weight: 600;
+  color: var(--blanco);
+}
+
+.leccion__poster-ayuda {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--neutral-300);
+}
+
+// ------------------------------------------------------- Sesión en vivo --
+.leccion__sesion {
+  padding: 24px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 20px;
+}
+
+.leccion__sesion-icono {
+  width: 64px;
+  height: 64px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radio-lg);
+  background: var(--celeste-050);
+  color: var(--celeste-700);
+}
+
+.leccion__sesion-titulo {
+  margin: 0 0 4px;
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 600;
+  color: var(--neutral-950);
+}
+
+.leccion__sesion-fecha {
+  margin: 0 0 10px;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--neutral-600);
+}
+
+.leccion__sesion-accion {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  max-width: 260px;
+}
+
+.leccion__nota {
+  margin: 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--neutral-600);
+  text-align: right;
+}
+
+// -------------------------------------------------------------- Acciones --
+.leccion__acciones {
+  padding: 12px 16px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+}
+
+.leccion__acciones-lado--der {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.leccion__estado {
+  text-align: center;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.leccion__completa {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--exito);
+}
+
+.leccion__pendiente {
+  color: var(--neutral-600);
+}
+
+// ------------------------------------------------------------- Pestañas --
+.leccion__pestanas {
+  padding: 0;
+  overflow: hidden;
+}
+
+// Guía §13.1: alto 44 px, texto 14/20 peso 600, activa con línea turquesa de 3 px.
+.leccion__tablist {
+  display: flex;
+  gap: 4px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--neutral-200);
+  overflow-x: auto;
+}
+
+.leccion__tab {
+  flex: none;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -1px;
+  background: transparent;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  color: var(--neutral-600);
+  cursor: pointer;
+}
+
+.leccion__tab:hover {
+  color: var(--marca-900);
+}
+
+.leccion__tab--activa {
+  color: var(--marca-900);
+  border-bottom-color: var(--acento-500);
+}
+
+.leccion__panel {
+  padding: 20px 24px;
+}
+
+.leccion__descripcion {
+  margin: 0;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--neutral-800);
+  white-space: pre-line;
+}
+
+.leccion__vacio-texto {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--neutral-600);
+}
+
+// ------------------------------------------------------------ Materiales --
+// Guía §25.3: fila de 56–64 px con icono, nombre, formato/tamaño y acciones.
+.materiales {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 14px;
 }
 
-.leccion-material {
+.material {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 64px;
+  padding: 10px 0;
+  border-top: 1px solid var(--neutral-100);
+}
+
+.material:first-child {
+  border-top: 0;
+}
+
+.material__icono {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radio-md);
+  background: var(--acento-050);
+  color: var(--acento-700);
+}
+
+.material__texto {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px;
 }
 
-.leccion-material__titulo {
-  font-size: 15px;
+.material__titulo {
+  font-size: 16px;
+  line-height: 24px;
   font-weight: 600;
   color: var(--neutral-950);
 }
 
-.leccion-material__video {
-  width: 100%;
-  max-height: 540px;
-  border-radius: var(--radio-md);
-  background: var(--neutral-950);
-}
-
-.leccion-material__descarga {
-  align-self: flex-start;
+.material__meta {
   font-size: 13px;
-  font-weight: 600;
-  color: var(--marca-900);
-  text-decoration: none;
+  line-height: 18px;
+  color: var(--neutral-600);
 }
 
-.leccion-material__descarga:hover {
-  text-decoration: underline;
+.material__accion {
+  flex: none;
 }
 
-// ------------------------------------------------------------ Completado --
-.leccion-completado {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 16px;
-  padding: 16px;
-}
+// ------------------------------------------------------ Móvil y tablet --
+@media (max-width: 767px) {
+  .leccion__titulo {
+    font-size: 24px;
+    line-height: 32px;
+  }
 
-.leccion-completado__estado {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--neutral-700);
-}
+  .leccion__video,
+  .leccion__marco {
+    border-radius: var(--radio-md);
+  }
 
-.leccion-completado__estado--ok {
-  color: var(--exito);
-}
+  .leccion__poster-texto {
+    font-size: 16px;
+    line-height: 24px;
+  }
 
-.leccion-completado__punto {
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: currentColor;
-}
+  .leccion__sesion {
+    grid-template-columns: auto minmax(0, 1fr);
+    padding: 16px;
+    gap: 14px;
+  }
 
-.leccion-completado__siguiente {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--acento-700);
-  text-decoration: none;
-}
+  .leccion__sesion-accion {
+    grid-column: 1 / -1;
+    align-items: stretch;
+    max-width: none;
+  }
 
-.leccion-completado__siguiente:hover {
-  text-decoration: underline;
+  .leccion__nota {
+    text-align: left;
+  }
+
+  // Guía §17.3 / §34: en móvil las acciones se apilan, con la principal primero.
+  .leccion__acciones {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .leccion__acciones-lado--der {
+    order: -1;
+  }
+
+  .leccion__acciones .btn {
+    width: 100%;
+  }
+
+  .leccion__estado {
+    order: 1;
+  }
+
+  .leccion__acciones-lado:not(.leccion__acciones-lado--der) {
+    order: 2;
+  }
+
+  .leccion__panel {
+    padding: 16px;
+  }
+
+  .material {
+    flex-wrap: wrap;
+  }
+
+  .material__texto {
+    flex: 1 1 calc(100% - 60px);
+  }
+
+  .material__accion {
+    flex: 1 1 auto;
+  }
 }

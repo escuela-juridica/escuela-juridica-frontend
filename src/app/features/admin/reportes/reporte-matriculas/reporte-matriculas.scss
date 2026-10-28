@@ -161,11 +161,17 @@
     border-bottom: 1px solid var(--neutral-200);
 }
 
+// Guía §13.1: alto 44 px, texto 14/20 peso 600, activa con línea turquesa de 3 px.
 .reporte__seccion {
-    padding: 10px 16px;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 16px;
+    font-size: 14px;
+    line-height: 20px;
     font-weight: 600;
     color: var(--neutral-600);
-    border-bottom: 2px solid transparent;
+    border-bottom: 3px solid transparent;
     margin-bottom: -1px;
     text-decoration: none;
 }

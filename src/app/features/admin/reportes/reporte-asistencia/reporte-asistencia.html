@@ -25,11 +25,40 @@
   </div>
 
   <div class="reporte__filtros">
-    <input class="input" [(ngModel)]="texto" (keyup.enter)="buscar()" placeholder="Alumno, correo o curso" />
+    <input class="input" [(ngModel)]="texto" (keyup.enter)="buscar()" placeholder="Alumno, correo o curso" aria-label="Buscar alumno, correo o curso" />
     <select class="input" [(ngModel)]="cursoId" (ngModelChange)="cambiarCurso()" aria-label="Curso">
       <option [ngValue]="null">Todos los cursos</option>
       @for (curso of cursos(); track curso.id) { <option [ngValue]="curso.id">{{ curso.etiqueta }}</option> }
     </select>
+    <label class="reporte__filtro-fecha">Sesiones desde<input class="input" type="date" [(ngModel)]="fechaDesde" /></label>
+    <label class="reporte__filtro-fecha">Sesiones hasta<input class="input" type="date" [(ngModel)]="fechaHasta" [min]="fechaDesde" /></label>
+  </div>
+
+  <div class="reporte__barra-acciones">
+    <button class="btn btn--acento reporte__btn-filtro" type="button" (click)="buscar()">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="7" />
+        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+      </svg>
+      Buscar
+    </button>
+    <button class="btn reporte__btn-limpiar reporte__btn-filtro" type="button" (click)="limpiarFiltros()">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18" />
+        <line x1="6" y1="6" x2="18" y2="18" />
+      </svg>
+      Limpiar
+    </button>
+    <button class="btn btn--secundario reporte__btn-filtro" type="button" (click)="masFiltros.set(!masFiltros())"
+      [attr.aria-expanded]="masFiltros()" aria-controls="reporte-mas-filtros">
+      Más filtros@if (filtrosAvanzadosActivos > 0) { <span class="reporte__contador">{{ filtrosAvanzadosActivos }}</span> }
+    </button>
+  </div>
+
+  @if (masFiltros()) {
+  <div class="reporte__filtros reporte__filtros--mas" id="reporte-mas-filtros">
     <select class="input" [(ngModel)]="sesionId" (change)="buscar()" [disabled]="!cursoId" aria-label="Sesión">
       <option [ngValue]="null">{{ cursoId ? 'Todas las sesiones' : 'Elige un curso para filtrar por sesión' }}</option>
       @for (sesion of sesiones(); track sesion.id) {
@@ -58,27 +87,8 @@
       <option value="CUMPLE">Cumple el mínimo</option>
       <option value="NO_CUMPLE">No cumple el mínimo</option>
     </select>
-    <label class="reporte__filtro-fecha">Sesiones desde<input class="input" type="date" [(ngModel)]="fechaDesde" /></label>
-    <label class="reporte__filtro-fecha">Sesiones hasta<input class="input" type="date" [(ngModel)]="fechaHasta" [min]="fechaDesde" /></label>
-    <div class="reporte__filtro-acciones">
-      <button class="btn btn--acento reporte__btn-filtro" type="button" (click)="buscar()">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
-          stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="7" />
-          <line x1="21" y1="21" x2="16.65" y2="16.65" />
-        </svg>
-        Buscar
-      </button>
-      <button class="btn reporte__btn-limpiar reporte__btn-filtro" type="button" (click)="limpiarFiltros()">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
-          stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18" />
-          <line x1="6" y1="6" x2="18" y2="18" />
-        </svg>
-        Limpiar
-      </button>
-    </div>
   </div>
+  }
 
   @if (cargando()) {
   <p>Cargando reporte…</p>
