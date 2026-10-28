@@ -10,7 +10,10 @@
     <div class="estado-vacio leccion__vacio">
       <h3 class="estado-vacio__titulo">Esta lección todavía está bloqueada</h3>
       <p class="estado-vacio__texto">{{ leccion()?.motivoBloqueo }}</p>
-      <a class="btn btn--primario" [routerLink]="['/aula', estado.cursoId()]">Volver al curso</a>
+      @if (examenBloqueante(); as examen) {
+        <a class="btn btn--acento" [routerLink]="['/aula', estado.cursoId(), 'examenes', examen.id]">Ir al examen</a>
+      }
+      <a class="btn btn--secundario" [routerLink]="['/aula', estado.cursoId()]">Volver al curso</a>
     </div>
   }
   @default {
@@ -155,6 +158,9 @@
                 <div>
                   <p class="alerta__titulo">La siguiente lección está bloqueada</p>
                   <p class="alerta__texto">{{ siguiente.leccion.motivoBloqueo }}</p>
+                  @if (examenBloqueante(); as examen) {
+                    <a class="btn btn--acento leccion__aviso-accion" [routerLink]="['/aula', estado.cursoId(), 'examenes', examen.id]">Ir al examen</a>
+                  }
                 </div>
               </div>
             }

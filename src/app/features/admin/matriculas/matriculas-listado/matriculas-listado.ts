@@ -1,5 +1,6 @@
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatriculaApiService } from '../../../matriculas/matricula-api.service';
 import {AdvertenciaMatricula,MatriculaAdministrativa,MatriculaDetalleAdministrativa} from '../../../matriculas/matricula.model';
@@ -18,7 +19,7 @@ import { finalize } from 'rxjs';
 // Lo de HU-019 ("+ Nueva matrícula") se quedó funcionando tal cual estaba.
 @Component({
   selector: 'app-matriculas-listado',
-  imports: [FormsModule, Modal, NgClass],
+  imports: [FormsModule, Modal, NgClass, RouterLink],
   templateUrl: './matriculas-listado.html',
   styleUrl: './matriculas-listado.scss',
 })

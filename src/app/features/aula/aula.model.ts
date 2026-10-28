@@ -23,14 +23,24 @@ export interface LeccionAulaRespuesta {
   duracionSegundos: number | null;
 }
 
-/** HU-025 — Examen de un módulo. Rendirlo es Épica 5; aquí solo se informa su estado. */
+export type EstadoExamenAula = 'PENDIENTE' | 'EN_CURSO' | 'EN_REVISION' | 'APROBADO' | 'NO_APROBADO';
+
+/** HU-025 / HU-028 — Examen del aula (de un módulo o final) con su estado para el alumno. */
 export interface ExamenAulaRespuesta {
   id: number;
   titulo: string;
-  tipo: string;
+  tipo: 'CALIFICADO' | 'PRACTICA';
+  finalidad: 'MODULO' | 'FINAL';
   bloqueaSiguienteModulo: boolean;
   aprobado: boolean;
   mejorNota: number | null;
+  estado: EstadoExamenAula;
+  habilitado: boolean;
+  motivoNoHabilitado: string | null;
+  intentosUsados: number;
+  /** null = intentos ilimitados. */
+  intentosMaximos: number | null;
+  fechaLimiteRevision: string | null;
 }
 
 /** HU-025 — Una condición activa del certificado con su valor real y su meta. */
@@ -65,4 +75,5 @@ export interface AulaRespuesta {
   modulos: ModuloAulaRespuesta[];
   ultimaLeccionIdValida: number | null;
   avanceCertificado: AvanceCertificado;
+  examenesFinales: ExamenAulaRespuesta[];
 }

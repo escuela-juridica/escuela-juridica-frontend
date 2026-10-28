@@ -91,6 +91,11 @@ export class LeccionReproductor {
     return siguiente && siguiente.leccion.estado !== 'BLOQUEADA' ? siguiente : null;
   });
 
+  /** Examen que frena el avance (calificado, de módulo y sin aprobar), para ofrecer rendirlo desde aquí. */
+  protected readonly examenBloqueante = computed(
+    () => this.estado.aula()?.modulos.flatMap((m) => m.examenes).find((e) => e.bloqueaSiguienteModulo && !e.aprobado) ?? null,
+  );
+
   protected readonly esUltima = computed(() => this.estado.siguiente() === null);
 
   protected readonly pestanas = computed<{ id: PestanaLeccion; etiqueta: string }[]>(() => {

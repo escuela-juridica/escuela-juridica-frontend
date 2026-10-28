@@ -152,6 +152,15 @@
   color: var(--celeste-700);
 }
 
+.resumen__sesion-icono--examen {
+  background: var(--violeta-050);
+  color: var(--violeta-700);
+}
+
+.resumen__aviso-accion {
+  margin-top: 12px;
+}
+
 .resumen__sesion-texto {
   flex: 1;
   min-width: 0;

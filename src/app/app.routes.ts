@@ -116,6 +116,10 @@ export const routes: Routes = [
             loadComponent: () =>
               import('./features/leccion/leccion-reproductor').then((m) => m.LeccionReproductor),
           }, // PF-021
+          {
+            path: 'examenes/:examenId',
+            loadComponent: () => import('./features/examen/examen-pantalla').then((m) => m.ExamenPantalla),
+          }, // HU-028 / HU-029
         ],
       },
     ],
@@ -170,6 +174,20 @@ export const routes: Routes = [
             (m) => m.ReporteAsistenciaPantalla,
           ),
       }, // PF-039 (HU-045)
+      {
+        path: 'reportes/academico',
+        loadComponent: () =>
+          import('./features/admin/reportes/reporte-academico/reporte-academico').then(
+            (m) => m.ReporteAcademicoPantalla,
+          ),
+      }, // HU-043
+      {
+        path: 'matriculas/:matriculaId/academico',
+        loadComponent: () =>
+          import('./features/admin/matriculas/seguimiento-academico/seguimiento-academico').then(
+            (m) => m.SeguimientoAcademico,
+          ),
+      }, // HU-031
       {
         path: 'reportes/matriculas',
         loadComponent: () =>

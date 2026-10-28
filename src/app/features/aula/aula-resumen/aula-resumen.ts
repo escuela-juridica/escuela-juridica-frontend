@@ -7,6 +7,13 @@ import { formatearFechaHora } from '../../cursos/curso-formato.util';
 import { SesionAlumnoApiService } from '../../sesiones/sesion-alumno-api.service';
 import { AvanceCertificadoBloque } from '../avance-certificado/avance-certificado';
 import { AulaSesionService, LeccionDelCurso } from '../aula-sesion.service';
+import { ExamenAulaRespuesta } from '../aula.model';
+
+/** Un examen del curso con el módulo al que pertenece (o ninguno si es final). */
+export interface ExamenDelCurso {
+  examen: ExamenAulaRespuesta;
+  modulo: string | null;
+}
 
 /** HU-022 / HU-025 — Resumen del curso: avance, dónde continuar, qué falta para el certificado y
  * próximas sesiones en vivo. Es lo que se ve al entrar al aula, antes de abrir una lección. */
@@ -36,6 +43,21 @@ export class AulaResumen {
     return this.estado.lecciones().find((l) => l.leccion.estado === 'BLOQUEADA')?.leccion.motivoBloqueo ?? null;
   });
 
+  /** Todos los exámenes del curso (de módulo y final), en el orden del temario. */
+  protected readonly examenes = computed<ExamenDelCurso[]>(() => {
+    const aula = this.estado.aula();
+    if (!aula) return [];
+    return [
+      ...aula.modulos.flatMap((m) => m.examenes.map((examen) => ({ examen, modulo: m.titulo }))),
+      ...aula.examenesFinales.map((examen) => ({ examen, modulo: null })),
+    ];
+  });
+
+  /** El examen que frena el avance (calificado, de módulo y sin aprobar), para ofrecer rendirlo ya. */
+  protected readonly examenBloqueante = computed(
+    () => this.examenes().find((e) => e.examen.bloqueaSiguienteModulo && !e.examen.aprobado)?.examen ?? null,
+  );
+
   protected readonly terminoLecciones = computed(
     () => this.estado.lecciones().length > 0 && this.estado.totalCompletadas() === this.estado.lecciones().length,
   );
@@ -51,6 +73,32 @@ export class AulaResumen {
 
   constructor() {
     this.estado.leccionActualId.set(null);
+  }
+
+  protected etiquetaEstadoExamen(e: ExamenAulaRespuesta): string {
+    switch (e.estado) {
+      case 'APROBADO': return 'Aprobado';
+      case 'EN_CURSO': return 'En curso';
+      case 'EN_REVISION': return 'En revisión';
+      case 'NO_APROBADO': return 'No aprobado';
+      default: return e.habilitado ? 'Pendiente' : 'No disponible';
+    }
+  }
+
+  protected claseEstadoExamen(e: ExamenAulaRespuesta): string {
+    switch (e.estado) {
+      case 'APROBADO': return 'badge--disp-inmediato';
+      case 'NO_APROBADO': return 'badge--disp-cancelado';
+      case 'PENDIENTE': return e.habilitado ? 'badge--disp-proximo' : 'badge--disp-cerrado';
+      default: return 'badge--disp-proximo';
+    }
+  }
+
+  protected accionExamen(e: ExamenAulaRespuesta): string {
+    if (e.estado === 'EN_CURSO') return 'Continuar';
+    if (e.estado === 'PENDIENTE' && e.habilitado) return 'Rendir';
+    if (e.estado === 'NO_APROBADO' && e.habilitado) return 'Ver y reintentar';
+    return 'Ver';
   }
 
   protected ingresar(item: LeccionDelCurso): void {

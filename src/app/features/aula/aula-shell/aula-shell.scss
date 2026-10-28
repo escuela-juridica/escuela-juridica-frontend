@@ -344,7 +344,20 @@ a.aula-item--actual:hover {
   color: var(--neutral-500);
 }
 
-.aula-item--examen {
+.aula-item--examen:not(.aula-item--actual) {
+  background: var(--neutral-050);
+}
+
+a.aula-item--examen:not(.aula-item--actual):hover {
+  background: var(--neutral-100);
+}
+
+// Encabezado de sección que no se despliega (evaluación final).
+.aula-modulo__cabecera--fija {
+  cursor: default;
+}
+
+.aula-modulo__cabecera--fija:hover {
   background: var(--neutral-050);
 }
 

@@ -94,25 +94,26 @@
                     </li>
                   }
                   @for (examen of modulo.examenes; track examen.id) {
-                    <li>
-                      <div class="aula-item aula-item--examen">
-                        <span class="aula-item__icono aula-item__icono--examen" [class.aula-item__icono--completa]="examen.aprobado" aria-hidden="true">
-                          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg>
-                        </span>
-                        <span class="aula-item__texto">
-                          <span class="aula-item__titulo">{{ examen.titulo }}</span>
-                          <span class="aula-item__detalle">
-                            @if (examen.aprobado) { Examen aprobado{{ examen.mejorNota !== null ? ' · nota ' + examen.mejorNota : '' }} }
-                            @else if (examen.tipo === 'PRACTICA') { Práctica · no bloquea el avance }
-                            @else if (examen.bloqueaSiguienteModulo) { Examen pendiente · libera el siguiente módulo }
-                            @else { Examen pendiente }
-                          </span>
-                        </span>
-                      </div>
-                    </li>
+                    <li><ng-container [ngTemplateOutlet]="filaExamen" [ngTemplateOutletContext]="{ $implicit: examen }" /></li>
                   }
                 </ul>
               }
+            </section>
+          }
+
+          @if (aula.examenesFinales.length > 0) {
+            <section class="aula-modulo">
+              <div class="aula-modulo__cabecera aula-modulo__cabecera--fija">
+                <span class="aula-modulo__texto">
+                  <span class="aula-modulo__titulo">Evaluación final</span>
+                  <span class="aula-modulo__meta">{{ aula.examenesFinales.length === 1 ? '1 examen' : aula.examenesFinales.length + ' exámenes' }}</span>
+                </span>
+              </div>
+              <ul class="aula-modulo__items">
+                @for (examen of aula.examenesFinales; track examen.id) {
+                  <li><ng-container [ngTemplateOutlet]="filaExamen" [ngTemplateOutletContext]="{ $implicit: examen }" /></li>
+                }
+              </ul>
             </section>
           }
         </div>
@@ -124,3 +125,24 @@
     </div>
   </div>
 }
+
+<ng-template #filaExamen let-examen>
+  <a class="aula-item aula-item--examen" [class.aula-item--actual]="examen.id === examenActualId()"
+    [routerLink]="['/aula', estado.cursoId(), 'examenes', examen.id]" (click)="panelAbierto.set(false)"
+    [attr.aria-current]="examen.id === examenActualId() ? 'page' : null">
+    <span class="aula-item__icono aula-item__icono--examen" [class.aula-item__icono--completa]="examen.aprobado"
+      [class.aula-item__icono--bloqueada]="!examen.habilitado && !examen.aprobado" aria-hidden="true">
+      @if (!examen.habilitado && !examen.aprobado) {
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>
+      } @else if (examen.aprobado) {
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
+      } @else {
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg>
+      }
+    </span>
+    <span class="aula-item__texto">
+      <span class="aula-item__titulo">{{ examen.titulo }}</span>
+      <span class="aula-item__detalle">{{ detalleExamen(examen) }}</span>
+    </span>
+  </a>
+</ng-template>

@@ -1,0 +1,284 @@
+// HU-045 — Reporte de asistencia (misma base visual que el reporte de matrículas).
+
+.reporte__titulo {
+    font-size: 22px;
+    line-height: 30px;
+    font-weight: 700;
+    color: var(--neutral-950);
+    margin: 0;
+}
+
+.reporte__cabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.reporte__cabecera p {
+    margin: 4px 0 0;
+    color: var(--neutral-600);
+}
+
+.reporte__acciones-exportar {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.reporte__btn-exportar {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.reporte__filtros {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin: 24px 0;
+}
+
+.reporte__filtros .input {
+    min-width: 0;
+    width: 100%;
+}
+
+.reporte__filtros select.input {
+    width: 100%;
+}
+
+.reporte__filtro-fecha {
+    color: var(--neutral-600);
+    display: grid;
+    font-size: 12px;
+    font-weight: 600;
+    gap: 5px;
+}
+
+.reporte__filtro-acciones {
+    display: flex;
+    align-items: end;
+    gap: 12px;
+}
+
+.reporte__btn-filtro {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.reporte__btn-limpiar {
+    background: var(--neutral-600);
+    color: var(--blanco);
+    transition: background-color 0.15s ease;
+}
+
+.reporte__btn-limpiar:hover {
+    background: var(--neutral-800);
+}
+
+.reporte__tabla {
+    overflow: auto;
+    border: 1px solid var(--neutral-200);
+    border-radius: 10px;
+    background: var(--blanco);
+}
+
+.reporte__tabla table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.reporte__tabla th,
+.reporte__tabla td {
+    padding: 12px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--neutral-100);
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.reporte__tabla th {
+    color: var(--neutral-500);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.reporte__tabla td strong {
+    color: var(--neutral-950);
+    font-weight: 600;
+}
+
+.reporte__tabla small {
+    display: block;
+    color: var(--neutral-500);
+    font-size: 12px;
+    margin-top: 2px;
+}
+
+.reporte__paginacion {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 20px;
+    font-size: 14px;
+    color: var(--neutral-600);
+}
+
+.reporte__celda-matricula {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+}
+
+@media (max-width: 700px) {
+    .reporte__cabecera {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .reporte__filtros {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 480px) {
+    .reporte__filtros {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+// Pestañas del centro de reportes (Matrículas | Asistencia).
+.reporte__secciones {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--neutral-200);
+}
+
+// Guía §13.1: alto 44 px, texto 14/20 peso 600, activa con línea turquesa de 3 px.
+.reporte__seccion {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 16px;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 600;
+    color: var(--neutral-600);
+    border-bottom: 3px solid transparent;
+    margin-bottom: -1px;
+    text-decoration: none;
+}
+
+.reporte__seccion:hover {
+    color: var(--marca-900);
+}
+
+.reporte__seccion--activa {
+    color: var(--marca-900);
+    border-bottom-color: var(--acento-500);
+}
+
+.reporte__resumen {
+    margin: 0 0 8px;
+    font-size: 13px;
+    color: var(--neutral-500);
+}
+
+.reporte__atenuado {
+    color: var(--neutral-500);
+    font-size: 13px;
+}
+
+// Primera línea: búsqueda, curso y rango; los demás filtros viven en "Más filtros".
+.reporte__filtros {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin-bottom: 12px;
+}
+
+.reporte__filtros--mas {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    margin-top: 0;
+}
+
+.reporte__barra-acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.reporte__contador {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    margin-left: 8px;
+    padding: 0 6px;
+    border-radius: var(--radio-completo);
+    background: var(--marca-900);
+    color: var(--blanco);
+    font-size: 12px;
+    line-height: 16px;
+}
+
+// La tabla debe caber junto al menú lateral: las celdas pueden partir línea.
+.reporte__tabla th,
+.reporte__tabla td {
+    padding: 12px 14px;
+    white-space: normal;
+}
+
+.reporte__tabla td .badge {
+    white-space: nowrap;
+}
+
+@media (max-width: 1100px) {
+    .reporte__filtros,
+    .reporte__filtros--mas {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 700px) {
+    .reporte__filtros,
+    .reporte__filtros--mas {
+        grid-template-columns: 1fr;
+    }
+
+    .reporte__barra-acciones .btn {
+        flex: 1 1 auto;
+        justify-content: center;
+    }
+}
+
+// Los campos con etiqueta (fechas) y sin ella (búsqueda, curso) comparten línea base inferior.
+.reporte__filtros {
+    align-items: end;
+}
+
+// HU-043 — enlace al seguimiento del alumno y condiciones pendientes (valor y meta visibles).
+.reporte__enlace {
+  color: var(--neutral-950);
+  text-decoration: none;
+}
+
+.reporte__enlace:hover strong {
+  color: var(--marca-900);
+  text-decoration: underline;
+}
+
+.reporte__falta {
+  color: var(--advertencia-700, #b54708);
+}
+
+.reporte__linea {
+  display: block;
+}

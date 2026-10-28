@@ -95,6 +95,8 @@
                     Ver detalle
                   </button>
 
+                  <a class="btn btn--secundario" [routerLink]="['/admin/matriculas', fila.id, 'academico']">Seguimiento</a>
+
                   @if (fila.estado === 'ACTIVA') {
                     <button
                       type="button"
