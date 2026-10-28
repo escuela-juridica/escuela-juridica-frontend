@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 
 import { PageResponse } from '../../../core/api/page-response.model';
 import { nombrePropioValidator } from '../../cuenta/mi-perfil/mi-perfil.validators';
+import { ImagenSubida } from './imagen-subida/imagen-subida';
 import { InformacionBaseApiService } from './informacion-base-api.service';
 import {
   CategoriaRespuesta,
@@ -43,7 +44,7 @@ const PESTANAS: DefinicionPestana[] = [
  * curso. Solo una sección es visible a la vez (ver Figma EP02-PF-012). */
 @Component({
   selector: 'app-informacion-base',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, ImagenSubida],
   templateUrl: './informacion-base.html',
   styleUrl: './informacion-base.scss',
 })

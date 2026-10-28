@@ -132,7 +132,8 @@
             </div>
             <div>
               <label class="label"><span>Logo</span><span class="nota-pill">Opcional</span></label>
-              <input class="input" formControlName="logoUrl" placeholder="entidades/logo.png" />
+              <app-imagen-subida tipo="LOGO" [valor]="formEntidad.controls.logoUrl.value"
+                (cambio)="formEntidad.controls.logoUrl.setValue($event)" />
             </div>
           </div>
         }
@@ -165,7 +166,8 @@
             </div>
             <div class="infobase-campo--ancho">
               <label class="label"><span>Imagen de firma</span><span class="nota-pill">Opcional</span></label>
-              <input class="input" formControlName="imagenFirmaUrl" placeholder="firmas/nombre.png" />
+              <app-imagen-subida tipo="FIRMA" [valor]="formFirmante.controls.imagenFirmaUrl.value"
+                (cambio)="formFirmante.controls.imagenFirmaUrl.setValue($event)" />
             </div>
           </div>
         }

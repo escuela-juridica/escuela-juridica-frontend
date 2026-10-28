@@ -6,7 +6,7 @@ export const API_URL = environment.apiUrl;
  * a una URL completa usable desde el navegador. Si ya es una URL externa completa (no empieza con
  * "/api/"), la devuelve intacta. */
 export function resolverUrlApi(ruta: string): string {
-  if (!ruta.startsWith('/api/')) {
+  if (!ruta.startsWith('/api/') && !ruta.startsWith('/uploads/')) {
     return ruta;
   }
   const origen = new URL(API_URL, window.location.origin).origin;
