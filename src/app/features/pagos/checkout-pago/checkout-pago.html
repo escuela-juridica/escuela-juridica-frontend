@@ -78,7 +78,7 @@
               } @else {
                 <button type="button" class="btn btn--primario btn--grande btn--ancho-completo"
                   [disabled]="procesando() || (!confirmado() && !enProceso())" (click)="pagar()">
-                  {{ procesando() ? 'Procesando…' : enProceso() ? 'Continuar mi pago con Culqi' : 'Pagar con Culqi' }}
+                  {{ procesando() ? 'Procesando…' : enProceso() ? 'Continuar mi pago' : 'Pagar ahora' }}
                 </button>
               }
             }
