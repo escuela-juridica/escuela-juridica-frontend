@@ -33,6 +33,16 @@
       </div>
     </section>
 
+    @if (aula.cursoCancelado) {
+      <div class="alerta alerta--advertencia aula-cancelado" role="status">
+        <span class="alerta__icono">!</span>
+        <div>
+          <p class="alerta__titulo">Este curso fue cancelado por la Escuela</p>
+          <p class="alerta__texto">Puedes consultar lo que ya estaba disponible, pero ya no se registran progreso, intentos ni asistencia, y no hay sesiones nuevas.@if (aula.motivoCancelacionCurso) { <br /><strong>Motivo:</strong> {{ aula.motivoCancelacionCurso }}}</p>
+        </div>
+      </div>
+    }
+
     <div class="aula-cuerpo">
       <div class="aula-principal"><router-outlet /></div>
 

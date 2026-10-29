@@ -31,6 +31,8 @@ interface CursoActivo {
   estadoNotificacion: string | null;
   /** HU-047: compra iniciada que Culqi todavía no aprobó. */
   pagoPendiente: boolean;
+  /** HU-038: el curso fue cancelado por la Escuela. */
+  cursoCancelado: boolean;
   urlAmigable: string;
 }
 
@@ -82,6 +84,7 @@ export class Panel {
           fechaInicio: matricula.fechaInicio,
           estadoNotificacion: matricula.estadoNotificacion,
           pagoPendiente: matricula.estado === 'PENDIENTE_PAGO',
+          cursoCancelado: matricula.cursoCancelado,
           urlAmigable: matricula.cursoUrlAmigable,
         })));
         this.cargando.set(false);

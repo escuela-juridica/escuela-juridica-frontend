@@ -147,3 +147,39 @@ export interface CerrarCursoPeticion {
 export interface CambiarDestacadoPeticion {
   destacado: boolean;
 }
+
+/** HU-038 — Cancelación completa de un curso. */
+export interface CancelacionCurso {
+  cursoId: number;
+  titulo: string;
+  estado: string;
+  puedeCancelar: boolean;
+  bloqueo: string | null;
+  alumnosConAcceso: number;
+  alumnosFinalizados: number;
+  alumnosSinFinalizar: number;
+  matriculasPendientePago: number;
+  pagosEnProceso: number;
+  sesionesFuturas: number;
+  canceladoEn: string | null;
+  motivoCancelacion: string | null;
+  avisosTotal: number;
+  avisosEnviados: number;
+  avisosConError: number;
+}
+
+export interface CancelacionAfectado {
+  usuarioId: number;
+  alumno: string;
+  correo: string;
+  finalizado: boolean;
+  estadoAviso: 'PENDIENTE' | 'ENVIADO' | 'ERROR';
+  intentos: number;
+  ultimoError: string | null;
+  enviadoEn: string | null;
+}
+
+export interface CancelarCursoPeticion {
+  motivo: string;
+  confirmo: boolean;
+}

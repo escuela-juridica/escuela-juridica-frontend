@@ -19,6 +19,8 @@ export interface Matricula {
   totalLecciones: number;
   siguienteLeccion: string;
   estadoNotificacion: string | null;
+  /** HU-038: el curso fue cancelado por la Escuela. */
+  cursoCancelado: boolean;
 }
 
 export interface MatriculaAdministrativa {

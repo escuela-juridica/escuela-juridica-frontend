@@ -45,13 +45,13 @@
 
     <aside class="admin-sidebar" [class.admin-sidebar--abierto]="menuMovilAbierto()">
       <nav class="admin-sidebar__nav">
-        <span class="admin-sidebar__item admin-sidebar__item--deshabilitado" title="Dashboard">
+        <a routerLink="/admin/dashboard" routerLinkActive="admin-sidebar__item--activo" class="admin-sidebar__item" title="Dashboard" (click)="cerrarMenuMovil()">
           <svg class="admin-sidebar__icono" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M3 11l9-8 9 8" />
             <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
           </svg>
           <span class="admin-sidebar__etiqueta">Dashboard</span>
-        </span>
+        </a>
 
         <a routerLink="/admin/cursos" routerLinkActive="admin-sidebar__item--activo" class="admin-sidebar__item" title="Cursos" (click)="cerrarMenuMovil()">
           <svg class="admin-sidebar__icono" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

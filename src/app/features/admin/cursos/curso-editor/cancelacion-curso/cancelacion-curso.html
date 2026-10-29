@@ -1,0 +1,111 @@
+@if (impacto(); as i) {
+  @if (i.estado === 'PUBLICADO' || i.estado === 'EN_CURSO') {
+    <div class="card editor-card canc__riesgo">
+      <h3 class="canc__titulo">Cancelar el curso por completo</h3>
+      <p class="editor-material-info">
+        Es una decisión excepcional, distinta de cerrar: detiene las ventas y los pagos, cancela las sesiones futuras y avisa a los alumnos. No borra nada: matrículas, pagos, progreso y certificados se conservan.
+      </p>
+      <div class="canc__acciones">
+        <button type="button" class="btn btn--peligro" (click)="abrir()">Cancelar curso…</button>
+      </div>
+    </div>
+  }
+
+  @if (i.estado === 'CANCELADO') {
+    <div class="card editor-card canc__panel">
+      <div class="alerta alerta--error" role="status">
+        <span class="alerta__icono">!</span>
+        <div>
+          <p class="alerta__titulo">Curso cancelado el {{ i.canceladoEn | date:'dd/MM/yyyy HH:mm' }}</p>
+          <p class="alerta__texto"><strong>Motivo:</strong> {{ i.motivoCancelacion }}</p>
+        </div>
+      </div>
+
+      <dl class="canc__cifras">
+        <div><dt>Alumnos con acceso previo</dt><dd>{{ i.alumnosConAcceso }}</dd></div>
+        <div><dt>Ya cumplieron</dt><dd>{{ i.alumnosFinalizados }}</dd></div>
+        <div><dt>Sin finalizar</dt><dd>{{ i.alumnosSinFinalizar }}</dd></div>
+        <div><dt>Avisos enviados</dt><dd>{{ i.avisosEnviados }} de {{ i.avisosTotal }}</dd></div>
+      </dl>
+      <p class="canc__nota">Los alumnos conservan la consulta de lo que ya estaba disponible; no hay nuevas actividades ni sesiones. Quien ya cumplió conserva su certificado; quien no cumplió no recibe uno automático. ESEJUR no devuelve dinero: atiende los pagos de este curso en <a routerLink="/admin/excepciones-pago">Excepciones de pago</a>.</p>
+
+      @if (i.avisosConError > 0) {
+        <div class="alerta alerta--advertencia" role="status">
+          <span class="alerta__icono">!</span>
+          <div class="canc__reintento">
+            <p class="alerta__titulo">{{ i.avisosConError }} {{ i.avisosConError === 1 ? 'aviso no se envió' : 'avisos no se enviaron' }}</p>
+            <button type="button" class="btn btn--secundario" [disabled]="reintentando()" (click)="reintentarAvisos()">{{ reintentando() ? 'Reintentando…' : 'Reintentar envío' }}</button>
+          </div>
+        </div>
+      }
+
+      <h3 class="canc__subtitulo">Alumnos afectados</h3>
+      @if (afectados().length === 0) {
+        <p class="canc__nota">Ningún alumno tenía acceso activo al cancelar el curso.</p>
+      } @else {
+        <div class="canc__tabla">
+          <table>
+            <thead><tr><th>Alumno</th><th>Cumplimiento</th><th>Aviso</th></tr></thead>
+            <tbody>
+              @for (a of afectados(); track a.usuarioId) {
+                <tr>
+                  <td><strong>{{ a.alumno }}</strong><small>{{ a.correo }}</small></td>
+                  <td>{{ a.finalizado ? 'Ya cumplió' : 'Sin finalizar' }}</td>
+                  <td>
+                    @switch (a.estadoAviso) {
+                      @case ('ENVIADO') { <span class="badge badge--disp-inmediato">Enviado</span> }
+                      @case ('ERROR') { <span class="badge badge--disp-cancelado">No enviado</span> }
+                      @default { <span class="badge badge--advertencia-suave">Pendiente</span> }
+                    }
+                    @if (a.ultimoError) { <small>{{ a.ultimoError }}</small> }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        @if (totalPaginas() > 1) {
+          <div class="canc__paginacion">
+            <button type="button" class="btn btn--secundario" [disabled]="pagina() === 0" (click)="irAPagina(pagina() - 1)">Anterior</button>
+            <span>Página {{ pagina() + 1 }} de {{ totalPaginas() }} · {{ totalAfectados() }} alumnos</span>
+            <button type="button" class="btn btn--secundario" [disabled]="pagina() + 1 >= totalPaginas()" (click)="irAPagina(pagina() + 1)">Siguiente</button>
+          </div>
+        }
+      }
+    </div>
+  }
+
+  @if (modalAbierto()) {
+    <app-modal titulo="Cancelar curso" ancho="lg" (cerrar)="cerrar()">
+      <form [formGroup]="formulario" (ngSubmit)="cancelar()" novalidate>
+        @if (errorModal(); as mensaje) {
+          <div class="alerta alerta--error" role="alert"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div>
+        }
+        <p class="canc__resumen">Vas a cancelar <strong>{{ i.titulo }}</strong>. Esto es lo que se afectará:</p>
+        <ul class="canc__impacto">
+          <li><strong>{{ i.alumnosConAcceso }}</strong> {{ i.alumnosConAcceso === 1 ? 'alumno con acceso recibirá' : 'alumnos con acceso recibirán' }} un solo aviso por correo ({{ i.alumnosFinalizados }} ya cumplieron, {{ i.alumnosSinFinalizar }} no).</li>
+          <li><strong>{{ i.sesionesFuturas }}</strong> {{ i.sesionesFuturas === 1 ? 'sesión futura se cancelará' : 'sesiones futuras se cancelarán' }}.</li>
+          <li><strong>{{ i.pagosEnProceso }}</strong> {{ i.pagosEnProceso === 1 ? 'pago en proceso' : 'pagos en proceso' }} ({{ i.matriculasPendientePago }} matrículas pendientes de pago): ya no podrán completarse; si Culqi aprueba alguno después, se registra sin dar acceso y queda para atención.</li>
+          <li>Se detienen de inmediato las nuevas matrículas y pagos. Los alumnos conservan la consulta de lo que ya estaba disponible, sin nuevos intentos, progreso ni asistencia.</li>
+          <li>No se devuelve dinero desde ESEJUR y no se borra ningún dato.</li>
+        </ul>
+
+        <label class="label" for="cc-motivo">Motivo de la cancelación</label>
+        <textarea id="cc-motivo" class="input" rows="3" formControlName="motivo" [class.input--error]="invalido('motivo')"
+          placeholder="Se incluirá en el aviso que recibirán los alumnos."></textarea>
+        @if (invalido('motivo')) { <p class="campo-error">Explica el motivo (mínimo 10 caracteres).</p> }
+
+        <label class="canc__check">
+          <input type="checkbox" formControlName="confirmo" />
+          <span>Entiendo el impacto: la cancelación es excepcional y no se puede revertir desde la plataforma.</span>
+        </label>
+        @if (invalido('confirmo')) { <p class="campo-error">Confirma que entiendes el impacto.</p> }
+
+        <div class="editor-form__acciones">
+          <button type="button" class="btn btn--secundario" [disabled]="cancelando()" (click)="cerrar()">Volver</button>
+          <button type="submit" class="btn btn--peligro" [disabled]="cancelando()">{{ cancelando() ? 'Cancelando…' : 'Cancelar el curso' }}</button>
+        </div>
+      </form>
+    </app-modal>
+  }
+}

@@ -439,3 +439,8 @@ a.aula-item--examen:not(.aula-item--actual):hover {
     line-height: 24px;
   }
 }
+
+// HU-038: aviso de curso cancelado, entre la barra del curso y el contenido.
+.aula-cancelado {
+  margin: 16px 24px 0;
+}

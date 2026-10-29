@@ -1,0 +1,122 @@
+<section class="dash">
+  <header class="dash__hero">
+    <div class="dash__hero-texto">
+      <h1 class="dash__titulo">Dashboard</h1>
+      <p>Evolución de las matrículas y de los pagos confirmados. Las cifras salen de las mismas reglas que los reportes: el detalle está en el centro de reportes. No es contabilidad.</p>
+    </div>
+
+    <div class="dash__filtros" role="group" aria-label="Filtros de todos los gráficos">
+      <label class="dash__campo">Periodo
+        <select class="input" [ngModel]="rango" (ngModelChange)="cambiarRango($event)" aria-label="Periodo">
+          <option value="ANIO">Este año</option>
+          <option value="ANIO_ANTERIOR">Año anterior</option>
+          <option value="ULTIMOS_90">Últimos 90 días</option>
+          <option value="MES">Este mes</option>
+          <option value="PERSONALIZADO">Personalizado</option>
+        </select>
+      </label>
+      <label class="dash__campo">Desde<input class="input" type="date" [(ngModel)]="desde" (change)="editarFechas()" /></label>
+      <label class="dash__campo">Hasta<input class="input" type="date" [(ngModel)]="hasta" [min]="desde" (change)="editarFechas()" /></label>
+      <label class="dash__campo">Curso
+        <select class="input" [(ngModel)]="cursoId" (ngModelChange)="cargar()" aria-label="Curso">
+          <option [ngValue]="null">Todos los cursos</option>
+          @for (curso of cursos(); track curso.id) { <option [ngValue]="curso.id">{{ curso.etiqueta }}</option> }
+        </select>
+      </label>
+      <label class="dash__campo">Modalidad
+        <select class="input" [(ngModel)]="modalidad" (ngModelChange)="cargar()" aria-label="Modalidad">
+          <option value="">Todas</option>
+          <option value="VIRTUAL">Virtual</option>
+          <option value="EN_VIVO">En vivo</option>
+          <option value="HIBRIDO">Híbrido</option>
+        </select>
+      </label>
+    </div>
+  </header>
+
+  @if (error(); as mensaje) {
+    <div class="alerta alerta--error" role="alert"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div>
+  }
+
+  @if (datos(); as d) {
+    <div class="dash__rejilla" [class.dash__rejilla--cargando]="cargando()" aria-live="polite">
+      <article class="card dash__grafico dash__grafico--azul">
+        <header class="dash__encabezado">
+          <span class="dash__icono" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7" /><polyline points="15 7 21 7 21 13" /></svg>
+          </span>
+          <div class="dash__encabezado-texto">
+            <h2>Matrículas activadas</h2>
+            <p>Cuántas llegaron a Activa por {{ d.granularidad === 'DIA' ? 'día' : 'mes' }} · {{ tituloRango }}</p>
+          </div>
+          <button type="button" class="btn btn--secundario dash__tabla-boton" (click)="alternarTabla('evolucion')">{{ conTabla('evolucion') ? 'Ver gráfico' : 'Ver tabla' }}</button>
+        </header>
+        @if (conTabla('evolucion')) {
+          <div class="dash__tabla"><table><thead><tr><th>{{ d.granularidad === 'DIA' ? 'Día' : 'Mes' }}</th><th>Matrículas</th></tr></thead>
+            <tbody>@for (p of d.matriculasPorPeriodo; track p.periodo) { <tr><td>{{ p.etiqueta }}</td><td>{{ p.valor }}</td></tr> }</tbody></table></div>
+        } @else {
+          <app-grafico-serie [puntos]="evolucion()" tipo="area" [entero]="true" nombre="matrículas activadas" descripcion="Evolución de matrículas activadas" />
+        }
+      </article>
+
+      <article class="card dash__grafico dash__grafico--azul">
+        <header class="dash__encabezado">
+          <span class="dash__icono" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5a2 2 0 0 1 2-2h5v16H5a2 2 0 0 0-2 2V5z" /><path d="M21 5a2 2 0 0 0-2-2h-5v16h5a2 2 0 0 1 2 2V5z" /></svg>
+          </span>
+          <div class="dash__encabezado-texto">
+            <h2>Matrículas por curso</h2>
+            <p>Distribución de las matrículas activadas · más intenso, más matrículas</p>
+          </div>
+          <button type="button" class="btn btn--secundario dash__tabla-boton" (click)="alternarTabla('cursos')">{{ conTabla('cursos') ? 'Ver gráfico' : 'Ver tabla' }}</button>
+        </header>
+        @if (conTabla('cursos')) {
+          <div class="dash__tabla"><table><thead><tr><th>Curso</th><th>Matrículas</th></tr></thead>
+            <tbody>@for (b of d.matriculasPorCurso; track b.clave) { <tr><td>{{ b.etiqueta }}</td><td>{{ b.valor }}</td></tr> } @empty { <tr><td colspan="2">Sin datos en este periodo.</td></tr> }</tbody></table></div>
+        } @else {
+          <app-grafico-barras [barras]="porCurso()" nombre="matrículas" descripcion="Matrículas activadas por curso" />
+        }
+      </article>
+
+      <article class="card dash__grafico dash__grafico--naranja">
+        <header class="dash__encabezado">
+          <span class="dash__icono" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" /><polyline points="10 17 15 12 10 7" /><line x1="15" y1="12" x2="3" y2="12" /></svg>
+          </span>
+          <div class="dash__encabezado-texto">
+            <h2>Forma de ingreso</h2>
+            <p>Cómo llegaron a Activa esas matrículas</p>
+          </div>
+          <button type="button" class="btn btn--secundario dash__tabla-boton" (click)="alternarTabla('ingreso')">{{ conTabla('ingreso') ? 'Ver gráfico' : 'Ver tabla' }}</button>
+        </header>
+        @if (conTabla('ingreso')) {
+          <div class="dash__tabla"><table><thead><tr><th>Forma de ingreso</th><th>Matrículas</th></tr></thead>
+            <tbody>@for (b of d.formaIngreso; track b.clave) { <tr><td>{{ b.etiqueta }}</td><td>{{ b.valor }}</td></tr> }</tbody></table></div>
+        } @else {
+          <app-grafico-barras [barras]="porIngreso()" [conPunto]="true" [holgado]="true" nombre="matrículas" descripcion="Matrículas activadas por forma de ingreso" />
+        }
+      </article>
+
+      <article class="card dash__grafico dash__grafico--verde">
+        <header class="dash__encabezado">
+          <span class="dash__icono" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" /><path d="M14.5 9.5c-.5-1-1.5-1.5-2.5-1.5-1.5 0-2.5.8-2.5 2s1 1.7 2.5 2 2.5.8 2.5 2-1 2-2.5 2c-1 0-2-.5-2.5-1.5" /><path d="M12 6v2" /><path d="M12 16v2" /></svg>
+          </span>
+          <div class="dash__encabezado-texto">
+            <h2>Pagos confirmados</h2>
+            <p>Importe por {{ d.granularidad === 'DIA' ? 'día' : 'mes' }}: pagos en línea aprobados y pagos manuales; no incluye exonerados ni intentos fallidos</p>
+          </div>
+          <button type="button" class="btn btn--secundario dash__tabla-boton" (click)="alternarTabla('pagos')">{{ conTabla('pagos') ? 'Ver gráfico' : 'Ver tabla' }}</button>
+        </header>
+        @if (conTabla('pagos')) {
+          <div class="dash__tabla"><table><thead><tr><th>{{ d.granularidad === 'DIA' ? 'Día' : 'Mes' }}</th><th>Importe</th></tr></thead>
+            <tbody>@for (p of d.pagosPorPeriodo; track p.periodo) { <tr><td>{{ p.etiqueta }}</td><td>{{ formatearPrecio(p.monto) }}</td></tr> }</tbody></table></div>
+        } @else {
+          <app-grafico-serie [puntos]="pagos()" tipo="columnas" color="var(--viz-dinero)" nombre="confirmado" [formato]="formatoMonto" descripcion="Pagos confirmados por periodo" />
+        }
+      </article>
+    </div>
+  } @else if (cargando()) {
+    <p>Cargando…</p>
+  }
+</section>

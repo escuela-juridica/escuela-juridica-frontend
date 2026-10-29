@@ -78,4 +78,7 @@ export interface AulaRespuesta {
   examenesFinales: ExamenAulaRespuesta[];
   imagenPortadaUrl: string | null;
   horasAcademicas: number | null;
+  /** HU-038: el curso fue cancelado; el alumno solo consulta lo que ya tenía. */
+  cursoCancelado: boolean;
+  motivoCancelacionCurso: string | null;
 }

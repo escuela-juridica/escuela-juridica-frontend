@@ -1,0 +1,104 @@
+:host {
+  display: block;
+}
+
+.serie {
+  position: relative;
+}
+
+.serie__svg {
+  display: block;
+  max-width: 100%;
+  overflow: visible;
+}
+
+.serie__rejilla {
+  stroke: var(--viz-rejilla, #e1e0d9);
+  stroke-width: 1;
+}
+
+.serie__rejilla--base {
+  stroke: var(--viz-base, #c3c2b7);
+}
+
+.serie__eje {
+  fill: var(--viz-ejes, #898781);
+  font-size: 11px;
+}
+
+.serie__valor {
+  fill: var(--neutral-950, #101828);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.serie__punto {
+  stroke: var(--blanco, #fff);
+  stroke-width: 2;
+}
+
+.serie__guia {
+  stroke: var(--viz-base, #c3c2b7);
+  stroke-width: 1;
+  pointer-events: none;
+}
+
+.serie__captura {
+  fill: transparent;
+  cursor: crosshair;
+}
+
+.serie__vacio {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  color: var(--neutral-600, #475467);
+  font-size: 14px;
+  pointer-events: none;
+}
+
+// El aviso lleva fondo propio para no cruzarse con la cuadrícula.
+.serie__vacio span {
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--blanco, #fff);
+}
+
+// Una sola lectura con el valor primero y el periodo después.
+.serie__tip {
+  position: absolute;
+  top: 6px;
+  transform: translateX(10px);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  border: 1px solid var(--neutral-200, #eaecf0);
+  border-radius: 8px;
+  background: var(--blanco, #fff);
+  box-shadow: 0 4px 12px rgba(16, 24, 40, 0.12);
+  font-size: 12px;
+  color: var(--neutral-600, #475467);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.serie__tip--derecha {
+  transform: translateX(calc(-100% - 10px));
+}
+
+.serie__tip strong {
+  font-size: 14px;
+  color: var(--neutral-950, #101828);
+}
+
+.serie__llave {
+  display: inline-block;
+  width: 10px;
+  height: 2px;
+  margin-right: 6px;
+  vertical-align: middle;
+}

@@ -169,7 +169,12 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./core/layout/layout-admin/layout-admin').then((m) => m.LayoutAdmin),
     children: [
-      { path: '', pathMatch: 'full', redirectTo: 'usuarios' },
+      { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./features/admin/dashboard/dashboard').then((m) => m.DashboardPantalla),
+      }, // PF-040 (HU-046)
       {
         // Crear y editar usuario se hacen en modales dentro del listado, no en rutas aparte.
         path: 'usuarios',

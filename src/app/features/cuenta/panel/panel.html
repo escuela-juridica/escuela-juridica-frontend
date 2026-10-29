@@ -53,6 +53,9 @@
             <div class="panel-curso__leccion">
               @if (curso.pagoPendiente) {
                 Tu pago aún no está aprobado: no tienes acceso ni cupo reservado hasta que Culqi lo apruebe.
+              } @else if (curso.cursoCancelado) {
+                <strong>Curso cancelado por la Escuela.</strong>
+                {{ curso.accesoEfectivo ? 'Solo puedes consultar el contenido que ya tenías.' : 'No había contenido disponible antes de la cancelación.' }}
               } @else if (curso.fechaInicio && !curso.accesoEfectivo) {
                 El curso inicia el {{ curso.fechaInicio | date:'dd/MM/yyyy' }}.
               } @else if (curso.totalLecciones > 0) {

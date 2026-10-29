@@ -7,6 +7,7 @@ import { CursoAdminApiService } from '../../curso-admin-api.service';
 import { ErrorValidacionCurso, ValidacionPublicacionRespuesta } from '../../curso-admin.model';
 import { ConfirmacionService } from '../../../../../core/dialogo/confirmacion.service';
 import { AlertaGlobalService } from '../../../../../core/notificaciones/alerta-global.service';
+import { CancelacionCursoPanel } from '../cancelacion-curso/cancelacion-curso';
 
 interface GrupoHallazgos {
   seccion: string;
@@ -43,9 +44,11 @@ const PESTANA_POR_SECCION: Record<string, string> = {
 /** HU-015 — Valida un borrador y, si no hay bloqueos, lo publica (o lo pasa directamente a
  * EN_CURSO cuando es virtual sin fecha de inicio). HU-016 — Una vez publicado, administra el resto
  * del ciclo de vida: adelantar/retrasar el inicio, cerrar anticipadamente, destacar y duplicar
- * como una nueva convocatoria. CANCELADO no se ofrece aquí (HU-038, EP06). */
+ * como una nueva convocatoria. HU-038 — La cancelación completa (y el seguimiento de afectados) vive en
+ * {@link CancelacionCursoPanel}. */
 @Component({
   selector: 'app-publicacion-tab',
+  imports: [CancelacionCursoPanel],
   templateUrl: './publicacion-tab.html',
   styleUrl: './publicacion-tab.scss',
 })
