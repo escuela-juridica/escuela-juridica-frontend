@@ -4,7 +4,14 @@ import { Observable } from 'rxjs';
 
 import { API_URL } from '../../../core/api/api.config';
 import { PageResponse } from '../../../core/api/page-response.model';
-import { CertificadoGestion, EmisionManualSituacion, EmitirCertificadoManual } from './certificados-admin.model';
+import {
+  AnularCertificado,
+  CertificadoDetalle,
+  CertificadoGestion,
+  CorregirCertificado,
+  EmisionManualSituacion,
+  EmitirCertificadoManual,
+} from './certificados-admin.model';
 
 /** HU-035 — Consume `/api/admin/certificados`. */
 @Injectable({ providedIn: 'root' })
@@ -23,5 +30,18 @@ export class CertificadosAdminApiService {
 
   emitir(matriculaId: number, datos: EmitirCertificadoManual): Observable<EmisionManualSituacion> {
     return this.http.post<EmisionManualSituacion>(`${this.url}/manual/${matriculaId}`, datos);
+  }
+
+  /** HU-036 — Datos, firmantes e historial de un certificado. */
+  detalle(certificadoId: number): Observable<CertificadoDetalle> {
+    return this.http.get<CertificadoDetalle>(`${this.url}/${certificadoId}`);
+  }
+
+  corregir(certificadoId: number, datos: CorregirCertificado): Observable<CertificadoDetalle> {
+    return this.http.post<CertificadoDetalle>(`${this.url}/${certificadoId}/corregir`, datos);
+  }
+
+  anular(certificadoId: number, datos: AnularCertificado): Observable<CertificadoDetalle> {
+    return this.http.post<CertificadoDetalle>(`${this.url}/${certificadoId}/anular`, datos);
   }
 }

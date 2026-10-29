@@ -51,6 +51,8 @@
               <td>
                 @if (fila.puedeEmitirManual) {
                   <a class="btn btn--secundario" [routerLink]="['/admin/certificados/manual', fila.matriculaId]">Emitir manualmente</a>
+                } @else if (fila.certificadoId !== null) {
+                  <a class="btn btn--secundario" [routerLink]="['/admin/certificados', fila.certificadoId]">{{ fila.estadoCertificado === 'VIGENTE' ? 'Corregir o anular' : 'Ver historial' }}</a>
                 } @else {
                   <a class="btn btn--secundario" [routerLink]="['/admin/certificados/manual', fila.matriculaId]">Ver situación</a>
                 }

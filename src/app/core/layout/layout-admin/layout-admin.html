@@ -96,12 +96,12 @@
           <span class="admin-sidebar__etiqueta">Certificados</span>
         </a>
 
-        <span class="admin-sidebar__item admin-sidebar__item--deshabilitado" title="Reclamaciones">
+        <a routerLink="/admin/reclamaciones" routerLinkActive="admin-sidebar__item--activo" class="admin-sidebar__item" title="Reclamaciones" (click)="cerrarMenuMovil()">
           <svg class="admin-sidebar__icono" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
           </svg>
           <span class="admin-sidebar__etiqueta">Reclamaciones</span>
-        </span>
+        </a>
 
         <a routerLink="/admin/reportes/matriculas" routerLinkActive="admin-sidebar__item--activo" class="admin-sidebar__item" title="Reportes" (click)="cerrarMenuMovil()">
           <svg class="admin-sidebar__icono" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

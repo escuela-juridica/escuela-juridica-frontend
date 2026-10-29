@@ -4,7 +4,11 @@
       <h1 class="matriculas__titulo">Matrículas y pagos</h1>
       <p>Consulta las matrículas activas, manuales y exoneradas.</p>
     </div>
-    <button type="button" class="btn btn--primario" (click)="abrirFormulario()">+ Nueva matrícula</button>
+    <div class="matriculas__acciones-cabecera">
+      <a class="btn btn--secundario" routerLink="/admin/excepciones-pago">Excepciones de pago</a>
+      <a class="btn btn--secundario" routerLink="/admin/reportes/pagos">Reporte de pagos</a>
+      <button type="button" class="btn btn--primario" (click)="abrirFormulario()">+ Nueva matrícula</button>
+    </div>
   </div>
 
     <div class="matriculas__filtros">

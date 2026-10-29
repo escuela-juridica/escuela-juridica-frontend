@@ -1,0 +1,74 @@
+<section class="ban">
+  <header class="ban__cabecera">
+    <h1 class="ban__titulo">Quejas y reclamos</h1>
+    <p>Libro de Reclamaciones. Tanto las quejas como los reclamos se responden por correo en máximo 15 días hábiles, improrrogables. Los casos próximos a vencer o vencidos se resaltan, pero siguen abiertos hasta que la respuesta se envíe.</p>
+  </header>
+
+  <div class="ban__filtros">
+    <input class="input" [(ngModel)]="texto" (keyup.enter)="buscar()" placeholder="N.º de caso, documento, nombre o correo" aria-label="Buscar" />
+    <select class="input" [(ngModel)]="estado" (ngModelChange)="buscar()" aria-label="Estado">
+      <option value="">Todos los estados</option>
+      <option value="PENDIENTE_RESPUESTA">Pendientes de respuesta</option>
+      <option value="RESPONDIDO">Respondidos</option>
+    </select>
+    <select class="input" [(ngModel)]="tipo" (ngModelChange)="buscar()" aria-label="Tipo">
+      <option value="">Queja o reclamo</option>
+      <option value="QUEJA">Queja</option>
+      <option value="RECLAMO">Reclamo</option>
+    </select>
+    <button type="button" class="btn btn--acento" (click)="buscar()">Buscar</button>
+    <button type="button" class="btn btn--secundario" (click)="limpiar()">Limpiar</button>
+  </div>
+
+  @if (cargando()) {
+    <p>Cargando…</p>
+  } @else if (error(); as mensaje) {
+    <div class="alerta alerta--error" role="alert"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div>
+  } @else if (filas().length === 0) {
+    <div class="estado-vacio">
+      <h3 class="estado-vacio__titulo">No hay casos con esos filtros</h3>
+      <p class="estado-vacio__texto">Prueba con otro estado o busca por número de caso, documento, nombre o correo.</p>
+    </div>
+  } @else {
+    <p class="ban__resumen">{{ totalFilas() }} {{ totalFilas() === 1 ? 'caso' : 'casos' }}</p>
+    <div class="ban__tabla">
+      <table>
+        <thead>
+          <tr><th>Caso</th><th>Reclamante</th><th>Fecha límite</th><th>Imágenes</th><th>Estado</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+          @for (fila of filas(); track fila.id) {
+            <tr [class.ban__fila--vencido]="fila.plazo === 'VENCIDO'" [class.ban__fila--por-vencer]="fila.plazo === 'POR_VENCER'">
+              <td>
+                <strong class="ban__codigo">{{ fila.codigo }}</strong>
+                <small>{{ fila.tipo === 'QUEJA' ? 'Queja' : 'Reclamo' }} · {{ fila.registradoEn | date:'dd/MM/yyyy' }}</small>
+              </td>
+              <td><strong>{{ fila.reclamante }}</strong><small>{{ fila.documento }}</small><small>{{ fila.correo }}</small></td>
+              <td>
+                <strong>{{ fila.fechaLimite | date:'dd/MM/yyyy' }}</strong>
+                @if (fila.plazo; as plazo) {
+                  <span class="badge" [class.badge--disp-cancelado]="plazo === 'VENCIDO'" [class.badge--advertencia-suave]="plazo === 'POR_VENCER'" [class.badge--disp-inmediato]="plazo === 'EN_PLAZO'">{{ textoPlazo(fila) }}</span>
+                }
+              </td>
+              <td>{{ fila.imagenes === 0 ? '—' : fila.imagenes }}</td>
+              <td>
+                @if (fila.estado === 'RESPONDIDO') { <span class="badge badge--disp-inmediato">Respondido</span> }
+                @else { <span class="badge badge--advertencia-suave">Pendiente</span> }
+                <small>{{ etiquetaRespuesta(fila.estadoRespuesta) }}</small>
+              </td>
+              <td><a class="btn btn--secundario" [routerLink]="['/admin/reclamaciones', fila.id]">{{ fila.estado === 'RESPONDIDO' ? 'Ver expediente' : 'Responder' }}</a></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (totalPaginas() > 1) {
+      <div class="ban__paginacion">
+        <button type="button" class="btn btn--secundario" [disabled]="pagina() === 0" (click)="irAPagina(pagina() - 1)">Anterior</button>
+        <span>Página {{ pagina() + 1 }} de {{ totalPaginas() }}</span>
+        <button type="button" class="btn btn--secundario" [disabled]="pagina() + 1 >= totalPaginas()" (click)="irAPagina(pagina() + 1)">Siguiente</button>
+      </div>
+    }
+  }
+</section>

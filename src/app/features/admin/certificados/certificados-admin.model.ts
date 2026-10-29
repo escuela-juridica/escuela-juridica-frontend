@@ -4,6 +4,7 @@ export type EstadoCertificadoGestion = 'SIN_CERTIFICADO' | 'VIGENTE' | 'ANULADO'
 
 export interface CertificadoGestion {
   matriculaId: number;
+  certificadoId: number | null;
   alumno: string;
   correo: string;
   cursoId: number;
@@ -60,4 +61,61 @@ export interface EmisionManualSituacion {
 export interface EmitirCertificadoManual {
   motivo: string;
   fechaFinalizacion: string | null;
+}
+
+/** HU-036 — Corrección y anulación de un certificado. */
+export interface FirmanteImpreso {
+  firmanteId: number;
+  nombre: string;
+  cargo: string;
+}
+
+export type AccionHistorial = 'EMISION_MANUAL' | 'CORRECCION' | 'ANULACION';
+
+export interface CambioCertificado {
+  id: number;
+  accion: AccionHistorial;
+  datosAnteriores: string | null;
+  datosNuevos: string | null;
+  motivo: string;
+  realizadoPor: string;
+  realizadoEn: string;
+}
+
+export interface CertificadoDetalle {
+  certificadoId: number;
+  codigo: string;
+  estado: 'VIGENTE' | 'ANULADO';
+  tipoEmision: string;
+  nivel: 'NORMAL' | 'REFRENDADO';
+  nota: number | null;
+  alumno: string;
+  correo: string;
+  cursoId: number;
+  nombres: string;
+  titulo: string;
+  tipoCurso: string;
+  horas: number;
+  entidad: string | null;
+  emitidoEn: string;
+  anuladoEn: string | null;
+  motivoAnulacion: string | null;
+  puedeModificar: boolean;
+  firmantes: FirmanteImpreso[];
+  firmantesDisponibles: FirmanteImpreso[];
+  historial: CambioCertificado[];
+}
+
+export interface CorregirCertificado {
+  motivo: string;
+  nombres: string;
+  titulo: string;
+  horas: number;
+  entidad: string | null;
+  firmanteIds: number[];
+}
+
+export interface AnularCertificado {
+  motivo: string;
+  confirmo: boolean;
 }

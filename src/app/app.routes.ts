@@ -239,6 +239,37 @@ export const routes: Routes = [
           import('./features/admin/certificados/emision-manual/emision-manual').then((m) => m.EmisionManual),
       }, // PF-034 (HU-035)
       {
+        path: 'certificados/:certificadoId',
+        loadComponent: () =>
+          import('./features/admin/certificados/correccion-certificado/correccion-certificado').then(
+            (m) => m.CorreccionCertificado,
+          ),
+      }, // PF-034 (HU-036)
+      {
+        path: 'excepciones-pago',
+        loadComponent: () =>
+          import('./features/admin/excepciones-pago/excepciones-pago').then((m) => m.ExcepcionesPago),
+      }, // PF-035 (HU-037)
+      {
+        path: 'reclamaciones',
+        loadComponent: () =>
+          import('./features/admin/reclamaciones/bandeja-reclamaciones/bandeja-reclamaciones').then(
+            (m) => m.BandejaReclamaciones,
+          ),
+      }, // PF-037 (HU-040)
+      {
+        path: 'reclamaciones/:id',
+        loadComponent: () =>
+          import('./features/admin/reclamaciones/detalle-reclamacion/detalle-reclamacion').then(
+            (m) => m.DetalleReclamacion,
+          ),
+      }, // PF-038 (HU-040)
+      {
+        path: 'reportes/pagos',
+        loadComponent: () =>
+          import('./features/admin/reportes/reporte-pagos/reporte-pagos').then((m) => m.ReportePagosPantalla),
+      }, // HU-042
+      {
         path: 'reportes/certificados',
         loadComponent: () =>
           import('./features/admin/reportes/reporte-certificados/reporte-certificados').then(
