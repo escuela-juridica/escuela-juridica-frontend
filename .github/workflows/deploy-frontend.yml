@@ -1,0 +1,68 @@
+name: Deploy frontend
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-frontend
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Código
+        uses: actions/checkout@v4
+
+      - name: Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Compilar para producción
+        run: npx ng build --configuration production
+
+      - name: Regla de rutas del sitio (Apache)
+        run: |
+          cat > dist/escuela-juridica-frontend/browser/.htaccess <<'HTACCESS'
+          <IfModule mod_rewrite.c>
+            RewriteEngine On
+            RewriteRule ^index\.html$ - [L]
+            RewriteCond %{REQUEST_FILENAME} !-f
+            RewriteCond %{REQUEST_FILENAME} !-d
+            RewriteRule . /index.html [L]
+          </IfModule>
+          HTACCESS
+
+      - name: Preparar SSH
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_PORT: ${{ secrets.VPS_PORT }}
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p "$VPS_PORT" -T 15 "$VPS_HOST" >> ~/.ssh/known_hosts
+
+      - name: Publicar en el VPS
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_PORT: ${{ secrets.VPS_PORT }}
+          VPS_FRONTEND_DIR: ${{ secrets.VPS_FRONTEND_DIR }}
+        run: |
+          rsync -az --delete \
+            --exclude '.well-known' --exclude 'cgi-bin' \
+            -e "ssh -p $VPS_PORT -i $HOME/.ssh/deploy_key -o StrictHostKeyChecking=yes" \
+            dist/escuela-juridica-frontend/browser/ \
+            "$VPS_USER@$VPS_HOST:$VPS_FRONTEND_DIR/"
