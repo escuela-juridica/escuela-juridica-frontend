@@ -1,0 +1,49 @@
+<app-modal titulo="Pagar con Culqi" ancho="md" (cerrar)="cerrar.emit()">
+  @let p = pago();
+  <div class="sim">
+    <div class="sim__aviso" role="note">
+      <strong>Culqi simulado.</strong> Es un entorno de demostración: no se procesa dinero real ni se piden datos reales. Elige qué resultado quieres reproducir.
+    </div>
+
+    <div class="sim__monto">
+      <span>{{ p.titulo }}</span>
+      <strong>{{ formatearPrecio(p.importe) }}</strong>
+    </div>
+
+    <div class="sim__medios" role="tablist" aria-label="Medio de pago">
+      <button type="button" role="tab" class="sim__medio" [class.sim__medio--activo]="medio() === 'TARJETA'" [attr.aria-selected]="medio() === 'TARJETA'" (click)="medio.set('TARJETA')">Tarjeta</button>
+      <button type="button" role="tab" class="sim__medio" [class.sim__medio--activo]="medio() === 'YAPE'" [attr.aria-selected]="medio() === 'YAPE'" (click)="medio.set('YAPE')">Yape</button>
+      <button type="button" role="tab" class="sim__medio" [class.sim__medio--activo]="medio() === 'PLIN'" [attr.aria-selected]="medio() === 'PLIN'" (click)="medio.set('PLIN')">Plin</button>
+    </div>
+
+    @switch (medio()) {
+      @case ('TARJETA') {
+        <fieldset class="sim__grupo">
+          <legend>Tarjeta de prueba</legend>
+          @for (t of tarjetas; track t.codigo) {
+            <label class="sim__opcion" [class.sim__opcion--activa]="scenario === t.codigo">
+              <input type="radio" name="escenario" [value]="t.codigo" [(ngModel)]="scenario" />
+              <span><strong>{{ t.etiqueta }}</strong><small>{{ t.detalle }}</small></span>
+            </label>
+          }
+        </fieldset>
+      }
+      @case ('YAPE') {
+        <div class="sim__grupo">
+          <p class="sim__texto"><strong>Celular de prueba:</strong> 900 000 001 · <strong>código:</strong> cualquier número de 6 dígitos.</p>
+          <p class="sim__texto">Yape devuelve el cobro aprobado de inmediato.</p>
+        </div>
+      }
+      @default {
+        <div class="sim__grupo">
+          <p class="sim__texto">Con Plin y otras billeteras, Culqi crea la orden y avisa el resultado cuando termines de pagar en tu app. Este intento quedará <strong>PENDIENTE</strong> hasta que Culqi comunique el resultado.</p>
+        </div>
+      }
+    }
+
+    <div class="sim__acciones">
+      <button type="button" class="btn btn--secundario" (click)="cerrar.emit()">Cancelar</button>
+      <button type="button" class="btn btn--acento" (click)="pagar()">Pagar {{ formatearPrecio(p.importe) }}</button>
+    </div>
+  </div>
+</app-modal>

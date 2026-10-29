@@ -1,0 +1,65 @@
+@let c = constancia();
+<article class="card constancia" aria-labelledby="constancia-titulo">
+  <header class="constancia__cabecera">
+    <span class="constancia__marca" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
+    </span>
+    <div>
+      <p class="constancia__etiqueta">Constancia de presentación</p>
+      <h2 id="constancia-titulo" class="constancia__titulo">Registramos tu {{ c.tipo === 'QUEJA' ? 'queja' : 'reclamo' }}</h2>
+    </div>
+  </header>
+
+  <div class="constancia__resumen">
+    <div class="constancia__dato constancia__dato--principal">
+      <span class="constancia__dato-etiqueta">Número de caso</span>
+      <span class="constancia__dato-valor constancia__codigo">{{ c.codigo }}</span>
+    </div>
+    <div class="constancia__dato">
+      <span class="constancia__dato-etiqueta">Presentado el</span>
+      <span class="constancia__dato-valor">{{ formatearFechaHoraCorta(c.registradoEn) }}</span>
+    </div>
+    <div class="constancia__dato">
+      <span class="constancia__dato-etiqueta">Estado</span>
+      <span class="constancia__dato-valor"><span class="badge badge--disp-proximo">Pendiente de respuesta</span></span>
+    </div>
+    <div class="constancia__dato constancia__dato--limite">
+      <span class="constancia__dato-etiqueta">Fecha máxima de respuesta</span>
+      <span class="constancia__dato-valor">{{ formatearFecha(c.fechaLimiteRespuesta) }}</span>
+    </div>
+  </div>
+
+  @if (c.constanciaEnviada) {
+    <div class="alerta alerta--exito" role="status">
+      <span class="alerta__icono">✓</span>
+      <div><p class="alerta__titulo">Te enviamos esta constancia a {{ c.correo }}</p><p class="alerta__texto">La respuesta de la Escuela llegará a ese mismo correo. Conserva el número de caso.</p></div>
+    </div>
+  } @else {
+    <div class="alerta alerta--advertencia" role="status">
+      <span class="alerta__icono">!</span>
+      <div><p class="alerta__titulo">Tu caso quedó registrado, pero no pudimos enviar el correo</p><p class="alerta__texto">Guarda o imprime esta constancia: el número de caso y la fecha máxima de respuesta están aquí. La respuesta llegará a {{ c.correo }}.</p></div>
+    </div>
+  }
+
+  <h3 class="constancia__subtitulo">Copia de lo que presentaste</h3>
+  <dl class="constancia__lista">
+    <div><dt>Nombre</dt><dd>{{ c.nombres }} {{ c.apellidos }}</dd></div>
+    <div><dt>Documento</dt><dd>{{ c.tipoDocumento }} {{ c.numeroDocumento }}</dd></div>
+    <div><dt>Correo</dt><dd>{{ c.correo }}</dd></div>
+    <div><dt>Celular</dt><dd>{{ c.celular }}</dd></div>
+    <div class="constancia__ancho"><dt>Dirección</dt><dd>{{ c.direccion }}</dd></div>
+    <div><dt>Producto o servicio</dt><dd>{{ c.descripcionBien }}</dd></div>
+    <div><dt>Monto reclamado</dt><dd>S/ {{ c.montoReclamado | number: '1.2-2' }}</dd></div>
+    <div class="constancia__ancho"><dt>¿Qué pasó?</dt><dd class="constancia__texto">{{ c.detalle }}</dd></div>
+    <div class="constancia__ancho"><dt>¿Qué podemos hacer por usted?</dt><dd class="constancia__texto">{{ c.pedido }}</dd></div>
+    <div class="constancia__ancho">
+      <dt>Imágenes adjuntas</dt>
+      <dd>{{ c.adjuntos.length === 0 ? 'Sin imágenes' : c.adjuntos.join(', ') }}</dd>
+    </div>
+  </dl>
+
+  <div class="constancia__acciones">
+    <button type="button" class="btn btn--secundario" (click)="imprimir()">Imprimir constancia</button>
+    <a class="btn btn--primario" routerLink="/catalogo">Volver al catálogo</a>
+  </div>
+</article>

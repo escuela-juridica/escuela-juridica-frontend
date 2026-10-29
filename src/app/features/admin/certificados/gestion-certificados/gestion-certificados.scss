@@ -1,0 +1,91 @@
+.gestion__titulo {
+  margin: 0;
+  font-size: 22px;
+  line-height: 30px;
+  font-weight: 700;
+  color: var(--neutral-950);
+}
+
+.gestion__cabecera {
+  margin-bottom: 24px;
+}
+
+.gestion__cabecera p {
+  margin: 4px 0 0;
+  max-width: 760px;
+  color: var(--neutral-600);
+}
+
+.gestion__filtros {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto auto;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.gestion__resumen {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: var(--neutral-600);
+}
+
+.gestion__tabla {
+  overflow-x: auto;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radio-lg);
+  background: var(--blanco);
+}
+
+.gestion__tabla table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.gestion__tabla th {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--neutral-600);
+  background: var(--neutral-050);
+  border-bottom: 1px solid var(--neutral-200);
+}
+
+.gestion__tabla td {
+  padding: 14px 16px;
+  vertical-align: top;
+  border-bottom: 1px solid var(--neutral-100);
+}
+
+.gestion__tabla tr:last-child td {
+  border-bottom: 0;
+}
+
+.gestion__tabla small {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--neutral-600);
+}
+
+.gestion__codigo {
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.gestion__paginacion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+@media (max-width: 800px) {
+  .gestion__filtros {
+    grid-template-columns: 1fr;
+  }
+}

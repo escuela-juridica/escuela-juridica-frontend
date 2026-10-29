@@ -30,6 +30,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/legal/terminos/terminos').then((m) => m.Terminos),
       }, // PF-011b
+      {
+        path: 'libro-de-reclamaciones',
+        loadComponent: () =>
+          import('./features/reclamaciones/libro-reclamaciones/libro-reclamaciones').then(
+            (m) => m.LibroReclamaciones,
+          ),
+      }, // PF-036 (HU-039)
     ],
   },
   // PF-003/PF-004: sin ningún layout — pantalla completa a su propio ritmo (hero + formulario),
@@ -86,6 +93,16 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/cuenta/mi-perfil/mi-perfil').then((m) => m.MiPerfil),
       }, // PF-009
+      {
+        path: 'pagar/:urlAmigable',
+        loadComponent: () =>
+          import('./features/pagos/checkout-pago/checkout-pago').then((m) => m.CheckoutPago),
+      }, // PF-017 (HU-047)
+      {
+        path: 'pagos/:numeroPedido',
+        loadComponent: () =>
+          import('./features/pagos/resultado-pago/resultado-pago').then((m) => m.ResultadoPago),
+      }, // PF-018 (HU-047)
       {
         path: 'certificados',
         loadComponent: () =>
@@ -209,6 +226,18 @@ export const routes: Routes = [
             (m) => m.RevisionIntentoPantalla,
           ),
       }, // HU-030
+      {
+        path: 'certificados',
+        loadComponent: () =>
+          import('./features/admin/certificados/gestion-certificados/gestion-certificados').then(
+            (m) => m.GestionCertificados,
+          ),
+      }, // PF-033 (HU-035)
+      {
+        path: 'certificados/manual/:matriculaId',
+        loadComponent: () =>
+          import('./features/admin/certificados/emision-manual/emision-manual').then((m) => m.EmisionManual),
+      }, // PF-034 (HU-035)
       {
         path: 'reportes/certificados',
         loadComponent: () =>

@@ -1,0 +1,176 @@
+.resultado {
+  max-width: 820px;
+  padding-top: 32px;
+  padding-bottom: 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.resultado__estado {
+  padding: 56px 0;
+  text-align: center;
+  color: var(--neutral-600);
+}
+
+.resultado__tarjeta {
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  border-top: 6px solid var(--neutral-300);
+}
+
+.resultado__tarjeta[data-estado='APROBADO'] {
+  border-top-color: var(--exito);
+}
+
+.resultado__tarjeta[data-estado='PENDIENTE'] {
+  border-top-color: var(--advertencia);
+}
+
+.resultado__tarjeta[data-estado='RECHAZADO'],
+.resultado__tarjeta[data-estado='ERROR'],
+.resultado__tarjeta[data-estado='EXPIRADO'] {
+  border-top-color: var(--error);
+}
+
+.resultado__cabecera {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.resultado__icono {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--neutral-300);
+  color: #fff;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+[data-estado='APROBADO'] .resultado__icono {
+  background: var(--exito);
+}
+
+[data-estado='PENDIENTE'] .resultado__icono {
+  background: var(--advertencia);
+}
+
+[data-estado='RECHAZADO'] .resultado__icono,
+[data-estado='ERROR'] .resultado__icono,
+[data-estado='EXPIRADO'] .resultado__icono {
+  background: var(--error);
+}
+
+.resultado__etiqueta {
+  margin: 0 0 2px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--neutral-600);
+}
+
+.resultado__titulo {
+  margin: 0;
+  font-size: 26px;
+  line-height: 34px;
+  color: var(--neutral-950);
+}
+
+.resultado__mensaje {
+  margin: 0;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--neutral-800);
+}
+
+.resultado__datos {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px 24px;
+  padding: 16px 18px;
+  border-radius: var(--radio-md);
+  background: var(--neutral-050);
+}
+
+.resultado__datos dt {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--neutral-600);
+}
+
+.resultado__datos dd {
+  margin: 2px 0 0;
+  font-weight: 600;
+  color: var(--neutral-950);
+}
+
+.resultado__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.resultado__constancia,
+.resultado__simulador {
+  padding: 24px 28px;
+}
+
+.resultado__constancia-cab {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.resultado__subtitulo {
+  margin: 0;
+  font-size: 18px;
+  color: var(--neutral-950);
+}
+
+.resultado__nota {
+  margin: 6px 0 14px;
+  font-size: 13px;
+  color: var(--neutral-600);
+}
+
+.resultado__botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.resultado__simulador {
+  border: 1px dashed var(--advertencia);
+  background: #fffaf0;
+}
+
+@media (max-width: 640px) {
+  .resultado__tarjeta {
+    padding: 22px 18px;
+  }
+
+  .resultado__datos {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media print {
+  .resultado__tarjeta,
+  .resultado__simulador,
+  .resultado__constancia-cab .btn {
+    display: none;
+  }
+}

@@ -5,7 +5,7 @@ export interface Matricula {
   cursoUrlAmigable: string;
   imagenPortadaUrl: string | null;
   modalidad: 'VIRTUAL' | 'EN_VIVO' | 'HIBRIDO';
-  estado: 'ACTIVA' | 'CANCELADA' | 'FINALIZADA' | 'VENCIDA';
+  estado: 'ACTIVA' | 'CANCELADA' | 'FINALIZADA' | 'VENCIDA' | 'PENDIENTE_PAGO';
   formaIngreso: string;
   fechaMatricula: string;
   fechaActivacion: string | null;

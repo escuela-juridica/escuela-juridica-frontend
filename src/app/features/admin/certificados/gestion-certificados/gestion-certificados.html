@@ -1,0 +1,72 @@
+<section class="gestion">
+  <header class="gestion__cabecera">
+    <h1 class="gestion__titulo">Certificados</h1>
+    <p>Consulta la situación del certificado de cada alumno y emite uno de forma excepcional cuando el caso lo justifique. Los certificados normales se emiten solos al cumplirse las condiciones del curso.</p>
+  </header>
+
+  <div class="gestion__filtros">
+    <input class="input" [(ngModel)]="texto" (keyup.enter)="buscar()" placeholder="Alumno, correo, curso o código" aria-label="Buscar" />
+    <select class="input" [(ngModel)]="estado" (ngModelChange)="buscar()" aria-label="Situación del certificado">
+      <option value="">Cualquier situación</option>
+      <option value="SIN_CERTIFICADO">Sin certificado</option>
+      <option value="VIGENTE">Vigente</option>
+      <option value="ANULADO">Anulado</option>
+    </select>
+    <button type="button" class="btn btn--acento" (click)="buscar()">Buscar</button>
+    <button type="button" class="btn btn--secundario" (click)="limpiar()">Limpiar</button>
+  </div>
+
+  @if (cargando()) {
+    <p>Cargando…</p>
+  } @else if (error(); as mensaje) {
+    <div class="alerta alerta--error" role="alert"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div>
+  } @else if (filas().length === 0) {
+    <div class="estado-vacio">
+      <h3 class="estado-vacio__titulo">No encontramos matrículas con esos filtros</h3>
+      <p class="estado-vacio__texto">Prueba con otro nombre, curso o situación.</p>
+    </div>
+  } @else {
+    <p class="gestion__resumen">{{ totalFilas() }} {{ totalFilas() === 1 ? 'matrícula' : 'matrículas' }}</p>
+    <div class="gestion__tabla">
+      <table>
+        <thead>
+          <tr><th>Alumno y curso</th><th>Matrícula</th><th>Certificado</th><th>Código</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+          @for (fila of filas(); track fila.matriculaId) {
+            <tr>
+              <td><strong>{{ fila.alumno }}</strong><small>{{ fila.correo }}</small><small>{{ fila.curso }}</small></td>
+              <td>{{ etiquetaMatricula(fila.estadoMatricula) }}</td>
+              <td>
+                @switch (fila.estadoCertificado) {
+                  @case ('VIGENTE') { <span class="badge badge--disp-inmediato">Vigente</span> }
+                  @case ('ANULADO') { <span class="badge badge--disp-cancelado">Anulado</span> }
+                  @default { <span class="badge badge--disp-proximo">Sin certificado</span> }
+                }
+                @if (fila.emitidoEn) {
+                  <small>{{ etiquetaEmision(fila.tipoEmision) }} · {{ fila.emitidoEn | date:'dd/MM/yyyy' }}</small>
+                }
+              </td>
+              <td class="gestion__codigo">{{ fila.codigo ?? '—' }}</td>
+              <td>
+                @if (fila.puedeEmitirManual) {
+                  <a class="btn btn--secundario" [routerLink]="['/admin/certificados/manual', fila.matriculaId]">Emitir manualmente</a>
+                } @else {
+                  <a class="btn btn--secundario" [routerLink]="['/admin/certificados/manual', fila.matriculaId]">Ver situación</a>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (totalPaginas() > 1) {
+      <div class="gestion__paginacion">
+        <button type="button" class="btn btn--secundario" [disabled]="pagina() === 0" (click)="irAPagina(pagina() - 1)">Anterior</button>
+        <span>Página {{ pagina() + 1 }} de {{ totalPaginas() }}</span>
+        <button type="button" class="btn btn--secundario" [disabled]="pagina() + 1 >= totalPaginas()" (click)="irAPagina(pagina() + 1)">Siguiente</button>
+      </div>
+    }
+  }
+</section>

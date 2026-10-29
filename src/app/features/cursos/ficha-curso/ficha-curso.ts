@@ -265,7 +265,7 @@ export class FichaCurso implements OnInit {
       return;
     }
     if (this.session.estaAutenticado()) {
-      this.abrirConfirmacionMatricula();
+      void this.router.navigate(['/app/pagar', curso.urlAmigable]);
       return;
     }
     void this.router.navigate(['/acceso'], {

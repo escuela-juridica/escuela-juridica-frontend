@@ -265,7 +265,8 @@ export class SeguimientoAcademico {
 
   protected etiquetaExcepcion(tipo: string): string {
     return tipo === 'REABRIR_INTENTO' ? 'Intento adicional'
-      : tipo === 'CORREGIR_ASISTENCIA' ? 'Corrección de asistencia' : tipo;
+      : tipo === 'CORREGIR_ASISTENCIA' ? 'Corrección de asistencia'
+      : tipo === 'EMITIR_CERTIFICADO' ? 'Certificado emitido manualmente' : tipo;
   }
 
   private mensaje(e: HttpErrorResponse): string | null {

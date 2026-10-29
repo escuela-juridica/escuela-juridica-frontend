@@ -1,0 +1,183 @@
+.checkout {
+  padding-top: 28px;
+  padding-bottom: 56px;
+}
+
+.checkout__estado {
+  padding: 56px 0;
+  text-align: center;
+  color: var(--neutral-600);
+}
+
+.checkout__volver {
+  display: inline-block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--neutral-600);
+  text-decoration: none;
+}
+
+.checkout__titulo {
+  margin: 0 0 20px;
+  font-size: 28px;
+  line-height: 36px;
+  color: var(--neutral-950);
+}
+
+.checkout__rejilla {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.checkout__curso {
+  overflow: hidden;
+}
+
+.checkout__portada {
+  height: 220px;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--marca-900);
+}
+
+.checkout__curso-cuerpo {
+  padding: 24px 28px 28px;
+}
+
+.checkout__etiqueta {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--eyebrow-color);
+}
+
+.checkout__curso-titulo {
+  margin: 6px 0 8px;
+  font-size: 24px;
+  line-height: 32px;
+  color: var(--neutral-950);
+}
+
+.checkout__curso-datos {
+  margin: 0 0 16px;
+  color: var(--neutral-600);
+}
+
+.checkout__incluye {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.checkout__incluye li {
+  position: relative;
+  padding-left: 26px;
+  color: var(--neutral-800);
+}
+
+.checkout__incluye li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  font-weight: 700;
+  color: var(--exito);
+}
+
+.checkout__resumen {
+  position: sticky;
+  top: 96px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.checkout__resumen-titulo {
+  margin: 0;
+  font-size: 18px;
+  color: var(--neutral-950);
+}
+
+.checkout__precio {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.checkout__precio-antes {
+  font-size: 16px;
+  text-decoration: line-through;
+  color: var(--neutral-600);
+}
+
+.checkout__precio-actual {
+  font-size: 36px;
+  line-height: 44px;
+  font-weight: 700;
+  color: var(--neutral-950);
+}
+
+.checkout__precio-nota {
+  font-size: 13px;
+  color: var(--neutral-600);
+}
+
+.checkout__confirmar {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--neutral-800);
+  cursor: pointer;
+}
+
+.checkout__confirmar input {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  accent-color: var(--marca-900);
+}
+
+.checkout__medios {
+  margin: 0;
+  padding: 12px 0 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-top: 1px solid var(--neutral-200);
+}
+
+.checkout__medios li {
+  padding: 4px 12px;
+  border-radius: var(--radio-completo);
+  background: var(--neutral-100);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--neutral-800);
+}
+
+.checkout__legal {
+  margin: 0;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--neutral-600);
+}
+
+@media (max-width: 900px) {
+  .checkout__rejilla {
+    grid-template-columns: 1fr;
+  }
+
+  .checkout__resumen {
+    position: static;
+  }
+}

@@ -51,7 +51,9 @@
               <span class="panel-curso__progreso-porcentaje">{{ curso.porcentajeProgreso }}%</span>
             </div>
             <div class="panel-curso__leccion">
-              @if (curso.fechaInicio && !curso.accesoEfectivo) {
+              @if (curso.pagoPendiente) {
+                Tu pago aún no está aprobado: no tienes acceso ni cupo reservado hasta que Culqi lo apruebe.
+              } @else if (curso.fechaInicio && !curso.accesoEfectivo) {
                 El curso inicia el {{ curso.fechaInicio | date:'dd/MM/yyyy' }}.
               } @else if (curso.totalLecciones > 0) {
                 {{ curso.leccionesCompletadas }} de {{ curso.totalLecciones }} lecciones completadas · siguiente: "{{ curso.siguienteLeccionNombre }}"
@@ -60,9 +62,13 @@
               }
             </div>
           </div>
-          <button type="button" [routerLink]="['/aula', curso.id]" [disabled]="!curso.accesoEfectivo" class="btn btn--acento panel-curso__boton">
-            {{ curso.accesoEfectivo ? 'Continuar curso' : 'Acceso no disponible' }}
-          </button>
+          @if (curso.pagoPendiente) {
+            <a [routerLink]="['/app/pagar', curso.urlAmigable]" class="btn btn--acento panel-curso__boton">Completar pago</a>
+          } @else {
+            <button type="button" [routerLink]="['/aula', curso.id]" [disabled]="!curso.accesoEfectivo" class="btn btn--acento panel-curso__boton">
+              {{ curso.accesoEfectivo ? 'Continuar curso' : 'Acceso no disponible' }}
+            </button>
+          }
           @if (curso.estadoNotificacion === 'ERROR') {
             <button type="button" class="btn btn--secundario" [disabled]="reenviando() === curso.id" (click)="reenviarConfirmacion(curso.id)">
               {{ reenviando() === curso.id ? 'Enviando…' : 'Reenviar confirmación' }}

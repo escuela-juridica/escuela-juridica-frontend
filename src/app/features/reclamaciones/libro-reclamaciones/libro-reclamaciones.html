@@ -1,0 +1,168 @@
+<main>
+  <section class="libro-hero" aria-labelledby="libro-titulo">
+    <div class="contenedor libro-hero__interior">
+      <span class="libro-hero__icono" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="38" height="38" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v17H6.5A2.5 2.5 0 0 0 4 21.5z" /><path d="M4 21.5A2.5 2.5 0 0 0 6.5 24H20v-5" /><path d="M9 7h7M9 11h7" /></svg>
+      </span>
+      <div>
+        <div class="eyebrow eyebrow--claro"><span class="eyebrow__dash"></span><span class="eyebrow__texto">Atención al consumidor</span></div>
+        <h1 id="libro-titulo" class="libro-hero__titulo">Libro de Reclamaciones</h1>
+        <p class="libro-hero__subtitulo">
+          La Escuela Jurídica dispone del Libro de Reclamaciones conforme al Código de Protección y Defensa del
+          Consumidor. Responderemos tu caso en un máximo de <strong>15 días hábiles</strong>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <div class="contenedor libro">
+    @if (constancia(); as c) {
+      <app-reclamacion-constancia [constancia]="c" />
+    } @else {
+      <form class="libro-formulario" [formGroup]="formulario" (ngSubmit)="enviar()" novalidate>
+        @if (prellenado()) {
+          <div class="alerta alerta--info" role="status">
+            <span class="alerta__icono">i</span>
+            <div><p class="alerta__texto">Completamos tus datos conocidos. Puedes revisarlos y corregirlos antes de enviar.</p></div>
+          </div>
+        }
+
+        <section class="card libro-seccion" aria-labelledby="libro-tipo">
+          <h2 id="libro-tipo" class="libro-seccion__titulo"><span class="libro-seccion__numero">1</span>¿Qué quieres presentar?</h2>
+          <div class="libro-tipos" role="radiogroup" aria-label="Tipo de caso">
+            <button type="button" class="libro-tipo" role="radio" [attr.aria-checked]="formulario.controls.tipo.value === 'RECLAMO'"
+              [class.libro-tipo--activo]="formulario.controls.tipo.value === 'RECLAMO'" (click)="elegirTipo('RECLAMO')">
+              <span class="libro-tipo__nombre">Reclamo</span>
+              <span class="libro-tipo__texto">Disconformidad con el <strong>producto o servicio</strong> que adquiriste.</span>
+            </button>
+            <button type="button" class="libro-tipo" role="radio" [attr.aria-checked]="formulario.controls.tipo.value === 'QUEJA'"
+              [class.libro-tipo--activo]="formulario.controls.tipo.value === 'QUEJA'" (click)="elegirTipo('QUEJA')">
+              <span class="libro-tipo__nombre">Queja</span>
+              <span class="libro-tipo__texto">Disconformidad con la <strong>atención</strong> recibida, sin relación directa con el producto o servicio.</span>
+            </button>
+          </div>
+          <p class="libro-nota">Ambos se responden dentro del mismo plazo máximo de 15 días hábiles.</p>
+          @if (invalido('tipo')) { <p class="campo-error">Elige si es una queja o un reclamo.</p> }
+        </section>
+
+        <section class="card libro-seccion" aria-labelledby="libro-datos">
+          <h2 id="libro-datos" class="libro-seccion__titulo"><span class="libro-seccion__numero">2</span>Tus datos</h2>
+          <div class="libro-campos">
+            <div>
+              <label class="label" for="lr-tipodoc">Tipo de documento</label>
+              <select id="lr-tipodoc" class="input" formControlName="tipoDocumento">
+                @for (t of tiposDocumento; track t) { <option [value]="t">{{ etiquetasDocumento[t] }}</option> }
+              </select>
+            </div>
+            <div>
+              <label class="label" for="lr-documento">Número de documento</label>
+              <input id="lr-documento" class="input" formControlName="numeroDocumento" autocomplete="off" [class.input--error]="documentoInvalido()" />
+              @if (documentoInvalido()) { <p class="campo-error">{{ ayudaDocumento() }}</p> }
+            </div>
+            <div>
+              <label class="label" for="lr-nombres">Nombres</label>
+              <input id="lr-nombres" class="input" formControlName="nombres" autocomplete="given-name" [class.input--error]="invalido('nombres')" />
+              @if (invalido('nombres')) { <p class="campo-error">Ingresa tus nombres.</p> }
+            </div>
+            <div>
+              <label class="label" for="lr-apellidos">Apellidos</label>
+              <input id="lr-apellidos" class="input" formControlName="apellidos" autocomplete="family-name" [class.input--error]="invalido('apellidos')" />
+              @if (invalido('apellidos')) { <p class="campo-error">Ingresa tus apellidos.</p> }
+            </div>
+            <div>
+              <label class="label" for="lr-correo">Correo electrónico</label>
+              <input id="lr-correo" type="email" class="input" formControlName="correo" autocomplete="email" [class.input--error]="invalido('correo')" />
+              @if (invalido('correo')) { <p class="campo-error">Ingresa un correo válido.</p> }
+            </div>
+            <div>
+              <label class="label" for="lr-celular">Celular</label>
+              <input id="lr-celular" type="tel" class="input" formControlName="celular" autocomplete="tel" [class.input--error]="invalido('celular')" />
+              @if (invalido('celular')) { <p class="campo-error">Ingresa un celular válido.</p> }
+            </div>
+            <div class="libro-campo--ancho">
+              <label class="label" for="lr-direccion">Dirección</label>
+              <input id="lr-direccion" class="input" formControlName="direccion" autocomplete="street-address" [class.input--error]="invalido('direccion')" />
+              @if (invalido('direccion')) { <p class="campo-error">Ingresa tu dirección (mínimo 5 caracteres).</p> }
+            </div>
+          </div>
+        </section>
+
+        <section class="card libro-seccion" aria-labelledby="libro-bien">
+          <h2 id="libro-bien" class="libro-seccion__titulo"><span class="libro-seccion__numero">3</span>Lo que contrataste</h2>
+          <div class="libro-campos">
+            <div class="libro-campo--ancho">
+              <label class="label" for="lr-bien">Producto o servicio</label>
+              <input id="lr-bien" class="input" formControlName="descripcionBien" placeholder="Por ejemplo: Diplomado en Derecho Registral y Notarial" [class.input--error]="invalido('descripcionBien')" />
+              @if (invalido('descripcionBien')) { <p class="campo-error">Describe el producto o servicio.</p> }
+            </div>
+            <div>
+              <label class="label" for="lr-monto">Monto reclamado (S/)</label>
+              <input id="lr-monto" type="number" min="0" step="0.01" class="input" formControlName="montoReclamado" [class.input--error]="invalido('montoReclamado')" />
+              @if (invalido('montoReclamado')) { <p class="campo-error">Ingresa el monto (puede ser 0).</p> }
+            </div>
+          </div>
+        </section>
+
+        <section class="card libro-seccion" aria-labelledby="libro-detalle">
+          <h2 id="libro-detalle" class="libro-seccion__titulo"><span class="libro-seccion__numero">4</span>Detalle del caso</h2>
+          <div class="libro-campos libro-campos--una">
+            <div>
+              <label class="label" for="lr-detalle">Cuéntenos, ¿qué pasó?</label>
+              <textarea id="lr-detalle" class="input" rows="5" formControlName="detalle" [class.input--error]="invalido('detalle')"></textarea>
+              @if (invalido('detalle')) { <p class="campo-error">Cuéntanos qué ocurrió (mínimo 10 caracteres).</p> }
+            </div>
+            <div>
+              <label class="label" for="lr-pedido">¿Qué podemos hacer por usted?</label>
+              <textarea id="lr-pedido" class="input" rows="4" formControlName="pedido" [class.input--error]="invalido('pedido')"></textarea>
+              @if (invalido('pedido')) { <p class="campo-error">Indica qué solución esperas (mínimo 10 caracteres).</p> }
+            </div>
+          </div>
+        </section>
+
+        <section class="card libro-seccion" aria-labelledby="libro-imagenes">
+          <h2 id="libro-imagenes" class="libro-seccion__titulo"><span class="libro-seccion__numero">5</span>Imágenes <span class="nota-pill">Opcional</span></h2>
+          <p class="libro-nota">Adjunta, por ejemplo, tu comprobante de pago. PNG, JPG o WEBP de hasta 5 MB cada una.</p>
+          <label class="btn btn--secundario libro-subir">
+            Agregar imágenes
+            <input type="file" accept="image/png,image/jpeg,image/webp" multiple hidden (change)="elegirImagenes($event)" />
+          </label>
+          @if (errorImagenes(); as mensaje) { <p class="campo-error" role="alert">{{ mensaje }}</p> }
+          @if (imagenes().length > 0) {
+            <ul class="libro-imagenes">
+              @for (imagen of imagenes(); track $index) {
+                <li class="libro-imagen">
+                  <span class="libro-imagen__nombre">{{ imagen.name }}</span>
+                  <span class="libro-imagen__tamano">{{ tamano(imagen) }}</span>
+                  <button type="button" class="libro-imagen__quitar" [attr.aria-label]="'Quitar ' + imagen.name" (click)="quitarImagen($index)">Quitar</button>
+                </li>
+              }
+            </ul>
+          }
+        </section>
+
+        <section class="card libro-seccion" aria-labelledby="libro-declaracion">
+          <h2 id="libro-declaracion" class="libro-seccion__titulo"><span class="libro-seccion__numero">6</span>Declaración</h2>
+          <label class="libro-check">
+            <input type="checkbox" formControlName="declaracionJurada" />
+            <span>Declaro ser usuario del servicio y manifiesto, bajo declaración jurada, que los hechos descritos son veraces.</span>
+          </label>
+          @if (invalido('declaracionJurada')) { <p class="campo-error">Debes aceptar la declaración jurada.</p> }
+          <label class="libro-check">
+            <input type="checkbox" formControlName="autorizaRespuestaCorreo" />
+            <span>Autorizo que se me comunique cualquier respuesta al correo electrónico consignado.</span>
+          </label>
+          @if (invalido('autorizaRespuestaCorreo')) { <p class="campo-error">Debes autorizar la respuesta por correo.</p> }
+        </section>
+
+        @if (errorEnvio(); as mensaje) {
+          <div class="alerta alerta--error" role="alert"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div>
+        }
+
+        <div class="libro-acciones">
+          <a class="btn btn--secundario" routerLink="/catalogo">Cancelar</a>
+          <button type="submit" class="btn btn--primario btn--grande" [disabled]="enviando()">{{ enviando() ? 'Enviando…' : 'Enviar al Libro de Reclamaciones' }}</button>
+        </div>
+      </form>
+    }
+  </div>
+</main>

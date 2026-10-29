@@ -1,0 +1,22 @@
+@let c = constancia();
+<article class="constancia" aria-label="Constancia de pago">
+  <header class="constancia__cabecera">
+    <div>
+      <p class="constancia__marca">Escuela Jurídica</p>
+      <h2 class="constancia__titulo">Constancia de pago</h2>
+    </div>
+    <div class="constancia__numero">
+      <span>N.º de constancia</span>
+      <strong>{{ c.constanciaNumero }}</strong>
+    </div>
+  </header>
+  <dl class="constancia__lista">
+    <div><dt>Número de pedido</dt><dd>{{ c.numeroPedido }}</dd></div>
+    <div><dt>Fecha y hora</dt><dd>{{ formatearFechaHoraCorta(c.fecha) }}</dd></div>
+    <div><dt>Alumno</dt><dd>{{ c.alumno }}<small>{{ c.correo }}</small></dd></div>
+    <div><dt>Curso</dt><dd>{{ c.curso }}</dd></div>
+    <div><dt>Método de pago</dt><dd>{{ etiquetaMedio(c) }}</dd></div>
+    <div><dt>Importe pagado</dt><dd class="constancia__importe">{{ c.moneda === 'PEN' ? 'S/' : c.moneda }} {{ c.importe | number: '1.2-2' }}</dd></div>
+  </dl>
+  <p class="constancia__legal">Pago procesado y aprobado por Culqi. Esta constancia no es un comprobante de pago SUNAT; la Escuela emite ese documento por su canal habitual.</p>
+</article>
