@@ -1,0 +1,24 @@
+<div class="barras" [class.barras--holgado]="holgado()" role="list" [attr.aria-label]="descripcion()">
+  @for (b of barras(); track b.etiqueta; let i = $index) {
+    <div class="barras__fila" role="listitem" tabindex="0"
+      (pointerenter)="activa.set(i)" (pointerleave)="activa.set(null)" (focus)="activa.set(i)" (blur)="activa.set(null)">
+      <span class="barras__etiqueta" [attr.title]="b.etiqueta">
+        @if (conPunto()) { <i class="barras__punto" [style.background]="b.color ?? color()"></i> }
+        {{ b.etiqueta }}
+      </span>
+      <span class="barras__pista">
+        @if (b.valor > 0) {
+          <span class="barras__barra" [style.width.%]="ancho(b.valor)" [style.background]="b.color ?? color()"
+            [class.barras__barra--atenuada]="activa() !== null && activa() !== i"></span>
+        }
+        <span class="barras__valor">{{ b.valor }}</span>
+      </span>
+      @if (activa() === i) {
+        <span class="barras__tip" role="status"><strong>{{ b.valor }}</strong> {{ nombre() }} · {{ b.etiqueta }}</span>
+      }
+    </div>
+  }
+  @if (vacio()) {
+    <p class="barras__vacio">Sin datos en este periodo.</p>
+  }
+</div>

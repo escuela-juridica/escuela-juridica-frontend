@@ -1,3 +1,523 @@
 // PF-002 · Estilos propios de esta pantalla.
-// PENDIENTE — pegar acá las clases .ficha-* del bloque <style> de
-// maquetacion-html/HU-007-PF-002-ficha-curso.html
+
+.ficha-hero {
+  color: #ffffff;
+  padding: 32px 24px 48px;
+  position: relative;
+  overflow: hidden;
+}
+.ficha-hero__degradado {
+  background: linear-gradient(90deg, rgba(11, 23, 40, 0.9) 0%, rgba(11, 23, 40, 0.62) 55%, rgba(11, 23, 40, 0.2) 100%);
+}
+.ficha-hero__blob {
+  position: absolute;
+  top: -120px;
+  left: -60px;
+  width: 320px;
+  height: 320px;
+  border-radius: 999px;
+  background: rgba(200, 62, 77, 0.16);
+}
+.ficha-hero__contenido {
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+.ficha-hero__volver {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  min-height: 32px;
+  padding: 4px 12px;
+  margin-bottom: -24px;
+  border: 1px solid var(--neutral-300);
+  border-radius: var(--radio-completo);
+  color: var(--neutral-700);
+  font-size: 13px;
+  font-weight: 600;
+}
+.ficha-hero__migas {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--acento-100);
+  margin-bottom: 20px;
+}
+.ficha-hero__migas a {
+  color: inherit;
+  text-decoration: underline;
+}
+.ficha-hero__separador {
+  padding: 0 8px;
+  color: #7fa3bf;
+}
+.ficha-hero__miga-actual {
+  color: #ffffff;
+  font-weight: 600;
+}
+.ficha-hero__badges {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.ficha-hero__badge-clara {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+}
+.ficha-hero__titulo {
+  font-family: var(--fuente-editorial);
+  margin: 0 0 16px;
+  max-width: 800px;
+}
+.ficha-hero__resumen {
+  font-size: 18px;
+  line-height: 28px;
+  color: var(--acento-100);
+  max-width: 680px;
+  margin: 0 0 12px;
+}
+.ficha-hero__leer-mas {
+  display: inline-block;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  color: var(--acento-500);
+  margin-bottom: 28px;
+}
+.ficha-hero__datos {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+@media (min-width: 900px) {
+  .ficha-hero__datos {
+    max-width: 740px;
+  }
+}
+.ficha-hero__dato-titulo {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  color: #9fd9db;
+  margin-bottom: 4px;
+}
+.ficha-hero__dato-valor {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+}
+
+.ficha-layout {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  padding-top: 24px;
+  padding-bottom: 56px;
+}
+.ficha-principal {
+  flex: 1 1 520px;
+  min-width: min(300px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.ficha-seccion-titulo {
+  color: var(--neutral-950);
+  margin: 0 0 16px;
+}
+.ficha-seccion-titulo-sin-margen {
+  color: var(--neutral-950);
+  margin: 0;
+}
+
+.ficha-preview {
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radio-lg);
+  background: #0b1728;
+  display: grid;
+  place-items: center;
+  position: relative;
+  overflow: hidden;
+}
+.ficha-preview__play {
+  width: 72px;
+  height: 72px;
+  border-radius: 999px;
+  background: var(--acento-500);
+  display: grid;
+  place-items: center;
+  color: var(--marca-900);
+  font-size: 22px;
+  font-weight: 700;
+}
+.ficha-preview__video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.ficha-preview__etiqueta {
+  position: absolute;
+  bottom: 14px;
+  left: 16px;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--neutral-300);
+  pointer-events: none;
+}
+.ficha-preview__nota {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--neutral-600);
+  margin: 14px 0 0;
+  padding: 0 24px;
+  text-align: center;
+}
+
+.ficha-calendario {
+  padding: 8px 20px;
+  display: flex;
+  flex-direction: column;
+}
+.ficha-calendario__fila {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  flex-wrap: wrap;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--neutral-100);
+  font-size: 14px;
+  line-height: 20px;
+}
+.ficha-calendario__fila:last-child {
+  border-bottom: 0;
+}
+.ficha-calendario__fecha {
+  font-weight: 600;
+  color: var(--neutral-950);
+  text-transform: capitalize;
+}
+.ficha-calendario__hora {
+  color: var(--neutral-500);
+}
+.ficha-calendario__nombre {
+  color: var(--neutral-600);
+  flex: 1 1 auto;
+}
+
+.ficha-temario-cabecera {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.ficha-temario-conteo {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--neutral-500);
+}
+.ficha-temario-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ficha-modulo {
+  padding: 0;
+}
+.ficha-modulo__cabecera {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 52px;
+  padding: 14px 20px;
+  cursor: pointer;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  text-align: left;
+}
+.ficha-modulo__numero {
+  flex: 0 0 32px;
+  height: 32px;
+  border-radius: var(--radio-sm);
+  background: var(--marca-900);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  font-weight: 600;
+}
+.ficha-modulo__nombre {
+  flex: 1 1 180px;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--neutral-950);
+}
+.ficha-modulo__conteo {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--neutral-500);
+}
+.ficha-modulo__flecha {
+  width: 20px;
+  text-align: center;
+  font-size: 16px;
+  color: var(--neutral-500);
+}
+.ficha-modulo__lecciones {
+  border-top: 1px solid var(--neutral-200);
+  padding: 4px 20px 12px;
+}
+.ficha-leccion {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  width: 100%;
+  padding: 10px 0;
+  border: 0;
+  border-bottom: 1px solid var(--neutral-100);
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: default;
+  flex-wrap: wrap;
+}
+.ficha-leccion:last-child {
+  border-bottom: 0;
+}
+.ficha-leccion--clicable {
+  cursor: pointer;
+}
+.ficha-leccion__tipo {
+  flex: 0 0 auto;
+}
+.badge--grabada-suave {
+  background: var(--celeste-050);
+  color: var(--celeste-700);
+}
+.ficha-leccion__nombre {
+  flex: 1 1 200px;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--neutral-800);
+}
+.ficha-leccion__duracion {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--neutral-500);
+}
+.ficha-leccion__bloqueada {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  color: var(--neutral-500);
+}
+
+.ficha-docentes {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.ficha-docente {
+  overflow: hidden;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+}
+.ficha-docente__foto {
+  flex: 0 0 140px;
+  min-height: 160px;
+  background-color: var(--neutral-200);
+  background-size: cover;
+  background-position: center;
+}
+.ficha-docente__info {
+  flex: 1 1 260px;
+  padding: 20px;
+}
+.ficha-docente__nombre {
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 600;
+  color: var(--neutral-950);
+  margin: 0 0 4px;
+}
+.ficha-docente__cargo {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  color: var(--marca-700);
+  margin-bottom: 8px;
+}
+.ficha-docente__bio {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--neutral-600);
+  margin: 0;
+}
+
+.ficha-respaldo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: var(--neutral-050);
+}
+.ficha-respaldo__icono {
+  flex: 0 0 40px;
+  height: 40px;
+  border-radius: var(--radio-md);
+  background: var(--acento-100);
+  color: var(--marca-900);
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  font-weight: 700;
+}
+.ficha-respaldo__texto {
+  flex: 1 1 260px;
+}
+.ficha-respaldo__titulo {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  color: var(--neutral-950);
+}
+.ficha-respaldo__subtitulo {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--neutral-600);
+}
+
+.ficha-price-aside {
+  flex: 0 1 368px;
+  min-width: 288px;
+  position: sticky;
+  top: 96px;
+  z-index: 2;
+}
+.ficha-price-card {
+  box-shadow: var(--sombra-lg);
+}
+.ficha-price-card > .btn {
+  margin-top: 20px;
+}
+.ficha-price__antes {
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--neutral-500);
+  text-decoration: line-through;
+}
+.ficha-price__actual {
+  font-size: 32px;
+  line-height: 40px;
+  font-weight: 700;
+  color: var(--neutral-950);
+}
+.ficha-price__moneda {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--neutral-500);
+  margin-top: 2px;
+}
+.ficha-price__incluye {
+  margin: 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ficha-price__item {
+  display: flex;
+  gap: 10px;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--neutral-800);
+}
+.ficha-price__check {
+  color: var(--exito);
+  font-weight: 600;
+}
+.ficha-price__promo {
+  margin: 16px 0 20px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  background: var(--rojo-marca-600);
+  color: #fff;
+}
+.ficha-price__cerrado {
+  background: var(--neutral-100);
+  border-radius: var(--radio-md);
+  padding: var(--esp-04);
+  text-align: center;
+  margin-top: 20px;
+}
+.ficha-price__cerrado-titulo {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  color: var(--neutral-800);
+  margin-bottom: 4px;
+}
+.ficha-price__cerrado-texto {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--neutral-500);
+}
+.ficha-price__ver-otros {
+  margin-top: 10px;
+}
+.ficha-price__pago {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--neutral-200);
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--neutral-500);
+}
+.ficha-price__matriculado { margin: 20px 0 12px; text-align: left; }
+
+.ficha-cargando {
+  padding-top: 40px;
+  padding-bottom: 56px;
+}
+.ficha-cargando__hero {
+  height: 280px;
+  border-radius: var(--radio-lg);
+  margin-bottom: 24px;
+}
+.ficha-cargando__linea {
+  height: 16px;
+  border-radius: var(--radio-sm);
+  margin-bottom: 12px;
+}
+.ficha-cargando__linea--corta {
+  width: 30%;
+}
+.ficha-cargando__linea--media {
+  width: 60%;
+}
+
+@media (max-width: 899px) {
+  .ficha-price-aside {
+    position: static;
+    order: -1;
+  }
+}

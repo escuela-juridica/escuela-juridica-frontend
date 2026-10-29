@@ -1,0 +1,14 @@
+<div class="anillo" [class.anillo--oscuro]="tono() === 'oscuro'" [class.anillo--exito]="estado() === 'exito'"
+  [class.anillo--error]="estado() === 'error'" [style.width.px]="tamano()" [style.height.px]="tamano()"
+  role="progressbar" [attr.aria-valuenow]="acotado()" aria-valuemin="0" aria-valuemax="100" [attr.aria-label]="descripcion()">
+  <svg [attr.width]="tamano()" [attr.height]="tamano()" [attr.viewBox]="'0 0 ' + tamano() + ' ' + tamano()" aria-hidden="true">
+    <circle class="anillo__pista" [attr.cx]="tamano() / 2" [attr.cy]="tamano() / 2" [attr.r]="radio()" [attr.stroke-width]="grosor()" fill="none" />
+    <circle class="anillo__arco" [attr.cx]="tamano() / 2" [attr.cy]="tamano() / 2" [attr.r]="radio()" [attr.stroke-width]="grosor()" fill="none"
+      stroke-linecap="round" [attr.stroke-dasharray]="circunferencia()" [attr.stroke-dashoffset]="desplazamiento()"
+      [attr.transform]="'rotate(-90 ' + tamano() / 2 + ' ' + tamano() / 2 + ')'" />
+  </svg>
+  <div class="anillo__centro">
+    <span class="anillo__valor" [style.font-size.px]="tamano() * 0.24">{{ centroTexto() }}</span>
+    @if (etiqueta()) { <span class="anillo__etiqueta" [style.font-size.px]="tamanoEtiqueta()">{{ etiqueta() }}</span> }
+  </div>
+</div>

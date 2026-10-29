@@ -1,0 +1,22 @@
+<div class="modal-fondo">
+  <div
+    class="modal-caja"
+    [class.modal-caja--lg]="ancho === 'lg'"
+    #cajaModal
+    role="dialog"
+    aria-modal="true"
+  >
+    <div class="modal-cabecera">
+      <h2 class="modal-titulo">{{ titulo }}</h2>
+      <button type="button" class="modal-cerrar" (click)="cerrar.emit()" aria-label="Cerrar">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="5" y1="5" x2="19" y2="19" />
+          <line x1="19" y1="5" x2="5" y2="19" />
+        </svg>
+      </button>
+    </div>
+    <div class="modal-cuerpo">
+      <ng-content />
+    </div>
+  </div>
+</div>

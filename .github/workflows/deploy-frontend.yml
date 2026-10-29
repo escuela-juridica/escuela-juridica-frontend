@@ -1,0 +1,47 @@
+name: Deploy frontend
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-frontend
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Código
+        uses: actions/checkout@v4
+
+      - name: Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Compilar para producción
+        run: npx ng build --configuration production
+
+      - name: Configurar SSH
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan -p ${{ secrets.VPS_PORT }} ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Subir archivos
+        run: |
+          rsync -rlz --delete --chmod=D755,F644 \
+            --exclude '.well-known' --exclude 'cgi-bin' \
+            -e "ssh -i ~/.ssh/id_deploy -p ${{ secrets.VPS_PORT }}" \
+            dist/escuela-juridica-frontend/browser/ \
+            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/aulavirtual/app.aulavirtual.escuelajuridica.edu.pe/

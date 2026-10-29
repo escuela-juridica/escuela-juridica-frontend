@@ -1,0 +1,24 @@
+<div class="imagen-subida">
+  <div class="imagen-subida__vista" [class.imagen-subida__vista--vacia]="!valor()">
+    @if (urlVista(); as url) {
+      <img [src]="url" [alt]="tipo() === 'FIRMA' ? 'Imagen de la firma' : 'Logo de la entidad'" />
+    } @else if (valor()) {
+      <span>Referencia no válida: sube la imagen de nuevo</span>
+    } @else {
+      <span>Sin imagen</span>
+    }
+  </div>
+  <div class="imagen-subida__acciones">
+    <label class="btn btn--secundario" [class.imagen-subida__boton--ocupado]="subiendo()">
+      {{ subiendo() ? 'Subiendo…' : valor() ? 'Cambiar imagen' : 'Subir imagen' }}
+      <input type="file" accept="image/png,image/jpeg" hidden [disabled]="subiendo()" (change)="elegir($event)" />
+    </label>
+    @if (valor()) {
+      <button type="button" class="btn btn--secundario" [disabled]="subiendo()" (click)="quitar()">Quitar</button>
+    }
+  </div>
+  <p class="imagen-subida__nota">PNG o JPG de hasta 2 MB{{ tipo() === 'FIRMA' ? ', con fondo transparente o blanco' : '' }}.</p>
+  @if (error(); as mensaje) {
+    <div class="campo-error" role="alert">{{ mensaje }}</div>
+  }
+</div>

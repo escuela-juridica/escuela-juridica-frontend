@@ -1,0 +1,94 @@
+:host {
+  display: block;
+}
+
+.constancia {
+  padding: 24px 28px;
+  border: 1px dashed var(--neutral-300);
+  border-radius: var(--radio-lg);
+  background: var(--blanco);
+}
+
+.constancia__cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+  border-bottom: 2px solid var(--marca-900);
+}
+
+.constancia__marca {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--marca-900);
+}
+
+.constancia__titulo {
+  margin: 2px 0 0;
+  font-size: 22px;
+  color: var(--neutral-950);
+}
+
+.constancia__numero {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-size: 12px;
+  color: var(--neutral-600);
+}
+
+.constancia__numero strong {
+  font-size: 16px;
+  color: var(--neutral-950);
+  font-variant-numeric: tabular-nums;
+}
+
+.constancia__lista {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px 24px;
+}
+
+.constancia__lista dt {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--neutral-600);
+}
+
+.constancia__lista dd {
+  margin: 2px 0 0;
+  font-weight: 600;
+  color: var(--neutral-950);
+  overflow-wrap: anywhere;
+}
+
+.constancia__lista small {
+  display: block;
+  font-weight: 400;
+  color: var(--neutral-600);
+}
+
+.constancia__importe {
+  font-size: 20px;
+}
+
+.constancia__legal {
+  margin: 18px 0 0;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--neutral-600);
+}
+
+@media (max-width: 560px) {
+  .constancia__lista {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,14 +1,397 @@
-<!-- PF-009 · Mi perfil (HU-005). PENDIENTE DE MAQUETACIÓN.
-     El equipo arma esta pantalla copiando SOLO lo que está adentro de
-     <main>...</main> en: maquetacion-html/HU-005-PF-009-mi-perfil.html
-     (las clases .perfil-* de su bloque <style> van en mi-perfil.scss).
+<main>
+  <div class="contenedor">
+    <div class="eyebrow"><span class="eyebrow__dash"></span><span class="eyebrow__texto">Tu cuenta</span></div>
+    <h1 class="tipo-h1 perfil-titulo">Mi perfil</h1>
 
-     Reusable: el header/nav/footer de esa pantalla NO se copian — ya los
-     pone <app-layout-alumno> por afuera (compartido con Panel, PF-008). El
-     checklist de requisitos usa la clase global .requisito-pass, tampoco
-     se copia. -->
-<div class="pantalla-pendiente">
-  <a routerLink="/catalogo" class="pantalla-pendiente__volver">&larr; Volver al inicio</a>
-  <p class="pantalla-pendiente__codigo">PF-009 · Mi perfil</p>
-  <p>Pegar acá el contenido de <code>&lt;main&gt;</code> de <code>maquetacion-html/HU-005-PF-009-mi-perfil.html</code>.</p>
-</div>
+    @if (estadoCarga() === 'cargando') {
+      <p>Cargando tu perfil…</p>
+    } @else if (estadoCarga() === 'no-autorizado') {
+      <div class="alerta alerta--error">
+        <span class="alerta__icono">!</span>
+        <div class="alerta__titulo">Tu sesión venció. Vuelve a iniciar sesión para ver tu perfil.</div>
+      </div>
+    } @else if (estadoCarga() === 'error') {
+      <div class="alerta alerta--error">
+        <span class="alerta__icono">!</span>
+        <div class="alerta__titulo">No pudimos cargar tu perfil. Inténtalo nuevamente más tarde.</div>
+      </div>
+    } @else {
+      <div class="perfil-layout">
+        <div class="perfil-sidebar">
+          <div class="card perfil-tarjeta-usuario">
+            <span class="avatar avatar--lg avatar--marca" style="margin: 0 auto 16px">{{ inicialesUsuario }}</span>
+            <div class="perfil-tarjeta-usuario__nombre">{{ nombreCompletoActual }}</div>
+            <div class="perfil-tarjeta-usuario__correo">{{ perfil()?.correo }}</div>
+          </div>
+          <div class="card perfil-tabs">
+            <div
+              class="perfil-tab"
+              [class.perfil-tab--activa]="pestana() === 'datos'"
+              (click)="cambiarPestana('datos')"
+            >
+              Datos personales
+            </div>
+            @if (mostrarPestanaSeguridad) {
+              <div
+                class="perfil-tab"
+                [class.perfil-tab--activa]="pestana() === 'seguridad'"
+                (click)="cambiarPestana('seguridad')"
+              >
+                Seguridad
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="perfil-contenido">
+          @if (pestana() === 'datos') {
+            <form class="card card--acento-superior" [formGroup]="formulario" (ngSubmit)="guardar()">
+              <h2>Datos personales</h2>
+
+              @if (errorGuardado()) {
+                <div class="alerta alerta--error perfil-alerta">
+                  <span class="alerta__icono">!</span>
+                  <div class="alerta__titulo">{{ errorGuardado() }}</div>
+                </div>
+              }
+
+              <div class="perfil-campos">
+                <div>
+                  <label class="label" for="nombres"><span>Nombres</span></label>
+                  <input
+                    id="nombres"
+                    class="input"
+                    formControlName="nombres"
+                    [class.input--error]="campoInvalido('nombres')"
+                    [attr.aria-invalid]="campoInvalido('nombres')"
+                  />
+                  @if (campoInvalido('nombres')) {
+                    <div class="campo-error">
+                      @if (formulario.controls.nombres.hasError('required')) {
+                        Ingresa tus nombres.
+                      } @else {
+                        Solo se admiten letras y espacios.
+                      }
+                    </div>
+                  }
+                </div>
+
+                <div>
+                  <label class="label" for="apellidoPaterno"><span>Apellido paterno</span></label>
+                  <input
+                    id="apellidoPaterno"
+                    class="input"
+                    formControlName="apellidoPaterno"
+                    [class.input--error]="campoInvalido('apellidoPaterno')"
+                    [attr.aria-invalid]="campoInvalido('apellidoPaterno')"
+                  />
+                  @if (campoInvalido('apellidoPaterno')) {
+                    <div class="campo-error">
+                      @if (formulario.controls.apellidoPaterno.hasError('required')) {
+                        Ingresa tu apellido paterno.
+                      } @else {
+                        Solo se admiten letras y espacios.
+                      }
+                    </div>
+                  }
+                </div>
+
+                <div>
+                  <label class="label"><span>Apellido materno</span><span class="nota-pill">Opcional</span></label>
+                  <input
+                    id="apellidoMaterno"
+                    class="input"
+                    formControlName="apellidoMaterno"
+                    [class.input--error]="campoInvalido('apellidoMaterno')"
+                    [attr.aria-invalid]="campoInvalido('apellidoMaterno')"
+                  />
+                  @if (campoInvalido('apellidoMaterno')) {
+                    <div class="campo-error">Solo se admiten letras y espacios.</div>
+                  }
+                </div>
+
+                <div>
+                  <label class="label"
+                    ><span>Correo electrónico</span><span class="nota-pill nota-pill--neutra">No editable</span></label
+                  >
+                  <input class="input input--solo-lectura" [value]="perfil()?.correo" readonly />
+                </div>
+
+                <div>
+                  <label class="label"><span>Teléfono/Celular</span><span class="nota-pill">Opcional</span></label>
+                  <input
+                    id="telefono"
+                    class="input"
+                    formControlName="telefono"
+                    placeholder="999 999 999"
+                    [class.input--error]="campoInvalido('telefono')"
+                    [attr.aria-invalid]="campoInvalido('telefono')"
+                  />
+                  @if (campoInvalido('telefono')) {
+                    <div class="campo-error">Ingresa entre 6 y 9 dígitos.</div>
+                  }
+                </div>
+
+                <div>
+                  <label class="label"><span>Documento de identidad</span><span class="nota-pill">Opcional</span></label>
+                  <input
+                    id="documentoIdentidad"
+                    class="input"
+                    formControlName="documentoIdentidad"
+                    placeholder="45781203"
+                    [class.input--error]="campoInvalido('documentoIdentidad') || documentoDuplicado()"
+                    [attr.aria-invalid]="campoInvalido('documentoIdentidad') || documentoDuplicado()"
+                  />
+                  @if (documentoDuplicado()) {
+                    <div class="campo-error">Ese documento ya está registrado en otra cuenta.</div>
+                  } @else if (campoInvalido('documentoIdentidad')) {
+                    <div class="campo-error">El documento debe tener 8 dígitos.</div>
+                  }
+                </div>
+              </div>
+
+              @if (guardadoOk()) {
+                <div class="perfil-guardado">✓ Cambios guardados.</div>
+              }
+
+              <div class="perfil-acciones">
+                <button type="submit" class="btn btn--primario" [disabled]="guardando()">
+                  {{ guardando() ? 'Guardando…' : 'Guardar cambios' }}
+                </button>
+              </div>
+            </form>
+          } @else if (perfil()?.puedeCrearContrasena) {
+            <div class="card card--acento-superior perfil-seguridad">
+              <h2>Crear contraseña</h2>
+              <p class="perfil-seguridad__texto">
+                Tu cuenta accede con Google. Puedes definir una contraseña propia sin perder ese acceso.
+              </p>
+
+              <form
+                class="perfil-seguridad__formulario"
+                [formGroup]="formularioContrasena"
+                (ngSubmit)="crearContrasena()"
+              >
+                @if (errorContrasena()) {
+                  <div class="alerta alerta--error perfil-alerta">
+                    <span class="alerta__icono">!</span>
+                    <div class="alerta__titulo">{{ errorContrasena() }}</div>
+                  </div>
+                }
+
+                <div>
+                  <label class="label" for="contrasena">Nueva contraseña</label>
+                  <div class="input-con-accion">
+                    <input
+                      id="contrasena"
+                      class="input"
+                      [type]="mostrarContrasena ? 'text' : 'password'"
+                      formControlName="contrasena"
+                      autocomplete="new-password"
+                      placeholder="Mínimo 8 caracteres"
+                      [class.input--error]="contrasenaCrearInvalida"
+                      [attr.aria-invalid]="contrasenaCrearInvalida"
+                    />
+                    <button
+                      type="button"
+                      class="btn btn--neutro"
+                      (click)="mostrarContrasena = !mostrarContrasena"
+                      [attr.aria-pressed]="mostrarContrasena"
+                    >
+                      {{ mostrarContrasena ? 'Ocultar' : 'Mostrar' }}
+                    </button>
+                  </div>
+
+                  <div class="requisitos-pass-lista requisitos-pass-lista--horizontal">
+                    <div class="requisito-pass requisito-pass--sm" [class.requisito-pass--cumplido]="cumpleLongitud">
+                      <span class="requisito-pass__marca">{{ cumpleLongitud ? '✓' : '○' }}</span>
+                      <span>Al menos 8 caracteres</span>
+                    </div>
+                    <div class="requisito-pass requisito-pass--sm" [class.requisito-pass--cumplido]="cumpleMayuscula">
+                      <span class="requisito-pass__marca">{{ cumpleMayuscula ? '✓' : '○' }}</span>
+                      <span>Una letra mayúscula</span>
+                    </div>
+                    <div class="requisito-pass requisito-pass--sm" [class.requisito-pass--cumplido]="cumpleMinuscula">
+                      <span class="requisito-pass__marca">{{ cumpleMinuscula ? '✓' : '○' }}</span>
+                      <span>Una letra minúscula</span>
+                    </div>
+                    <div class="requisito-pass requisito-pass--sm" [class.requisito-pass--cumplido]="cumpleNumero">
+                      <span class="requisito-pass__marca">{{ cumpleNumero ? '✓' : '○' }}</span>
+                      <span>Un número</span>
+                    </div>
+                  </div>
+
+                  @if (contrasenaCrearInvalida) {
+                    <div class="campo-error">La contraseña debe cumplir todas las condiciones indicadas.</div>
+                  }
+                </div>
+
+                <div>
+                  <label class="label" for="confirmarContrasena">Repetir nueva contraseña</label>
+                  <div class="input-con-accion">
+                    <input
+                      id="confirmarContrasena"
+                      class="input"
+                      [type]="mostrarConfirmacion ? 'text' : 'password'"
+                      formControlName="confirmarContrasena"
+                      autocomplete="new-password"
+                      placeholder="Vuelve a escribirla"
+                      [class.input--error]="confirmacionContrasenaInvalida"
+                      [attr.aria-invalid]="confirmacionContrasenaInvalida"
+                    />
+                    <button
+                      type="button"
+                      class="btn btn--neutro"
+                      (click)="mostrarConfirmacion = !mostrarConfirmacion"
+                      [attr.aria-pressed]="mostrarConfirmacion"
+                    >
+                      {{ mostrarConfirmacion ? 'Ocultar' : 'Mostrar' }}
+                    </button>
+                  </div>
+                  @if (confirmacionContrasenaInvalida) {
+                    <div class="campo-error">Las contraseñas no coinciden.</div>
+                  }
+                </div>
+
+                @if (contrasenaCreada()) {
+                  <div class="perfil-guardado">✓ Tu contraseña se creó correctamente.</div>
+                }
+
+                <button type="submit" class="btn btn--grande btn--primario" [disabled]="guardandoContrasena()">
+                  {{ guardandoContrasena() ? 'Guardando…' : 'Guardar nueva contraseña' }}
+                </button>
+              </form>
+            </div>
+          } @else {
+            <div class="card card--acento-superior perfil-seguridad">
+              <h2>Cambiar contraseña</h2>
+              <p class="perfil-seguridad__texto">Tu correo de acceso no se modifica desde esta sección.</p>
+
+              <form
+                class="perfil-seguridad__formulario"
+                [formGroup]="formularioCambioContrasena"
+                (ngSubmit)="cambiarContrasena()"
+              >
+                @if (errorCambioContrasena()) {
+                  <div class="alerta alerta--error perfil-alerta">
+                    <span class="alerta__icono">!</span>
+                    <div class="alerta__titulo">{{ errorCambioContrasena() }}</div>
+                  </div>
+                }
+
+                <div>
+                  <label class="label" for="contrasenaActual">Contraseña actual</label>
+                  <div class="input-con-accion">
+                    <input
+                      id="contrasenaActual"
+                      class="input"
+                      [type]="mostrarContrasenaActual ? 'text' : 'password'"
+                      formControlName="contrasenaActual"
+                      autocomplete="current-password"
+                      placeholder="Tu contraseña actual"
+                      [class.input--error]="contrasenaActualInvalida"
+                      [attr.aria-invalid]="contrasenaActualInvalida"
+                    />
+                    <button
+                      type="button"
+                      class="btn btn--neutro"
+                      (click)="mostrarContrasenaActual = !mostrarContrasenaActual"
+                      [attr.aria-pressed]="mostrarContrasenaActual"
+                    >
+                      {{ mostrarContrasenaActual ? 'Ocultar' : 'Mostrar' }}
+                    </button>
+                  </div>
+                  @if (contrasenaActualInvalida) {
+                    <div class="campo-error">Ingresa tu contraseña actual.</div>
+                  }
+                </div>
+
+                <div>
+                  <label class="label" for="contrasenaNueva">Nueva contraseña</label>
+                  <div class="input-con-accion">
+                    <input
+                      id="contrasenaNueva"
+                      class="input"
+                      [type]="mostrarContrasenaNueva ? 'text' : 'password'"
+                      formControlName="contrasena"
+                      autocomplete="new-password"
+                      placeholder="Mínimo 8 caracteres"
+                      [class.input--error]="contrasenaNuevaInvalida"
+                      [attr.aria-invalid]="contrasenaNuevaInvalida"
+                    />
+                    <button
+                      type="button"
+                      class="btn btn--neutro"
+                      (click)="mostrarContrasenaNueva = !mostrarContrasenaNueva"
+                      [attr.aria-pressed]="mostrarContrasenaNueva"
+                    >
+                      {{ mostrarContrasenaNueva ? 'Ocultar' : 'Mostrar' }}
+                    </button>
+                  </div>
+
+                  <div class="requisitos-pass-lista requisitos-pass-lista--horizontal">
+                    <div class="requisito-pass requisito-pass--sm" [class.requisito-pass--cumplido]="cumpleLongitudNueva">
+                      <span class="requisito-pass__marca">{{ cumpleLongitudNueva ? '✓' : '○' }}</span>
+                      <span>Al menos 8 caracteres</span>
+                    </div>
+                    <div class="requisito-pass requisito-pass--sm" [class.requisito-pass--cumplido]="cumpleMayusculaNueva">
+                      <span class="requisito-pass__marca">{{ cumpleMayusculaNueva ? '✓' : '○' }}</span>
+                      <span>Una letra mayúscula</span>
+                    </div>
+                    <div class="requisito-pass requisito-pass--sm" [class.requisito-pass--cumplido]="cumpleMinusculaNueva">
+                      <span class="requisito-pass__marca">{{ cumpleMinusculaNueva ? '✓' : '○' }}</span>
+                      <span>Una letra minúscula</span>
+                    </div>
+                    <div class="requisito-pass requisito-pass--sm" [class.requisito-pass--cumplido]="cumpleNumeroNueva">
+                      <span class="requisito-pass__marca">{{ cumpleNumeroNueva ? '✓' : '○' }}</span>
+                      <span>Un número</span>
+                    </div>
+                  </div>
+
+                  @if (contrasenaNuevaInvalida) {
+                    <div class="campo-error">La contraseña debe cumplir todas las condiciones indicadas.</div>
+                  }
+                </div>
+
+                <div>
+                  <label class="label" for="confirmarContrasenaNueva">Repetir nueva contraseña</label>
+                  <div class="input-con-accion">
+                    <input
+                      id="confirmarContrasenaNueva"
+                      class="input"
+                      [type]="mostrarConfirmacionNueva ? 'text' : 'password'"
+                      formControlName="confirmarContrasena"
+                      autocomplete="new-password"
+                      placeholder="Vuelve a escribirla"
+                      [class.input--error]="confirmacionContrasenaNuevaInvalida"
+                      [attr.aria-invalid]="confirmacionContrasenaNuevaInvalida"
+                    />
+                    <button
+                      type="button"
+                      class="btn btn--neutro"
+                      (click)="mostrarConfirmacionNueva = !mostrarConfirmacionNueva"
+                      [attr.aria-pressed]="mostrarConfirmacionNueva"
+                    >
+                      {{ mostrarConfirmacionNueva ? 'Ocultar' : 'Mostrar' }}
+                    </button>
+                  </div>
+                  @if (confirmacionContrasenaNuevaInvalida) {
+                    <div class="campo-error">Las contraseñas no coinciden.</div>
+                  }
+                </div>
+
+                @if (contrasenaCambiada()) {
+                  <div class="perfil-guardado">✓ Tu contraseña se actualizó correctamente.</div>
+                }
+
+                <button type="submit" class="btn btn--grande btn--primario" [disabled]="cambiandoContrasena()">
+                  {{ cambiandoContrasena() ? 'Guardando…' : 'Guardar nueva contraseña' }}
+                </button>
+              </form>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</main>

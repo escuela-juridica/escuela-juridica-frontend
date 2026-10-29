@@ -1,0 +1,249 @@
+// HU-039 · Libro de Reclamaciones.
+
+.libro-hero {
+  background:
+    radial-gradient(circle at 88% 30%, rgba(0, 216, 216, 0.22), transparent 42%),
+    linear-gradient(115deg, var(--marca-900) 0%, var(--marca-700) 60%, var(--acento-700) 100%);
+  color: #fff;
+}
+
+.libro-hero__interior {
+  max-width: 880px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding-top: 44px;
+  padding-bottom: 76px;
+}
+
+.libro-hero__icono {
+  flex: none;
+  width: 84px;
+  height: 84px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: var(--acento-500);
+}
+
+.libro-hero__titulo {
+  margin: 0 0 8px;
+  font-size: 30px;
+  line-height: 38px;
+  color: #fff;
+}
+
+.libro-hero__subtitulo {
+  max-width: 640px;
+  margin: 0;
+  font-size: 16px;
+  line-height: 24px;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+:host ::ng-deep .eyebrow--claro .eyebrow__dash {
+  background: var(--acento-500);
+}
+
+:host ::ng-deep .eyebrow--claro .eyebrow__texto {
+  color: var(--acento-500);
+}
+
+.libro {
+  max-width: 880px;
+  margin-top: -44px;
+  padding-bottom: 56px;
+}
+
+.libro-formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.libro-seccion {
+  padding: 24px 28px;
+}
+
+.libro-seccion__titulo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 18px;
+  font-size: 18px;
+  line-height: 26px;
+  color: var(--neutral-950);
+}
+
+.libro-seccion__numero {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--acento-050);
+  color: var(--acento-700);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.libro-tipos {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.libro-tipo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 18px;
+  text-align: left;
+  font-family: inherit;
+  border: 2px solid var(--neutral-200);
+  border-radius: var(--radio-lg);
+  background: var(--blanco);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.libro-tipo:hover {
+  border-color: var(--acento-500);
+}
+
+.libro-tipo--activo {
+  border-color: var(--marca-900);
+  background: var(--acento-050);
+}
+
+.libro-tipo__nombre {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--neutral-950);
+}
+
+.libro-tipo__texto {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--neutral-600);
+}
+
+.libro-nota {
+  margin: 12px 0 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--neutral-600);
+}
+
+.libro-campos {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.libro-campos--una {
+  grid-template-columns: 1fr;
+}
+
+.libro-campo--ancho {
+  grid-column: 1 / -1;
+}
+
+.libro-subir {
+  margin-top: 14px;
+  cursor: pointer;
+}
+
+.libro-imagenes {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.libro-imagen {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radio-md);
+  background: var(--neutral-050);
+  font-size: 14px;
+}
+
+.libro-imagen__nombre {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--neutral-950);
+}
+
+.libro-imagen__tamano {
+  color: var(--neutral-600);
+}
+
+.libro-imagen__quitar {
+  border: 0;
+  background: none;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--error);
+  cursor: pointer;
+}
+
+.libro-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--neutral-800);
+  cursor: pointer;
+}
+
+.libro-check input {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  accent-color: var(--marca-900);
+}
+
+.libro-acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 720px) {
+  .libro-hero__interior {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .libro-tipos,
+  .libro-campos {
+    grid-template-columns: 1fr;
+  }
+
+  .libro-seccion {
+    padding: 20px 18px;
+  }
+
+  .libro-acciones .btn {
+    flex: 1 1 100%;
+  }
+}

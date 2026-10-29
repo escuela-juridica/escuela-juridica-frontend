@@ -1,6 +1,8 @@
-import { Component, ElementRef, HostListener, inject, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, inject, signal, viewChild } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { obtenerIniciales } from '../../session/nombre-utils';
 import { Session } from '../../session/session';
+import { ConfirmacionService } from '../../dialogo/confirmacion.service';
 
 @Component({
   selector: 'app-layout-alumno',
@@ -11,25 +13,28 @@ import { Session } from '../../session/session';
 export class LayoutAlumno {
   private readonly session = inject(Session);
   private readonly router = inject(Router);
-  private readonly elementRef = inject(ElementRef);
+  private readonly confirmacion = inject(ConfirmacionService);
 
   protected readonly usuario = this.session.usuario;
-  protected readonly menuCuentaAbierto = signal(false);
   protected readonly menuMovilAbierto = signal(false);
+
+  private readonly movilBotonRef = viewChild<ElementRef<HTMLElement>>('movilBoton');
+  private readonly movilPanelRef = viewChild<ElementRef<HTMLElement>>('movilPanel');
+
+  protected get iniciales(): string {
+    return obtenerIniciales(this.usuario()?.nombreCompleto) || 'LC';
+  }
 
   @HostListener('document:click', ['$event'])
   protected alClicFuera(evento: MouseEvent): void {
-    if (this.elementRef.nativeElement.contains(evento.target)) return;
-    this.menuCuentaAbierto.set(false);
-    this.menuMovilAbierto.set(false);
-  }
+    const objetivo = evento.target as Node;
 
-  protected toggleMenuCuenta(): void {
-    this.menuCuentaAbierto.update((abierto) => !abierto);
-  }
-
-  protected cerrarMenuCuenta(): void {
-    this.menuCuentaAbierto.set(false);
+    const dentroDeMovil =
+      this.movilBotonRef()?.nativeElement.contains(objetivo) ||
+      this.movilPanelRef()?.nativeElement.contains(objetivo);
+    if (!dentroDeMovil) {
+      this.menuMovilAbierto.set(false);
+    }
   }
 
   protected toggleMenuMovil(): void {
@@ -40,9 +45,18 @@ export class LayoutAlumno {
     this.menuMovilAbierto.set(false);
   }
 
-  cerrarSesion(): void {
-    this.cerrarMenuCuenta();
-    this.session.cerrarSesion();
-    this.router.navigateByUrl('/');
+  async cerrarSesion(): Promise<void> {
+    const confirmado = await this.confirmacion.preguntar({
+      titulo: 'Cerrar sesión',
+      mensaje: '¿Deseas salir de tu sesión ahora?',
+      textoConfirmar: 'Sí, cerrar sesión',
+      textoCancelar: 'Seguir aquí',
+      variante: 'peligro',
+    });
+    if (!confirmado) return;
+
+    this.session.cerrarSesion().subscribe(() => {
+      void this.router.navigate(['/catalogo']);
+    });
   }
 }

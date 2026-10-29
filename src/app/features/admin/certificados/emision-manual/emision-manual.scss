@@ -1,0 +1,202 @@
+.emision {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 1040px;
+}
+
+.emision__volver {
+  align-self: flex-start;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--neutral-600);
+  text-decoration: none;
+}
+
+.emision__etiqueta {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--eyebrow-color);
+}
+
+.emision__titulo {
+  margin: 2px 0 0;
+  font-size: 22px;
+  line-height: 30px;
+  font-weight: 700;
+  color: var(--neutral-950);
+}
+
+.emision__cabecera p {
+  margin: 4px 0 0;
+  color: var(--neutral-600);
+}
+
+.emision__rejilla {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 16px;
+}
+
+.emision__tarjeta {
+  padding: 22px 24px;
+}
+
+.emision__subtitulo {
+  margin: 0 0 14px;
+  font-size: 17px;
+  line-height: 24px;
+  color: var(--neutral-950);
+}
+
+.emision__condiciones {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.emision__condiciones li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--neutral-100);
+}
+
+.emision__marca {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--neutral-200);
+  color: var(--neutral-600);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.emision__marca--ok {
+  background: var(--exito);
+  color: #fff;
+}
+
+.emision__cond-texto {
+  flex: 1;
+  font-weight: 600;
+  color: var(--neutral-950);
+}
+
+.emision__cond-texto small {
+  display: block;
+  font-weight: 400;
+  font-size: 13px;
+  color: var(--neutral-600);
+}
+
+.emision__cond-estado {
+  font-size: 13px;
+  color: var(--neutral-600);
+}
+
+.emision__datos {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.emision__datos dt {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--neutral-600);
+}
+
+.emision__datos dd {
+  margin: 2px 0 0;
+  font-weight: 600;
+  color: var(--neutral-950);
+}
+
+.emision__nota {
+  margin: 12px 0 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--neutral-600);
+}
+
+.emision__emitido {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  border-left: 4px solid var(--exito);
+}
+
+.emision__emitido-icono {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--exito);
+  color: #fff;
+  font-size: 20px;
+}
+
+.emision__emitido .emision__subtitulo {
+  margin-bottom: 4px;
+}
+
+.emision__codigo {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.emision__formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.emision__check {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--neutral-800);
+  cursor: pointer;
+}
+
+.emision__check input {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  accent-color: var(--marca-900);
+}
+
+.emision__acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.emision__confirmar {
+  margin: 0 0 20px;
+  line-height: 24px;
+}
+
+@media (max-width: 860px) {
+  .emision__rejilla {
+    grid-template-columns: 1fr;
+  }
+}

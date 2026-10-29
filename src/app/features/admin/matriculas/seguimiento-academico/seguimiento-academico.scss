@@ -1,0 +1,318 @@
+// HU-031 · Seguimiento académico de un alumno (administración).
+
+:host {
+  display: block;
+}
+
+.seg {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 1100px;
+}
+
+.seg__volver {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--neutral-600);
+  text-decoration: none;
+}
+
+.seg__volver:hover {
+  color: var(--marca-900);
+}
+
+.seg__estado {
+  padding: 32px 0;
+  text-align: center;
+  color: var(--neutral-600);
+}
+
+.seg__cabecera {
+  padding: 20px 24px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px 32px;
+}
+
+.seg__eyebrow {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--eyebrow-color);
+}
+
+// Títulos de pantalla admin: 22/30 px (misma regla que el resto del panel administrativo).
+.seg__titulo {
+  margin: 2px 0 4px;
+  font-size: 22px;
+  line-height: 30px;
+  font-weight: 700;
+  color: var(--neutral-950);
+}
+
+.seg__meta {
+  margin: 2px 0 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--neutral-600);
+}
+
+.seg__cabecera-datos {
+  display: flex;
+  gap: 24px;
+}
+
+.seg__dato {
+  display: flex;
+  flex-direction: column;
+}
+
+.seg__dato span {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--neutral-600);
+}
+
+.seg__dato strong {
+  font-size: 22px;
+  line-height: 30px;
+  color: var(--neutral-950);
+}
+
+.seg__avance {
+  padding: 20px 24px;
+}
+
+.seg__subtitulo {
+  margin: 0 0 12px;
+  font-size: 18px;
+  line-height: 28px;
+  font-weight: 600;
+  color: var(--neutral-950);
+}
+
+// ---------------------------------------------------------------- Pestañas --
+.seg__pestanas {
+  padding: 0;
+  overflow: hidden;
+}
+
+// Guía §13.1: alto 44 px, 14/20 peso 600, activa con línea turquesa de 3 px.
+.seg__tablist {
+  display: flex;
+  gap: 4px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--neutral-200);
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.seg__tab {
+  flex: none;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -1px;
+  background: transparent;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  color: var(--neutral-600);
+  cursor: pointer;
+}
+
+.seg__tab:hover {
+  color: var(--marca-900);
+}
+
+.seg__tab--activa {
+  color: var(--marca-900);
+  border-bottom-color: var(--acento-500);
+}
+
+.seg__panel {
+  padding: 16px 24px 20px;
+}
+
+.seg__modulo {
+  margin: 16px 0 4px;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 700;
+  color: var(--neutral-950);
+}
+
+.seg__modulo:first-child {
+  margin-top: 0;
+}
+
+.seg__filas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.seg__fila {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  padding: 8px 0;
+  border-top: 1px solid var(--neutral-100);
+}
+
+.seg__fila:first-child {
+  border-top: 0;
+}
+
+.seg__fila-texto {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.seg__fila-titulo {
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 600;
+  color: var(--neutral-950);
+}
+
+.seg__fila-meta {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--neutral-600);
+}
+
+.seg__motivo {
+  margin-top: 2px;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--neutral-800);
+}
+
+.seg__vacio {
+  margin: 0;
+  padding: 12px 0;
+  font-size: 14px;
+  color: var(--neutral-600);
+}
+
+// ---------------------------------------------------------------- Exámenes --
+.seg__examen {
+  padding: 16px 0;
+  border-top: 1px solid var(--neutral-100);
+}
+
+.seg__examen:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.seg__examen-cab {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.seg__intentos {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radio-md);
+}
+
+.seg__intento {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 6px 12px;
+  font-size: 14px;
+}
+
+.seg__intento + .seg__intento {
+  border-top: 1px solid var(--neutral-100);
+}
+
+.seg__intento .seg__fila-meta {
+  flex: 1;
+}
+
+.seg__intento-nota {
+  min-width: 40px;
+  text-align: right;
+}
+
+.seg__aviso {
+  margin: 10px 0 0;
+  padding: 10px 12px;
+  border-radius: var(--radio-md);
+  background: var(--advertencia-050, #fffaeb);
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--advertencia-700, #b54708);
+}
+
+.seg__examen-acciones {
+  margin-top: 12px;
+}
+
+// ------------------------------------------------------------------ Modales --
+.seg__alerta-modal {
+  margin: 0 0 16px;
+}
+
+.seg__confirmar {
+  margin: 0 0 16px;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--neutral-800);
+}
+
+.seg__label-motivo {
+  margin-top: 16px;
+}
+
+// ------------------------------------------------------------ Móvil y tablet --
+@media (max-width: 767px) {
+  .seg__cabecera,
+  .seg__avance {
+    padding: 16px;
+  }
+
+  .seg__panel {
+    padding: 12px 16px 16px;
+  }
+
+  .seg__fila,
+  .seg__examen-cab {
+    flex-wrap: wrap;
+  }
+
+  .seg__fila .btn,
+  .seg__examen-acciones .btn {
+    width: 100%;
+  }
+
+  .seg__intento {
+    flex-wrap: wrap;
+  }
+}

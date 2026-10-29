@@ -1,0 +1,88 @@
+<section class="bandeja">
+  <div class="bandeja__cabecera">
+    <div>
+      <h1 class="bandeja__titulo">Evaluaciones por revisar</h1>
+      <p>Intentos con respuestas abiertas esperando calificación, de la fecha límite más cercana a la más lejana. Vencer un plazo no califica nada: solo señala la demora.</p>
+    </div>
+  </div>
+
+  @if (resumen(); as r) {
+    <div class="bandeja__resumen" role="group" aria-label="Filtrar por plazo">
+      <button type="button" class="bandeja__tarjeta" [class.bandeja__tarjeta--activa]="plazo === ''" (click)="filtrarPlazo('')">
+        <span class="bandeja__tarjeta-valor">{{ r.pendientes }}</span><span class="bandeja__tarjeta-texto">Por revisar</span>
+      </button>
+      <button type="button" class="bandeja__tarjeta bandeja__tarjeta--aviso" [class.bandeja__tarjeta--activa]="plazo === 'PROXIMO'" (click)="filtrarPlazo('PROXIMO')">
+        <span class="bandeja__tarjeta-valor">{{ r.proximos }}</span><span class="bandeja__tarjeta-texto">Próximos a vencer (24 h)</span>
+      </button>
+      <button type="button" class="bandeja__tarjeta bandeja__tarjeta--peligro" [class.bandeja__tarjeta--activa]="plazo === 'VENCIDO'" (click)="filtrarPlazo('VENCIDO')">
+        <span class="bandeja__tarjeta-valor">{{ r.vencidos }}</span><span class="bandeja__tarjeta-texto">Vencidos</span>
+      </button>
+    </div>
+  }
+
+  <div class="bandeja__filtros">
+    <input class="input" [(ngModel)]="texto" (keyup.enter)="buscar()" placeholder="Alumno, correo, curso o examen" aria-label="Buscar" />
+    <select class="input" [(ngModel)]="cursoId" (ngModelChange)="buscar()" aria-label="Curso">
+      <option [ngValue]="null">Todos los cursos</option>
+      @for (curso of cursos(); track curso.id) { <option [ngValue]="curso.id">{{ curso.etiqueta }}</option> }
+    </select>
+    <select class="input" [(ngModel)]="plazo" (change)="buscar()" aria-label="Plazo">
+      <option value="">Cualquier plazo</option>
+      <option value="VENCIDO">Vencidos</option>
+      <option value="PROXIMO">Próximos a vencer</option>
+      <option value="EN_PLAZO">En plazo</option>
+    </select>
+    <button class="btn btn--acento" type="button" (click)="buscar()">Buscar</button>
+    <button class="btn btn--secundario" type="button" (click)="limpiar()">Limpiar</button>
+  </div>
+
+  @if (cargando()) {
+    <p>Cargando bandeja…</p>
+  } @else if (error(); as mensaje) {
+    <div class="alerta alerta--error"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div>
+  } @else if (filas().length === 0) {
+    <div class="estado-vacio">
+      <h3 class="estado-vacio__titulo">No hay intentos por revisar</h3>
+      <p class="estado-vacio__texto">Cuando un alumno envíe un examen con respuestas abiertas, aparecerá aquí.</p>
+    </div>
+  } @else {
+    <p class="bandeja__total">{{ totalFilas() }} {{ totalFilas() === 1 ? 'intento' : 'intentos' }}</p>
+    <div class="bandeja__tabla">
+      <table>
+        <thead>
+          <tr>
+            <th>Alumno</th>
+            <th>Curso y examen</th>
+            <th>Enviado</th>
+            <th>Fecha límite</th>
+            <th>Respuestas</th>
+            <th><span class="bandeja__sr">Acción</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (f of filas(); track f.intentoId) {
+            <tr [class.bandeja__fila--vencida]="f.plazo === 'VENCIDO'">
+              <td><strong>{{ f.alumno }}</strong><small>{{ f.correo }}</small></td>
+              <td><strong>{{ f.examen }}</strong><small>{{ f.curso }} · intento {{ f.numeroIntento }}</small></td>
+              <td>{{ f.enviadoEn | date:'dd/MM/yyyy, h:mm a' | lowercase }}</td>
+              <td>
+                <span [class]="'badge ' + clasePlazo(f.plazo)">{{ textoPlazo(f) }}</span>
+                <small>{{ f.fechaLimite | date:'dd/MM/yyyy, h:mm a' | lowercase }}</small>
+              </td>
+              <td>{{ f.respuestasPendientes }} {{ f.respuestasPendientes === 1 ? 'abierta' : 'abiertas' }}</td>
+              <td><a class="btn btn--primario bandeja__revisar" [routerLink]="['/admin/evaluaciones/intentos', f.intentoId]">Revisar</a></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (totalPaginas() > 1) {
+      <div class="bandeja__paginacion">
+        <button type="button" class="btn btn--secundario" [disabled]="pagina() === 0" (click)="irAPagina(pagina() - 1)">Anterior</button>
+        <span>Página {{ pagina() + 1 }} de {{ totalPaginas() }}</span>
+        <button type="button" class="btn btn--secundario" [disabled]="pagina() + 1 >= totalPaginas()" (click)="irAPagina(pagina() + 1)">Siguiente</button>
+      </div>
+    }
+  }
+</section>

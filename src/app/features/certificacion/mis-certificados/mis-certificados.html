@@ -1,0 +1,71 @@
+<main>
+  <section class="galeria-hero" aria-labelledby="galeria-titulo">
+    <div class="contenedor galeria-hero__interior">
+      <div>
+        <div class="eyebrow eyebrow--claro"><span class="eyebrow__dash"></span><span class="eyebrow__texto">Tu acreditación</span></div>
+        <h1 id="galeria-titulo" class="tipo-h1 galeria-hero__titulo">Mis certificados</h1>
+        <p class="galeria-hero__subtitulo">
+          Los certificados de los cursos que completaste. Son privados: solo tú puedes descargarlos, y cualquiera puede comprobar que son auténticos con su código.
+        </p>
+      </div>
+      @if (!cargando() && certificados().length > 0) {
+        <div class="galeria-hero__cifra">
+          <span class="galeria-hero__numero">{{ certificados().length }}</span>
+          <span class="galeria-hero__texto">{{ certificados().length === 1 ? 'certificado' : 'certificados' }}</span>
+        </div>
+      }
+    </div>
+  </section>
+
+  <div class="contenedor galeria">
+    @if (cargando()) {
+      <p class="galeria__estado">Cargando tus certificados…</p>
+    } @else if (error(); as mensaje) {
+      <div class="alerta alerta--error" role="alert"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div>
+    } @else if (certificados().length === 0) {
+      <div class="estado-vacio">
+        <h3 class="estado-vacio__titulo">Todavía no tienes certificados</h3>
+        <p class="estado-vacio__texto">Cuando completes un curso y emitas tu certificado, aparecerá aquí.</p>
+        <a class="btn btn--acento" routerLink="/app/panel">Ir a mis cursos</a>
+      </div>
+    } @else {
+      <ul class="galeria__lista">
+        @for (c of certificados(); track c.codigo) {
+          <li class="card tarjeta" [class.tarjeta--anulada]="c.estado === 'ANULADO'">
+            <div class="tarjeta__vista">
+              <app-diploma-miniatura [titular]="c.titular" [curso]="c.curso" [nivel]="c.nivel" [entidad]="c.entidad" [anulado]="c.estado === 'ANULADO'" />
+            </div>
+            <div class="tarjeta__cuerpo">
+              <div class="tarjeta__estado">
+                @if (c.estado === 'VIGENTE') {
+                  <span class="badge badge--disp-inmediato">Vigente</span>
+                } @else {
+                  <span class="badge badge--disp-cancelado">Anulado · no válido</span>
+                }
+                @if (c.nivel === 'REFRENDADO') { <span class="badge badge--hibrido-suave">Refrendado</span> }
+              </div>
+              <h2 class="tarjeta__curso">{{ c.curso }}</h2>
+              <dl class="tarjeta__datos">
+                <div><dt>Emitido el</dt><dd>{{ formatearFechaLarga(c.emitidoEn) }}</dd></div>
+                <div><dt>Duración</dt><dd>{{ c.horas | number:'1.0-2' }} h académicas</dd></div>
+                @if (c.entidad) { <div class="tarjeta__ancho"><dt>Refrendado por</dt><dd>{{ c.entidad }}</dd></div> }
+                <div class="tarjeta__ancho"><dt>Código</dt><dd class="tarjeta__codigo">{{ c.codigo }}</dd></div>
+              </dl>
+              @if (c.estado === 'ANULADO') {
+                <p class="tarjeta__aviso">Anulado{{ c.anuladoEn ? ' el ' + formatearFechaLarga(c.anuladoEn) : '' }}. Ya no es válido y su documento no está disponible.</p>
+              }
+              <div class="tarjeta__acciones">
+                @if (c.descargaUrl) {
+                  <button type="button" class="btn btn--acento" (click)="descargar(c)">Descargar PDF</button>
+                  <button type="button" class="btn btn--secundario" (click)="ver(c)">Ver</button>
+                }
+                <a class="btn btn--secundario" [routerLink]="['/verificar-certificado']" [queryParams]="{ codigo: c.codigo }" target="_blank">Verificar</a>
+                <a class="btn btn--secundario" [routerLink]="['/aula', c.cursoId]">Ver curso</a>
+              </div>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+</main>

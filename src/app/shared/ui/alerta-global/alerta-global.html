@@ -1,0 +1,7 @@
+@if (alertas.alerta(); as alerta) {
+  <div class="alerta alerta-global" [class.alerta--error]="alerta.tipo === 'error'" [class.alerta--exito]="alerta.tipo === 'exito'" [class.alerta--info]="alerta.tipo === 'info'">
+    <span class="alerta__icono">{{ alerta.tipo === 'error' ? '!' : alerta.tipo === 'info' ? 'i' : '✓' }}</span>
+    <div class="alerta__titulo">{{ alerta.texto }}</div>
+    <button type="button" class="alerta__cerrar" (click)="alertas.cerrar()" aria-label="Cerrar">✕</button>
+  </div>
+}

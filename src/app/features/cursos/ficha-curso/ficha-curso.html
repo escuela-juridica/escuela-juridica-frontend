@@ -1,15 +1,346 @@
-<!-- PF-002 · Ficha y vista previa (HU-007). PENDIENTE DE MAQUETACIÓN.
-     El equipo arma esta pantalla copiando SOLO lo que está adentro de
-     <main>...</main> en: maquetacion-html/HU-007-PF-002-ficha-curso.html
-     (las clases .ficha-* de su bloque <style> van en ficha-curso.scss).
+@switch (estado()) {
+  @case ('cargando') {
+    <div class="contenedor ficha-cargando">
+      <div class="catalogo-esqueleto ficha-cargando__hero"></div>
+      <div class="catalogo-esqueleto ficha-cargando__linea ficha-cargando__linea--corta"></div>
+      <div class="catalogo-esqueleto ficha-cargando__linea"></div>
+      <div class="catalogo-esqueleto ficha-cargando__linea ficha-cargando__linea--media"></div>
+    </div>
+  }
 
-     Reusable: el header/footer de esa pantalla NO se copian — ya los pone
-     <app-layout-publico> por afuera (el footer es el componente compartido
-     <app-footer-publico/>). El panel de precio usa la clase global
-     .ficha-price (con su ajuste de posición en _componentes.scss), no la
-     dupliques. -->
-<div class="pantalla-pendiente">
-  <a routerLink="/catalogo" class="pantalla-pendiente__volver">&larr; Volver al inicio</a>
-  <p class="pantalla-pendiente__codigo">PF-002 · Ficha y vista previa</p>
-  <p>Pegar acá el contenido de <code>&lt;main&gt;</code> de <code>maquetacion-html/HU-007-PF-002-ficha-curso.html</code>.</p>
-</div>
+  @case ('no-encontrada') {
+    <div class="contenedor estado-vacio">
+      <div class="catalogo-vacio-icono"></div>
+      <h3 class="estado-vacio__titulo">No encontramos este curso</h3>
+      <p class="estado-vacio__texto">
+        El curso que buscas no existe o ya no está publicado.
+      </p>
+      <a routerLink="/catalogo" class="btn btn--primario">Ver el catálogo</a>
+    </div>
+  }
+
+  @case ('error') {
+    <div class="contenedor">
+      <div class="alerta alerta--error">
+        <span class="alerta__icono">!</span>
+        <div>
+          <p class="alerta__titulo">No pudimos cargar este curso</p>
+          <p class="alerta__texto">Revisa tu conexión e inténtalo nuevamente.</p>
+        </div>
+        <button type="button" class="btn btn--secundario" (click)="reintentar()">Reintentar</button>
+      </div>
+    </div>
+  }
+
+  @default {
+    @if (ficha(); as curso) {
+      <div class="ficha-hero">
+        <div class="hero-media">
+          <div class="hero-media__imagen" [style.background-image]="'url(\'' + (curso.imagenPortadaUrl ?? '') + '\')'"></div>
+        </div>
+        <div class="hero-overlay ficha-hero__degradado"></div>
+        <div class="ficha-hero__blob"></div>
+
+        <div class="ficha-hero__contenido">
+          <div class="ficha-hero__migas">
+            <a routerLink="/catalogo">Catálogo</a>
+            @if (curso.categoriaNombre) {
+              <span class="ficha-hero__separador">/</span>
+              <span>{{ curso.categoriaNombre }}</span>
+            }
+            @if (curso.tipoCursoNombre) {
+              <span class="ficha-hero__separador">/</span>
+              <span class="ficha-hero__miga-actual">{{ curso.tipoCursoNombre }}</span>
+            }
+          </div>
+          <div class="ficha-hero__badges">
+            <span class="badge badge--punto badge--sobre-foto" [ngClass]="claseModalidad()">
+              {{ etiquetaModalidad() }}
+            </span>
+            @if (curso.tipoCursoNombre) {
+              <span class="badge ficha-hero__badge-clara">{{ curso.tipoCursoNombre }}</span>
+            }
+            <span class="badge ficha-hero__badge-clara">{{ etiquetaDisponibilidad() }}</span>
+          </div>
+          <h1 class="tipo-h1 ficha-hero__titulo">{{ curso.titulo }}</h1>
+          <p class="ficha-hero__resumen">{{ descripcionMostrada() }}</p>
+          @if (necesitaLeerMas()) {
+            <button type="button" class="ficha-hero__leer-mas" (click)="alternarDescripcion()">
+              {{ descripcionExpandida() ? 'Leer menos' : 'Leer más' }}
+            </button>
+          }
+          <div class="ficha-hero__datos">
+            <div>
+              <div class="ficha-hero__dato-titulo">Modalidad</div>
+              <div class="ficha-hero__dato-valor">{{ etiquetaModalidad() }} · {{ etiquetaDisponibilidad() }}</div>
+            </div>
+            @if (curso.horasAcademicas) {
+              <div>
+                <div class="ficha-hero__dato-titulo">Duración</div>
+                <div class="ficha-hero__dato-valor">{{ curso.horasAcademicas }} horas académicas</div>
+              </div>
+            }
+            <div>
+              <div class="ficha-hero__dato-titulo">Contenido</div>
+              <div class="ficha-hero__dato-valor">
+                {{ curso.modulos.length }} módulos · {{ totalLecciones() }} lecciones
+              </div>
+            </div>
+            @if (curso.entidadCertificadoraNombre) {
+              <div>
+                <div class="ficha-hero__dato-titulo">Entidad</div>
+                <div class="ficha-hero__dato-valor">{{ curso.entidadCertificadoraNombre }}</div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="contenedor ficha-layout">
+        <div class="ficha-principal">
+          <a routerLink="/catalogo" class="ficha-hero__volver">← Volver al catálogo</a>
+
+          @if (alertaCurso(); as alerta) {
+            <div class="alerta alerta--info">
+              <span class="alerta__icono">i</span>
+              <div>
+                <div class="alerta__titulo">{{ alerta.titulo }}</div>
+                <div class="alerta__texto">{{ alerta.texto }}</div>
+              </div>
+            </div>
+          }
+
+          @if (muestraCalendario()) {
+            <div>
+              <div class="eyebrow"><span class="eyebrow__dash"></span><span class="eyebrow__texto">Calendario</span></div>
+              <h2 class="tipo-h2 ficha-seccion-titulo">Próximas sesiones</h2>
+              <div class="card ficha-calendario">
+                @for (sesion of sesionesEnVivo(); track sesion.leccionId) {
+                  <div class="ficha-calendario__fila">
+                    <span class="ficha-calendario__fecha">{{ formatearFechaHora(sesion.fechaHoraInicio!) }}</span>
+                    @if (sesion.fechaHoraFin) {
+                      <span class="ficha-calendario__hora">– {{ formatearHora(sesion.fechaHoraFin) }}</span>
+                    }
+                    <span class="ficha-calendario__nombre">{{ sesion.titulo }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          <div>
+            <div class="eyebrow"><span class="eyebrow__dash"></span><span class="eyebrow__texto">Pruébalo tú mismo</span></div>
+            <h2 class="tipo-h2 ficha-seccion-titulo">Vista previa gratuita</h2>
+            <div class="ficha-preview">
+              @switch (vistaPreviaEstado()) {
+                @case ('cargando') {
+                  <div class="ficha-preview__play">▶</div>
+                }
+                @case ('lista') {
+                  @if (vistaPrevia(); as previa) {
+                    @for (material of previa.materiales; track material.materialLeccionId) {
+                      @if (material.tipoRecurso === 'VIDEO') {
+                        @if (material.origen === 'YOUTUBE') {
+                          <a class="btn btn--secundario" [href]="material.referencia" target="_blank" rel="noopener">
+                            Ver video en YouTube
+                          </a>
+                        } @else {
+                          <video class="ficha-preview__video" controls [src]="material.referencia"></video>
+                        }
+                      } @else {
+                        <a class="btn btn--secundario" [href]="material.referencia" target="_blank" rel="noopener">
+                          Ver {{ material.titulo }}
+                        </a>
+                      }
+                    }
+                  }
+                }
+                @case ('error') {
+                  <p class="ficha-preview__nota">No pudimos cargar la vista previa.</p>
+                }
+                @default {
+                  <p class="ficha-preview__nota">Este curso todavía no tiene una lección de vista previa.</p>
+                }
+              }
+              @if (leccionActivaDatos(); as leccionActiva) {
+                <div class="ficha-preview__etiqueta">
+                  {{ leccionActiva.titulo }}
+                  @if (formatearDuracion(leccionActiva.duracionSegundos); as duracion) {
+                    · {{ duracion }}
+                  }
+                  · pública sin registro
+                </div>
+              }
+            </div>
+            <p class="ficha-preview__nota">
+              Solo las lecciones marcadas como vista previa son públicas. El resto exige matrícula vigente.
+            </p>
+          </div>
+
+          <div>
+            <div class="eyebrow"><span class="eyebrow__dash"></span><span class="eyebrow__texto">Contenido del curso</span></div>
+            <div class="ficha-temario-cabecera">
+              <h2 class="tipo-h2 ficha-seccion-titulo-sin-margen">Temario</h2>
+              <span class="ficha-temario-conteo">{{ curso.modulos.length }} módulos · {{ totalLecciones() }} lecciones</span>
+            </div>
+            <div class="ficha-temario-lista">
+              @if (curso.modulos.length === 0) {
+                <p class="ficha-preview__nota">Aún no hay temario publicado para este curso.</p>
+              }
+              @for (modulo of curso.modulos; track modulo.moduloId; let indice = $index) {
+                <div class="card ficha-modulo">
+                  <button
+                    type="button"
+                    class="ficha-modulo__cabecera"
+                    [attr.aria-expanded]="moduloExpandidoId() === modulo.moduloId"
+                    (click)="alternarModulo(modulo.moduloId)"
+                  >
+                    <span class="ficha-modulo__numero">{{ indice + 1 }}</span>
+                    <span class="ficha-modulo__nombre">{{ modulo.titulo }}</span>
+                    <span class="ficha-modulo__conteo">{{ modulo.lecciones.length }} lecciones</span>
+                    <span class="ficha-modulo__flecha">{{ moduloExpandidoId() === modulo.moduloId ? '⌄' : '›' }}</span>
+                  </button>
+                  @if (moduloExpandidoId() === modulo.moduloId) {
+                    <div class="ficha-modulo__lecciones">
+                      @for (leccion of modulo.lecciones; track leccion.leccionId) {
+                        <button
+                          type="button"
+                          class="ficha-leccion"
+                          [class.ficha-leccion--clicable]="leccion.esVistaPrevia"
+                          (click)="seleccionarVistaPrevia(leccion)"
+                        >
+                          <span
+                            class="badge ficha-leccion__tipo"
+                            [ngClass]="leccion.tipo === 'EN_VIVO' ? 'badge--vivo-suave' : 'badge--grabada-suave'"
+                          >
+                            {{ etiquetaTipoLeccion(leccion.tipo) }}
+                          </span>
+                          <span class="ficha-leccion__nombre">{{ leccion.titulo }}</span>
+                          @if (leccion.esVistaPrevia) {
+                            <span class="badge badge--vista-previa">Vista previa</span>
+                          } @else if (leccionBloqueadaId() === leccion.leccionId) {
+                            <span class="ficha-leccion__bloqueada">Requiere matrícula vigente</span>
+                          }
+                          @if (leccion.tipo === 'EN_VIVO' && leccion.fechaHoraInicio) {
+                            <span class="ficha-leccion__duracion">{{ formatearFechaHora(leccion.fechaHoraInicio) }}</span>
+                          } @else if (formatearDuracion(leccion.duracionSegundos); as duracion) {
+                            <span class="ficha-leccion__duracion">{{ duracion }}</span>
+                          }
+                        </button>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+
+          @if (curso.docentes.length > 0) {
+            <div>
+              <div class="eyebrow"><span class="eyebrow__dash"></span><span class="eyebrow__texto">Nuestro equipo</span></div>
+              <h2 class="tipo-h2 ficha-seccion-titulo">Docentes</h2>
+              <div class="ficha-docentes">
+                @for (docente of curso.docentes; track docente.personaId) {
+                  <div class="card ficha-docente">
+                    <div
+                      class="ficha-docente__foto"
+                      [style.background-image]="docente.fotoUrl ? ('url(\'' + docente.fotoUrl + '\')') : null"
+                    ></div>
+                    <div class="ficha-docente__info">
+                      <h3 class="ficha-docente__nombre">{{ docente.nombreCompleto }}</h3>
+                      @if (docente.cargoProfesional) {
+                        <div class="ficha-docente__cargo">{{ docente.cargoProfesional }}</div>
+                      }
+                      @if (docente.biografiaProfesional) {
+                        <p class="ficha-docente__bio">{{ docente.biografiaProfesional }}</p>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          @if (curso.entidadCertificadoraNombre) {
+            <div class="card ficha-respaldo">
+              <span class="ficha-respaldo__icono">✓</span>
+              <div class="ficha-respaldo__texto">
+                <div class="ficha-respaldo__titulo">Respaldado por {{ curso.entidadCertificadoraNombre }}</div>
+                <div class="ficha-respaldo__subtitulo">
+                  Certificado con código y QR de verificación pública, sin costo adicional.
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+
+        <aside class="ficha-price ficha-price-aside">
+          <div class="card card--acento-superior ficha-price-card">
+            @if (curso.estadoComercial.promocionActiva) {
+              <div class="ficha-price__antes">{{ formatearPrecio(curso.estadoComercial.precioRegular) }}</div>
+            }
+            <div class="ficha-price__actual">{{ formatearPrecio(curso.estadoComercial.precioActual) }}</div>
+            <div class="ficha-price__moneda">Soles peruanos (PEN), impuestos incluidos</div>
+            @if (curso.estadoComercial.promocionActiva) {
+              <div class="ficha-price__promo">Promoción vigente</div>
+            }
+
+            @if (curso.beneficios.length > 0) {
+              <div class="ficha-price__incluye">
+                @for (beneficio of curso.beneficios; track beneficio) {
+                  <div class="ficha-price__item">
+                    <span class="ficha-price__check">✓</span>
+                    <span>{{ beneficio }}</span>
+                  </div>
+                }
+              </div>
+            }
+
+            @if (yaMatriculado()) {
+              <div class="alerta alerta--exito ficha-price__matriculado" role="status">
+                <span class="alerta__icono">✓</span>
+                <div>
+                  <p class="alerta__titulo">Ya estás matriculado</p>
+                  <p class="alerta__texto">Este curso está en Mis cursos. Puedes continuar desde tu panel.</p>
+                </div>
+              </div>
+              <button type="button" class="btn btn--primario btn--grande btn--ancho-completo" (click)="irAMisCursos()">
+                Ver mis cursos
+              </button>
+            } @else if (curso.estadoComercial.matriculaPermitida) {
+              <button type="button" class="btn btn--primario btn--grande btn--ancho-completo" (click)="alAccionComercial()">
+                {{ etiquetaAccionComercial() }}
+              </button>
+            } @else {
+              <div class="ficha-price__cerrado">
+                <div class="ficha-price__cerrado-titulo">{{ curso.estadoComercial.etiqueta }}</div>
+                <div class="ficha-price__cerrado-texto">No se reservan lugares ni existe lista de espera.</div>
+              </div>
+              <button
+                type="button"
+                class="btn btn--neutro btn--ancho-completo ficha-price__ver-otros"
+                routerLink="/catalogo"
+              >
+                Ver otros cursos
+              </button>
+            }
+            <div class="ficha-price__pago">El pago lo procesa Culqi con {{ descripcionMedios(curso.estadoComercial.precioActual) }}.</div>
+          </div>
+        </aside>
+      </div>
+
+      @if (dialogoMatriculaAbierto()) {
+        <app-confirmacion-matricula
+          [curso]="curso"
+          [etiquetaModalidad]="etiquetaModalidad()"
+          [totalLecciones]="totalLecciones()"
+          [gratuita]="esMatriculaGratuita"
+          [procesando]="procesandoMatricula()"
+          [error]="errorMatricula()"
+          (cancelar)="cerrarConfirmacionMatricula()"
+          (confirmar)="confirmarMatriculaGratis()"
+        />
+      }
+    }
+  }
+}

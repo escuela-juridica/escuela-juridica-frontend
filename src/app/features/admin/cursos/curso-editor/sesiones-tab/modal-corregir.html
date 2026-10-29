@@ -1,0 +1,81 @@
+<app-modal titulo="Corregir sesión realizada" ancho="lg" (cerrar)="cerrado.emit()">
+  @if (error()) {
+    <div class="alerta alerta--error modal-corregir__alerta">
+      <span class="alerta__icono">!</span>
+      <div class="alerta__titulo">{{ error() }}</div>
+      <button type="button" class="alerta__cerrar" (click)="error.set(null)" aria-label="Cerrar">✕</button>
+    </div>
+  }
+
+  <div class="editor-campos editor-campos--1">
+    <div>
+      <label class="label">Enlace de la grabación</label>
+      <input class="input" [value]="enlace()" (input)="enlace.set($any($event.target).value)" placeholder="https://..." />
+    </div>
+  </div>
+
+  <h3 class="editor-card__titulo modal-corregir__subtitulo">Corregir asistencia</h3>
+
+  @if (cargando() && !cargado()) {
+    <p class="editor-estado">Cargando asistencia…</p>
+  } @else if (asistencias().length === 0) {
+    <p class="editor-material-info">No hay registros de asistencia para esta sesión.</p>
+  } @else {
+    <div class="modal-corregir__asistencias">
+      @for (fila of asistencias(); track fila.asistenciaId) {
+        <div class="modal-corregir__fila">
+          <span class="modal-corregir__alumno">{{ fila.alumnoNombre }}</span>
+          <select
+            class="input modal-corregir__select"
+            [value]="fila.estadoNuevo"
+            (change)="cambiarEstadoFila(fila.asistenciaId, $any($event.target).value)"
+          >
+            @if (fila.estadoOriginal === 'PENDIENTE') {
+              <option value="PENDIENTE" [disabled]="true">Pendiente</option>
+            }
+            @for (estado of estadosAsistencia; track estado) {
+              <option [value]="estado">
+                {{ estado === 'PRESENTE' ? 'Presente' : estado === 'AUSENTE' ? 'Ausente' : 'Justificada' }}
+              </option>
+            }
+          </select>
+          @if (fila.estadoNuevo !== fila.estadoOriginal) {
+            <input
+              class="input modal-corregir__motivo"
+              placeholder="Motivo de la corrección (obligatorio)"
+              [value]="fila.motivo"
+              (input)="cambiarMotivoFila(fila.asistenciaId, $any($event.target).value)"
+            />
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <h3 class="editor-card__titulo modal-corregir__subtitulo">Historial de cambios</h3>
+  @if (historial().length === 0) {
+    <p class="editor-material-info">Esta sesión no tiene reprogramaciones ni cancelaciones registradas.</p>
+  } @else {
+    <div class="modal-corregir__historial">
+      @for (item of historial(); track item.realizadoEn + item.accion) {
+        <div class="modal-corregir__historial-item">
+          <span class="modal-corregir__historial-accion">{{ etiquetaAccionHistorial(item.accion) }}</span>
+          <div class="modal-corregir__historial-detalle">
+            @if (item.accion === 'REPROGRAMACION') {
+              <span>De {{ formatearFecha(item.inicioAnterior) }}–{{ formatearFecha(item.finAnterior) }} a {{ formatearFecha(item.inicioNuevo) }}–{{ formatearFecha(item.finNuevo) }}</span>
+            }
+            <span class="modal-corregir__historial-motivo">"{{ item.motivo }}"</span>
+            <span class="modal-corregir__historial-fecha">{{ formatearFecha(item.realizadoEn) }}</span>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <div class="editor-form__acciones">
+    <button type="button" class="btn btn--secundario" (click)="cerrado.emit()">Cerrar</button>
+    <button type="button" class="btn btn--primario" [disabled]="guardando()" (click)="guardar()">
+      {{ guardando() ? 'Guardando…' : 'Guardar' }}
+    </button>
+  </div>
+</app-modal>

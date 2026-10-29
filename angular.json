@@ -2,11 +2,12 @@
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
   "cli": {
-    "packageManager": "npm"
+    "packageManager": "npm",
+    "analytics": false
   },
   "newProjectRoot": "projects",
   "projects": {
-    "desarrollo-web-integrado-frontend": {
+    "escuela-juridica-frontend": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -27,9 +28,17 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": ".htaccess",
+                "input": "src",
+                "output": "/"
               }
             ],
             "styles": [
+              "node_modules/ngx-spinner/animations/ball-spin-clockwise-fade.css",
+              "node_modules/@fullcalendar/angular/skeleton.css",
+              "node_modules/@ng-select/ng-select/themes/default.theme.css",
               "src/styles.scss"
             ]
           },
@@ -47,7 +56,13 @@
                   "maximumError": "12kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ]
             },
             "development": {
               "optimization": false,
@@ -61,10 +76,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "desarrollo-web-integrado-frontend:build:production"
+              "buildTarget": "escuela-juridica-frontend:build:production"
             },
             "development": {
-              "buildTarget": "desarrollo-web-integrado-frontend:build:development"
+              "buildTarget": "escuela-juridica-frontend:build:development"
             }
           },
           "defaultConfiguration": "development"

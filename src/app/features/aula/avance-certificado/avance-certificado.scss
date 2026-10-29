@@ -1,0 +1,106 @@
+:host {
+  display: block;
+  // El listado se acomoda al ancho de SU tarjeta (no al de la pantalla): así no se amontona en columnas angostas.
+  container-type: inline-size;
+}
+
+.avance__lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.avance__item {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) auto auto 88px;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  padding: 10px 0;
+  border-top: 1px solid var(--neutral-100);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.avance__item:first-child {
+  border-top: 0;
+}
+
+.avance__icono {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--neutral-300);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--blanco);
+}
+
+.avance__item--cumplida .avance__icono {
+  background: var(--exito);
+  border-color: var(--exito);
+}
+
+.avance__nombre {
+  color: var(--neutral-800);
+  font-weight: 600;
+}
+
+.avance__valor {
+  color: var(--neutral-950);
+  font-weight: 700;
+}
+
+.avance__meta {
+  color: var(--neutral-500);
+  font-size: 13px;
+  text-align: right;
+}
+
+// El estado también va en texto (no solo en color), según la guía §2 regla 7.
+.avance__estado {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  color: var(--neutral-500);
+  text-align: right;
+}
+
+.avance__item--cumplida .avance__estado {
+  color: var(--exito);
+}
+
+.avance__frase {
+  margin: 12px 0 0;
+  padding: 12px 16px;
+  border-radius: var(--radio-md);
+  background: var(--advertencia-fondo);
+  color: var(--advertencia);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+}
+
+.avance__frase--ok {
+  background: var(--exito-fondo);
+  color: var(--exito);
+}
+
+@container (max-width: 540px) {
+  .avance__item {
+    grid-template-columns: 22px minmax(0, 1fr) auto;
+    row-gap: 2px;
+  }
+
+  .avance__meta {
+    grid-column: 2;
+    text-align: left;
+  }
+
+  .avance__estado {
+    grid-column: 3;
+  }
+}

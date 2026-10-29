@@ -1,0 +1,140 @@
+// Portada de la ficha de un examen: identidad de marca, mejor nota, aviso de estado e indicadores.
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+// ---- Portada de la ficha: identidad de marca y la mejor nota a la vista.
+.ficha-hero {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 24px 28px;
+  border-radius: var(--radio-xl);
+  color: #fff;
+  background:
+    radial-gradient(circle at 90% 20%, rgba(0, 216, 216, 0.25), transparent 45%),
+    linear-gradient(115deg, var(--marca-900) 0%, var(--marca-700) 62%, var(--acento-700) 100%);
+  box-shadow: 0 8px 24px rgba(16, 56, 96, 0.22);
+}
+
+.ficha-hero__icono {
+  flex: none;
+  width: 68px;
+  height: 68px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radio-xl);
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: var(--acento-500);
+}
+
+.ficha-hero__texto {
+  flex: 1;
+  min-width: 0;
+}
+
+.ficha-hero__chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.ficha-hero__ruta {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--acento-500);
+}
+
+.ficha-hero__chip {
+  padding: 2px 10px;
+  border-radius: var(--radio-completo);
+  background: rgba(255, 255, 255, 0.18);
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 600;
+}
+
+.ficha-hero__titulo {
+  margin: 0;
+  font-size: 28px;
+  line-height: 36px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.ficha-hero__descripcion {
+  margin: 6px 0 0;
+  font-size: 15px;
+  line-height: 22px;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.ficha-hero__nota {
+  flex: none;
+}
+
+// ---- Indicadores con icono.
+.indicadores {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+}
+
+.indicador {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 16px 18px;
+  border: 1px solid var(--tarjeta-borde);
+  border-radius: var(--radio-lg);
+  background: var(--blanco);
+  box-shadow: var(--tarjeta-sombra);
+}
+
+.indicador__icono {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radio-md);
+  background: var(--acento-050);
+  color: var(--acento-700);
+}
+
+.indicador__valor {
+  font-size: 24px;
+  line-height: 30px;
+  font-weight: 700;
+  color: var(--neutral-950);
+}
+
+.indicador__etiqueta {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--neutral-600);
+}
+
+@media (max-width: 767px) {
+  .ficha-hero {
+    flex-wrap: wrap;
+    padding: 20px;
+  }
+
+  .ficha-hero__titulo {
+    font-size: 24px;
+    line-height: 32px;
+  }
+}

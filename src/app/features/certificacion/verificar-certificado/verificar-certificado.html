@@ -1,0 +1,79 @@
+<main>
+  <section class="verificar-hero">
+    <div class="contenedor verificar-hero__interior">
+      <span class="verificar-hero__escudo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6l8-3z" /><path d="M8.5 12l2.5 2.5 4.5-5" /></svg>
+      </span>
+      <div>
+        <div class="eyebrow eyebrow--claro"><span class="eyebrow__dash"></span><span class="eyebrow__texto">Verificación pública</span></div>
+        <h1 class="tipo-h1 verificar__titulo">Verificar un certificado</h1>
+        <p class="verificar__subtitulo">
+          Escribe el código que aparece en el certificado o escanea su código QR para comprobar si es auténtico y está vigente.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <div class="contenedor verificar">
+    <form class="card verificar__formulario" [formGroup]="formulario" (ngSubmit)="verificar()" novalidate>
+      <label class="label" for="verificar-codigo">Código del certificado</label>
+      <div class="verificar__fila">
+        <input id="verificar-codigo" class="input" formControlName="codigo" placeholder="ESEJUR-2026-XXXXXXXX"
+          autocomplete="off" autocapitalize="characters" spellcheck="false"
+          [class.input--error]="formulario.controls.codigo.invalid && formulario.controls.codigo.touched" />
+        <button type="submit" class="btn btn--acento" [disabled]="resultado() === 'cargando'">
+          {{ resultado() === 'cargando' ? 'Verificando…' : 'Verificar' }}
+        </button>
+      </div>
+      @if (formulario.controls.codigo.invalid && formulario.controls.codigo.touched) {
+        <p class="campo-error">Escribe el código del certificado.</p>
+      }
+    </form>
+
+    <div class="verificar__resultado" aria-live="polite">
+      @switch (resultado()) {
+        @case ('vigente') {
+          @if (datos(); as d) {
+            <section class="card verificar__tarjeta verificar__tarjeta--vigente">
+              <p class="verificar__sello"><span class="verificar__sello-icono" aria-hidden="true">✓</span> Certificado vigente</p>
+              <dl class="verificar__datos">
+                <div class="verificar__ancho"><dt>Otorgado a</dt><dd class="verificar__titular">{{ d.titular }}</dd></div>
+                <div class="verificar__ancho"><dt>Curso</dt><dd>{{ d.curso }}</dd></div>
+                <div><dt>Horas académicas</dt><dd>{{ d.horas | number:'1.0-2' }} h</dd></div>
+                <div><dt>Nivel</dt><dd>{{ d.nivel === 'REFRENDADO' ? 'Refrendado' : 'Normal' }}</dd></div>
+                @if (d.entidad) { <div><dt>Entidad</dt><dd>{{ d.entidad }}</dd></div> }
+                <div><dt>Fecha de emisión</dt><dd>{{ formatearFechaLarga(d.emitidoEn) }}</dd></div>
+                <div><dt>Código</dt><dd class="verificar__codigo">{{ d.codigo }}</dd></div>
+              </dl>
+            </section>
+          }
+        }
+        @case ('anulado') {
+          @if (datos(); as d) {
+            <section class="card verificar__tarjeta verificar__tarjeta--anulado">
+              <p class="verificar__sello verificar__sello--anulado"><span class="verificar__sello-icono" aria-hidden="true">✕</span> Certificado anulado — no válido</p>
+              <dl class="verificar__datos">
+                <div class="verificar__ancho"><dt>Otorgado a</dt><dd class="verificar__titular">{{ d.titular }}</dd></div>
+                <div class="verificar__ancho"><dt>Curso</dt><dd>{{ d.curso }}</dd></div>
+                <div><dt>Fecha de emisión</dt><dd>{{ formatearFechaLarga(d.emitidoEn) }}</dd></div>
+                @if (d.anuladoEn) { <div><dt>Fecha de anulación</dt><dd>{{ formatearFechaLarga(d.anuladoEn) }}</dd></div> }
+                <div><dt>Código</dt><dd class="verificar__codigo">{{ d.codigo }}</dd></div>
+              </dl>
+            </section>
+          }
+        }
+        @case ('noEncontrado') {
+          <section class="card verificar__tarjeta verificar__tarjeta--ninguno">
+            <p class="verificar__sello verificar__sello--neutro">Certificado no encontrado</p>
+            <p class="verificar__ayuda">No existe un certificado con el código «{{ codigoConsultado() }}». Revisa que esté escrito tal como aparece en el documento.</p>
+          </section>
+        }
+        @case ('error') {
+          <div class="alerta alerta--error" role="alert"><span class="alerta__icono">!</span><div class="alerta__titulo">No pudimos hacer la verificación. Inténtalo nuevamente.</div></div>
+        }
+      }
+    </div>
+
+    <p class="verificar__privacidad">Por privacidad, esta página solo muestra los datos mínimos del certificado: nunca documento de identidad, correo, teléfono ni nota.</p>
+  </div>
+</main>

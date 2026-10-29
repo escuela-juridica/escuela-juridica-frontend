@@ -1,0 +1,151 @@
+<section class="reporte">
+  <nav class="reporte__secciones" aria-label="Secciones del centro de reportes">
+    <a routerLink="/admin/reportes/matriculas" routerLinkActive="reporte__seccion--activa" class="reporte__seccion">Matrículas</a>
+    <a routerLink="/admin/reportes/asistencia" routerLinkActive="reporte__seccion--activa" class="reporte__seccion">Asistencia</a>
+    <a routerLink="/admin/reportes/academico" routerLinkActive="reporte__seccion--activa" class="reporte__seccion">Académico</a>
+    <a routerLink="/admin/reportes/certificados" routerLinkActive="reporte__seccion--activa" class="reporte__seccion">Certificados</a>
+    <a routerLink="/admin/reportes/pagos" routerLinkActive="reporte__seccion--activa" class="reporte__seccion">Pagos</a>
+  </nav>
+
+  <div class="reporte__cabecera">
+    <div>
+      <h1 class="reporte__titulo">Certificados emitidos</h1>
+      <p>Un registro por certificado, con sus datos vigentes. El rango de fechas se aplica a la fecha de emisión. Por privacidad no se incluye la nota, el documento de identidad, las firmas ni el PDF.</p>
+    </div>
+    <div class="reporte__acciones-exportar">
+      <button type="button" class="btn btn--exito reporte__btn-exportar" (click)="exportarExcel()">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <line x1="3" y1="9" x2="21" y2="9" />
+          <line x1="3" y1="15" x2="21" y2="15" />
+          <line x1="9" y1="3" x2="9" y2="21" />
+          <line x1="15" y1="3" x2="15" y2="21" />
+        </svg>
+        Exportar Excel
+      </button>
+    </div>
+  </div>
+
+  <div class="reporte__filtros">
+    <input class="input" [(ngModel)]="texto" (keyup.enter)="buscar()" placeholder="Alumno, curso o código" aria-label="Buscar alumno, curso o código" />
+    <select class="input" [(ngModel)]="cursoId" (ngModelChange)="buscar()" aria-label="Curso">
+      <option [ngValue]="null">Todos los cursos</option>
+      @for (curso of cursos(); track curso.id) { <option [ngValue]="curso.id">{{ curso.etiqueta }}</option> }
+    </select>
+    <label class="reporte__filtro-fecha">Emitidos desde<input class="input" type="date" [(ngModel)]="fechaDesde" /></label>
+    <label class="reporte__filtro-fecha">Emitidos hasta<input class="input" type="date" [(ngModel)]="fechaHasta" [min]="fechaDesde" /></label>
+  </div>
+
+  <div class="reporte__barra-acciones">
+    <button class="btn btn--acento reporte__btn-filtro" type="button" (click)="buscar()">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="7" />
+        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+      </svg>
+      Buscar
+    </button>
+    <button class="btn reporte__btn-limpiar reporte__btn-filtro" type="button" (click)="limpiarFiltros()">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18" />
+        <line x1="6" y1="6" x2="18" y2="18" />
+      </svg>
+      Limpiar
+    </button>
+    <button class="btn btn--secundario reporte__btn-filtro" type="button" (click)="masFiltros.set(!masFiltros())"
+      [attr.aria-expanded]="masFiltros()" aria-controls="reporte-mas-filtros">
+      Más filtros@if (filtrosAvanzadosActivos > 0) { <span class="reporte__contador">{{ filtrosAvanzadosActivos }}</span> }
+    </button>
+  </div>
+
+  @if (masFiltros()) {
+  <div class="reporte__filtros reporte__filtros--mas" id="reporte-mas-filtros">
+    <select class="input" [(ngModel)]="nivel" (change)="buscar()" aria-label="Nivel">
+      <option value="">Cualquier nivel</option>
+      <option value="NORMAL">Normal</option>
+      <option value="REFRENDADO">Refrendado</option>
+    </select>
+    <select class="input" [(ngModel)]="entidad" (change)="buscar()" aria-label="Entidad certificadora">
+      <option value="">Cualquier entidad</option>
+      <option value="ninguna">Sin entidad (Escuela Jurídica)</option>
+      @for (e of entidades(); track e.id) { <option [value]="e.etiqueta">{{ e.etiqueta }}</option> }
+    </select>
+    <select class="input" [(ngModel)]="estado" (change)="buscar()" aria-label="Estado">
+      <option value="">Cualquier estado</option>
+      <option value="VIGENTE">Vigente</option>
+      <option value="ANULADO">Anulado</option>
+    </select>
+    <select class="input" [(ngModel)]="forma" (change)="buscar()" aria-label="Forma de emisión">
+      <option value="">Cualquier forma de emisión</option>
+      <option value="AUTOMATICA">Automática programada</option>
+      <option value="SOLICITADA">Confirmada por el alumno</option>
+      <option value="MANUAL">Manual administrativa</option>
+    </select>
+  </div>
+  }
+
+  @if (cargando()) {
+  <p>Cargando reporte…</p>
+  } @else if (error(); as mensaje) {
+  <div class="alerta alerta--error">
+    <span class="alerta__icono">!</span>
+    <div class="alerta__titulo">{{ mensaje }}</div>
+  </div>
+  } @else if (filas().length === 0) {
+  <div class="estado-vacio">
+    <h3 class="estado-vacio__titulo">No encontramos certificados con esos filtros</h3>
+    <p class="estado-vacio__texto">Prueba con otro rango de fechas, curso o estado.</p>
+  </div>
+  } @else {
+  <p class="reporte__resumen">{{ totalFilas() }} {{ totalFilas() === 1 ? 'certificado' : 'certificados' }}</p>
+  <div class="reporte__tabla">
+    <table>
+      <thead>
+        <tr>
+          <th>Alumno y curso</th>
+          <th>Nivel</th>
+          <th>Finalización</th>
+          <th>Emisión</th>
+          <th>Estado</th>
+          <th>Código</th>
+          <th>Forma de emisión</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (fila of filas(); track fila.certificadoId) {
+        <tr>
+          <td><strong>{{ fila.alumno }}</strong><small>{{ fila.curso }}</small></td>
+          <td>
+            <strong>{{ fila.nivel === 'REFRENDADO' ? 'Refrendado' : 'Normal' }}</strong>
+            <small>{{ fila.entidad ?? 'Escuela Jurídica' }}</small>
+          </td>
+          <td>{{ fila.fechaFinalizacion ? (fila.fechaFinalizacion | date:'dd/MM/yyyy') : '—' }}</td>
+          <td>{{ fila.fechaEmision | date:'dd/MM/yyyy' }}</td>
+          <td>
+            @if (fila.estado === 'VIGENTE') { <span class="badge badge--disp-inmediato">Vigente</span> }
+            @else { <span class="badge badge--disp-cancelado">Anulado</span> }
+          </td>
+          <td class="reporte__codigo">{{ fila.codigo }}</td>
+          <td>{{ etiquetaForma(fila.forma) }}</td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  @if (totalPaginas() > 1) {
+  <div class="reporte__paginacion">
+    <button type="button" class="btn btn--secundario" [disabled]="pagina() === 0" (click)="irAPagina(pagina() - 1)">
+      Anterior
+    </button>
+    <span>Página {{ pagina() + 1 }} de {{ totalPaginas() }}</span>
+    <button type="button" class="btn btn--secundario" [disabled]="pagina() + 1 >= totalPaginas()"
+      (click)="irAPagina(pagina() + 1)">
+      Siguiente
+    </button>
+  </div>
+  }
+  }
+</section>

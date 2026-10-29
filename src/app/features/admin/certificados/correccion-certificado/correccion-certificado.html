@@ -1,0 +1,177 @@
+<section class="corr">
+  <a class="corr__volver" routerLink="/admin/certificados">← Certificados</a>
+
+  @if (cargando()) {
+    <p>Cargando…</p>
+  } @else if (error(); as mensaje) {
+    <div class="alerta alerta--error" role="alert"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div>
+  } @else if (detalle(); as d) {
+    <header class="corr__cabecera">
+      <span class="corr__etiqueta">Corrección y anulación</span>
+      <h1 class="corr__titulo">{{ d.alumno }}</h1>
+      <p>{{ d.correo }} · <span class="corr__codigo">{{ d.codigo }}</span>
+        @if (d.estado === 'VIGENTE') { <span class="badge badge--disp-inmediato">Vigente</span> }
+        @else { <span class="badge badge--disp-cancelado">Anulado</span> }
+      </p>
+    </header>
+
+    @if (d.estado === 'ANULADO') {
+      <div class="alerta alerta--error" role="status">
+        <span class="alerta__icono">!</span>
+        <div>
+          <p class="alerta__titulo">Certificado anulado el {{ d.anuladoEn | date:'dd/MM/yyyy HH:mm' }}</p>
+          <p class="alerta__texto">La anulación es irreversible: no se puede corregir ni reactivar y su PDF ya no se descarga. La página pública solo informa que no es válido y la fecha; el motivo es privado.</p>
+          <p class="alerta__texto"><strong>Motivo (privado):</strong> {{ d.motivoAnulacion }}</p>
+        </div>
+      </div>
+    }
+
+    <div class="corr__rejilla">
+      <div class="card corr__tarjeta">
+        <h2 class="corr__subtitulo">Datos congelados</h2>
+        <dl class="corr__datos">
+          <div><dt>Nivel</dt><dd>{{ d.nivel === 'REFRENDADO' ? 'Refrendado' : 'Normal' }}</dd></div>
+          <div><dt>Nota</dt><dd>@if (d.nota !== null) { {{ d.nota | number:'1.0-2' }} } @else { Sin nota }</dd></div>
+          <div><dt>Emisión</dt><dd>{{ etiquetaEmision(d.tipoEmision) }} · {{ d.emitidoEn | date:'dd/MM/yyyy HH:mm' }}</dd></div>
+          <div><dt>Tipo de curso</dt><dd>{{ d.tipoCurso }}</dd></div>
+        </dl>
+        <p class="corr__nota">La nota y el nivel no se corrigen libremente: salen de la evaluación del curso.</p>
+      </div>
+
+      <div class="card corr__tarjeta">
+        <h2 class="corr__subtitulo">Firmantes impresos</h2>
+        <ol class="corr__firmantes">
+          @for (f of d.firmantes; track f.firmanteId) { <li><strong>{{ f.nombre }}</strong><small>{{ f.cargo }}</small></li> }
+        </ol>
+      </div>
+    </div>
+
+    @if (d.puedeModificar) {
+      <form class="card corr__tarjeta corr__formulario" [formGroup]="formulario" (ngSubmit)="revisarCorreccion()" novalidate>
+        <h2 class="corr__subtitulo">Corregir datos documentales</h2>
+        <p class="corr__nota">Se conserva el código y el estado vigente; se regenera el PDF y la versión anterior deja de descargarse pero queda en el historial.</p>
+
+        <div>
+          <label class="label" for="co-nombres">Nombres impresos</label>
+          <input id="co-nombres" class="input" formControlName="nombres" [class.input--error]="invalido(formulario, 'nombres')" />
+          @if (invalido(formulario, 'nombres')) { <p class="campo-error">Indica los nombres (máximo 240 caracteres).</p> }
+        </div>
+        <div>
+          <label class="label" for="co-titulo">Título del curso</label>
+          <input id="co-titulo" class="input" formControlName="titulo" [class.input--error]="invalido(formulario, 'titulo')" />
+          @if (invalido(formulario, 'titulo')) { <p class="campo-error">Indica el título (máximo 220 caracteres).</p> }
+        </div>
+        <div class="corr__fila">
+          <div>
+            <label class="label" for="co-horas">Horas académicas</label>
+            <input id="co-horas" type="number" step="0.5" min="0.5" class="input" formControlName="horas" [class.input--error]="invalido(formulario, 'horas')" />
+            @if (invalido(formulario, 'horas')) { <p class="campo-error">Indica las horas (mayor que cero).</p> }
+          </div>
+          @if (d.nivel === 'REFRENDADO') {
+            <div>
+              <label class="label" for="co-entidad">Entidad que refrenda</label>
+              <input id="co-entidad" class="input" formControlName="entidad" />
+            </div>
+          }
+        </div>
+
+        <fieldset class="corr__firmantes-elegir">
+          <legend class="label">Firmantes (el orden es el de selección)</legend>
+          @for (f of d.firmantesDisponibles; track f.firmanteId) {
+            <label class="corr__check">
+              <input type="checkbox" [checked]="firmantes().includes(f.firmanteId)" (change)="alternarFirmante(f.firmanteId)" />
+              <span>{{ f.nombre }}<small>{{ f.cargo }}</small></span>
+              @if (posicion(f.firmanteId) > 0) { <span class="corr__orden">{{ posicion(f.firmanteId) }}</span> }
+            </label>
+          }
+          @if (firmantes().length === 0 || firmantes().length > 4) { <p class="campo-error">Elige entre 1 y 4 firmantes.</p> }
+        </fieldset>
+
+        <div>
+          <label class="label" for="co-motivo">Motivo de la corrección</label>
+          <textarea id="co-motivo" class="input" rows="3" formControlName="motivo" [class.input--error]="invalido(formulario, 'motivo')"
+            placeholder="Explica qué estaba mal y por qué se corrige (queda registrado con tu nombre y la fecha)."></textarea>
+          @if (invalido(formulario, 'motivo')) { <p class="campo-error">Explica el motivo (mínimo 10 caracteres).</p> }
+        </div>
+        <div class="corr__acciones">
+          <button type="submit" class="btn btn--acento">Revisar cambios</button>
+        </div>
+      </form>
+
+      <div class="card corr__tarjeta corr__peligro">
+        <h2 class="corr__subtitulo">Anular certificado</h2>
+        <p class="corr__nota">Retira el PDF y deja el código informando «Certificado anulado — no válido». No se puede deshacer ni reactivar.</p>
+        <div class="corr__acciones">
+          <button type="button" class="btn btn--peligro" (click)="abrirAnulacion()">Anular certificado…</button>
+        </div>
+      </div>
+    }
+
+    <div class="card corr__tarjeta">
+      <h2 class="corr__subtitulo">Historial</h2>
+      @if (d.historial.length === 0) {
+        <p class="corr__nota">Este certificado no tiene cambios administrativos.</p>
+      } @else {
+        <ol class="corr__historial">
+          @for (c of d.historial; track c.id) {
+            <li>
+              <p class="corr__hist-cab"><strong>{{ etiquetaAccion(c.accion) }}</strong> · {{ c.realizadoEn | date:'dd/MM/yyyy HH:mm' }} · {{ c.realizadoPor }}</p>
+              <p class="corr__hist-motivo"><strong>Motivo:</strong> {{ c.motivo }}</p>
+              @if (c.accion === 'CORRECCION') {
+                <div class="corr__hist-versiones">
+                  <div><span>Antes</span><pre>{{ c.datosAnteriores }}</pre></div>
+                  <div><span>Después</span><pre>{{ c.datosNuevos }}</pre></div>
+                </div>
+              }
+            </li>
+          }
+        </ol>
+      }
+    </div>
+
+    @if (modal() === 'corregir') {
+      <app-modal titulo="Confirmar corrección" ancho="lg" (cerrar)="cerrarModal()">
+        @if (errorModal(); as mensaje) {
+          <div class="alerta alerta--error" role="alert"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div>
+        }
+        <p class="corr__confirmar">Estos datos cambiarán. El código <strong>{{ d.codigo }}</strong> y el estado vigente se mantienen; el alumno y la verificación pública verán la versión nueva.</p>
+        <table class="corr__comparacion">
+          <thead><tr><th>Dato</th><th>Antes</th><th>Después</th></tr></thead>
+          <tbody>
+            @for (x of diferencias(); track x.campo) { <tr><td>{{ x.campo }}</td><td>{{ x.antes }}</td><td><strong>{{ x.despues }}</strong></td></tr> }
+          </tbody>
+        </table>
+        <div class="editor-form__acciones">
+          <button type="button" class="btn btn--secundario" [disabled]="enviando()" (click)="cerrarModal()">Volver</button>
+          <button type="button" class="btn btn--acento" [disabled]="enviando()" (click)="confirmarCorreccion()">{{ enviando() ? 'Corrigiendo…' : 'Sí, corregir' }}</button>
+        </div>
+      </app-modal>
+    }
+
+    @if (modal() === 'anular') {
+      <app-modal titulo="Anular certificado" (cerrar)="cerrarModal()">
+        <form [formGroup]="formularioAnulacion" (ngSubmit)="confirmarAnulacion()" novalidate>
+          @if (errorModal(); as mensaje) {
+            <div class="alerta alerta--error" role="alert"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div>
+          }
+          <p class="corr__confirmar">Vas a anular el certificado <strong>{{ d.codigo }}</strong> de <strong>{{ d.alumno }}</strong>. Su PDF dejará de descargarse y su código informará que no es válido. <strong>No se puede deshacer.</strong></p>
+          <div>
+            <label class="label" for="an-motivo">Motivo de la anulación</label>
+            <textarea id="an-motivo" class="input" rows="3" formControlName="motivo" [class.input--error]="invalido(formularioAnulacion, 'motivo')"
+              placeholder="El motivo es privado: lo verá solo la administración."></textarea>
+            @if (invalido(formularioAnulacion, 'motivo')) { <p class="campo-error">Explica el motivo (mínimo 10 caracteres).</p> }
+          </div>
+          <label class="corr__check corr__check--confirmar">
+            <input type="checkbox" formControlName="confirmo" />
+            <span>Entiendo que la anulación es irreversible.</span>
+          </label>
+          @if (invalido(formularioAnulacion, 'confirmo')) { <p class="campo-error">Confirma que entiendes que es irreversible.</p> }
+          <div class="editor-form__acciones">
+            <button type="button" class="btn btn--secundario" [disabled]="enviando()" (click)="cerrarModal()">Volver</button>
+            <button type="submit" class="btn btn--peligro" [disabled]="enviando()">{{ enviando() ? 'Anulando…' : 'Anular certificado' }}</button>
+          </div>
+        </form>
+      </app-modal>
+    }
+  }
+</section>

@@ -1,13 +1,103 @@
-<!-- PF-005 · Verificación del correo (HU-003). PENDIENTE DE MAQUETACIÓN.
-     El equipo arma esta pantalla copiando SOLO lo que está adentro de
-     <main>...</main> en: maquetacion-html/HU-003-PF-005-verificar-correo.html
-     (las clases .verif-* de su bloque <style> van en verificar-correo.scss).
+<main>
+  <div class="contenedor-centrado verif-max">
+    @switch (estado()) {
+      @case ('verificado') {
+        <div class="card verif-tarjeta">
+          <div class="icono-estado icono-estado--exito">✓</div>
+          <h1>Correo verificado</h1>
+          @if (requiereCambioContrasena()) {
+            <p style="margin-bottom: 28px">
+              Tu correo ya está verificado. Como tu cuenta fue creada por un administrador, al
+              iniciar sesión deberás definir tu propia contraseña.
+            </p>
+          } @else {
+            <p style="margin-bottom: 28px">
+              Tu cuenta ya está habilitada. Puedes iniciar sesión y matricularte sin intervención
+              administrativa.
+            </p>
+          }
+          <button type="button" class="btn btn--grande btn--primario verif-boton" (click)="irAAcceso()">
+            Iniciar sesión
+          </button>
+        </div>
+      }
+      @default {
+        <div class="card verif-tarjeta">
+          <div class="icono-estado icono-estado--info">✉</div>
+          <h1>Revisa tu correo</h1>
 
-     Reusable: el header/footer de esa pantalla NO se copian — ya los pone
-     <app-layout-auth> por afuera (el footer es el componente compartido
-     <app-footer-publico/>). -->
-<div class="pantalla-pendiente">
-  <a routerLink="/catalogo" class="pantalla-pendiente__volver">&larr; Volver al inicio</a>
-  <p class="pantalla-pendiente__codigo">PF-005 · Verificación del correo</p>
-  <p>Pegar acá el contenido de <code>&lt;main&gt;</code> de <code>maquetacion-html/HU-003-PF-005-verificar-correo.html</code>.</p>
-</div>
+          @if (correoConocido()) {
+            <p>
+              Te enviamos un código de 6 dígitos a <strong>{{ correoOculto() }}</strong>. Ingrésalo
+              para activar tu cuenta.
+            </p>
+          } @else if (resolviendoContexto()) {
+            <p>Recuperando los datos de tu registro…</p>
+          } @else {
+            <p>
+              Escribe el correo con el que te registraste para poder verificar tu código de 6
+              dígitos.
+            </p>
+            <div class="verif-input-wrap">
+              <input
+                class="input"
+                type="email"
+                placeholder="nombre@correo.com"
+                [value]="correoManual()"
+                (input)="onCorreoManualInput($any($event.target).value)"
+              />
+            </div>
+          }
+
+          @if (errorCodigo(); as mensaje) {
+            <div class="alerta alerta--error verif-alerta">
+              <span class="alerta__icono">!</span>
+              <span class="alerta__texto">{{ mensaje }}</span>
+            </div>
+          }
+          @if (errorGeneral(); as mensaje) {
+            <div class="alerta alerta--error verif-alerta">
+              <span class="alerta__icono">!</span>
+              <span class="alerta__texto">{{ mensaje }}</span>
+            </div>
+          }
+          @if (mensajeReenvio(); as mensaje) {
+            <div class="alerta alerta--info verif-alerta">
+              <span class="alerta__icono">i</span>
+              <span class="alerta__texto">{{ mensaje }}</span>
+            </div>
+          }
+
+          <div class="verif-input-wrap">
+            <input
+              class="input verif-input"
+              [class.input--error]="errorCodigo()"
+              placeholder="000000"
+              maxlength="6"
+              inputmode="numeric"
+              autocomplete="one-time-code"
+              [value]="codigo()"
+              (input)="onCodigoInput($any($event.target).value)"
+            />
+          </div>
+
+          <button
+            type="button"
+            class="btn btn--grande btn--primario verif-boton"
+            [disabled]="!puedeVerificar()"
+            (click)="verificar()"
+          >
+            {{ estado() === 'verificando' ? 'Verificando...' : 'Verificar' }}
+          </button>
+
+          <div class="verif-reenviar">
+            ¿No te llegó?
+            <button type="button" class="verif-reenviar__boton" (click)="reenviar()">
+              {{ reenviando() ? 'Enviando...' : 'Reenviar código' }}
+            </button>
+          </div>
+        </div>
+      }
+    }
+  </div>
+</main>

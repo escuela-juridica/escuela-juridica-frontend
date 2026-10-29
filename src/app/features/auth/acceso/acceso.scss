@@ -1,3 +1,146 @@
 // PF-003 · Estilos propios de esta pantalla.
 // PENDIENTE — pegar acá las clases .acceso-* del bloque <style> de
 // maquetacion-html/HU-001-PF-003-acceso.html
+
+.acceso-fila {
+    background: var(--neutral-050);
+    display: flex;
+    align-items: stretch;
+    min-height: 100vh;
+    flex-wrap: wrap;
+}
+
+.acceso-form-col {
+    flex: 1 1 440px;
+    min-width: 300px;
+    display: grid;
+    place-items: center;
+    padding: 48px 24px;
+}
+
+.acceso-form-ancho {
+    width: 100%;
+    max-width: 440px;
+}
+
+.acceso-volver {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 600;
+    color: var(--neutral-600);
+    margin-bottom: 28px;
+}
+
+.acceso-titulo {
+    font-size: 32px;
+    line-height: 40px;
+    font-weight: 700;
+    color: var(--neutral-950);
+    margin: 0 0 8px;
+}
+
+.acceso-subtitulo {
+    font-size: 16px;
+    line-height: 24px;
+    color: var(--neutral-600);
+    margin: 0 0 28px;
+}
+
+.acceso-formulario {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.acceso-olvide {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.acceso-olvide a {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 600;
+}
+
+.acceso-crear-cuenta {
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--neutral-600);
+    text-align: center;
+}
+
+.acceso-crear-cuenta a {
+    font-weight: 600;
+}
+
+.acceso-hero-col {
+    flex: 1 1 380px;
+    min-width: 260px;
+    color: #ffffff;
+    padding: 48px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.acceso-hero-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(160deg, rgba(11, 23, 40, 0.92) 0%, rgba(16, 56, 96, 0.88) 55%, rgba(11, 23, 40, 0.8) 100%);
+}
+
+.acceso-hero-blob {
+    position: absolute;
+    bottom: -100px;
+    right: -80px;
+    width: 300px;
+    height: 300px;
+    border-radius: 999px;
+    background: rgba(200, 62, 77, 0.18);
+    z-index: 2;
+}
+
+.acceso-hero-logo {
+    height: 44px;
+    width: auto;
+    background: #ffffff;
+    border-radius: var(--radio-md);
+    padding: 8px 12px;
+    align-self: flex-start;
+    position: relative;
+    z-index: 3;
+}
+
+.acceso-hero-eyebrow {
+    position: relative;
+    z-index: 3;
+}
+
+.acceso-hero-titulo {
+    font-family: var(--fuente-editorial);
+    font-size: 36px;
+    line-height: 46px;
+    font-weight: 700;
+    margin: 0;
+    max-width: 380px;
+    position: relative;
+    z-index: 3;
+}
+
+.acceso-hero-texto {
+    font-size: 17px;
+    line-height: 26px;
+    color: var(--acento-100);
+    margin: 0;
+    max-width: 380px;
+    position: relative;
+    z-index: 3;
+}

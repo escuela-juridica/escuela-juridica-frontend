@@ -1,0 +1,191 @@
+// HU-033 · Mis certificados: portada de marca y galería de diplomas.
+
+// ------------------------------------------------------------------ Portada --
+.galeria-hero {
+  background:
+    radial-gradient(circle at 90% 20%, rgba(244, 183, 64, 0.22), transparent 40%),
+    linear-gradient(115deg, var(--marca-900) 0%, var(--marca-700) 58%, var(--acento-700) 100%);
+  color: #fff;
+}
+
+.galeria-hero__interior {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+
+// Mismo tamaño de título de pantalla que Panel y Mi perfil (28/36 px).
+.galeria-hero__titulo {
+  font-size: 28px;
+  line-height: 36px;
+  color: #fff;
+  margin: 0 0 8px;
+}
+
+.galeria-hero__subtitulo {
+  max-width: 640px;
+  margin: 0;
+  font-size: 16px;
+  line-height: 24px;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.galeria-hero__cifra {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 120px;
+  padding: 14px 24px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: var(--radio-xl);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.galeria-hero__numero {
+  font-size: 40px;
+  line-height: 44px;
+  font-weight: 700;
+}
+
+.galeria-hero__texto {
+  font-size: 13px;
+  line-height: 18px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+// El eyebrow de marca (rojo) no se lee sobre azul: versión clara.
+:host ::ng-deep .eyebrow--claro .eyebrow__dash {
+  background: var(--acento-500);
+}
+
+:host ::ng-deep .eyebrow--claro .eyebrow__texto {
+  color: var(--acento-500);
+}
+
+// ------------------------------------------------------------------ Galería --
+.galeria {
+  padding-top: 32px;
+  padding-bottom: 48px;
+}
+
+.galeria__estado {
+  color: var(--neutral-600);
+}
+
+.galeria__lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr));
+  gap: 24px;
+}
+
+.tarjeta {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0;
+}
+
+.tarjeta__vista {
+  padding: 28px 32px 22px;
+  background: linear-gradient(160deg, var(--neutral-100), var(--neutral-200));
+}
+
+.tarjeta--anulada .tarjeta__vista {
+  background: var(--neutral-200);
+}
+
+.tarjeta__cuerpo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px 24px 24px;
+}
+
+.tarjeta__estado {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tarjeta__curso {
+  margin: 0;
+  font-size: 19px;
+  line-height: 26px;
+  font-weight: 700;
+  color: var(--neutral-950);
+}
+
+.tarjeta__datos {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 16px;
+}
+
+.tarjeta__ancho {
+  grid-column: 1 / -1;
+}
+
+.tarjeta__datos dt {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--neutral-600);
+}
+
+.tarjeta__datos dd {
+  margin: 0;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--neutral-950);
+  overflow-wrap: anywhere;
+}
+
+.tarjeta__codigo {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.tarjeta__aviso {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--error);
+}
+
+.tarjeta__acciones {
+  margin-top: auto;
+  padding-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+@media (max-width: 767px) {
+  .galeria-hero__interior {
+    flex-direction: column;
+    align-items: flex-start;
+    padding-top: 28px;
+    padding-bottom: 28px;
+  }
+
+  .tarjeta__vista {
+    padding: 20px 20px 16px;
+  }
+
+  .tarjeta__acciones .btn {
+    flex: 1 1 100%;
+  }
+}
