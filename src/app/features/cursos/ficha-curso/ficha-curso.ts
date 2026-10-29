@@ -14,6 +14,7 @@ import {
   formatearFechaHora,
   formatearHora,
   formatearPrecio,
+  LIMITE_BILLETERA_SOLES,
 } from '../curso-formato.util';
 import { FichaCursoDetalle, LeccionFicha, VistaPrevia } from '../curso.model';
 import { Session } from '../../../core/session/session';
@@ -38,6 +39,7 @@ export class FichaCurso implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly session = inject(Session);
   private readonly router = inject(Router);
+  protected readonly limiteBilletera = LIMITE_BILLETERA_SOLES;
   private readonly matriculasApi = inject(MatriculaApiService);
   private readonly alertas = inject(AlertaGlobalService);
 

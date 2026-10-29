@@ -1,0 +1,24 @@
+<section class="qr" aria-label="Pagar con tu billetera">
+  <h2 class="qr__titulo">Paga con tu billetera</h2>
+  <div class="qr__cuerpo">
+    @if (instrucciones().qrUrl; as qr) {
+      <img class="qr__imagen" [src]="qr" width="176" height="176" alt="Código QR para pagar con tu billetera móvil" />
+    }
+    <div class="qr__detalle">
+      <ol class="qr__pasos">
+        <li>Escanea el código QR desde Yape, Plin u otra billetera.</li>
+        <li>Verifica el monto a pagar.</li>
+        <li>Confirma la operación.</li>
+      </ol>
+      @if (instrucciones().codigo; as codigo) {
+        <p class="qr__codigo">Código de pago <strong>{{ codigo }}</strong></p>
+      }
+      @if (instrucciones().venceEn; as vence) {
+        <p class="qr__vence">Vence el {{ formatearFechaHoraCorta(vence) }}</p>
+      }
+      @if (instrucciones().enlace; as enlace) {
+        <a class="btn btn--secundario" [href]="enlace" target="_blank" rel="noopener noreferrer">Ver instrucciones de pago</a>
+      }
+    </div>
+  </div>
+</section>

@@ -6,6 +6,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AlertaGlobalService } from '../../../core/notificaciones/alerta-global.service';
 import { formatearPrecio } from '../../cursos/curso-formato.util';
 import { ConstanciaPagoVista } from '../constancia-pago/constancia-pago';
+import { InstruccionesQr } from '../instrucciones-qr/instrucciones-qr';
 import { ConstanciaPago, PagoDetalle } from '../pago.model';
 import { PagosApiService } from '../pagos-api.service';
 
@@ -19,7 +20,7 @@ const MAXIMO_CONSULTAS = 150;
  */
 @Component({
   selector: 'app-resultado-pago',
-  imports: [RouterLink, ConstanciaPagoVista],
+  imports: [RouterLink, ConstanciaPagoVista, InstruccionesQr],
   templateUrl: './resultado-pago.html',
   styleUrl: './resultado-pago.scss',
 })

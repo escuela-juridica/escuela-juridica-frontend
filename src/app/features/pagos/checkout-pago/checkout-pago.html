@@ -46,6 +46,10 @@
               </div>
             }
 
+            @if (enProceso() && instruccionesPendientes(); as qr) {
+              <app-instrucciones-qr [instrucciones]="qr" />
+            }
+
             <div class="checkout__precio">
               @if (f.estadoComercial.promocionActiva) { <span class="checkout__precio-antes">{{ formatearPrecio(f.estadoComercial.precioRegular) }}</span> }
               <span class="checkout__precio-actual">{{ formatearPrecio(f.estadoComercial.precioActual) }}</span>
@@ -67,16 +71,22 @@
               @if (errorPago(); as mensaje) {
                 <div class="alerta alerta--error" role="alert"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div>
               }
-              <button type="button" class="btn btn--primario btn--grande btn--ancho-completo"
-                [disabled]="procesando() || (!confirmado() && !enProceso())" (click)="pagar()">
-                {{ procesando() ? 'Procesando…' : enProceso() ? 'Continuar mi pago con Culqi' : 'Pagar con Culqi' }}
-              </button>
+              @if (enProceso() && instruccionesPendientes()) {
+                <a class="btn btn--primario btn--grande btn--ancho-completo" [routerLink]="['/app/pagos', enProceso()]">
+                  Ver el estado de mi pago
+                </a>
+              } @else {
+                <button type="button" class="btn btn--primario btn--grande btn--ancho-completo"
+                  [disabled]="procesando() || (!confirmado() && !enProceso())" (click)="pagar()">
+                  {{ procesando() ? 'Procesando…' : enProceso() ? 'Continuar mi pago con Culqi' : 'Pagar con Culqi' }}
+                </button>
+              }
             }
 
             <ul class="checkout__medios" aria-label="Medios de pago">
-              <li>Tarjeta de crédito o débito</li>
-              <li>Yape</li>
-              <li>Plin</li>
+              @for (medio of medios(); track medio) {
+                <li>{{ medio }}</li>
+              }
             </ul>
             <p class="checkout__legal">
               El pago lo procesa Culqi. Tu matrícula se activa <strong>solo cuando Culqi aprueba</strong> la operación; hasta entonces

@@ -6,10 +6,11 @@ import { switchMap, tap } from 'rxjs';
 
 import { AlertaGlobalService } from '../../../core/notificaciones/alerta-global.service';
 import { CursoApiService } from '../../cursos/curso-api.service';
-import { etiquetaModalidad, formatearPrecio } from '../../cursos/curso-formato.util';
+import { etiquetaModalidad, formatearPrecio, mediosDePago } from '../../cursos/curso-formato.util';
 import { FichaCursoDetalle } from '../../cursos/curso.model';
 import { CulqiCheckoutService } from '../culqi-checkout.service';
-import { PagoCheckout, PagoDetalle, PagosCurso } from '../pago.model';
+import { InstruccionesQr } from '../instrucciones-qr/instrucciones-qr';
+import { InstruccionesPago, PagoCheckout, PagoDetalle, PagosCurso } from '../pago.model';
 import { PagosApiService } from '../pagos-api.service';
 
 /**
@@ -18,7 +19,7 @@ import { PagosApiService } from '../pagos-api.service';
  */
 @Component({
   selector: 'app-checkout-pago',
-  imports: [RouterLink],
+  imports: [RouterLink, InstruccionesQr],
   templateUrl: './checkout-pago.html',
   styleUrl: './checkout-pago.scss',
 })
@@ -41,6 +42,13 @@ export class CheckoutPago {
   protected readonly confirmado = signal(false);
   protected readonly procesando = signal(false);
   protected readonly errorPago = signal<string | null>(null);
+  /** QR de una orden de billetera ya generada y aún pendiente: Culqi no deja volver a generarlo. */
+  protected readonly instruccionesPendientes = signal<InstruccionesPago | null>(null);
+
+  protected readonly medios = computed(() => {
+    const f = this.ficha();
+    return f ? mediosDePago(f.estadoComercial.precioActual) : [];
+  });
 
   /** Hay un intento en proceso que se reanuda en lugar de crear otro. */
   protected readonly enProceso = computed(() => this.intentos()?.pendiente ?? null);
@@ -69,6 +77,12 @@ export class CheckoutPago {
           }
           this.intentos.set(intentos);
           this.estado.set('listo');
+          if (intentos.pendiente) {
+            this.pagos.detalle(intentos.pendiente).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+              next: (d) => this.instruccionesPendientes.set(d.instrucciones),
+              error: () => undefined,
+            });
+          }
         },
         error: (e: HttpErrorResponse) => {
           this.mensajeError.set(e.status === 404 ? 'No encontramos este curso.' : 'No pudimos preparar tu compra. Inténtalo nuevamente.');

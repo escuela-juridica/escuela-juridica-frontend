@@ -88,6 +88,14 @@ export function formatearPrecio(monto: number): string {
   }).format(monto);
 }
 
+/** Culqi solo permite pagar con billeteras (Plin y otras) hasta S/ 500; sobre ese monto el checkout ofrece tarjeta. */
+export const LIMITE_BILLETERA_SOLES = 500;
+
+/** Medios con los que se paga un curso de ese precio en Culqi Checkout. */
+export function mediosDePago(precio: number): string[] {
+  return precio > LIMITE_BILLETERA_SOLES ? ['Tarjeta de crédito o débito', 'Yape'] : ['Yape', 'Plin'];
+}
+
 export function formatearDuracion(segundos: number): string {
   const minutos = Math.round(segundos / 60);
   return minutos <= 1 ? '1 min' : `${minutos} min`;

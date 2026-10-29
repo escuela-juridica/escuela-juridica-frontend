@@ -324,7 +324,7 @@
                 Ver otros cursos
               </button>
             }
-            <div class="ficha-price__pago">El pago lo procesa Culqi con tarjeta, Yape o Plin.</div>
+            <div class="ficha-price__pago">El pago lo procesa Culqi con {{ curso.estadoComercial.precioActual > limiteBilletera ? 'tarjeta o Yape' : 'Yape o Plin' }}.</div>
           </div>
         </aside>
       </div>

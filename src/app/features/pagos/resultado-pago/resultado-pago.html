@@ -46,6 +46,10 @@
         </div>
       }
 
+      @if (p.estado === 'PENDIENTE' && p.instrucciones; as instrucciones) {
+        <app-instrucciones-qr [instrucciones]="instrucciones" />
+      }
+
       @if (p.estado === 'APROBADO' && p.accesoConcedido && p.estadoCorreo === 'ERROR') {
         <div class="alerta alerta--advertencia" role="status">
           <span class="alerta__icono">!</span>

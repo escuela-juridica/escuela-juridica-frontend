@@ -16,6 +16,14 @@ export interface PagoCheckout {
   apellidos: string;
 }
 
+/** QR y código de una orden de billetera aún pendiente (Culqi/PagoEfectivo). */
+export interface InstruccionesPago {
+  qrUrl: string | null;
+  enlace: string | null;
+  codigo: string | null;
+  venceEn: string | null;
+}
+
 export interface PagoDetalle {
   numeroPedido: string;
   cursoId: number;
@@ -36,6 +44,7 @@ export interface PagoDetalle {
   estadoMatricula: string;
   accesoConcedido: boolean;
   puedeReintentar: boolean;
+  instrucciones: InstruccionesPago | null;
   estadoCorreo: string | null;
 }
 
