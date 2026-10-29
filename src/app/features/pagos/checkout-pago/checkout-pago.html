@@ -87,8 +87,4 @@
       }
     }
   }
-
-  @if (checkoutSimulado(); as simulado) {
-    <app-culqi-simulado [pago]="simulado" (tokenCreado)="alTokenSimulado($event)" (cerrar)="cerrarSimulado()" />
-  }
 </main>

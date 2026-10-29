@@ -34,9 +34,4 @@ export class PagosApiService {
   reenviarAviso(numeroPedido: string): Observable<PagoDetalle> {
     return this.http.post<PagoDetalle>(`${this.base}/pagos/${numeroPedido}/reenviar-aviso`, {});
   }
-
-  /** Solo con Culqi simulado: reproduce el aviso que enviaría Culqi. */
-  simular(numeroPedido: string, resultado: string, repetirUltimo = false): Observable<PagoDetalle> {
-    return this.http.post<PagoDetalle>(`${this.base}/pagos/${numeroPedido}/simular`, { resultado, repetirUltimo });
-  }
 }

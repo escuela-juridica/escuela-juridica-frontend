@@ -76,19 +76,5 @@
         <app-constancia-pago [constancia]="c" />
       </section>
     }
-
-    @if (p.simulado) {
-      <section class="card resultado__simulador" aria-label="Panel de pruebas de Culqi simulado">
-        <h2 class="resultado__subtitulo">Panel de pruebas · Culqi simulado</h2>
-        <p class="resultado__nota">Reproduce los avisos que Culqi enviaría para este intento. Solo existe con Culqi simulado; con Culqi real no aparece.</p>
-        <div class="resultado__botones">
-          <button type="button" class="btn btn--secundario" [disabled]="ocupado()" (click)="simular('APROBADO')">Aprobar</button>
-          <button type="button" class="btn btn--secundario" [disabled]="ocupado()" (click)="simular('RECHAZADO')">Rechazar</button>
-          <button type="button" class="btn btn--secundario" [disabled]="ocupado()" (click)="simular('ERROR')">Error</button>
-          <button type="button" class="btn btn--secundario" [disabled]="ocupado()" (click)="simular('EXPIRADO')">Expirar</button>
-          <button type="button" class="btn btn--secundario" [disabled]="ocupado()" (click)="simular(p.estado === 'PENDIENTE' ? 'APROBADO' : p.estado, true)">Repetir la última confirmación</button>
-        </div>
-      </section>
-    }
   }
 </main>

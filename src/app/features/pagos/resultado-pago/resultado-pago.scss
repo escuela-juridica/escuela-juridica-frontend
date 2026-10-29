@@ -121,8 +121,7 @@
   gap: 12px;
 }
 
-.resultado__constancia,
-.resultado__simulador {
+.resultado__constancia {
   padding: 24px 28px;
 }
 
@@ -140,23 +139,6 @@
   color: var(--neutral-950);
 }
 
-.resultado__nota {
-  margin: 6px 0 14px;
-  font-size: 13px;
-  color: var(--neutral-600);
-}
-
-.resultado__botones {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.resultado__simulador {
-  border: 1px dashed var(--advertencia);
-  background: #fffaf0;
-}
-
 @media (max-width: 640px) {
   .resultado__tarjeta {
     padding: 22px 18px;
@@ -169,7 +151,6 @@
 
 @media print {
   .resultado__tarjeta,
-  .resultado__simulador,
   .resultado__constancia-cab .btn {
     display: none;
   }

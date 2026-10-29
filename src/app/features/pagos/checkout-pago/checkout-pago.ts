@@ -9,7 +9,6 @@ import { CursoApiService } from '../../cursos/curso-api.service';
 import { etiquetaModalidad, formatearPrecio } from '../../cursos/curso-formato.util';
 import { FichaCursoDetalle } from '../../cursos/curso.model';
 import { CulqiCheckoutService } from '../culqi-checkout.service';
-import { CulqiSimulado } from '../culqi-simulado/culqi-simulado';
 import { PagoCheckout, PagoDetalle, PagosCurso } from '../pago.model';
 import { PagosApiService } from '../pagos-api.service';
 
@@ -19,7 +18,7 @@ import { PagosApiService } from '../pagos-api.service';
  */
 @Component({
   selector: 'app-checkout-pago',
-  imports: [RouterLink, CulqiSimulado],
+  imports: [RouterLink],
   templateUrl: './checkout-pago.html',
   styleUrl: './checkout-pago.scss',
 })
@@ -42,7 +41,6 @@ export class CheckoutPago {
   protected readonly confirmado = signal(false);
   protected readonly procesando = signal(false);
   protected readonly errorPago = signal<string | null>(null);
-  protected readonly checkoutSimulado = signal<PagoCheckout | null>(null);
 
   /** Hay un intento en proceso que se reanuda en lugar de crear otro. */
   protected readonly enProceso = computed(() => this.intentos()?.pendiente ?? null);
@@ -109,21 +107,7 @@ export class CheckoutPago {
       });
   }
 
-  protected cerrarSimulado(): void {
-    this.checkoutSimulado.set(null);
-  }
-
-  protected alTokenSimulado(tokenId: string): void {
-    const checkout = this.checkoutSimulado();
-    this.checkoutSimulado.set(null);
-    if (checkout) this.enviarToken(checkout.numeroPedido, tokenId);
-  }
-
   private abrirCheckout(checkout: PagoCheckout): void {
-    if (checkout.modo === 'SIMULADO') {
-      this.checkoutSimulado.set(checkout);
-      return;
-    }
     this.culqi
       .abrir(checkout, {
         alCrearToken: (tokenId) => this.enviarToken(checkout.numeroPedido, tokenId),

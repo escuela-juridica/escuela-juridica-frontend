@@ -7,7 +7,6 @@ export interface PagoCheckout {
   importe: number;
   moneda: string;
   reanudado: boolean;
-  modo: 'SIMULADO' | 'REAL';
   llavePublica: string;
   ordenId: string;
   montoCentimos: number;
@@ -37,7 +36,6 @@ export interface PagoDetalle {
   estadoMatricula: string;
   accesoConcedido: boolean;
   puedeReintentar: boolean;
-  simulado: boolean;
   estadoCorreo: string | null;
 }
 

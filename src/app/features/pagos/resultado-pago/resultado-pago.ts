@@ -70,25 +70,6 @@ export class ResultadoPago implements OnDestroy {
     window.print();
   }
 
-  /** Solo con Culqi simulado: reproduce el aviso que enviaría Culqi (incluye repetirlo y los casos tardíos). */
-  protected simular(resultado: string, repetirUltimo = false): void {
-    this.ocupado.set(true);
-    this.api
-      .simular(this.numeroPedido, resultado, repetirUltimo)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (p) => {
-          this.ocupado.set(false);
-          this.aplicar(p);
-          this.alertas.mostrar('info', repetirUltimo ? 'Repetimos la misma confirmación: no cambió nada.' : 'Aviso de Culqi simulado aplicado.');
-        },
-        error: (e: HttpErrorResponse) => {
-          this.ocupado.set(false);
-          this.alertas.mostrar('error', this.mensaje(e) ?? 'No pudimos simular el aviso.');
-        },
-      });
-  }
-
   private consultar(): void {
     this.api
       .detalle(this.numeroPedido)
