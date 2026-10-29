@@ -1,6 +1,8 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { API_URL } from '../../../core/api/api.config';
+import { credencialesInterceptor } from '../../../core/interceptors/credenciales.interceptor';
 import { AntiRobot } from './anti-robot';
 
 describe('AntiRobot nativo', () => {
@@ -8,12 +10,12 @@ describe('AntiRobot nativo', () => {
   let component: AntiRobot;
   let http: HttpTestingController;
   let emitir: ReturnType<typeof vi.spyOn>;
-  const base = '/api/auth/registro/antirobot';
+  const base = `${API_URL}/auth/registro/antirobot`;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AntiRobot],
-      providers: [provideHttpClient(), provideHttpClientTesting()],
+      providers: [provideHttpClient(withInterceptors([credencialesInterceptor])), provideHttpClientTesting()],
     }).compileComponents();
     fixture = TestBed.createComponent(AntiRobot);
     component = fixture.componentInstance;

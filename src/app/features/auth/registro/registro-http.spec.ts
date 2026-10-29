@@ -2,6 +2,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router, provideRouter } from '@angular/router';
+import { API_URL } from '../../../core/api/api.config';
 import { Session } from '../../../core/session/session';
 import { Registro } from './registro';
 import { By } from '@angular/platform-browser';
@@ -33,7 +34,7 @@ describe('Registro: llamadas HTTP reales del componente', () => {
     });
     component.registrar();
     const http = TestBed.inject(HttpTestingController);
-    http.expectOne('/api/auth/registro').flush({
+    http.expectOne(`${API_URL}/auth/registro`).flush({
       usuarioId: 123,
       correo: 'ana@example.com',
       envioAceptado: false,
@@ -58,23 +59,23 @@ describe('Registro: llamadas HTTP reales del componente', () => {
     const fixture = TestBed.createComponent(Registro);
     fixture.detectChanges();
     const http = TestBed.inject(HttpTestingController);
-    http.expectOne('/api/auth/registro/google/contexto-hu001').flush({
+    http.expectOne(`${API_URL}/auth/registro/google/contexto-hu001`).flush({
       correo: 'ana@example.com',
-      nombres: 'Ana',
-      apellidos: 'Pérez García',
+      nombres: 'ANA',
+      apellidos: 'PÉREZ GARCÍA',
       fotoUrl: null,
       venceEn: new Date(Date.now() + 120_000).toISOString(),
     });
     const component = fixture.componentInstance;
     expect(component.formulario.controls.correo.disabled).toBe(true);
-    expect(component.formulario.controls.apellidoPaterno.value).toBe('Pérez García');
+    expect(component.formulario.controls.apellidoPaterno.value).toBe('PÉREZ GARCÍA');
     component.formulario.controls.aceptaTerminos.setValue(true);
     component.registrar();
-    const solicitud = http.expectOne('/api/auth/registro/google');
+    const solicitud = http.expectOne(`${API_URL}/auth/registro/google`);
     expect(solicitud.request.body).toEqual({
       referencia: 'contexto-hu001',
-      nombres: 'Ana',
-      apellidoPaterno: 'Pérez García',
+      nombres: 'ANA',
+      apellidoPaterno: 'PÉREZ GARCÍA',
       apellidoMaterno: null,
       telefono: null,
       documentoIdentidad: null,
@@ -82,9 +83,9 @@ describe('Registro: llamadas HTTP reales del componente', () => {
     });
     solicitud.flush({ nombre: 'Ana', email: 'ana@example.com', rol: 'alumno' });
     expect(TestBed.inject(Session).usuario()).toEqual({
-      nombre: 'Ana',
-      email: 'ana@example.com',
-      rol: 'alumno',
+      nombreCompleto: 'Ana',
+      correo: 'ana@example.com',
+      rolPrincipal: 'ALUMNO',
     });
     expect(navegar).toHaveBeenCalledWith(['/app/panel']);
     http.expectNone(() => true);
@@ -99,14 +100,14 @@ describe('Registro: llamadas HTTP reales del componente', () => {
       .componentInstance as AntiRobot;
     const http = TestBed.inject(HttpTestingController);
     antiRobot.crear();
-    http.expectOne('/api/auth/registro/antirobot/desafios').flush({
+    http.expectOne(`${API_URL}/auth/registro/antirobot/desafios`).flush({
       desafioId: 'desafio',
       pregunta: '¿Cuánto es 1 + 2?',
       vigenciaSegundos: 120,
     });
     antiRobot.respuesta.setValue('3');
     antiRobot.verificar();
-    http.expectOne('/api/auth/registro/antirobot/verificar').flush({
+    http.expectOne(`${API_URL}/auth/registro/antirobot/verificar`).flush({
       evidencia: 'evidencia-validada',
       vigenciaSegundos: 120,
     });
@@ -121,7 +122,7 @@ describe('Registro: llamadas HTTP reales del componente', () => {
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('button[type="submit"]').disabled).toBe(false);
     component.registrar();
-    const registro = http.expectOne('/api/auth/registro');
+    const registro = http.expectOne(`${API_URL}/auth/registro`);
     expect(registro.request.body.evidenciaAntiRobot).toBe('evidencia-validada');
     registro.flush(
       { message: 'Servicio no disponible' },
@@ -152,7 +153,7 @@ describe('Registro: llamadas HTTP reales del componente', () => {
     const fixture = TestBed.createComponent(Registro);
     fixture.detectChanges();
     const http = TestBed.inject(HttpTestingController);
-    const solicitud = http.expectOne('/api/auth/registro/google/contexto-hu001');
+    const solicitud = http.expectOne(`${API_URL}/auth/registro/google/contexto-hu001`);
     expect(solicitud.request.method).toBe('GET');
     solicitud.flush(
       { code: 'GOOGLE_PENDIENTE', message: 'Pendiente de integrar HU-001.' },

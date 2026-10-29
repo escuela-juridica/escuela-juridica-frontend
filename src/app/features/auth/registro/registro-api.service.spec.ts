@@ -2,6 +2,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
+import { API_URL } from '../../../core/api/api.config';
 import { RegistroApiService } from './registro-api.service';
 import { RegistroFormularioPeticion, RegistroGooglePeticion } from './registro.models';
 
@@ -36,7 +37,7 @@ describe('RegistroApiService', () => {
 
     servicio.registrarFormulario(peticion).subscribe();
 
-    const solicitud = http.expectOne('/api/auth/registro');
+    const solicitud = http.expectOne(`${API_URL}/auth/registro`);
     expect(solicitud.request.method).toBe('POST');
     expect(solicitud.request.body).toEqual(peticion);
     solicitud.flush({
@@ -50,7 +51,7 @@ describe('RegistroApiService', () => {
   it('codifica la referencia al consultar el contexto Google', () => {
     servicio.obtenerContextoGoogle('ref con/espacios').subscribe();
 
-    const solicitud = http.expectOne('/api/auth/registro/google/ref%20con%2Fespacios');
+    const solicitud = http.expectOne(`${API_URL}/auth/registro/google/ref%20con%2Fespacios`);
     expect(solicitud.request.method).toBe('GET');
     solicitud.flush({ correo: 'lucia@example.com' });
   });
@@ -68,7 +69,7 @@ describe('RegistroApiService', () => {
 
     servicio.completarRegistroGoogle(peticion).subscribe();
 
-    const solicitud = http.expectOne('/api/auth/registro/google');
+    const solicitud = http.expectOne(`${API_URL}/auth/registro/google`);
     expect(solicitud.request.method).toBe('POST');
     expect(solicitud.request.body).toEqual(peticion);
     expect(solicitud.request.body.correo).toBeUndefined();
