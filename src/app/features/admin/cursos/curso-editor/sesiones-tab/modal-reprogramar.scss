@@ -1,0 +1,19 @@
+.modal-reprogramar__alerta {
+  margin: 16px 0 0;
+}
+
+.modal-reprogramar__volver {
+  appearance: none;
+  border: none;
+  background: none;
+  padding: 0;
+  margin-top: 8px;
+  color: var(--acento-700);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.modal-reprogramar__volver:hover {
+  text-decoration: underline;
+}

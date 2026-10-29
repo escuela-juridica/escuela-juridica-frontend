@@ -1,0 +1,369 @@
+// HU-032 · Bloque "Tu certificado" del resumen del curso.
+
+:host {
+  display: block;
+}
+
+.cert {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.cert__estado {
+  margin: 0;
+  color: var(--neutral-600);
+}
+
+// ----------------------------------------------------------------- Pasos --
+.cert__pasos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.cert__paso {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+// Línea que une cada paso con el siguiente.
+.cert__paso::after {
+  content: '';
+  position: absolute;
+  top: 15px;
+  left: calc(50% + 20px);
+  right: calc(-50% + 20px);
+  height: 3px;
+  border-radius: 2px;
+  background: var(--neutral-200);
+}
+
+.cert__paso:last-child::after {
+  display: none;
+}
+
+.cert__paso--hecho::after {
+  background: var(--exito);
+}
+
+.cert__paso-marca {
+  position: relative;
+  z-index: 1;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 2px solid var(--neutral-300);
+  background: var(--blanco);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--neutral-500);
+}
+
+.cert__paso--hecho .cert__paso-marca {
+  background: var(--exito);
+  border-color: var(--exito);
+  color: #fff;
+}
+
+.cert__paso--actual .cert__paso-marca {
+  border-color: var(--acento-500);
+  background: var(--acento-050);
+  color: var(--acento-700);
+  box-shadow: 0 0 0 4px var(--acento-100);
+}
+
+.cert__paso-texto {
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 600;
+  color: var(--neutral-500);
+}
+
+.cert__paso--hecho .cert__paso-texto,
+.cert__paso--actual .cert__paso-texto {
+  color: var(--neutral-950);
+}
+
+// ------------------------------------------------------ Estado sin emitir --
+.cert__estado-tarjeta {
+  padding: 16px 20px;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radio-lg);
+  background: var(--neutral-050);
+}
+
+.cert__estado-tarjeta--listo {
+  border-color: var(--acento-500);
+  background: var(--acento-050);
+}
+
+.cert__estado-texto {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.cert__mensaje {
+  margin: 0;
+  max-width: 760px;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--neutral-950);
+}
+
+.cert__nota {
+  margin: 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--neutral-600);
+}
+
+.cert__subtitulo {
+  margin: 0;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--neutral-950);
+}
+
+.cert__proyeccion {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+}
+
+.cert__ficha {
+  padding: 14px 16px;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radio-lg);
+  background: var(--blanco);
+}
+
+.cert__ficha dt {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--neutral-600);
+}
+
+.cert__ficha dd {
+  margin: 4px 0 0;
+  font-size: 17px;
+  line-height: 24px;
+  font-weight: 700;
+  color: var(--neutral-950);
+}
+
+.cert__ficha dd small {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--neutral-600);
+}
+
+.cert__ficha-grande {
+  font-size: 32px !important;
+  line-height: 38px !important;
+  color: var(--marca-900) !important;
+}
+
+.cert__formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radio-lg);
+}
+
+.cert__campos {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.cert__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.cert__acciones--izquierda {
+  justify-content: flex-start;
+}
+
+.cert__datos-confirmados {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--neutral-800);
+}
+
+// ------------------------------------------------------------ Celebración --
+.cert__celebracion {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  align-items: center;
+  gap: 32px;
+  padding: 28px 32px;
+  border-radius: var(--radio-xl);
+  color: #fff;
+  background:
+    radial-gradient(circle at 85% 15%, rgba(244, 183, 64, 0.28), transparent 45%),
+    linear-gradient(120deg, var(--marca-900) 0%, var(--marca-700) 55%, var(--acento-700) 100%);
+  box-shadow: 0 10px 28px rgba(16, 56, 96, 0.28);
+}
+
+.cert__celebracion--anulado {
+  background: linear-gradient(120deg, #475467, #667085);
+  box-shadow: none;
+}
+
+.cert__celebracion-texto {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.cert__celebracion-titulo {
+  margin: 4px 0 0;
+  font-size: 26px;
+  line-height: 34px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.cert__celebracion-detalle {
+  margin: 0;
+  font-size: 16px;
+  line-height: 24px;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.cert__celebracion-datos {
+  margin: 8px 0 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 28px;
+}
+
+.cert__celebracion-datos dt {
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.cert__celebracion-datos dd {
+  margin: 2px 0 0;
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 700;
+  color: #fff;
+  overflow-wrap: anywhere;
+}
+
+.cert__celebracion-nota {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.cert__celebracion-vista {
+  transform: rotate(2deg);
+}
+
+// Botones sobre el degradado: el principal turquesa con texto azul; los secundarios, transparentes.
+.cert__cta {
+  background: var(--acento-500);
+  border-color: var(--acento-500);
+  color: var(--marca-900);
+}
+
+.cert__cta:hover {
+  background: #6ff0f0;
+  border-color: #6ff0f0;
+  color: var(--marca-900);
+}
+
+.cert__ghost {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #fff;
+}
+
+.cert__ghost:hover {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+
+.cert__alerta-modal {
+  margin: 0 0 16px;
+}
+
+.cert__confirmar {
+  margin: 0 0 16px;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--neutral-800);
+}
+
+@media (max-width: 900px) {
+  .cert__celebracion {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+    padding: 22px 20px;
+  }
+
+  .cert__celebracion-vista {
+    order: -1;
+    max-width: 380px;
+    transform: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .cert__campos {
+    grid-template-columns: 1fr;
+  }
+
+  .cert__paso-texto {
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  .cert__acciones .btn,
+  .cert__datos-confirmados .btn {
+    width: 100%;
+  }
+
+  .cert__celebracion-titulo {
+    font-size: 22px;
+    line-height: 30px;
+  }
+}

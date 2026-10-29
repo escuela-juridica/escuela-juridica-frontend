@@ -1,0 +1,134 @@
+// Vista previa de un certificado: papel marfil, doble marco azul, sello dorado.
+
+:host {
+  display: block;
+  container-type: inline-size;
+}
+
+.diploma {
+  position: relative;
+  aspect-ratio: 1.414 / 1;
+  width: 100%;
+  padding: 4cqw;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #fffdf6 0%, #fff7e0 100%);
+  box-shadow: 0 10px 24px rgba(16, 24, 40, 0.18), 0 2px 6px rgba(16, 24, 40, 0.1);
+}
+
+.diploma__marco {
+  height: 100%;
+  padding: 3.2cqw 5cqw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border: 0.8cqw double var(--marca-900);
+  gap: 1.2cqw;
+}
+
+.diploma__marca {
+  margin: 0;
+  font-size: 5cqw;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--marca-900);
+}
+
+.diploma__rotulo {
+  margin: 0;
+  font-size: 2.6cqw;
+  color: var(--neutral-500);
+}
+
+.diploma__titular {
+  margin: 1.4cqw 0 0;
+  max-width: 100%;
+  font-family: var(--fuente-editorial);
+  font-size: 5.4cqw;
+  line-height: 1.15;
+  font-weight: 700;
+  color: var(--marca-900);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.diploma__linea {
+  width: 55%;
+  height: 1px;
+  background: var(--neutral-400);
+}
+
+.diploma__curso {
+  margin: 0;
+  max-width: 100%;
+  font-size: 3cqw;
+  line-height: 1.25;
+  font-weight: 600;
+  color: var(--neutral-800);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.diploma__entidad {
+  margin: 0;
+  font-size: 2.4cqw;
+  font-style: italic;
+  color: var(--acento-700);
+}
+
+.diploma__pie {
+  margin-top: auto;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 4cqw;
+}
+
+.diploma__firma {
+  flex: 1;
+  height: 1px;
+  margin-bottom: 1.6cqw;
+  background: var(--neutral-400);
+}
+
+.diploma__sello {
+  width: 9cqw;
+  height: 9cqw;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #ffd978, var(--dorado-500));
+  color: #7a4f00;
+  box-shadow: 0 2px 6px rgba(122, 79, 0, 0.35);
+}
+
+.diploma__sello svg {
+  width: 55%;
+  height: 55%;
+}
+
+.diploma--anulado .diploma__marco {
+  opacity: 0.55;
+  filter: grayscale(0.6);
+}
+
+.diploma__sello-anulado {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-14deg);
+  padding: 0.6cqw 4cqw;
+  border: 0.8cqw solid var(--error);
+  border-radius: 6px;
+  font-size: 8cqw;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--error);
+  background: rgba(255, 255, 255, 0.7);
+}

@@ -17,6 +17,13 @@
   margin-bottom: 24px;
 }
 
+.matriculas__acciones-cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
 .matriculas__cabecera p {
   margin: 4px 0 0;
   color: var(--neutral-600);

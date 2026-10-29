@@ -1,0 +1,135 @@
+<section class="det">
+  <a class="det__volver" routerLink="/admin/reclamaciones">← Quejas y reclamos</a>
+
+  @if (cargando()) {
+    <p>Cargando…</p>
+  } @else if (error(); as mensaje) {
+    <div class="alerta alerta--error" role="alert"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div>
+  } @else if (detalle(); as d) {
+    <header class="det__cabecera">
+      <span class="det__etiqueta">{{ d.tipo === 'QUEJA' ? 'Queja' : 'Reclamo' }}</span>
+      <h1 class="det__titulo">{{ d.codigo }}</h1>
+      <p>
+        Presentado el {{ d.registradoEn | date:'dd/MM/yyyy HH:mm' }} · fecha límite {{ d.fechaLimite | date:'dd/MM/yyyy' }}
+        @if (d.estado === 'RESPONDIDO') { <span class="badge badge--disp-inmediato">Respondido el {{ d.respondidoEn | date:'dd/MM/yyyy' }}</span> }
+        @else { <span class="badge badge--advertencia-suave">Pendiente de respuesta</span> }
+      </p>
+    </header>
+
+    @if (d.plazo; as plazo) {
+      <div class="alerta" [class.alerta--error]="plazo === 'VENCIDO'" [class.alerta--advertencia]="plazo === 'POR_VENCER'" [class.alerta--info]="plazo === 'EN_PLAZO'" role="status">
+        <span class="alerta__icono">{{ plazo === 'EN_PLAZO' ? 'i' : '!' }}</span>
+        <div><p class="alerta__titulo">{{ textoPlazo(d) }}</p></div>
+      </div>
+    }
+
+    <div class="card det__tarjeta">
+      <h2 class="det__subtitulo">Formulario original</h2>
+      <dl class="det__datos">
+        <div><dt>Reclamante</dt><dd>{{ d.nombres }} {{ d.apellidos }}@if (d.conCuenta) { <small>Con cuenta en la plataforma</small> }</dd></div>
+        <div><dt>Documento</dt><dd>{{ d.tipoDocumento }} {{ d.numeroDocumento }}</dd></div>
+        <div><dt>Correo autorizado</dt><dd>{{ d.correo }}</dd></div>
+        <div><dt>Celular</dt><dd>{{ d.celular }}</dd></div>
+        <div><dt>Dirección</dt><dd>{{ d.direccion }}</dd></div>
+        <div><dt>Producto o servicio</dt><dd>{{ d.descripcionBien }}</dd></div>
+        <div><dt>Monto reclamado</dt><dd>{{ formatearPrecio(d.montoReclamado) }}</dd></div>
+      </dl>
+      <h3 class="det__mini">¿Qué pasó?</h3>
+      <p class="det__texto">{{ d.detalle }}</p>
+      <h3 class="det__mini">Lo que solicita</h3>
+      <p class="det__texto">{{ d.pedido }}</p>
+
+      <h3 class="det__mini">Imágenes</h3>
+      @if (d.adjuntos.length === 0) {
+        <p class="det__nota">No adjuntó imágenes.</p>
+      } @else {
+        <ul class="det__imagenes">
+          @for (a of d.adjuntos; track a.id) {
+            <li>
+              @if (imagenes()[a.id]; as url) {
+                <button type="button" class="det__miniatura" (click)="abrirImagen(a.id)" [attr.aria-label]="'Abrir ' + a.nombre"><img [src]="url" [alt]="a.nombre" /></button>
+              } @else { <span class="det__miniatura det__miniatura--carga">…</span> }
+              <small>{{ a.nombre }} · {{ tamano(a.tamanoBytes) }}</small>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+
+    <div class="card det__tarjeta">
+      <h2 class="det__subtitulo">Respuesta de la Escuela</h2>
+
+      @if (d.respuesta; as r) {
+        <p class="det__nota">Registrada el {{ r.creadoEn | date:'dd/MM/yyyy HH:mm' }} por {{ r.respondidoPor }}. Una vez registrada no se edita: solo se puede reenviar la misma respuesta con su fecha original.</p>
+        <blockquote class="det__respuesta">{{ r.texto }}</blockquote>
+
+        @if (d.estado === 'PENDIENTE_RESPUESTA') {
+          <div class="alerta alerta--error" role="status">
+            <span class="alerta__icono">!</span>
+            <div>
+              <p class="alerta__titulo">El correo no se pudo enviar y el caso sigue pendiente</p>
+              <p class="alerta__texto">La respuesta quedó conservada. Reenvíala cuando quieras; si el correo estaba mal, corrígelo aquí (queda en el historial).</p>
+            </div>
+          </div>
+        } @else {
+          <div class="alerta alerta--exito" role="status">
+            <span class="alerta__icono">✓</span>
+            <div><p class="alerta__titulo">Enviada el {{ r.enviadoEn | date:'dd/MM/yyyy HH:mm' }} a {{ r.correoDestino }}</p></div>
+          </div>
+        }
+
+        <form class="det__reenvio" [formGroup]="formularioReenvio" (ngSubmit)="reenviar()" novalidate>
+          @if (errorEnvio(); as mensaje) {
+            <div class="alerta alerta--error" role="alert"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div>
+          }
+          @if (d.estado === 'PENDIENTE_RESPUESTA') {
+            <label class="label" for="re-correo">Correo de destino</label>
+            <input id="re-correo" type="email" class="input" formControlName="correo" [class.input--error]="formularioReenvio.controls.correo.invalid && formularioReenvio.controls.correo.touched" />
+            @if (formularioReenvio.controls.correo.invalid && formularioReenvio.controls.correo.touched) { <p class="campo-error">Ingresa un correo válido.</p> }
+          }
+          <div class="det__acciones">
+            <button type="submit" class="btn btn--acento" [disabled]="enviando()">{{ enviando() ? 'Enviando…' : (d.estado === 'PENDIENTE_RESPUESTA' ? 'Reenviar respuesta' : 'Reenviar la misma respuesta') }}</button>
+          </div>
+        </form>
+      } @else {
+        <form [formGroup]="formulario" (ngSubmit)="pedirConfirmacion()" novalidate>
+          <label class="label" for="re-respuesta">Respuesta para la persona reclamante</label>
+          <textarea id="re-respuesta" class="input" rows="7" formControlName="respuesta" [class.input--error]="invalidoRespuesta()"
+            placeholder="Escribe la respuesta formal. Se enviará al correo autorizado junto con el número del caso, un resumen de lo solicitado y la fecha de atención."></textarea>
+          @if (invalidoRespuesta()) { <p class="campo-error">Escribe la respuesta (mínimo 20 caracteres).</p> }
+          <div class="det__acciones">
+            <button type="submit" class="btn btn--acento">Enviar respuesta</button>
+          </div>
+        </form>
+      }
+    </div>
+
+    @if (d.intentos.length > 0) {
+      <div class="card det__tarjeta">
+        <h2 class="det__subtitulo">Intentos de envío</h2>
+        <ol class="det__intentos">
+          @for (i of d.intentos; track i.id) {
+            <li>
+              <span class="badge" [class.badge--disp-inmediato]="i.resultado === 'ENVIADO'" [class.badge--disp-cancelado]="i.resultado === 'ERROR'">{{ i.resultado === 'ENVIADO' ? 'Enviado' : 'Falló' }}</span>
+              <span>{{ i.realizadoEn | date:'dd/MM/yyyy HH:mm' }} · a {{ i.correoDestino }} · {{ i.realizadoPor }}</span>
+              @if (i.detalleError) { <small>{{ i.detalleError }}</small> }
+            </li>
+          }
+        </ol>
+      </div>
+    }
+
+    @if (confirmando()) {
+      <app-modal titulo="Confirmar respuesta" (cerrar)="cerrarConfirmacion()">
+        @if (errorEnvio(); as mensaje) {
+          <div class="alerta alerta--error" role="alert"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div>
+        }
+        <p class="det__confirmar">Se enviará esta respuesta a <strong>{{ d.correo }}</strong>. Una vez registrada <strong>no se podrá editar</strong>. El caso pasará a «Respondido» solo si el correo se envía correctamente; si falla, quedará pendiente y podrás reenviar la misma respuesta.</p>
+        <div class="editor-form__acciones">
+          <button type="button" class="btn btn--secundario" [disabled]="enviando()" (click)="cerrarConfirmacion()">Volver</button>
+          <button type="button" class="btn btn--acento" [disabled]="enviando()" (click)="responder()">{{ enviando() ? 'Enviando…' : 'Sí, enviar' }}</button>
+        </div>
+      </app-modal>
+    }
+  }
+</section>

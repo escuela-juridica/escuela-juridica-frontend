@@ -1,0 +1,106 @@
+<main>
+  <div class="contenedor">
+    <div class="eyebrow"><span class="eyebrow__dash"></span><span class="eyebrow__texto">Sesiones en vivo</span></div>
+    <h1 class="tipo-h1 calendario-titulo">Calendario</h1>
+    <p class="calendario-subtitulo">
+      Tus sesiones en vivo e híbridas, organizadas por fecha. El horario se muestra en hora de Perú (Lima).
+    </p>
+
+    <div class="calendario-nav">
+      <button type="button" class="btn btn--secundario calendario-nav__flecha" (click)="cambiarMes(-1)" aria-label="Mes anterior">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6" /></svg>
+      </button>
+      <div class="calendario-nav__centro">
+        <span class="calendario-nav__mes">{{ etiquetaMes() }}</span>
+        <button type="button" class="btn btn--neutro calendario-nav__hoy" (click)="irAHoy()" [disabled]="esMesActual()">Hoy</button>
+      </div>
+      <button type="button" class="btn btn--secundario calendario-nav__flecha" (click)="cambiarMes(1)" aria-label="Mes siguiente">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
+      </button>
+    </div>
+
+    <div class="calendario-vistas" role="group" aria-label="Vista del calendario">
+      <button type="button" class="calendario-vistas__boton" [class.calendario-vistas__boton--activo]="vista() === 'mes'" [attr.aria-pressed]="vista() === 'mes'" (click)="cambiarVista('mes')">Mes</button>
+      <button type="button" class="calendario-vistas__boton" [class.calendario-vistas__boton--activo]="vista() === 'lista'" [attr.aria-pressed]="vista() === 'lista'" (click)="cambiarVista('lista')">Lista</button>
+    </div>
+
+    <div class="calendario-grilla" [class.calendario-oculto]="vista() !== 'mes'">
+      <full-calendar [options]="calendarOptions()" />
+    </div>
+
+    @if (vista() === 'lista') {
+      <div class="calendario-lista">
+        @for (grupo of grupos(); track grupo.clave) {
+          <h2 class="calendario-lista__dia">{{ grupo.etiqueta }}</h2>
+          @for (sesion of grupo.sesiones; track sesion.leccionId) {
+            <button type="button" class="card calendario-lista__sesion" (click)="sesionSeleccionada.set(sesion)">
+              <span class="calendario-lista__hora">
+                {{ sesion.fechaHoraInicio ? formatearHora(sesion.fechaHoraInicio) : '' }}
+              </span>
+              <span class="calendario-lista__info">
+                <span class="calendario-lista__titulo">{{ sesion.titulo }}</span>
+                <span class="calendario-lista__curso">{{ sesion.cursoTitulo }}</span>
+              </span>
+              <span class="badge" [class]="claseEstado(sesion.estadoSesion)">{{ etiquetaEstado(sesion.estadoSesion) }}</span>
+            </button>
+          }
+        } @empty {
+          @if (!cargando() && !error()) {
+            <p class="calendario-estado">No tienes sesiones en este mes.</p>
+          }
+        }
+      </div>
+    }
+
+    @if (cargando()) {
+      <p class="calendario-estado" aria-live="polite">Cargando sesiones…</p>
+    } @else if (error()) {
+      <div class="calendario-estado calendario-estado--error">
+        <p>No pudimos cargar tu calendario. Ocurrió un problema al consultar tus sesiones.</p>
+        <button type="button" class="btn btn--primario" (click)="reintentar()">Reintentar</button>
+      </div>
+    } @else if (mostrarPistaVacio()) {
+      <p class="calendario-estado calendario-estado--pista">
+        Este calendario se llena automáticamente cuando tienes una matrícula activa en un curso con sesiones en
+        vivo o híbridas. Probá revisar otro mes con las flechas de arriba.
+      </p>
+    }
+  </div>
+</main>
+
+@if (sesionSeleccionada(); as sesion) {
+  <app-modal [titulo]="sesion.cursoTitulo" (cerrar)="cerrarModal()">
+    <h3 class="modal-sesion__titulo">{{ sesion.titulo }}</h3>
+
+    <p class="modal-sesion__horario">
+      @if (sesion.fechaHoraInicio && sesion.fechaHoraFin) {
+        {{ formatearHora(sesion.fechaHoraInicio) }} – {{ formatearHora(sesion.fechaHoraFin) }}
+      } @else {
+        Horario por confirmar
+      }
+    </p>
+
+    <span class="badge modal-sesion__badge" [class]="claseEstado(sesion.estadoSesion)">{{ etiquetaEstado(sesion.estadoSesion) }}</span>
+
+    @switch (sesion.estadoSesion) {
+      @case ('FUTURA') {
+        <button type="button" class="btn btn--secundario modal-sesion__boton" disabled>Ingresar</button>
+      }
+      @case ('EN_VENTANA') {
+        <button
+          type="button"
+          class="btn btn--acento modal-sesion__boton"
+          [disabled]="ingresando() === sesion.leccionId"
+          (click)="ingresar(sesion)"
+        >
+          {{ ingresando() === sesion.leccionId ? 'Ingresando…' : 'Ingresar ahora' }}
+        </button>
+      }
+      @case ('REALIZADA') {
+        <p class="modal-sesion__nota">
+          {{ sesion.grabacionDisponible ? 'Grabación disponible' : 'Grabación pendiente' }}
+        </p>
+      }
+    }
+  </app-modal>
+}

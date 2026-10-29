@@ -1,0 +1,100 @@
+<main class="checkout contenedor">
+  @switch (estado()) {
+    @case ('cargando') { <p class="checkout__estado">Preparando tu compra…</p> }
+    @case ('error') {
+      <div class="estado-vacio">
+        <h3 class="estado-vacio__titulo">{{ mensajeError() }}</h3>
+        <a class="btn btn--primario" routerLink="/catalogo">Ver el catálogo</a>
+      </div>
+    }
+    @default {
+      @if (ficha(); as f) {
+        <a class="checkout__volver" [routerLink]="['/cursos', f.urlAmigable]">← Volver al curso</a>
+        <h1 class="checkout__titulo">Confirma tu compra</h1>
+
+        <div class="checkout__rejilla">
+          <section class="card checkout__curso" aria-label="Curso">
+            <div class="checkout__portada" [style.background-image]="f.imagenPortadaUrl ? 'url(' + f.imagenPortadaUrl + ')' : 'none'"></div>
+            <div class="checkout__curso-cuerpo">
+              <span class="checkout__etiqueta">{{ etiquetaModalidad(f.modalidad) }}@if (f.tipoCursoNombre) { · {{ f.tipoCursoNombre }} }</span>
+              <h2 class="checkout__curso-titulo">{{ f.titulo }}</h2>
+              <p class="checkout__curso-datos">
+                @if (f.horasAcademicas) { {{ f.horasAcademicas }} horas académicas · }
+                {{ f.modulos.length }} módulos
+                @if (f.entidadCertificadoraNombre) { · Refrenda {{ f.entidadCertificadoraNombre }} }
+              </p>
+              <ul class="checkout__incluye">
+                <li>Acceso a materiales y acompañamiento académico</li>
+                <li>Certificado según cumplimiento, sin costo adicional</li>
+                <li>Pago y certificado incluidos en un único importe</li>
+              </ul>
+            </div>
+          </section>
+
+          <aside class="card checkout__resumen" aria-label="Resumen de pago">
+            <h2 class="checkout__resumen-titulo">Resumen</h2>
+
+            @if (enProceso()) {
+              <div class="alerta alerta--info" role="status">
+                <span class="alerta__icono">i</span>
+                <div><p class="alerta__titulo">Tienes un pago en proceso</p><p class="alerta__texto">Continúa con ese intento: no se crea otro mientras Culqi no comunique su resultado.</p></div>
+              </div>
+            } @else if (anteriores().length > 0) {
+              <div class="alerta alerta--advertencia" role="status">
+                <span class="alerta__icono">!</span>
+                <div><p class="alerta__titulo">Tu intento anterior no fue aprobado</p><p class="alerta__texto">{{ anteriores()[0].mensaje }} Revisa el precio vigente y confírmalo para intentar de nuevo.</p></div>
+              </div>
+            }
+
+            @if (enProceso() && instruccionesPendientes(); as qr) {
+              <app-instrucciones-qr [instrucciones]="qr" />
+            }
+
+            <div class="checkout__precio">
+              @if (f.estadoComercial.promocionActiva) { <span class="checkout__precio-antes">{{ formatearPrecio(f.estadoComercial.precioRegular) }}</span> }
+              <span class="checkout__precio-actual">{{ formatearPrecio(f.estadoComercial.precioActual) }}</span>
+              <span class="checkout__precio-nota">Soles peruanos, impuestos incluidos</span>
+            </div>
+
+            @if (!puedePagar()) {
+              <div class="alerta alerta--error" role="alert">
+                <span class="alerta__icono">!</span>
+                <div><p class="alerta__titulo">{{ f.estadoComercial.etiqueta }}</p><p class="alerta__texto">Por ahora no se puede iniciar un pago para este curso. No se reservan lugares ni existe lista de espera.</p></div>
+              </div>
+            } @else {
+              @if (!enProceso()) {
+                <label class="checkout__confirmar">
+                  <input type="checkbox" [checked]="confirmado()" (change)="alternarConfirmacion($event)" />
+                  <span>Confirmo que pagaré <strong>{{ formatearPrecio(f.estadoComercial.precioActual) }}</strong> por este curso.</span>
+                </label>
+              }
+              @if (errorPago(); as mensaje) {
+                <div class="alerta alerta--error" role="alert"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div>
+              }
+              @if (enProceso() && instruccionesPendientes()) {
+                <a class="btn btn--primario btn--grande btn--ancho-completo" [routerLink]="['/app/pagos', enProceso()]">
+                  Ver el estado de mi pago
+                </a>
+              } @else {
+                <button type="button" class="btn btn--primario btn--grande btn--ancho-completo"
+                  [disabled]="procesando() || (!confirmado() && !enProceso())" (click)="pagar()">
+                  {{ procesando() ? 'Procesando…' : enProceso() ? 'Continuar mi pago' : 'Pagar ahora' }}
+                </button>
+              }
+            }
+
+            <ul class="checkout__medios" aria-label="Medios de pago">
+              @for (medio of medios(); track medio) {
+                <li>{{ medio }}</li>
+              }
+            </ul>
+            <p class="checkout__legal">
+              El pago lo procesa Culqi. Tu matrícula se activa <strong>solo cuando Culqi aprueba</strong> la operación; hasta entonces
+              no tienes acceso ni cupo reservado. No se aceptan efectivo, depósitos ni capturas de pantalla.
+            </p>
+          </aside>
+        </div>
+      }
+    }
+  }
+</main>

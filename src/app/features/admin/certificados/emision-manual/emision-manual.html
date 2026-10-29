@@ -1,0 +1,104 @@
+<section class="emision">
+  <a class="emision__volver" routerLink="/admin/certificados">← Certificados</a>
+
+  @if (cargando()) {
+    <p>Cargando…</p>
+  } @else if (error(); as mensaje) {
+    <div class="alerta alerta--error" role="alert"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div>
+  } @else if (situacion(); as s) {
+    <header class="emision__cabecera">
+      <span class="emision__etiqueta">Emisión excepcional</span>
+      <h1 class="emision__titulo">{{ s.alumno }}</h1>
+      <p>{{ s.correo }} · {{ s.curso }}</p>
+    </header>
+
+    @if (s.certificado; as c) {
+      <div class="card emision__tarjeta emision__emitido">
+        <div class="emision__emitido-icono" aria-hidden="true">✓</div>
+        <div>
+          <h2 class="emision__subtitulo">Certificado {{ c.estado === 'VIGENTE' ? 'vigente' : 'anulado' }}</h2>
+          <p class="emision__codigo">{{ c.codigo }}</p>
+          <p class="emision__nota">{{ etiquetaEmision(c.tipoEmision) }} · {{ c.nivel === 'REFRENDADO' ? 'Refrendado' : 'Normal' }} · emitido el {{ c.emitidoEn | date:'dd/MM/yyyy HH:mm' }}</p>
+          @if (c.motivoEmisionManual) { <p class="emision__nota"><strong>Motivo:</strong> {{ c.motivoEmisionManual }}</p> }
+        </div>
+      </div>
+    }
+
+    <div class="emision__rejilla">
+      <div class="card emision__tarjeta">
+        <h2 class="emision__subtitulo">Situación académica</h2>
+        <ul class="emision__condiciones">
+          @for (cond of s.condiciones; track cond.codigo) {
+            <li>
+              <span class="emision__marca" [class.emision__marca--ok]="cond.cumplida" aria-hidden="true">{{ cond.cumplida ? '✓' : '•' }}</span>
+              <span class="emision__cond-texto">{{ cond.titulo }}<small>{{ cond.valorActual }} · meta: {{ cond.meta }}</small></span>
+              <span class="emision__cond-estado">{{ cond.cumplida ? 'Cumplida' : 'Pendiente' }}</span>
+            </li>
+          }
+        </ul>
+        <p class="emision__nota">{{ s.frase }}</p>
+      </div>
+
+      <div class="card emision__tarjeta">
+        <h2 class="emision__subtitulo">Lo que se congelaría</h2>
+        <dl class="emision__datos">
+          <div><dt>Nombres a imprimir</dt><dd>{{ s.nombresConfirmados ?? 'Aún sin confirmar por el alumno' }}</dd></div>
+          <div><dt>Nota final</dt><dd>@if (s.notaFinal !== null) { {{ s.notaFinal | number:'1.0-2' }} } @else { Sin nota: no se imprime ninguna }</dd></div>
+          <div><dt>Nivel</dt><dd>{{ s.nivel === 'REFRENDADO' ? 'Refrendado' : 'Normal' }}@if (s.entidad) { · {{ s.entidad }} }</dd></div>
+          <div><dt>Finalización</dt><dd>{{ s.fechaFinalizacion ? (s.fechaFinalizacion | date:'dd/MM/yyyy') : 'Sin registrar' }}</dd></div>
+        </dl>
+        <p class="emision__nota">El nivel nunca se elige a mano: lo decide la nota definitiva con los umbrales del curso.</p>
+      </div>
+    </div>
+
+    @if (s.bloqueo; as bloqueo) {
+      @if (!s.certificado) {
+        <div class="alerta alerta--advertencia" role="status"><span class="alerta__icono">!</span><div><p class="alerta__titulo">No se puede emitir todavía</p><p class="alerta__texto">{{ bloqueo }}</p></div></div>
+      }
+    } @else {
+      <form class="card emision__tarjeta emision__formulario" [formGroup]="formulario" (ngSubmit)="pedirConfirmacion()" novalidate>
+        <h2 class="emision__subtitulo">Emitir el certificado</h2>
+        <div>
+          <label class="label" for="em-motivo">Motivo de la excepción</label>
+          <textarea id="em-motivo" class="input" rows="4" formControlName="motivo" [class.input--error]="invalido('motivo')"
+            placeholder="Explica por qué corresponde emitirlo (queda registrado con tu nombre y la fecha)."></textarea>
+          @if (invalido('motivo')) { <p class="campo-error">Explica el motivo (mínimo 10 caracteres).</p> }
+        </div>
+        @if (necesitaFecha(s)) {
+          <div>
+            <label class="label" for="em-fecha"><span>Fecha de finalización</span><span class="nota-pill">Opcional</span></label>
+            <input id="em-fecha" type="date" class="input" formControlName="fechaFinalizacion" [min]="s.fechaMinimaFinalizacion" [max]="s.fechaMaximaFinalizacion" />
+            <p class="emision__nota">El alumno aún no tiene fecha de finalización. Si no indicas una, se usa la fecha de hoy; debe estar entre su matrícula y hoy.</p>
+          </div>
+        }
+        <label class="emision__check">
+          <input type="checkbox" formControlName="entiendo" />
+          <span>Entiendo que es definitivo: se congelan la nota, el nivel y los datos, y se cierran los nuevos intentos de exámenes calificados. Los de práctica siguen disponibles.</span>
+        </label>
+        @if (invalido('entiendo')) { <p class="campo-error">Confirma que entiendes el impacto.</p> }
+        <div class="emision__acciones">
+          <a class="btn btn--secundario" routerLink="/admin/certificados">Cancelar</a>
+          <button type="submit" class="btn btn--acento">Emitir certificado</button>
+        </div>
+      </form>
+    }
+
+    @if (confirmando()) {
+      <app-modal titulo="Confirmar emisión excepcional" (cerrar)="cerrarConfirmacion()">
+        @if (errorEmision(); as mensaje) {
+          <div class="alerta alerta--error" role="alert"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div>
+        }
+        <p class="emision__confirmar">
+          Se emitirá un certificado a nombre de <strong>{{ s.nombresConfirmados }}</strong> para <strong>{{ s.curso }}</strong>,
+          @if (s.notaFinal !== null) { con nota <strong>{{ s.notaFinal | number:'1.0-2' }}</strong> y nivel <strong>{{ s.nivel === 'REFRENDADO' ? 'refrendado' : 'normal' }}</strong> }
+          @else { sin nota y con nivel <strong>normal</strong> }.
+          El alumno recibirá un aviso con el enlace de descarga.
+        </p>
+        <div class="editor-form__acciones">
+          <button type="button" class="btn btn--secundario" [disabled]="emitiendo()" (click)="cerrarConfirmacion()">Volver</button>
+          <button type="button" class="btn btn--acento" [disabled]="emitiendo()" (click)="emitir()">{{ emitiendo() ? 'Emitiendo…' : 'Sí, emitir' }}</button>
+        </div>
+      </app-modal>
+    }
+  }
+</section>

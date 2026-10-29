@@ -1,0 +1,258 @@
+// HU-030 · Revisión de un intento con respuestas abiertas (administración).
+
+:host {
+  display: block;
+}
+
+.rev {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 980px;
+}
+
+.rev__volver {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--neutral-600);
+  text-decoration: none;
+}
+
+.rev__volver:hover {
+  color: var(--marca-900);
+}
+
+.rev__estado {
+  padding: 24px 0;
+  text-align: center;
+  color: var(--neutral-600);
+}
+
+.rev__cabecera {
+  padding: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.rev__eyebrow {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--eyebrow-color);
+}
+
+// Títulos de pantalla admin: 22/30 px.
+.rev__titulo {
+  margin: 2px 0 6px;
+  font-size: 22px;
+  line-height: 30px;
+  font-weight: 700;
+  color: var(--neutral-950);
+}
+
+.rev__meta {
+  margin: 2px 0 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--neutral-600);
+}
+
+.rev__estado-plazo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.rev__estado-plazo small {
+  font-size: 13px;
+  color: var(--neutral-600);
+}
+
+.rev__objetivo {
+  padding: 14px 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 40px;
+}
+
+.rev__objetivo div {
+  display: flex;
+  flex-direction: column;
+}
+
+.rev__objetivo span,
+.rev__etiqueta {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--neutral-600);
+}
+
+.rev__objetivo strong {
+  font-size: 18px;
+  line-height: 28px;
+  color: var(--neutral-950);
+}
+
+.rev__pregunta {
+  padding: 20px 24px;
+}
+
+.rev__pregunta-cab {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.rev__maximo {
+  font-size: 13px;
+  color: var(--neutral-600);
+}
+
+.rev__enunciado {
+  margin: 6px 0 14px;
+  font-size: 18px;
+  line-height: 28px;
+  font-weight: 600;
+  color: var(--neutral-950);
+}
+
+.rev__etiqueta {
+  margin: 0 0 6px;
+}
+
+.rev__respuesta {
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: var(--radio-md);
+  background: var(--neutral-050);
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--neutral-800);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.rev__captura {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: 16px;
+}
+
+.rev__campo--ancho {
+  min-width: 0;
+}
+
+.rev__resultado {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--neutral-100);
+}
+
+.rev__observacion {
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: var(--neutral-800);
+}
+
+.rev__atenuado {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--neutral-600);
+}
+
+.rev__publicar {
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  position: sticky;
+  bottom: 12px;
+}
+
+.rev__nota-prevista {
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  color: var(--neutral-600);
+}
+
+.rev__nota-prevista strong,
+.rev__nota strong {
+  font-size: 28px;
+  line-height: 36px;
+  color: var(--neutral-950);
+}
+
+.rev__nota {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.rev__nota--ok {
+  border-color: var(--exito);
+}
+
+.rev__nota--mal {
+  border-color: var(--error);
+}
+
+.rev__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.rev__alerta-modal {
+  margin: 0 0 16px;
+}
+
+.rev__confirmar {
+  margin: 0 0 16px;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--neutral-800);
+}
+
+@media (max-width: 767px) {
+  .rev__cabecera,
+  .rev__pregunta {
+    padding: 16px;
+  }
+
+  .rev__estado-plazo {
+    align-items: flex-start;
+  }
+
+  .rev__captura {
+    grid-template-columns: 1fr;
+  }
+
+  .rev__publicar {
+    padding: 14px 16px;
+  }
+
+  .rev__publicar .btn,
+  .rev__acciones .btn {
+    width: 100%;
+  }
+}

@@ -6,8 +6,19 @@ import { Session } from '../../../core/session/session';
 import { MatriculaApiService } from '../../matriculas/matricula-api.service';
 import { AlertaGlobalService } from '../../../core/notificaciones/alerta-global.service';
 
+const ETIQUETAS_INGRESO: Record<string, string> = {
+  GRATUITA: 'Gratuita',
+  ADMINISTRADOR: 'Asignación manual',
+  REGISTRADO_MANUAL: 'Pago manual registrado',
+  PAGO_EN_LINEA: 'Pago en línea',
+  EXONERADA: 'Exonerada',
+  EXONERADO: 'Exonerada',
+};
+
 interface CursoActivo {
   id: number;
+  /** El reenvío de la confirmación se pide por matrícula, no por curso. */
+  matriculaId: number;
   imagenUrl: string;
   tipo: string;
   categoria: string;
@@ -20,6 +31,11 @@ interface CursoActivo {
   accesoEfectivo: boolean;
   fechaInicio: string | null;
   estadoNotificacion: string | null;
+  /** HU-047: compra iniciada que Culqi todavía no aprobó. */
+  pagoPendiente: boolean;
+  /** HU-038: el curso fue cancelado por la Escuela. */
+  cursoCancelado: boolean;
+  urlAmigable: string;
 }
 
 @Component({
@@ -57,9 +73,10 @@ export class Panel {
       next: (matriculas) => {
         this.cursosActivos.set(matriculas.map((matricula) => ({
           id: matricula.cursoId,
+          matriculaId: matricula.id,
           imagenUrl: matricula.imagenPortadaUrl ?? '',
           tipo: matricula.modalidad,
-          categoria: matricula.formaIngreso,
+          categoria: ETIQUETAS_INGRESO[matricula.formaIngreso] ?? matricula.formaIngreso,
           nombre: matricula.cursoTitulo,
           porcentajeProgreso: matricula.porcentajeProgreso,
           leccionesCompletadas: matricula.leccionesCompletadas,
@@ -69,6 +86,9 @@ export class Panel {
           accesoEfectivo: matricula.accesoEfectivo,
           fechaInicio: matricula.fechaInicio,
           estadoNotificacion: matricula.estadoNotificacion,
+          pagoPendiente: matricula.estado === 'PENDIENTE_PAGO',
+          cursoCancelado: matricula.cursoCancelado,
+          urlAmigable: matricula.cursoUrlAmigable,
         })));
         this.cargando.set(false);
       },

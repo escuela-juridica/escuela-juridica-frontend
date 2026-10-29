@@ -155,6 +155,10 @@
     </div>
   }
 
+  @if (estadoCodigo === 'PUBLICADO' || estadoCodigo === 'EN_CURSO' || estadoCodigo === 'CANCELADO') {
+    <app-cancelacion-curso [cursoId]="cursoId" [estadoCodigo]="estadoCodigo" (actualizado)="actualizado.emit()" />
+  }
+
   @if (estadoCodigo === 'CERRADO') {
     <div class="card editor-card">
       <div class="alerta alerta--info">

@@ -1,0 +1,84 @@
+<main class="resultado contenedor">
+  @if (cargando()) {
+    <p class="resultado__estado">Consultando tu pago…</p>
+  } @else if (error(); as mensaje) {
+    <div class="estado-vacio">
+      <h3 class="estado-vacio__titulo">{{ mensaje }}</h3>
+      <a class="btn btn--primario" routerLink="/app/panel">Ir a mis cursos</a>
+    </div>
+  } @else if (pago(); as p) {
+    <section class="card resultado__tarjeta" [attr.data-estado]="p.estado" aria-live="polite">
+      <header class="resultado__cabecera">
+        <span class="resultado__icono" aria-hidden="true">
+          @switch (p.estado) {
+            @case ('APROBADO') { ✓ }
+            @case ('PENDIENTE') { … }
+            @default { ✕ }
+          }
+        </span>
+        <div>
+          <p class="resultado__etiqueta">Pedido {{ p.numeroPedido }}</p>
+          <h1 class="resultado__titulo">
+            @switch (p.estado) {
+              @case ('APROBADO') { {{ p.accesoConcedido ? '¡Pago aprobado!' : 'Pago aprobado por Culqi' }} }
+              @case ('PENDIENTE') { Esperando el resultado de Culqi }
+              @case ('RECHAZADO') { Culqi rechazó el pago }
+              @case ('EXPIRADO') { El pago expiró }
+              @default { El pago no se completó }
+            }
+          </h1>
+        </div>
+      </header>
+
+      <p class="resultado__mensaje">{{ p.mensaje }}</p>
+
+      <dl class="resultado__datos">
+        <div><dt>Curso</dt><dd>{{ p.cursoTitulo }}</dd></div>
+        <div><dt>Importe del intento</dt><dd>{{ formatearPrecio(p.importe) }}</dd></div>
+        @if (p.medio) { <div><dt>Medio</dt><dd>{{ p.medio }}</dd></div> }
+        <div><dt>Matrícula</dt><dd>{{ p.estadoMatricula === 'ACTIVA' ? 'Activa' : p.estadoMatricula === 'PENDIENTE_PAGO' ? 'Pendiente de pago' : p.estadoMatricula === 'CANCELADA' ? 'Cancelada' : p.estadoMatricula }}</dd></div>
+      </dl>
+
+      @if (p.estado === 'PENDIENTE') {
+        <div class="alerta alerta--info" role="status">
+          <span class="alerta__icono">i</span>
+          <div><p class="alerta__titulo">Todavía no se concede acceso</p><p class="alerta__texto">Culqi aún no comunica el resultado final. Esta pantalla se actualiza sola; también puedes volver más tarde desde Mis cursos.</p></div>
+        </div>
+      }
+
+      @if (p.estado === 'PENDIENTE' && p.instrucciones; as instrucciones) {
+        <app-instrucciones-qr [instrucciones]="instrucciones" />
+      }
+
+      @if (p.estado === 'APROBADO' && p.accesoConcedido && p.estadoCorreo === 'ERROR') {
+        <div class="alerta alerta--advertencia" role="status">
+          <span class="alerta__icono">!</span>
+          <div><p class="alerta__titulo">Tu matrícula está activa, pero no pudimos enviar el correo</p><p class="alerta__texto">Tu pago y tu acceso no se ven afectados. Puedes reenviar el aviso.</p></div>
+          <button type="button" class="btn btn--secundario" [disabled]="ocupado()" (click)="reenviarAviso()">Reenviar aviso</button>
+        </div>
+      }
+
+      <div class="resultado__acciones">
+        @if (p.estado === 'APROBADO' && p.accesoConcedido) {
+          <a class="btn btn--primario btn--grande" [routerLink]="['/aula', p.cursoId]">Ir a mi curso</a>
+          <a class="btn btn--secundario" routerLink="/app/panel">Mis cursos</a>
+        } @else if (p.puedeReintentar) {
+          <a class="btn btn--primario btn--grande" [routerLink]="['/app/pagar', p.cursoUrlAmigable]">Volver a pagar</a>
+          <a class="btn btn--secundario" routerLink="/catalogo">Ver otros cursos</a>
+        } @else {
+          <a class="btn btn--secundario" routerLink="/app/panel">Ir a mis cursos</a>
+        }
+      </div>
+    </section>
+
+    @if (constancia(); as c) {
+      <section class="card resultado__constancia">
+        <div class="resultado__constancia-cab">
+          <h2 class="resultado__subtitulo">Tu constancia de pago</h2>
+          <button type="button" class="btn btn--secundario" (click)="imprimir()">Imprimir</button>
+        </div>
+        <app-constancia-pago [constancia]="c" />
+      </section>
+    }
+  }
+</main>

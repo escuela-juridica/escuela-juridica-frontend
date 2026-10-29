@@ -10,6 +10,9 @@ import {
   AsignarFirmantesPeticion,
   ActualizarReglasCursoPeticion,
   CambiarDestacadoPeticion,
+  CancelacionAfectado,
+  CancelacionCurso,
+  CancelarCursoPeticion,
   CerrarCursoPeticion,
   CrearCursoPeticion,
   CursoEditorRespuesta,
@@ -99,5 +102,24 @@ export class CursoAdminApiService {
 
   eliminar(cursoId: number): Observable<void> {
     return this.http.delete<void>(`${this.url}/${cursoId}`);
+  }
+
+  // ---------------------------------------------------------------- HU-038 --
+
+  impactoCancelacion(cursoId: number): Observable<CancelacionCurso> {
+    return this.http.get<CancelacionCurso>(`${this.url}/${cursoId}/cancelacion`);
+  }
+
+  cancelarCurso(cursoId: number, peticion: CancelarCursoPeticion): Observable<CancelacionCurso> {
+    return this.http.post<CancelacionCurso>(`${this.url}/${cursoId}/cancelacion/cancelar`, peticion);
+  }
+
+  afectadosCancelacion(cursoId: number, page: number, size: number): Observable<PageResponse<CancelacionAfectado>> {
+    const params = new HttpParams().set('page', page).set('size', size);
+    return this.http.get<PageResponse<CancelacionAfectado>>(`${this.url}/${cursoId}/cancelacion/afectados`, { params });
+  }
+
+  reenviarAvisosCancelacion(cursoId: number): Observable<CancelacionCurso> {
+    return this.http.post<CancelacionCurso>(`${this.url}/${cursoId}/cancelacion/reenviar-avisos`, {});
   }
 }

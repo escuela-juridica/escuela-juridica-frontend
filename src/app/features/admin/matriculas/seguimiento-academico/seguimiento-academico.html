@@ -1,0 +1,227 @@
+<section class="seg">
+  <a class="seg__volver" routerLink="/admin/matriculas">
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6" /></svg>
+    Matrículas
+  </a>
+
+  @if (cargando()) {
+    <p class="seg__estado">Cargando seguimiento…</p>
+  } @else if (error(); as mensaje) {
+    <div class="alerta alerta--error" role="alert">
+      <span class="alerta__icono">!</span>
+      <div class="alerta__titulo">{{ mensaje }}</div>
+    </div>
+  } @else if (detalle(); as d) {
+    <header class="seg__cabecera card">
+      <div class="seg__cabecera-texto">
+        <span class="seg__eyebrow">Seguimiento académico</span>
+        <h1 class="seg__titulo">{{ d.alumno }}</h1>
+        <p class="seg__meta">{{ d.correo }}</p>
+        <p class="seg__meta">
+          <strong>{{ d.curso }}</strong> · {{ etiquetaModalidad(d.modalidad) }} · Matrícula {{ etiquetaEstadoMatricula(d.estadoMatricula) | lowercase }}
+          desde el {{ d.fechaMatricula | date:'dd/MM/yyyy' }}
+        </p>
+      </div>
+      <div class="seg__cabecera-datos">
+        <div class="seg__dato"><span>Progreso</span><strong>{{ d.progreso }} %</strong></div>
+        @if (d.notaFinal !== null) {
+          <div class="seg__dato"><span>Nota final</span><strong>{{ d.notaFinal | number:'1.0-2' }}</strong></div>
+        }
+        @if (d.asistenciaExigida) {
+          <div class="seg__dato"><span>Asistencia</span><strong>{{ d.asistencia === null ? 'No aplica' : d.asistencia + ' %' }}</strong></div>
+        }
+      </div>
+    </header>
+
+    @if (d.certificado; as c) {
+      <div class="alerta alerta--info" role="status">
+        <span class="alerta__icono">i</span>
+        <div>
+          <p class="alerta__titulo">Certificado {{ c.estado === 'VIGENTE' ? 'emitido' : 'anulado' }} · {{ c.codigo }}</p>
+          <p class="alerta__texto">Su nota y nivel están congelados: las correcciones no los recalculan y no se otorgan nuevos intentos calificados.</p>
+        </div>
+      </div>
+    }
+
+    <section class="card seg__avance" aria-labelledby="seg-avance">
+      <h2 id="seg-avance" class="seg__subtitulo">¿Por qué no finaliza?</h2>
+      @if (avance(); as a) { <app-avance-certificado [avance]="a" /> }
+    </section>
+
+    <section class="card seg__pestanas">
+      <div class="seg__tablist" role="tablist" aria-label="Detalle académico">
+        @for (p of pestanas(); track p.id) {
+          <button type="button" role="tab" class="seg__tab" [class.seg__tab--activa]="pestana() === p.id"
+            [attr.aria-selected]="pestana() === p.id" (click)="pestana.set(p.id)">{{ p.etiqueta }}</button>
+        }
+      </div>
+
+      <div class="seg__panel" role="tabpanel">
+        @switch (pestana()) {
+          <!-- ------------------------------------------------ Lecciones -->
+          @case ('lecciones') {
+            @for (m of d.modulos; track m.id) {
+              <h3 class="seg__modulo">{{ m.titulo }}</h3>
+              <ul class="seg__filas">
+                @for (l of m.lecciones; track l.id) {
+                  <li class="seg__fila">
+                    <div class="seg__fila-texto">
+                      <span class="seg__fila-titulo">{{ l.titulo }}</span>
+                      <span class="seg__fila-meta">
+                        {{ l.tipo === 'EN_VIVO' ? 'En vivo' : 'Lección' }}{{ l.obligatoria ? '' : ' · opcional' }}
+                        @if (l.completadaEn) { · completada el {{ l.completadaEn | date:'dd/MM/yyyy' }}@if (etiquetaForma(l.forma)) { ({{ etiquetaForma(l.forma) | lowercase }}) } }
+                        @if (l.motivoBloqueo) { · {{ l.motivoBloqueo }} }
+                      </span>
+                    </div>
+                    <span [class]="'badge ' + claseLeccion(l.estado)">{{ etiquetaLeccion(l.estado) }}</span>
+                  </li>
+                } @empty {
+                  <li class="seg__vacio">Este módulo no tiene lecciones.</li>
+                }
+              </ul>
+            } @empty {
+              <p class="seg__vacio">Este curso todavía no tiene módulos.</p>
+            }
+          }
+
+          <!-- ------------------------------------------------ Exámenes -->
+          @case ('examenes') {
+            @for (e of d.examenes; track e.id) {
+              <article class="seg__examen">
+                <div class="seg__examen-cab">
+                  <div class="seg__fila-texto">
+                    <span class="seg__fila-titulo">{{ e.titulo }}</span>
+                    <span class="seg__fila-meta">
+                      {{ e.modulo ?? 'Evaluación final' }} · {{ e.tipo === 'PRACTICA' ? 'Práctica' : 'Calificado' }}
+                      · intentos {{ e.intentosUsados }}{{ e.intentosMaximos === null ? ' (ilimitados)' : ' de ' + e.intentosMaximos }}
+                      @if (e.mejorNota !== null) { · mejor nota {{ e.mejorNota | number:'1.0-2' }} }
+                    </span>
+                  </div>
+                  <span [class]="'badge ' + claseExamen(e.estado)">{{ etiquetaExamen(e.estado) }}</span>
+                </div>
+
+                @if (e.intentos.length > 0) {
+                  <ul class="seg__intentos">
+                    @for (i of e.intentos; track i.id) {
+                      <li class="seg__intento">
+                        <span>Intento {{ i.numero }}</span>
+                        <span class="seg__fila-meta">{{ (i.enviadoEn ?? i.iniciadoEn) | date:'dd/MM/yyyy h:mm a' | lowercase }}</span>
+                        <strong class="seg__intento-nota">{{ i.nota === null ? '—' : (i.nota | number:'1.0-2') }}</strong>
+                        <span [class]="'badge ' + claseIntento(i)">{{ etiquetaIntento(i) }}</span>
+                      </li>
+                    }
+                  </ul>
+                }
+
+                @if (e.agotadoSinAprobar) {
+                  <p class="seg__aviso">Agotó sus intentos sin aprobar: no puede reintentar ni certificar hasta que se le conceda un intento adicional.</p>
+                }
+                <div class="seg__examen-acciones">
+                  @if (e.puedeOtorgarIntento) {
+                    <button type="button" class="btn btn--secundario" (click)="abrirIntento(e)">Conceder intento adicional</button>
+                  } @else if (e.motivoNoPuedeOtorgar) {
+                    <span class="seg__fila-meta">{{ e.motivoNoPuedeOtorgar }}</span>
+                  }
+                </div>
+              </article>
+            } @empty {
+              <p class="seg__vacio">Este curso no tiene exámenes configurados.</p>
+            }
+          }
+
+          <!-- ------------------------------------------------ Asistencia -->
+          @case ('asistencia') {
+            <ul class="seg__filas">
+              @for (s of d.sesiones; track s.leccionId) {
+                <li class="seg__fila">
+                  <div class="seg__fila-texto">
+                    <span class="seg__fila-titulo">{{ s.titulo }}</span>
+                    <span class="seg__fila-meta">
+                      {{ s.inicio ? formatearFechaHoraCorta(s.inicio) : 'Sin fecha' }}
+                      @if (s.estadoSesion === 'CANCELADA') { · sesión cancelada: no cuenta }
+                      @else if (!s.elegible) { · anterior a su matrícula: no cuenta }
+                      @if (s.motivoCorreccion) { · corregida: “{{ s.motivoCorreccion }}” }
+                    </span>
+                  </div>
+                  <span [class]="'badge ' + claseAsistencia(s.asistencia)">{{ etiquetaAsistencia(s.asistencia) }}</span>
+                  @if (s.puedeCorregir) {
+                    <button type="button" class="btn btn--secundario" (click)="abrirCorreccion(s)">Corregir</button>
+                  }
+                </li>
+              } @empty {
+                <li class="seg__vacio">Este curso todavía no tiene sesiones en vivo.</li>
+              }
+            </ul>
+          }
+
+          <!-- ------------------------------------------------ Excepciones -->
+          @case ('historial') {
+            <ul class="seg__filas">
+              @for (x of d.excepciones; track x.id) {
+                <li class="seg__fila seg__fila--historial">
+                  <div class="seg__fila-texto">
+                    <span class="seg__fila-titulo">{{ etiquetaExcepcion(x.tipo) }}</span>
+                    <span class="seg__fila-meta">
+                      @if (x.valorAnterior || x.valorNuevo) { {{ x.valorAnterior ?? '—' }} → {{ x.valorNuevo ?? '—' }} · }
+                      por {{ x.realizadoPor }} el {{ x.realizadoEn | date:'dd/MM/yyyy h:mm a' | lowercase }}
+                    </span>
+                    <span class="seg__motivo">“{{ x.motivo }}”</span>
+                  </div>
+                </li>
+              } @empty {
+                <li class="seg__vacio">Todavía no hay excepciones registradas para esta matrícula.</li>
+              }
+            </ul>
+          }
+        }
+      </div>
+    </section>
+
+    <!-- ===================================== Modal: intento adicional -->
+    @if (examenAConceder(); as e) {
+      <app-modal titulo="Conceder un intento adicional" (cerrar)="cerrarModal()">
+        @if (errorModal(); as mensaje) {
+          <div class="alerta alerta--error seg__alerta-modal"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div>
+        }
+        <p class="seg__confirmar">Se agregará <strong>un solo intento</strong> a <strong>{{ d.alumno }}</strong> en «{{ e.titulo }}». Sus intentos anteriores se conservan y su nota no cambia.</p>
+        <label class="label" for="seg-motivo-intento">Motivo (obligatorio)</label>
+        <textarea id="seg-motivo-intento" class="input" rows="4" maxlength="1000" [value]="motivo"
+          (input)="escribirMotivo($any($event.target).value)" placeholder="Explica por qué corresponde esta excepción (mínimo 10 caracteres)"></textarea>
+        <div class="editor-form__acciones">
+          <button type="button" class="btn btn--secundario" (click)="cerrarModal()">Cancelar</button>
+          <button type="button" class="btn btn--primario" [disabled]="!motivoValido() || guardando()" (click)="confirmarIntento()">
+            {{ guardando() ? 'Guardando…' : 'Conceder intento' }}
+          </button>
+        </div>
+      </app-modal>
+    }
+
+    <!-- ===================================== Modal: corregir asistencia -->
+    @if (sesionACorregir(); as s) {
+      <app-modal titulo="Corregir asistencia" (cerrar)="cerrarModal()">
+        @if (errorModal(); as mensaje) {
+          <div class="alerta alerta--error seg__alerta-modal"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div>
+        }
+        <p class="seg__confirmar"><strong>{{ d.alumno }}</strong> · {{ s.titulo }}. Hoy figura como <strong>{{ etiquetaAsistencia(s.asistencia) | lowercase }}</strong>. El valor anterior queda en el historial.</p>
+        <label class="label" for="seg-estado">Nuevo estado</label>
+        <select id="seg-estado" class="input" [(ngModel)]="nuevoEstado">
+          <option value="PRESENTE">Presente</option>
+          <option value="AUSENTE">Ausente</option>
+          <option value="JUSTIFICADA">Justificada</option>
+        </select>
+        <label class="label seg__label-motivo" for="seg-motivo-asistencia">Motivo y respaldo (obligatorio)</label>
+        <textarea id="seg-motivo-asistencia" class="input" rows="4" maxlength="1000" [value]="motivo"
+          (input)="escribirMotivo($any($event.target).value)" placeholder="Indica el respaldo de la corrección (mínimo 10 caracteres)"></textarea>
+        @if (d.certificado) {
+          <p class="seg__fila-meta">El certificado ya emitido no se modifica con esta corrección.</p>
+        }
+        <div class="editor-form__acciones">
+          <button type="button" class="btn btn--secundario" (click)="cerrarModal()">Cancelar</button>
+          <button type="button" class="btn btn--primario" [disabled]="!motivoValido() || guardando()" (click)="confirmarCorreccion()">
+            {{ guardando() ? 'Guardando…' : 'Corregir asistencia' }}
+          </button>
+        </div>
+      </app-modal>
+    }
+  }
+</section>

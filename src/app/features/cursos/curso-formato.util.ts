@@ -53,6 +53,25 @@ export function formatearFechaHora(fechaHoraIso: string): string {
   }).format(new Date(fechaHoraIso));
 }
 
+/** "31 de octubre de 2026": una instancia (fecha y hora ISO) mostrada como fecha larga en hora de Lima. */
+export function formatearFechaLarga(fechaHoraIso: string): string {
+  return new Intl.DateTimeFormat('es-PE', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'America/Lima' })
+    .format(new Date(fechaHoraIso));
+}
+
+/** "31 oct 2026, 2:01 p. m.": fecha y hora cortas, en hora de Lima. */
+export function formatearFechaHoraCorta(fechaHoraIso: string): string {
+  return new Intl.DateTimeFormat('es-PE', {
+    day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'America/Lima',
+  }).format(new Date(fechaHoraIso));
+}
+
+/** "31 oct": solo día y mes abreviado, en hora de Lima. */
+export function formatearDiaMes(fechaHoraIso: string): string {
+  return new Intl.DateTimeFormat('es-PE', { day: 'numeric', month: 'short', timeZone: 'America/Lima' })
+    .format(new Date(fechaHoraIso));
+}
+
 export function formatearHora(fechaHoraIso: string): string {
   return new Intl.DateTimeFormat('es-PE', {
     hour: 'numeric',
@@ -67,6 +86,30 @@ export function formatearPrecio(monto: number): string {
     currency: 'PEN',
     minimumFractionDigits: 2,
   }).format(monto);
+}
+
+/**
+ * Billeteras digitales de Culqi (Plin y otras, que se pagan con QR por PagoEfectivo). Desactivadas mientras el
+ * simulador de pruebas de Culqi no marque como pagada la orden en su API; ponerlo en `true` las vuelve a ofrecer.
+ */
+export const BILLETERAS_HABILITADAS = false;
+
+/** Culqi solo permite pagar con billeteras (Plin y otras) hasta S/ 500. */
+export const LIMITE_BILLETERA_SOLES = 500;
+
+/**
+ * Medios con los que se paga un curso de ese precio en Culqi Checkout: tarjeta y Yape siempre; Plin y las demás
+ * billeteras solo si están habilitadas y el monto no supera su límite.
+ */
+export function mediosDePago(precio: number): string[] {
+  const conBilletera = BILLETERAS_HABILITADAS && precio <= LIMITE_BILLETERA_SOLES;
+  return ['Tarjeta de crédito o débito', 'Yape', ...(conBilletera ? ['Plin'] : [])];
+}
+
+/** Los medios en una frase: "Yape", "tarjeta o Yape" o "Yape o Plin". */
+export function descripcionMedios(precio: number): string {
+  const medios = mediosDePago(precio).map((m) => (m.startsWith('Tarjeta') ? 'tarjeta' : m));
+  return medios.length > 1 ? `${medios.slice(0, -1).join(', ')} o ${medios[medios.length - 1]}` : medios[0];
 }
 
 export function formatearDuracion(segundos: number): string {

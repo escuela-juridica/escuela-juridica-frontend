@@ -1,0 +1,67 @@
+@let f = ficha();
+<header class="ficha-hero">
+  <span class="ficha-hero__icono" aria-hidden="true">
+    <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg>
+  </span>
+  <div class="ficha-hero__texto">
+    <div class="ficha-hero__chips">
+      <span class="ficha-hero__ruta">{{ f.modulo ? f.modulo + ' · Examen del módulo' : 'Examen final' }}</span>
+      <span class="ficha-hero__chip">{{ f.tipo === 'PRACTICA' ? 'Práctica' : 'Calificado' }}</span>
+    </div>
+    <h1 class="ficha-hero__titulo">{{ f.titulo }}</h1>
+    @if (f.descripcion) { <p class="ficha-hero__descripcion">{{ f.descripcion }}</p> }
+  </div>
+  @if (f.mejorNota !== null) {
+    <div class="ficha-hero__nota">
+      <app-anillo-progreso [valor]="f.mejorNota * 5" [texto]="'' + (f.mejorNota | number:'1.0-2')" [tamano]="92" [grosor]="9" tono="oscuro"
+        [estado]="f.aprobado ? 'exito' : 'normal'" etiqueta="mejor nota" descripcion="Mejor nota" />
+    </div>
+  }
+</header>
+
+@if (f.soloLectura) {
+  <div class="alerta alerta--info" role="status">
+    <span class="alerta__icono">i</span>
+    <div><p class="alerta__titulo">Curso cancelado</p><p class="alerta__texto">Puedes consultar el examen, pero ya no se rinde.</p></div>
+  </div>
+} @else if (f.agotadoSinAprobar) {
+  <div class="alerta alerta--error" role="alert">
+    <span class="alerta__icono">!</span>
+    <div><p class="alerta__titulo">No puedes seguir intentando</p><p class="alerta__texto">{{ f.motivoNoPuedeIniciar }}</p></div>
+  </div>
+} @else if (f.motivoNoPuedeIniciar) {
+  <div class="alerta alerta--info" role="status">
+    <span class="alerta__icono">i</span>
+    <div><p class="alerta__titulo">{{ f.habilitado ? 'Por ahora no puedes iniciar otro intento' : 'Este examen aún no está habilitado' }}</p><p class="alerta__texto">{{ f.motivoNoPuedeIniciar }}</p></div>
+  </div>
+} @else if (f.aprobado) {
+  <div class="alerta alerta--exito" role="status">
+    <span class="alerta__icono">✓</span>
+    <div><p class="alerta__titulo">Aprobaste este examen</p><p class="alerta__texto">Tu mejor nota es {{ f.mejorNota | number:'1.0-2' }}.@if (f.bloqueaSiguienteModulo) { Ya puedes continuar con el siguiente módulo. }</p></div>
+  </div>
+}
+
+<section class="indicadores" aria-label="Reglas del examen">
+  <div class="indicador">
+    <span class="indicador__icono"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13" /><path d="M3 6h.01M3 12h.01M3 18h.01" /></svg></span>
+    <span class="indicador__valor">{{ f.totalPreguntas }}</span>
+    <span class="indicador__etiqueta">Preguntas · {{ f.puntajeTotal | number:'1.0-2' }} pts</span>
+  </div>
+  <div class="indicador">
+    <span class="indicador__icono"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8" /><path d="M12 9v4l2 2M9 2h6" /></svg></span>
+    <span class="indicador__valor">{{ f.tiempoLimiteMinutos ? f.tiempoLimiteMinutos + ' min' : 'Libre' }}</span>
+    <span class="indicador__etiqueta">Tiempo límite</span>
+  </div>
+  <div class="indicador">
+    <span class="indicador__icono"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 2l4 4-4 4" /><path d="M3 11V9a3 3 0 0 1 3-3h15" /><path d="M7 22l-4-4 4-4" /><path d="M21 13v2a3 3 0 0 1-3 3H3" /></svg></span>
+    <span class="indicador__valor">{{ f.intentosMaximos === null ? '∞' : f.intentosUsados + ' / ' + f.intentosMaximos }}</span>
+    <span class="indicador__etiqueta">{{ f.intentosMaximos === null ? 'Intentos ilimitados' : 'Intentos usados' }}</span>
+  </div>
+  @if (f.tipo === 'CALIFICADO') {
+    <div class="indicador">
+      <span class="indicador__icono"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="5" /><circle cx="12" cy="12" r="1" /></svg></span>
+      <span class="indicador__valor">{{ f.notaMinima | number:'1.0-2' }}</span>
+      <span class="indicador__etiqueta">Nota mínima de 20</span>
+    </div>
+  }
+</section>

@@ -68,7 +68,7 @@ export class Acceso {
 
   private navegarSegunRol(rol: 'ALUMNO' | 'ADMINISTRADOR'): void {
     // HU-008: por ahora el panel de administrador solo tiene "Usuarios" implementado.
-    void this.router.navigate([rol === 'ADMINISTRADOR' ? '/admin/usuarios' : '/app/panel']);
+    void this.router.navigate([rol === 'ADMINISTRADOR' ? '/admin/dashboard' : '/app/panel']);
   }
 
   private manejarError(error: HttpErrorResponse, correo: string): void {

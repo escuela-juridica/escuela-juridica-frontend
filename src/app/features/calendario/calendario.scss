@@ -1,0 +1,389 @@
+// HU-026 · Calendario de sesiones en vivo del alumno — grilla mensual tipo Google Calendar
+// (FullCalendar v7, sin theme: ver nota abajo sobre por qué se estiliza con ::ng-deep).
+
+// Mismo tamaño de título de pantalla que Panel y Mi perfil (28/36 px), en escritorio y móvil.
+.calendario-titulo {
+  font-size: 28px;
+  line-height: 36px;
+  color: var(--neutral-950);
+  margin: 0 0 8px;
+}
+
+.calendario-subtitulo {
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--neutral-600);
+  margin: 0 0 24px;
+}
+
+.calendario-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.calendario-nav__flecha {
+  padding: 0;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.calendario-nav__centro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 200px;
+}
+
+.calendario-nav__mes {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--neutral-950);
+  text-align: center;
+}
+
+.calendario-nav__hoy {
+  min-height: 44px;
+  padding: 0 14px;
+  font-size: 13px;
+}
+
+// FullCalendar v7 pinta su grilla con <div> y clases hasheadas por build (no hay <table>/<th>/<td>
+// ni clases estables tipo .fc-day-today), y fuera del motor de templates de Angular, así que se
+// estiliza con ::ng-deep apoyándose en los atributos ARIA role (estables por accesibilidad) y en
+// las clases propias que calendario.ts inyecta vía dayCellDidMount/eventDidMount.
+.calendario-grilla {
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radio-lg);
+  overflow: hidden;
+  background: var(--blanco);
+  margin-bottom: 8px;
+
+  ::ng-deep full-calendar {
+    display: block;
+    font-family: var(--fuente-interfaz);
+  }
+
+  // Encabezado de días de la semana.
+  ::ng-deep [role='columnheader'] {
+    // FullCalendar fija padding/border en 0 con más fuerza que una regla normal: !important.
+    padding: 10px 4px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--neutral-600);
+    background: var(--neutral-050);
+    border-bottom: 1px solid var(--neutral-200) !important;
+    border-right: 1px solid var(--neutral-200) !important;
+  }
+
+  ::ng-deep [role='columnheader']:last-child {
+    border-right: 0 !important;
+  }
+
+  // Celdas de día.
+  ::ng-deep [role='cell'] {
+    min-height: 112px;
+    padding: 2px 4px 6px !important;
+    border-right: 1px solid var(--neutral-200) !important;
+    border-bottom: 1px solid var(--neutral-200) !important;
+    color: var(--neutral-800);
+  }
+
+  ::ng-deep [role='cell']:last-child {
+    border-right: 0 !important;
+  }
+
+  ::ng-deep [role='rowgroup'] > [role='row']:last-child > [role='cell'] {
+    border-bottom: 0 !important;
+  }
+
+  // Número del día: centrado arriba, como Google Calendar.
+  ::ng-deep [role='cell'] > [role='presentation']:first-child > div:last-child {
+    width: 26px;
+    height: 26px;
+    margin: 4px auto 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1;
+  }
+
+  ::ng-deep .calendario-dia-otro-mes {
+    background: var(--neutral-050);
+    color: var(--neutral-400);
+  }
+
+  // Hoy: círculo de color de marca sobre el número, y un leve fondo en la celda.
+  ::ng-deep .calendario-dia-hoy {
+    background: var(--acento-050);
+    color: var(--neutral-800);
+  }
+
+  ::ng-deep .calendario-dia-hoy > [role='presentation']:first-child > div:last-child {
+    background: var(--marca-900);
+    color: var(--blanco);
+    font-weight: 700;
+  }
+
+  // Chips de sesión: hora + título en una línea, colores por estado vía --fc-event-*.
+  ::ng-deep .calendario-evento {
+    display: block;
+    border: none !important;
+    border-left: 3px solid var(--fc-event-contrast-color) !important;
+    border-radius: var(--radio-sm);
+    padding: 2px 6px;
+    margin: 0 0 3px;
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    background-color: var(--fc-event-color);
+    color: var(--fc-event-contrast-color);
+  }
+
+  ::ng-deep .calendario-evento > div {
+    display: flex;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  ::ng-deep .calendario-evento > div > div:first-child {
+    flex: none;
+    font-weight: 700;
+  }
+
+  ::ng-deep .calendario-evento > div > div:last-child {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  ::ng-deep .calendario-evento--cancelado {
+    opacity: 0.8;
+  }
+
+  ::ng-deep .calendario-evento--cancelado > div > div:last-child {
+    text-decoration: line-through;
+  }
+
+  ::ng-deep .calendario-evento:hover {
+    filter: brightness(0.96);
+  }
+
+  ::ng-deep .calendario-evento:focus-visible {
+    outline: 2px solid var(--marca-700);
+    outline-offset: 1px;
+  }
+}
+
+.calendario-estado {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--neutral-600);
+  text-align: center;
+  margin: 0;
+}
+
+.calendario-estado--error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: var(--error);
+}
+
+.calendario-estado--pista {
+  color: var(--neutral-500);
+}
+
+// Contenido del modal de detalle de sesión (abierto al hacer click en un evento de la grilla).
+.modal-sesion__titulo {
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 600;
+  color: var(--neutral-950);
+  margin: 0 0 6px;
+}
+
+.modal-sesion__horario {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--neutral-600);
+  margin: 0 0 12px;
+}
+
+.modal-sesion__badge {
+  margin-bottom: 20px;
+}
+
+.modal-sesion__boton {
+  width: 100%;
+}
+
+.modal-sesion__nota {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--neutral-600);
+}
+
+
+@media (max-width: 560px) {
+  .calendario-grilla ::ng-deep [role='cell'] {
+    min-height: 72px;
+    padding: 1px 2px 4px;
+  }
+
+  .calendario-grilla ::ng-deep [role='columnheader'] {
+    font-size: 12px;
+    padding: 8px 0;
+  }
+
+  // En pantallas angostas la sesión no cabe como texto: se muestra como un punto del color de
+  // su estado (tocarlo abre el detalle), igual que en la app móvil de Google Calendar.
+  .calendario-grilla ::ng-deep .calendario-evento {
+    width: 9px;
+    height: 9px;
+    min-height: 0;
+    margin: 2px auto 0;
+    padding: 0;
+    border-radius: 50%;
+    border: none !important;
+    background-color: var(--fc-event-contrast-color);
+    overflow: hidden;
+  }
+
+  .calendario-grilla ::ng-deep .calendario-evento > div {
+    display: none;
+  }
+}
+
+// Guía §26 — alternar entre Mes y Lista (vistas alternas, nunca ambas a la vez).
+.calendario-vistas {
+  display: flex;
+  width: fit-content;
+  margin: 0 auto 16px;
+  padding: 4px;
+  gap: 4px;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radio-md);
+  background: var(--blanco);
+}
+
+.calendario-vistas__boton {
+  min-height: 44px;
+  min-width: 88px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--radio-sm);
+  background: transparent;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  color: var(--neutral-600);
+  cursor: pointer;
+}
+
+.calendario-vistas__boton:hover {
+  color: var(--marca-900);
+}
+
+.calendario-vistas__boton--activo,
+.calendario-vistas__boton--activo:hover {
+  background: var(--marca-900);
+  color: var(--blanco);
+}
+
+.calendario-oculto {
+  display: none;
+}
+
+// Vista Lista: sesiones del mes agrupadas por día.
+.calendario-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.calendario-lista__dia {
+  margin: 14px 0 0;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 700;
+  color: var(--neutral-950);
+}
+
+.calendario-lista__sesion {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 60px;
+  padding: 12px 16px;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.calendario-lista__sesion:hover {
+  box-shadow: var(--sombra-sm);
+}
+
+.calendario-lista__hora {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 700;
+  color: var(--celeste-700);
+  white-space: nowrap;
+}
+
+.calendario-lista__info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.calendario-lista__titulo {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--neutral-950);
+}
+
+.calendario-lista__curso {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--neutral-600);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 560px) {
+  .calendario-lista__sesion {
+    grid-template-columns: 80px minmax(0, 1fr);
+  }
+
+  .calendario-lista__sesion .badge {
+    grid-column: 2;
+    justify-self: start;
+  }
+}

@@ -45,13 +45,13 @@
 
     <aside class="admin-sidebar" [class.admin-sidebar--abierto]="menuMovilAbierto()">
       <nav class="admin-sidebar__nav">
-        <span class="admin-sidebar__item admin-sidebar__item--deshabilitado" title="Dashboard">
+        <a routerLink="/admin/dashboard" routerLinkActive="admin-sidebar__item--activo" class="admin-sidebar__item" title="Dashboard" (click)="cerrarMenuMovil()">
           <svg class="admin-sidebar__icono" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M3 11l9-8 9 8" />
             <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
           </svg>
           <span class="admin-sidebar__etiqueta">Dashboard</span>
-        </span>
+        </a>
 
         <a routerLink="/admin/cursos" routerLinkActive="admin-sidebar__item--activo" class="admin-sidebar__item" title="Cursos" (click)="cerrarMenuMovil()">
           <svg class="admin-sidebar__icono" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -79,29 +79,29 @@
           <span class="admin-sidebar__etiqueta">Matrículas y pagos</span>
         </a>
 
-        <span class="admin-sidebar__item admin-sidebar__item--deshabilitado" title="Operación académica">
+        <a routerLink="/admin/evaluaciones" routerLinkActive="admin-sidebar__item--activo" class="admin-sidebar__item" title="Operación académica" (click)="cerrarMenuMovil()">
           <svg class="admin-sidebar__icono" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M9 2h6a1 1 0 0 1 1 1v1H8V3a1 1 0 0 1 1-1z" />
             <rect x="5" y="4" width="14" height="18" rx="2" />
             <path d="M9 12l2 2 4-4" />
           </svg>
           <span class="admin-sidebar__etiqueta">Operación académica</span>
-        </span>
+        </a>
 
-        <span class="admin-sidebar__item admin-sidebar__item--deshabilitado" title="Certificados">
+        <a routerLink="/admin/certificados" routerLinkActive="admin-sidebar__item--activo" class="admin-sidebar__item" title="Certificados" (click)="cerrarMenuMovil()">
           <svg class="admin-sidebar__icono" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="8" r="6" />
             <path d="M9 13.5L7 22l5-3 5 3-2-8.5" />
           </svg>
           <span class="admin-sidebar__etiqueta">Certificados</span>
-        </span>
+        </a>
 
-        <span class="admin-sidebar__item admin-sidebar__item--deshabilitado" title="Reclamaciones">
+        <a routerLink="/admin/reclamaciones" routerLinkActive="admin-sidebar__item--activo" class="admin-sidebar__item" title="Reclamaciones" (click)="cerrarMenuMovil()">
           <svg class="admin-sidebar__icono" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
           </svg>
           <span class="admin-sidebar__etiqueta">Reclamaciones</span>
-        </span>
+        </a>
 
         <a routerLink="/admin/reportes/matriculas" routerLinkActive="admin-sidebar__item--activo" class="admin-sidebar__item" title="Reportes" (click)="cerrarMenuMovil()">
           <svg class="admin-sidebar__icono" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

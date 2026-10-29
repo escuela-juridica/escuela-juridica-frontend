@@ -5,7 +5,7 @@ export interface Matricula {
   cursoUrlAmigable: string;
   imagenPortadaUrl: string | null;
   modalidad: 'VIRTUAL' | 'EN_VIVO' | 'HIBRIDO';
-  estado: 'ACTIVA' | 'CANCELADA' | 'FINALIZADA' | 'VENCIDA';
+  estado: 'ACTIVA' | 'CANCELADA' | 'FINALIZADA' | 'VENCIDA' | 'PENDIENTE_PAGO';
   formaIngreso: string;
   fechaMatricula: string;
   fechaActivacion: string | null;
@@ -19,6 +19,8 @@ export interface Matricula {
   totalLecciones: number;
   siguienteLeccion: string;
   estadoNotificacion: string | null;
+  /** HU-038: el curso fue cancelado por la Escuela. */
+  cursoCancelado: boolean;
 }
 
 export interface MatriculaAdministrativa {

@@ -1,0 +1,54 @@
+<div class="serie">
+  <svg class="serie__svg" [attr.width]="ancho()" [attr.height]="alto" [attr.viewBox]="'0 0 ' + ancho() + ' ' + alto" role="img" [attr.aria-label]="descripcion()">
+    <defs>
+      <linearGradient [attr.id]="idDegradado" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" [attr.stop-color]="color()" [attr.stop-opacity]="tipo() === 'area' ? 0.32 : 1" />
+        <stop offset="100%" [attr.stop-color]="color()" [attr.stop-opacity]="tipo() === 'area' ? 0.02 : 0.62" />
+      </linearGradient>
+    </defs>
+    <g [attr.transform]="'translate(' + margen.izquierda + ',' + margen.arriba + ')'">
+      @for (m of marcasY(); track m.y) {
+        <line class="serie__rejilla" [class.serie__rejilla--base]="m.valor === 0" x1="0" [attr.x2]="planoAncho()" [attr.y1]="m.y" [attr.y2]="m.y" />
+        <text class="serie__eje" x="-8" [attr.y]="m.y + 4" text-anchor="end">{{ etiquetaEje(m.valor) }}</text>
+      }
+
+      @if (tipo() === 'area') {
+        <path [attr.d]="relleno()" [attr.fill]="'url(#' + idDegradado + ')'" />
+        <path [attr.d]="linea()" fill="none" [attr.stroke]="color()" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+      } @else {
+        @for (c of columnas(); track $index) {
+          @if (c.trazo) { <path [attr.d]="c.trazo" [attr.fill]="'url(#' + idDegradado + ')'" [attr.opacity]="indiceActivo() === null || indiceActivo() === $index ? 1 : 0.55" /> }
+        }
+      }
+
+      @for (e of etiquetasX(); track e.i) {
+        <text class="serie__eje" [attr.x]="e.x" [attr.y]="planoAlto + 20" text-anchor="middle">{{ e.texto }}</text>
+      }
+
+      @if (pico(); as p) {
+        @if (tipo() === 'area') { <circle [attr.cx]="p.x" [attr.cy]="p.y" r="4" [attr.fill]="color()" class="serie__punto" /> }
+        <text class="serie__valor" [attr.x]="p.x" [attr.y]="p.y - 10" text-anchor="middle">{{ p.texto }}</text>
+      }
+
+      @if (activo(); as a) {
+        <line class="serie__guia" [attr.x1]="a.x" [attr.x2]="a.x" y1="0" [attr.y2]="planoAlto" />
+        @if (tipo() === 'area') { <circle [attr.cx]="a.x" [attr.cy]="a.y" r="5" [attr.fill]="color()" class="serie__punto" /> }
+      }
+
+      <rect class="serie__captura" x="0" y="0" [attr.width]="planoAncho()" [attr.height]="planoAlto"
+        (pointermove)="mover($event)" (pointerleave)="salir()" />
+    </g>
+  </svg>
+
+  @if (vacio()) {
+    <p class="serie__vacio"><span>Sin datos en este periodo.</span></p>
+  }
+
+  @if (activo(); as a) {
+    <div class="serie__tip" role="status"
+      [style.left.px]="margen.izquierda + a.x" [class.serie__tip--derecha]="a.x > planoAncho() * 0.6">
+      <strong>{{ a.texto }}</strong>
+      <span><i class="serie__llave" [style.background]="color()"></i>{{ nombre() }} · {{ a.etiqueta }}</span>
+    </div>
+  }
+</div>

@@ -1,0 +1,30 @@
+<nav class="card examen__navegador" aria-label="Navegación entre preguntas">
+  <div class="examen__navegador-cab">
+    <span>{{ respondidas().size }} de {{ preguntas().length }} respondidas</span>
+    <span class="examen__guardado" [attr.data-estado]="guardado()" aria-live="polite">
+      @switch (guardado()) {
+        @case ('guardando') { Guardando… }
+        @case ('ok') { ✓ Guardado }
+        @case ('error') { No se pudo guardar; reintentaremos al enviar }
+      }
+    </span>
+  </div>
+  <ol class="examen__numeros">
+    @for (p of preguntas(); track p.id; let i = $index) {
+      <li>
+        <button type="button" class="examen__numero"
+          [class.examen__numero--actual]="i === indice()"
+          [class.examen__numero--respondida]="respondidas().has(p.id)"
+          [class.examen__numero--marcada]="marcadas().has(p.id)"
+          [attr.aria-current]="i === indice() ? 'step' : null"
+          [attr.aria-label]="'Pregunta ' + (i + 1) + (respondidas().has(p.id) ? ', respondida' : ', sin responder') + (marcadas().has(p.id) ? ', marcada para revisar' : '')"
+          (click)="ir.emit(i)">{{ i + 1 }}</button>
+      </li>
+    }
+  </ol>
+  <p class="examen__leyenda">
+    <span><i class="examen__muestra examen__muestra--respondida"></i> Respondida</span>
+    <span><i class="examen__muestra"></i> Sin responder</span>
+    <span><i class="examen__muestra examen__muestra--marcada"></i> Para revisar</span>
+  </p>
+</nav>

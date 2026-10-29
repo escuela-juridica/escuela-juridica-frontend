@@ -1,0 +1,147 @@
+<section class="exc">
+  <header class="exc__cabecera">
+    <h1 class="exc__titulo">Excepciones de matrículas y pagos</h1>
+    <p>Sobrecupos y pagos aprobados tarde o después de cancelar el curso o la matrícula. La Escuela resuelve la comunicación o la devolución por su propio canal y aquí registra qué atención brindó; ESEJUR no devuelve dinero ni cambia el resultado de Culqi.</p>
+  </header>
+
+  <div class="exc__filtros">
+    <input class="input" [(ngModel)]="texto" (keyup.enter)="buscar()" placeholder="Alumno, correo o curso" aria-label="Buscar" />
+    <select class="input" [(ngModel)]="estado" (ngModelChange)="buscar()" aria-label="Estado">
+      <option value="">Cualquier estado</option>
+      <option value="PENDIENTE">Pendientes</option>
+      <option value="ATENDIDO">Atendidas</option>
+    </select>
+    <select class="input" [(ngModel)]="tipo" (ngModelChange)="buscar()" aria-label="Tipo de excepción">
+      <option value="">Cualquier tipo</option>
+      <option value="SOBRECUPO">Sobrecupo</option>
+      <option value="PAGO_TARDIO">Resultado tardío o contradictorio</option>
+      <option value="CURSO_CANCELADO">Pago tras cancelar el curso</option>
+      <option value="MATRICULA_CANCELADA">Pago tras cancelar la matrícula</option>
+    </select>
+    <button type="button" class="btn btn--acento" (click)="buscar()">Buscar</button>
+    <button type="button" class="btn btn--secundario" (click)="limpiar()">Limpiar</button>
+  </div>
+
+  @if (cargando()) {
+    <p>Cargando…</p>
+  } @else if (error(); as mensaje) {
+    <div class="alerta alerta--error" role="alert"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div>
+  } @else if (filas().length === 0) {
+    <div class="estado-vacio">
+      <h3 class="estado-vacio__titulo">No hay excepciones con esos filtros</h3>
+      <p class="estado-vacio__texto">Cuando un pago llegue tarde o un curso supere su cupo, aparecerá aquí.</p>
+    </div>
+  } @else {
+    <p class="exc__resumen">{{ totalFilas() }} {{ totalFilas() === 1 ? 'excepción' : 'excepciones' }}</p>
+    <div class="exc__tabla">
+      <table>
+        <thead>
+          <tr><th>Excepción</th><th>Alumno y curso</th><th>Pago</th><th>Estado</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+          @for (fila of filas(); track fila.id) {
+            <tr>
+              <td><strong>{{ etiquetaTipo(fila.tipo) }}</strong><small>{{ fila.creadoEn | date:'dd/MM/yyyy HH:mm' }}</small></td>
+              <td><strong>{{ fila.alumno }}</strong><small>{{ fila.correo }}</small><small>{{ fila.curso }}</small></td>
+              <td>
+                @if (fila.pago; as p) { <strong>{{ p.numeroPedido }}</strong><small>{{ formatearPrecio(p.importe) }} · {{ p.estado }}</small> }
+                @else { <span class="exc__atenuado">—</span> }
+              </td>
+              <td>
+                @if (fila.estado === 'PENDIENTE') { <span class="badge badge--advertencia-suave">Pendiente</span> }
+                @else { <span class="badge badge--disp-inmediato">Atendida</span> }
+              </td>
+              <td><button type="button" class="btn btn--secundario" (click)="revisar(fila)">{{ fila.estado === 'PENDIENTE' ? 'Revisar y atender' : 'Ver atención' }}</button></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (totalPaginas() > 1) {
+      <div class="exc__paginacion">
+        <button type="button" class="btn btn--secundario" [disabled]="pagina() === 0" (click)="irAPagina(pagina() - 1)">Anterior</button>
+        <span>Página {{ pagina() + 1 }} de {{ totalPaginas() }}</span>
+        <button type="button" class="btn btn--secundario" [disabled]="pagina() + 1 >= totalPaginas()" (click)="irAPagina(pagina() + 1)">Siguiente</button>
+      </div>
+    }
+  }
+
+  @if (seleccionada(); as e) {
+    <app-modal [titulo]="etiquetaTipo(e.tipo)" ancho="lg" (cerrar)="cerrar()">
+      @if (errorModal(); as mensaje) {
+        <div class="alerta alerta--error" role="alert"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div>
+      }
+      <p class="exc__descripcion">{{ e.descripcion }}</p>
+
+      @if (cargandoDetalle()) {
+        <p>Cargando detalle…</p>
+      } @else {
+        <div class="exc__bloques">
+          <section class="exc__bloque">
+            <h3>Pago</h3>
+            @if (e.pago; as p) {
+              <dl>
+                <div><dt>Pedido</dt><dd>{{ p.numeroPedido }}</dd></div>
+                <div><dt>Resultado de Culqi</dt><dd>{{ p.estado }} <small>(no se modifica)</small></dd></div>
+                <div><dt>Importe</dt><dd>{{ formatearPrecio(p.importe) }}</dd></div>
+                <div><dt>Referencia</dt><dd>{{ p.referencia ?? '—' }}</dd></div>
+                <div><dt>Resultado el</dt><dd>{{ p.resultadoEn ? (p.resultadoEn | date:'dd/MM/yyyy HH:mm') : '—' }}</dd></div>
+              </dl>
+            } @else { <p class="exc__atenuado">Sin pago asociado.</p> }
+          </section>
+          <section class="exc__bloque">
+            <h3>Matrícula y acceso</h3>
+            @if (e.matricula; as m) {
+              <dl>
+                <div><dt>Matrícula</dt><dd>{{ etiquetaMatricula(m.estado) }}</dd></div>
+                <div><dt>Acceso al curso</dt><dd>{{ m.acceso === 'CONCEDIDO' ? 'Concedido' : 'Sin acceso' }}</dd></div>
+                <div><dt>Alumno</dt><dd>{{ e.alumno }}</dd></div>
+              </dl>
+            }
+          </section>
+          <section class="exc__bloque">
+            <h3>Cupo del curso</h3>
+            @if (e.cursoDetalle; as c) {
+              <dl>
+                <div><dt>Curso</dt><dd>{{ e.curso }}</dd></div>
+                <div><dt>Estado</dt><dd>{{ c.estado ?? '—' }}</dd></div>
+                <div><dt>Cupo</dt><dd>{{ c.matriculasActivas }} de {{ c.cupoMaximo ?? 'sin límite' }}@if (c.sobrecupo) { <span class="badge badge--disp-cancelado">Sobrecupo</span> }</dd></div>
+              </dl>
+            }
+          </section>
+        </div>
+
+        @if (e.relacionados.length > 0) {
+          <section class="exc__bloque exc__bloque--ancho">
+            <h3>Pagos aprobados que originan el sobrecupo</h3>
+            <ul class="exc__relacionados">
+              @for (r of e.relacionados; track r.pagoId) { <li><strong>{{ r.alumno }}</strong> · {{ r.numeroPedido }} · {{ formatearPrecio(r.importe) }} · {{ r.estado }}</li> }
+            </ul>
+          </section>
+        }
+
+        @if (e.estado === 'ATENDIDO') {
+          <div class="alerta alerta--exito" role="status">
+            <span class="alerta__icono">✓</span>
+            <div>
+              <p class="alerta__titulo">Atención registrada el {{ e.atendidoEn | date:'dd/MM/yyyy HH:mm' }} por {{ e.atendidoPor ?? '—' }}</p>
+              <p class="alerta__texto">{{ e.resultado }}</p>
+            </div>
+          </div>
+        } @else {
+          <form [formGroup]="formulario" (ngSubmit)="atender()" novalidate>
+            <label class="label" for="ex-resultado">Atención brindada</label>
+            <textarea id="ex-resultado" class="input" rows="3" formControlName="resultado" [class.input--error]="invalido()"
+              placeholder="Qué se comunicó o resolvió con el alumno fuera de ESEJUR (queda registrado con tu nombre y la fecha)."></textarea>
+            @if (invalido()) { <p class="campo-error">Describe la atención (mínimo 10 caracteres).</p> }
+            <div class="editor-form__acciones">
+              <button type="button" class="btn btn--secundario" [disabled]="guardando()" (click)="cerrar()">Cerrar</button>
+              <button type="submit" class="btn btn--acento" [disabled]="guardando()">{{ guardando() ? 'Guardando…' : 'Registrar atención' }}</button>
+            </div>
+          </form>
+        }
+      }
+    </app-modal>
+  }
+</section>

@@ -1,0 +1,113 @@
+// ng-select (select con búsqueda): tema por defecto de la librería ajustado a los campos del proyecto,
+// con la misma altura, borde, radio y anillo de foco que `.input`. El panel desplegable se anexa al <body>
+// (appendTo="body"), por eso estas reglas son globales.
+
+.ng-select {
+  width: 100%;
+  font-size: 16px;
+  color: var(--input-texto);
+
+  // La variante «single» del tema fija 36 px de alto: se iguala a la de `.input` (48 px) con la misma especificidad.
+  .ng-select-container,
+  &.ng-select-single .ng-select-container {
+    min-height: var(--input-alto);
+    height: var(--input-alto);
+    border: 1px solid var(--input-borde);
+    border-radius: var(--radio-md);
+    background: var(--input-fondo);
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+
+  .ng-select-container .ng-value-container {
+    padding-left: 14px;
+    align-items: center;
+  }
+
+  .ng-select-container .ng-value-container .ng-placeholder {
+    color: var(--input-placeholder);
+  }
+
+  .ng-select-container .ng-value-container .ng-input,
+  &.ng-select-single .ng-select-container .ng-value-container .ng-input {
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    padding-left: 14px;
+  }
+
+  .ng-select-container .ng-value-container .ng-input > input {
+    font-size: 16px;
+    color: var(--input-texto);
+  }
+
+  &.ng-select-focused:not(.ng-select-opened) > .ng-select-container,
+  &.ng-select-opened > .ng-select-container {
+    border-color: var(--input-borde-foco);
+    box-shadow: 0 0 0 3px var(--input-anillo-foco);
+  }
+
+  &.ng-select-opened > .ng-select-container {
+    background: var(--input-fondo);
+  }
+
+  // El área de escritura ocupa todo el alto: los botones de quitar y abrir deben quedar por encima para recibir el clic.
+  .ng-clear-wrapper,
+  .ng-arrow-wrapper {
+    position: relative;
+    z-index: 2;
+  }
+
+  .ng-clear-wrapper {
+    color: var(--neutral-500);
+  }
+
+  .ng-clear-wrapper:hover .ng-clear {
+    color: var(--error);
+  }
+
+  .ng-arrow-wrapper .ng-arrow {
+    border-top-color: var(--neutral-500);
+  }
+}
+
+// Panel de opciones.
+.ng-dropdown-panel {
+  margin-top: 4px;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radio-md);
+  background: var(--blanco);
+  box-shadow: var(--sombra-md);
+  font-family: var(--fuente-interfaz);
+  overflow: hidden;
+
+  .ng-dropdown-panel-items .ng-option {
+    padding: 10px 14px;
+    font-size: 15px;
+    line-height: 22px;
+    color: var(--neutral-800);
+  }
+
+  .ng-dropdown-panel-items .ng-option.ng-option-marked {
+    background: var(--acento-100);
+    color: var(--marca-900);
+  }
+
+  .ng-dropdown-panel-items .ng-option.ng-option-selected,
+  .ng-dropdown-panel-items .ng-option.ng-option-selected.ng-option-marked {
+    background: color-mix(in srgb, var(--marca-700) 10%, #fff);
+    color: var(--marca-900);
+    font-weight: 600;
+  }
+
+  .ng-dropdown-panel-items .ng-option .ng-option-label {
+    overflow-wrap: anywhere;
+  }
+
+  .ng-dropdown-panel-items .ng-option-disabled,
+  .ng-dropdown-panel-items .ng-optgroup {
+    color: var(--neutral-500);
+  }
+}

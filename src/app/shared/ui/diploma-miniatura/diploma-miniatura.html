@@ -1,0 +1,18 @@
+<div class="diploma" [class.diploma--anulado]="anulado()" aria-hidden="true">
+  <div class="diploma__marco">
+    <p class="diploma__marca">ESCUELA JURÍDICA</p>
+    <p class="diploma__rotulo">Certificado de aprobación</p>
+    <p class="diploma__titular">{{ titular() }}</p>
+    <span class="diploma__linea"></span>
+    <p class="diploma__curso">{{ curso() }}</p>
+    @if (nivel() === 'REFRENDADO' && entidad()) { <p class="diploma__entidad">Refrendado por {{ entidad() }}</p> }
+    <div class="diploma__pie">
+      <span class="diploma__firma"></span>
+      <span class="diploma__sello">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="5.5" /><path d="M8.7 13.6L7.5 21l4.5-2.6 4.5 2.6-1.2-7.4" /></svg>
+      </span>
+      <span class="diploma__firma"></span>
+    </div>
+  </div>
+  @if (anulado()) { <span class="diploma__sello-anulado">ANULADO</span> }
+</div>

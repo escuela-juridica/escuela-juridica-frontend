@@ -1,0 +1,303 @@
+@switch (vista()) {
+  @case ('cargando') {
+    <p class="examen__estado">Cargando examen…</p>
+  }
+  @case ('error') {
+    <div class="estado-vacio examen__vacio">
+      <h3 class="estado-vacio__titulo">No pudimos abrir el examen</h3>
+      <p class="estado-vacio__texto">{{ error() }}</p>
+      <a class="btn btn--primario" [routerLink]="['/aula', aula.cursoId()]">Volver al curso</a>
+    </div>
+  }
+
+  <!-- ============================================================ FICHA == -->
+  @case ('ficha') {
+    @if (ficha(); as f) {
+      <article class="examen">
+        <app-examen-ficha-cabecera [ficha]="f" />
+
+        <section class="card examen__datos" aria-label="Antes de empezar">
+          <h2 class="examen__subtitulo">Antes de empezar</h2>
+          <ul class="examen__avisos examen__avisos--sin-borde">
+            @if (f.tipo === 'PRACTICA') {
+              <li>Es una práctica: tu nota no afecta tu certificación ni bloquea tu avance.</li>
+            } @else {
+              <li>Este examen es calificado y cuenta para tu certificación.</li>
+            }
+            @if (f.tiempoLimiteMinutos) {
+              <li>El tiempo corre desde que inicias y no se detiene si sales. Al llegar a cero, el intento se envía solo con lo que hayas respondido.</li>
+            }
+            @if (f.tieneRespuestaAbierta) {
+              <li>Incluye preguntas de respuesta abierta: las califica un administrador, por eso tu nota quedará pendiente de revisión.</li>
+            }
+            <li>Respuestas correctas: {{ etiquetaMostrar(f.mostrarRespuestas).toLowerCase() }}.</li>
+          </ul>
+        </section>
+
+        <div class="examen__cta">
+          @if (f.intentoEnCursoId) {
+            <button type="button" class="btn btn--acento" [disabled]="iniciando()" (click)="iniciar()">
+              {{ iniciando() ? 'Abriendo…' : 'Continuar intento' }}
+            </button>
+            <p class="examen__cta-nota">Tienes un intento en curso. Tus respuestas están guardadas.</p>
+          } @else if (f.puedeIniciar) {
+            <button type="button" class="btn btn--acento" [disabled]="iniciando()" (click)="iniciar()">
+              {{ iniciando() ? 'Preparando…' : f.intentosUsados === 0 ? 'Iniciar examen' : 'Iniciar nuevo intento' }}
+            </button>
+            @if (f.intentosRestantes !== null) {
+              <p class="examen__cta-nota">Te {{ f.intentosRestantes === 1 ? 'queda 1 intento' : 'quedan ' + f.intentosRestantes + ' intentos' }}.</p>
+            }
+          }
+          <a class="btn btn--secundario" [routerLink]="['/aula', f.cursoId]">Volver al curso</a>
+        </div>
+
+        @if (f.intentos.length > 0) {
+          <section class="card examen__historial" aria-labelledby="examen-historial">
+            <h2 id="examen-historial" class="examen__subtitulo">Tus intentos</h2>
+            <ul class="examen__intentos">
+              @for (i of f.intentos; track i.id) {
+                <li class="examen__intento">
+                  <div class="examen__intento-texto">
+                    <span class="examen__intento-titulo">Intento {{ i.numero }}</span>
+                    <span class="examen__intento-meta">
+                      {{ formatearFechaHoraCorta(i.enviadoEn ?? i.iniciadoEn) }}
+                      @if (i.estado === 'PENDIENTE_REVISION' && i.fechaLimiteRevision) {
+                        · calificación máxima el {{ formatearDiaMes(i.fechaLimiteRevision) }}
+                      }
+                    </span>
+                  </div>
+                  @if (i.nota !== null) { <span class="examen__intento-nota">{{ i.nota | number:'1.0-2' }}</span> }
+                  <span class="badge" [class]="'badge ' + claseEstadoIntento(i)">{{ etiquetaEstadoIntento(i) }}</span>
+                  @if (i.estado !== 'EN_PROGRESO') {
+                    <button type="button" class="btn btn--secundario examen__intento-ver" (click)="verIntento(i)">Ver resultado</button>
+                  }
+                </li>
+              }
+            </ul>
+          </section>
+        }
+      </article>
+    }
+  }
+
+  <!-- ====================================================== RINDIENDO == -->
+  @case ('rindiendo') {
+    @if (intento(); as it) {
+      <article class="examen examen--rindiendo">
+        <header class="examen__barra">
+          <div class="examen__barra-texto">
+            <span class="examen__ruta">{{ it.tipo === 'PRACTICA' ? 'Práctica' : 'Examen calificado' }} · Intento {{ it.numero }}</span>
+            <h1 class="examen__barra-titulo">{{ it.examenTitulo }}</h1>
+          </div>
+          @if (segundos() !== null) {
+            <div class="examen__tiempo" [class.examen__tiempo--poco]="poco()" role="timer" aria-live="off"
+              [attr.aria-label]="'Tiempo restante ' + tiempoFormateado()">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8" /><path d="M12 9v4l2 2M9 2h6" /></svg>
+              <span class="examen__tiempo-valor">{{ tiempoFormateado() }}</span>
+            </div>
+          }
+        </header>
+
+        @if (poco() && segundos() !== null) {
+          <div class="alerta alerta--advertencia" role="status">
+            <span class="alerta__icono">!</span>
+            <div><p class="alerta__titulo">Te queda poco tiempo</p><p class="alerta__texto">Al llegar a cero el intento se envía automáticamente con lo que hayas respondido.</p></div>
+          </div>
+        }
+
+        <app-examen-navegador [preguntas]="it.preguntas" [indice]="indice()" [respondidas]="respondidas()" [marcadas]="marcadas()"
+          [guardado]="guardado()" (ir)="irA($event)" />
+
+        @if (preguntaActual(); as p) {
+          <section class="card examen__pregunta" [attr.aria-labelledby]="'pregunta-' + p.id">
+            <div class="examen__pregunta-cab">
+              <span class="examen__pregunta-numero">Pregunta {{ indice() + 1 }} de {{ it.preguntas.length }}</span>
+              <span class="examen__pregunta-puntos">{{ p.puntaje | number:'1.0-2' }} {{ p.puntaje === 1 ? 'punto' : 'puntos' }}</span>
+            </div>
+            <h2 class="examen__enunciado" [id]="'pregunta-' + p.id">{{ p.enunciado }}</h2>
+            <p class="examen__indicacion">{{ etiquetaTipoPregunta(p.tipo) }}</p>
+
+            @if (p.tipo === 'RESPUESTA_ABIERTA') {
+              <textarea class="input examen__texto" rows="8" maxlength="8000" [value]="textoDe(p)"
+                (input)="escribir(p, $any($event.target).value)" placeholder="Escribe tu respuesta aquí"
+                [attr.aria-label]="'Respuesta a la pregunta ' + (indice() + 1)"></textarea>
+              <p class="examen__contador">{{ textoDe(p).length }} / 8000</p>
+            } @else {
+              <ul class="examen__opciones" [attr.role]="p.tipo === 'SELECCION_MULTIPLE' ? 'group' : 'radiogroup'" [attr.aria-labelledby]="'pregunta-' + p.id">
+                @for (o of p.opciones; track o.id) {
+                  <li>
+                    <label class="examen__opcion" [class.examen__opcion--elegida]="opcionMarcada(p, o.id)">
+                      <input [type]="p.tipo === 'SELECCION_MULTIPLE' ? 'checkbox' : 'radio'" [name]="'p' + p.id"
+                        [checked]="opcionMarcada(p, o.id)" (change)="elegirOpcion(p, o.id)" />
+                      <span>{{ o.texto }}</span>
+                    </label>
+                  </li>
+                }
+              </ul>
+            }
+
+            <div class="examen__pregunta-acciones">
+              <button type="button" class="btn btn--secundario" (click)="alternarMarca(p)" [attr.aria-pressed]="marcadas().has(p.id)">
+                {{ marcadas().has(p.id) ? '🚩 Quitar marca' : '⚑ Marcar para revisar' }}
+              </button>
+              @if (estaRespondida(p)) {
+                <button type="button" class="btn btn--secundario" (click)="limpiarRespuesta(p)">Borrar respuesta</button>
+              }
+            </div>
+          </section>
+        }
+
+        <div class="card examen__pie">
+          <button type="button" class="btn btn--secundario" [disabled]="indice() === 0" (click)="irA(indice() - 1)">← Anterior</button>
+          @if (indice() < it.preguntas.length - 1) {
+            <button type="button" class="btn btn--secundario" (click)="irA(indice() + 1)">Siguiente →</button>
+          }
+          <button type="button" class="btn btn--acento examen__enviar" (click)="abrirConfirmacion()">Revisar y enviar</button>
+        </div>
+      </article>
+
+      @if (confirmando()) {
+        <app-modal titulo="Revisar y enviar el intento" (cerrar)="cancelarConfirmacion()">
+          <p class="examen__resumen-linea">Respondiste <strong>{{ totalRespondidas() }} de {{ it.preguntas.length }}</strong> preguntas.</p>
+          @if (sinResponder().length > 0) {
+            <div class="alerta alerta--advertencia" role="alert">
+              <span class="alerta__icono">!</span>
+              <div>
+                <p class="alerta__titulo">Tienes {{ sinResponder().length }} {{ sinResponder().length === 1 ? 'pregunta sin responder' : 'preguntas sin responder' }}</p>
+                <p class="alerta__texto">Las preguntas sin responder valen cero y no podrás editar el intento después de enviarlo.</p>
+              </div>
+            </div>
+            <p class="examen__resumen-detalle">Sin responder: @for (p of sinResponder(); track p.id; let ult = $last) { <button type="button" class="examen__enlace" (click)="cancelarConfirmacion(); irA(p.posicion - 1)">{{ p.posicion }}</button>{{ ult ? '' : ', ' }} }</p>
+          }
+          @if (marcadasLista().length > 0) {
+            <p class="examen__resumen-detalle">Marcadas para revisar: @for (p of marcadasLista(); track p.id; let ult = $last) { <button type="button" class="examen__enlace" (click)="cancelarConfirmacion(); irA(p.posicion - 1)">{{ p.posicion }}</button>{{ ult ? '' : ', ' }} }</p>
+          }
+          @if (it.tipo === 'CALIFICADO') {
+            <p class="examen__resumen-detalle">Es un examen calificado: el intento cuenta aunque no lo apruebes.</p>
+          }
+          <div class="editor-form__acciones examen__confirmar-acciones">
+            <button type="button" class="btn btn--secundario" (click)="cancelarConfirmacion()">Seguir revisando</button>
+            <button type="button" class="btn btn--acento" [disabled]="enviando()" (click)="enviar()">
+              {{ enviando() ? 'Enviando…' : 'Enviar ahora' }}
+            </button>
+          </div>
+        </app-modal>
+      }
+    }
+  }
+
+  <!-- ======================================================= RESULTADO == -->
+  @case ('resultado') {
+    @if (intento(); as it) {
+      <article class="examen">
+        <header>
+          <div class="examen__etiquetas">
+            <span class="examen__ruta">Resultado · Intento {{ it.numero }}</span>
+            <span class="badge" [class.badge--disp-proximo]="it.tipo === 'PRACTICA'" [class.badge--hibrido-suave]="it.tipo === 'CALIFICADO'">{{ it.tipo === 'PRACTICA' ? 'Práctica' : 'Calificado' }}</span>
+          </div>
+          <h1 class="examen__titulo">{{ it.examenTitulo }}</h1>
+        </header>
+
+        @if (cerradoPorTiempoAviso() || it.cerradoPorTiempo) {
+          <div class="alerta alerta--advertencia" role="status">
+            <span class="alerta__icono">!</span>
+            <div><p class="alerta__titulo">Se acabó el tiempo</p><p class="alerta__texto">Enviamos tu intento automáticamente con lo que habías respondido; las preguntas sin responder valen cero y este intento ya cuenta.</p></div>
+          </div>
+        }
+
+        @if (it.estado === 'PENDIENTE_REVISION') {
+          <section class="card examen__nota examen__nota--revision">
+            <p class="examen__nota-etiqueta">Tu intento está en revisión</p>
+            <p class="examen__nota-ayuda">Incluye respuestas abiertas que califica un administrador. Tu nota definitiva aparecerá aquí cuando termine la revisión.</p>
+            @if (it.fechaLimiteRevision) {
+              <p class="examen__nota-fecha">Fecha máxima de calificación: <strong>{{ formatearFechaLarga(it.fechaLimiteRevision) }}</strong></p>
+            }
+            <p class="examen__nota-ayuda">Mientras tanto no puedes iniciar otro intento de este examen.@if (it.afectaCertificacion) { Tampoco se puede finalizar el curso ni emitir tu certificado hasta que exista tu nota. }</p>
+          </section>
+        } @else {
+          <section class="card examen__nota" [class.examen__nota--ok]="it.aprobado" [class.examen__nota--mal]="!it.aprobado">
+            <p class="examen__nota-etiqueta">Tu nota</p>
+            <app-anillo-progreso [valor]="(it.nota ?? 0) * 5" [texto]="'' + (it.nota | number:'1.0-2')" [tamano]="156" [grosor]="14"
+              [estado]="it.aprobado ? 'exito' : 'error'" etiqueta="de 20" descripcion="Tu nota" />
+            <p class="examen__nota-estado">{{ it.aprobado ? 'Aprobado' : 'No aprobado' }}</p>
+            <p class="examen__nota-ayuda">
+              Obtuviste {{ it.puntajeObtenido | number:'1.0-2' }} de {{ it.puntajeTotal | number:'1.0-2' }} puntos. @if (it.tipo === 'CALIFICADO') { La nota mínima es {{ it.notaMinima | number:'1.0-2' }}. }
+            </p>
+            @if (it.tipo === 'PRACTICA') { <p class="examen__nota-ayuda">Es una práctica: no afecta tu certificación.</p> }
+          </section>
+        }
+
+        <div class="examen__cta">
+          <button type="button" class="btn btn--secundario" (click)="volverALaFicha()">Ver intentos y opciones</button>
+          <a class="btn btn--acento" [routerLink]="['/aula', it.cursoId]">Volver al curso</a>
+        </div>
+
+        @if (abiertasRevisadas().length > 0) {
+          <section class="card examen__revision" aria-labelledby="examen-abiertas">
+            <h2 id="examen-abiertas" class="examen__subtitulo">Calificación de tus respuestas abiertas</h2>
+            <ol class="examen__revision-lista">
+              @for (p of abiertasRevisadas(); track p.id) {
+                <li class="examen__revision-item">
+                  <div class="examen__pregunta-cab">
+                    <span class="examen__pregunta-numero">Pregunta {{ p.posicion }}</span>
+                    <span class="examen__pregunta-puntos">{{ p.puntajeObtenido | number:'1.0-2' }} / {{ p.puntaje | number:'1.0-2' }} pts</span>
+                  </div>
+                  <p class="examen__enunciado examen__enunciado--chico">{{ p.enunciado }}</p>
+                  <p class="examen__respuesta-abierta">{{ p.texto || 'Sin respuesta' }}</p>
+                  @if (p.observacion) {
+                    <p class="examen__observacion"><strong>Observación del revisor:</strong> {{ p.observacion }}</p>
+                  }
+                </li>
+              }
+            </ol>
+          </section>
+        }
+
+        @if (it.respuestasVisibles) {
+          <section class="card examen__revision" aria-labelledby="examen-revision">
+            <h2 id="examen-revision" class="examen__subtitulo">Revisión de respuestas</h2>
+            <ol class="examen__revision-lista">
+              @for (p of it.preguntas; track p.id) {
+                <li class="examen__revision-item">
+                  <div class="examen__pregunta-cab">
+                    <span class="examen__pregunta-numero">Pregunta {{ p.posicion }}</span>
+                    @if (p.tipo === 'RESPUESTA_ABIERTA') {
+                      <span class="badge badge--disp-proximo">{{ p.estadoRevision === 'PENDIENTE' ? 'Pendiente de revisión' : 'Respuesta abierta' }}</span>
+                    } @else {
+                      <span class="badge" [class.badge--disp-inmediato]="p.correcta" [class.badge--disp-cancelado]="!p.correcta">{{ p.correcta ? 'Correcta' : 'Incorrecta' }}</span>
+                    }
+                    <span class="examen__pregunta-puntos">
+                      @if (p.puntajeObtenido !== null) { {{ p.puntajeObtenido | number:'1.0-2' }} / }{{ p.puntaje | number:'1.0-2' }} pts
+                    </span>
+                  </div>
+                  <p class="examen__enunciado examen__enunciado--chico">{{ p.enunciado }}</p>
+                  @if (p.tipo === 'RESPUESTA_ABIERTA') {
+                    <p class="examen__respuesta-abierta">{{ p.texto || 'Sin respuesta' }}</p>
+                  } @else {
+                    <ul class="examen__opciones examen__opciones--revision">
+                      @for (o of p.opciones; track o.id) {
+                        <li class="examen__opcion examen__opcion--revision"
+                          [class.examen__opcion--correcta]="o.esCorrecta"
+                          [class.examen__opcion--incorrecta]="fueElegida(p, o.id) && !o.esCorrecta">
+                          <span class="examen__opcion-marca" aria-hidden="true">{{ o.esCorrecta ? '✓' : fueElegida(p, o.id) ? '✗' : '' }}</span>
+                          <span>{{ o.texto }}</span>
+                          @if (fueElegida(p, o.id)) { <small>Tu respuesta</small> }
+                          @if (o.esCorrecta && !fueElegida(p, o.id)) { <small>Correcta</small> }
+                        </li>
+                      }
+                    </ul>
+                  }
+                </li>
+              }
+            </ol>
+          </section>
+        } @else {
+          <p class="examen__nota-ayuda">
+            @if (it.estado === 'PENDIENTE_REVISION') { Las respuestas correctas se mostrarán según la configuración del examen. }
+            @else { Por la configuración de este examen, aún no se muestran las respuestas correctas. }
+          </p>
+        }
+      </article>
+    }
+  }
+}

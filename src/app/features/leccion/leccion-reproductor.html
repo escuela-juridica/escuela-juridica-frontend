@@ -1,0 +1,228 @@
+@switch (vista()) {
+  @case ('noEncontrada') {
+    <div class="estado-vacio leccion__vacio">
+      <h3 class="estado-vacio__titulo">No encontramos esta lección</h3>
+      <p class="estado-vacio__texto">La lección no existe o no pertenece a este curso.</p>
+      <a class="btn btn--primario" [routerLink]="['/aula', estado.cursoId()]">Volver al curso</a>
+    </div>
+  }
+  @case ('bloqueada') {
+    <div class="estado-vacio leccion__vacio">
+      <h3 class="estado-vacio__titulo">Esta lección todavía está bloqueada</h3>
+      <p class="estado-vacio__texto">{{ leccion()?.motivoBloqueo }}</p>
+      @if (examenBloqueante(); as examen) {
+        <a class="btn btn--acento" [routerLink]="['/aula', estado.cursoId(), 'examenes', examen.id]">Ir al examen</a>
+      }
+      <a class="btn btn--secundario" [routerLink]="['/aula', estado.cursoId()]">Volver al curso</a>
+    </div>
+  }
+  @default {
+    @if (leccion(); as l) {
+      @if (actual(); as a) {
+        <article class="leccion">
+          <header class="leccion__cabecera">
+            <div class="leccion__etiquetas">
+              <span class="leccion__ruta">{{ a.modulo.titulo }} · Lección {{ a.numeroEnModulo }}</span>
+              @if (l.tipo === 'EN_VIVO') { <span class="badge badge--vivo-suave">En vivo</span> }
+              @if (l.duracionSegundos) { <span class="leccion__duracion">{{ formatearDuracion(l.duracionSegundos) }}</span> }
+            </div>
+            <h1 class="leccion__titulo">{{ l.titulo }}</h1>
+          </header>
+
+          @if (vista() === 'sesion') {
+            <section class="card leccion__sesion" aria-label="Sesión en vivo">
+              <span class="leccion__sesion-icono" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3" /><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M4.9 4.9a10 10 0 0 0 0 14.2M19.1 4.9a10 10 0 0 1 0 14.2" /></svg>
+              </span>
+              <div class="leccion__sesion-texto">
+                <h2 class="leccion__sesion-titulo">Sesión en vivo</h2>
+                @if (l.fechaHoraInicio) {
+                  <p class="leccion__sesion-fecha">
+                    {{ formatearFechaHora(l.fechaHoraInicio) }}@if (l.fechaHoraFin) { – {{ formatearHora(l.fechaHoraFin) }} }
+                    · hora de Perú (Lima)
+                  </p>
+                } @else {
+                  <p class="leccion__sesion-fecha">La fecha de la sesión aún no fue programada.</p>
+                }
+                @switch (l.estadoSesion) {
+                  @case ('EN_VENTANA') { <span class="badge badge--disp-inmediato">En vivo ahora</span> }
+                  @case ('CANCELADA') { <span class="badge badge--disp-cancelado">Cancelada</span> }
+                  @default { <span class="badge badge--disp-proximo">Próxima</span> }
+                }
+              </div>
+              <div class="leccion__sesion-accion">
+                @if (l.estadoSesion === 'EN_VENTANA') {
+                  <button type="button" class="btn btn--acento" [disabled]="ingresando()" (click)="ingresarASesion()">
+                    {{ ingresando() ? 'Ingresando…' : 'Ingresar a la sesión' }}
+                  </button>
+                  <p class="leccion__nota">Tu asistencia se registra al ingresar desde aquí.</p>
+                } @else if (l.estadoSesion === 'CANCELADA') {
+                  <p class="leccion__nota">Esta sesión fue cancelada y no cuenta para tu asistencia ni tu avance.</p>
+                } @else {
+                  <button type="button" class="btn btn--secundario" disabled>Ingresar a la sesión</button>
+                  <p class="leccion__nota">El enlace se habilita solo entre el inicio y el fin de la sesión.</p>
+                }
+              </div>
+            </section>
+          } @else {
+            <div class="leccion__medio">
+              @if (materiales() === null) {
+                <div class="leccion__marco leccion__marco--poster"><p class="leccion__poster-texto">Cargando lección…</p></div>
+              } @else if (videoPrincipal(); as video) {
+                @if (video.origen === 'SUBIDO') {
+                  <video
+                    class="leccion__video"
+                    controls
+                    preload="metadata"
+                    [src]="resolverUrlApi(video.verUrl)"
+                    (loadedmetadata)="onLoadedMetadata($event, video)"
+                    (timeupdate)="onTimeUpdate($event, video.id)"
+                    (pause)="onPauseOFin($event, video.id)"
+                    (ended)="onPauseOFin($event, video.id)"
+                  ></video>
+                } @else if (youtubeEmbebido(); as embebido) {
+                  <div class="leccion__marco">
+                    <iframe [src]="embebido" [title]="video.titulo" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"
+                      allow="accelerometer; encrypted-media; picture-in-picture; fullscreen"></iframe>
+                  </div>
+                } @else {
+                  <div class="leccion__marco leccion__marco--poster">
+                    <span class="leccion__poster-icono" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" width="44" height="44" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+                    </span>
+                    <p class="leccion__poster-texto">{{ video.titulo }}</p>
+                    <a class="btn btn--acento" [href]="video.verUrl" target="_blank" rel="noopener">
+                      Ver video en {{ video.origen === 'YOUTUBE' ? 'YouTube' : 'su sitio' }}
+                    </a>
+                  </div>
+                }
+              } @else {
+                <div class="leccion__marco leccion__marco--poster">
+                  <span class="leccion__poster-icono" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" /><path d="M9 13h6M9 17h6" /></svg>
+                  </span>
+                  <p class="leccion__poster-texto">Esta lección se estudia con sus materiales</p>
+                  <p class="leccion__poster-ayuda">Los encuentras en la pestaña «Materiales», aquí abajo.</p>
+                </div>
+              }
+            </div>
+          }
+
+          <div class="card leccion__acciones">
+            <div class="leccion__acciones-lado">
+              @if (estado.anterior(); as anterior) {
+                <a class="btn btn--secundario" [routerLink]="['/aula', estado.cursoId(), 'lecciones', anterior.leccion.id]">← Anterior</a>
+              }
+            </div>
+
+            <div class="leccion__estado" aria-live="polite">
+              @if (l.estado === 'COMPLETADA') {
+                <span class="leccion__completa">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5" /></svg>
+                  Lección completada
+                </span>
+              } @else if (esFinalizacionAutomatica()) {
+                <span class="leccion__pendiente">
+                  Se completa al ver el video{{ videoPrincipal()?.porcentajeVisto ? ' · llevas ' + videoPrincipal()?.porcentajeVisto + ' %' : '' }}
+                </span>
+              } @else if (vista() === 'contenido') {
+                <span class="leccion__pendiente">Al continuar se marca como completada</span>
+              }
+            </div>
+
+            <div class="leccion__acciones-lado leccion__acciones-lado--der">
+              @if (l.estado === 'COMPLETADA') {
+                @if (siguienteDisponible(); as siguiente) {
+                  <a class="btn btn--acento" [routerLink]="['/aula', estado.cursoId(), 'lecciones', siguiente.leccion.id]">Siguiente →</a>
+                } @else if (esUltima()) {
+                  <a class="btn btn--primario" [routerLink]="['/aula', estado.cursoId()]">Ir al resumen del curso</a>
+                } @else {
+                  <button type="button" class="btn btn--acento" disabled>Siguiente →</button>
+                }
+              } @else if (vista() === 'sesion') {
+                <!-- La asistencia completa la sesión: no hay acción manual hasta que termine. -->
+              } @else if (esFinalizacionAutomatica()) {
+                <button type="button" class="btn btn--acento" disabled title="Completa el video para continuar">Siguiente →</button>
+              } @else {
+                <button type="button" class="btn btn--acento" [disabled]="completando()" (click)="completarYContinuar()">
+                  {{ completando() ? 'Guardando…' : esUltima() ? 'Completar lección' : 'Siguiente →' }}
+                </button>
+              }
+            </div>
+          </div>
+
+          @if (l.estado === 'COMPLETADA' && estado.siguiente(); as siguiente) {
+            @if (siguiente.leccion.estado === 'BLOQUEADA') {
+              <div class="alerta alerta--info" role="status">
+                <span class="alerta__icono">i</span>
+                <div>
+                  <p class="alerta__titulo">La siguiente lección está bloqueada</p>
+                  <p class="alerta__texto">{{ siguiente.leccion.motivoBloqueo }}</p>
+                  @if (examenBloqueante(); as examen) {
+                    <a class="btn btn--acento leccion__aviso-accion" [routerLink]="['/aula', estado.cursoId(), 'examenes', examen.id]">Ir al examen</a>
+                  }
+                </div>
+              </div>
+            }
+          }
+
+          <section class="card leccion__pestanas">
+            <div class="leccion__tablist" role="tablist" aria-label="Información de la lección">
+              @for (p of pestanas(); track p.id) {
+                <button type="button" role="tab" class="leccion__tab" [class.leccion__tab--activa]="pestana() === p.id"
+                  [attr.aria-selected]="pestana() === p.id" (click)="elegirPestana(p.id)">{{ p.etiqueta }}</button>
+              }
+            </div>
+
+            <div class="leccion__panel" role="tabpanel">
+              @switch (pestana()) {
+                @case ('descripcion') {
+                  <p class="leccion__descripcion">{{ l.descripcion }}</p>
+                }
+                @case ('materiales') {
+                  @if (vista() === 'sesion') {
+                    <p class="leccion__vacio-texto">Los materiales y la grabación aparecerán aquí cuando termine la sesión.</p>
+                  } @else if (materiales() === null) {
+                    <p class="leccion__vacio-texto">Cargando materiales…</p>
+                  } @else {
+                    <ul class="materiales">
+                      @for (m of materiales(); track m.id) {
+                        <li class="material">
+                          <span class="material__icono" aria-hidden="true">
+                            @if (m.tipoRecurso === 'VIDEO') {
+                              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+                            } @else {
+                              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" /></svg>
+                            }
+                          </span>
+                          <div class="material__texto">
+                            <span class="material__titulo">{{ m.titulo }}</span>
+                            <span class="material__meta">{{ metaMaterial(m) }}</span>
+                          </div>
+                          @if (m.tipoRecurso === 'VIDEO' && m.porcentajeVisto !== null && m.origen === 'SUBIDO') {
+                            <span class="badge badge--disp-proximo">{{ m.porcentajeVisto }} % visto</span>
+                          }
+                          <a class="btn btn--secundario material__accion" [href]="resolverUrlApi(m.verUrl)" target="_blank" rel="noopener">Abrir</a>
+                          @if (m.descargarUrl; as descarga) {
+                            <a class="btn btn--secundario material__accion" [href]="resolverUrlApi(descarga)">Descargar</a>
+                          }
+                        </li>
+                      } @empty {
+                        <li class="leccion__vacio-texto">Esta lección todavía no tiene materiales.</li>
+                      }
+                    </ul>
+                  }
+                }
+                @case ('avance') {
+                  @if (estado.aula(); as aula) {
+                    <app-avance-certificado [avance]="aula.avanceCertificado" />
+                  }
+                }
+              }
+            </div>
+          </section>
+        </article>
+      }
+    }
+  }
+}

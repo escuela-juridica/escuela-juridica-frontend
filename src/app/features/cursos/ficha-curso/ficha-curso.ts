@@ -8,6 +8,7 @@ import { CursoApiService } from '../curso-api.service';
 import {
   claseDisponibilidad,
   claseModalidad,
+  descripcionMedios,
   etiquetaModalidad,
   formatearDuracion,
   formatearFecha,
@@ -19,7 +20,7 @@ import { FichaCursoDetalle, LeccionFicha, VistaPrevia } from '../curso.model';
 import { Session } from '../../../core/session/session';
 import { MatriculaApiService } from '../../matriculas/matricula-api.service';
 import { AlertaGlobalService } from '../../../core/notificaciones/alerta-global.service';
-import { Modal } from '../../../shared/ui/modal/modal';
+import { ConfirmacionMatricula } from './confirmacion-matricula/confirmacion-matricula';
 
 const LARGO_MAXIMO_DESCRIPCION = 260;
 
@@ -28,7 +29,7 @@ type EstadoVistaPrevia = 'inactiva' | 'cargando' | 'lista' | 'error';
 
 @Component({
   selector: 'app-ficha-curso',
-  imports: [RouterLink, NgClass, Modal],
+  imports: [RouterLink, NgClass, ConfirmacionMatricula],
   templateUrl: './ficha-curso.html',
   styleUrl: './ficha-curso.scss',
 })
@@ -38,6 +39,7 @@ export class FichaCurso implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly session = inject(Session);
   private readonly router = inject(Router);
+  protected readonly descripcionMedios = descripcionMedios;
   private readonly matriculasApi = inject(MatriculaApiService);
   private readonly alertas = inject(AlertaGlobalService);
 
@@ -184,10 +186,6 @@ export class FichaCurso implements OnInit {
     return estado ? claseDisponibilidad(estado.codigo) : '';
   }
 
-  protected formatearFecha(fecha: string): string {
-    return formatearFecha(fecha);
-  }
-
   protected formatearFechaHora(fechaHoraIso: string): string {
     return formatearFechaHora(fechaHoraIso);
   }
@@ -269,7 +267,7 @@ export class FichaCurso implements OnInit {
       return;
     }
     if (this.session.estaAutenticado()) {
-      this.abrirConfirmacionMatricula();
+      void this.router.navigate(['/app/pagar', curso.urlAmigable]);
       return;
     }
     void this.router.navigate(['/acceso'], {

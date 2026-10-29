@@ -1,6 +1,7 @@
 import { DatePipe, LowerCasePipe } from '@angular/common';
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatriculaApiService, ReporteMatricula, FiltrosReporteMatricula } from '../../../matriculas/matricula-api.service';
 import { CursoAdminApiService } from '../../cursos/curso-admin-api.service';
@@ -8,7 +9,7 @@ import { CursoResumenRespuesta } from '../../cursos/curso-admin.model';
 
 @Component({
   selector: 'app-reporte-matriculas',
-  imports: [FormsModule, DatePipe, LowerCasePipe],
+  imports: [FormsModule, DatePipe, LowerCasePipe, RouterLink, RouterLinkActive],
   templateUrl: './reporte-matriculas.html',
   styleUrl: './reporte-matriculas.scss',
 })

@@ -35,7 +35,7 @@
   appearance: none;
   border: 1px solid var(--neutral-200);
   background: var(--blanco);
-  color: var(--neutral-700);
+  color: var(--neutral-800);
   height: 36px;
   padding: 0 14px;
   border-radius: var(--radio-md);
@@ -196,6 +196,14 @@
   color: var(--advertencia);
 }
 
+.editor-sesion__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
 .editor-nota {
   margin-top: 16px;
 }
@@ -313,4 +321,28 @@
   color: var(--neutral-500);
   text-align: center;
   padding: 24px 0;
+}
+
+// Móvil: la fila de sesión se apila (texto arriba, acciones debajo a ancho completo) para que las
+// tres acciones (Editar programación / Reprogramar / Cancelar) no desborden la pantalla.
+@media (max-width: 767px) {
+  .editor-sesion {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .editor-sesion__principal {
+    flex: 1 1 calc(100% - 60px);
+    min-width: 0;
+  }
+
+  .editor-sesion__acciones {
+    flex-basis: 100%;
+    justify-content: stretch;
+  }
+
+  .editor-sesion__acciones .btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
 }
