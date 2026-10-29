@@ -88,12 +88,28 @@ export function formatearPrecio(monto: number): string {
   }).format(monto);
 }
 
-/** Culqi solo permite pagar con billeteras (Plin y otras) hasta S/ 500; sobre ese monto el checkout ofrece tarjeta. */
+/**
+ * Billeteras digitales de Culqi (Plin y otras, que se pagan con QR por PagoEfectivo). Desactivadas mientras el
+ * simulador de pruebas de Culqi no marque como pagada la orden en su API; ponerlo en `true` las vuelve a ofrecer.
+ */
+export const BILLETERAS_HABILITADAS = false;
+
+/** Culqi solo permite pagar con billeteras (Plin y otras) hasta S/ 500. */
 export const LIMITE_BILLETERA_SOLES = 500;
 
-/** Medios con los que se paga un curso de ese precio en Culqi Checkout. */
+/**
+ * Medios con los que se paga un curso de ese precio en Culqi Checkout: tarjeta y Yape siempre; Plin y las demás
+ * billeteras solo si están habilitadas y el monto no supera su límite.
+ */
 export function mediosDePago(precio: number): string[] {
-  return precio > LIMITE_BILLETERA_SOLES ? ['Tarjeta de crédito o débito', 'Yape'] : ['Yape', 'Plin'];
+  const conBilletera = BILLETERAS_HABILITADAS && precio <= LIMITE_BILLETERA_SOLES;
+  return ['Tarjeta de crédito o débito', 'Yape', ...(conBilletera ? ['Plin'] : [])];
+}
+
+/** Los medios en una frase: "Yape", "tarjeta o Yape" o "Yape o Plin". */
+export function descripcionMedios(precio: number): string {
+  const medios = mediosDePago(precio).map((m) => (m.startsWith('Tarjeta') ? 'tarjeta' : m));
+  return medios.length > 1 ? `${medios.slice(0, -1).join(', ')} o ${medios[medios.length - 1]}` : medios[0];
 }
 
 export function formatearDuracion(segundos: number): string {

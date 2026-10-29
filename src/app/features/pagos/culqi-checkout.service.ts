@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { LIMITE_BILLETERA_SOLES } from '../cursos/curso-formato.util';
+import { BILLETERAS_HABILITADAS, LIMITE_BILLETERA_SOLES } from '../cursos/curso-formato.util';
 import { PagoCheckout } from './pago.model';
 
 /** Culqi Checkout Custom: https://docs.culqi.com/es/documentacion/checkout/checkout-custom */
@@ -57,9 +57,17 @@ export class CulqiCheckoutService {
       manejadores.alFallar('No pudimos cargar el checkout de Culqi.');
       return;
     }
-    // Yape y billeteras digitales; la tarjeta solo cuando el monto supera el límite de las billeteras (ver LIMITE_BILLETERA_SOLES).
-    const admiteBilletera = pago.montoCentimos <= LIMITE_BILLETERA_SOLES * 100;
-    const paymentMethods = { tarjeta: !admiteBilletera, yape: true, billetera: admiteBilletera, bancaMovil: false, agente: false, cuotealo: false };
+    // Tarjeta y Yape siempre. Las billeteras (PagoEfectivo) solo si están habilitadas y el monto no supera su límite.
+    // Debe coincidir con mediosDePago().
+    const sobreLimiteBilletera = pago.montoCentimos > LIMITE_BILLETERA_SOLES * 100;
+    const paymentMethods = {
+      tarjeta: true,
+      yape: true,
+      billetera: BILLETERAS_HABILITADAS && !sobreLimiteBilletera,
+      bancaMovil: false,
+      agente: false,
+      cuotealo: false,
+    };
     const culqi = new constructor(pago.llavePublica, {
       settings: { title: pago.titulo, currency: pago.moneda, amount: pago.montoCentimos, order: pago.ordenId },
       client: { email: pago.correo, firstName: pago.nombres, lastName: pago.apellidos },
