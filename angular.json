@@ -33,6 +33,7 @@
             "styles": [
               "node_modules/ngx-spinner/animations/ball-spin-clockwise-fade.css",
               "node_modules/@fullcalendar/angular/skeleton.css",
+              "node_modules/@ng-select/ng-select/themes/default.theme.css",
               "src/styles.scss"
             ]
           },

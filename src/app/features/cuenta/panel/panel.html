@@ -73,8 +73,8 @@
             </button>
           }
           @if (curso.estadoNotificacion === 'ERROR') {
-            <button type="button" class="btn btn--secundario" [disabled]="reenviando() === curso.id" (click)="reenviarConfirmacion(curso.id)">
-              {{ reenviando() === curso.id ? 'Enviando…' : 'Reenviar confirmación' }}
+            <button type="button" class="btn btn--secundario" [disabled]="reenviando() === curso.matriculaId" (click)="reenviarConfirmacion(curso.matriculaId)">
+              {{ reenviando() === curso.matriculaId ? 'Enviando…' : 'Reenviar confirmación' }}
             </button>
           }
         </div>

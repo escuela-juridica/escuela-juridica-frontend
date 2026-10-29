@@ -17,6 +17,8 @@ const ETIQUETAS_INGRESO: Record<string, string> = {
 
 interface CursoActivo {
   id: number;
+  /** El reenvío de la confirmación se pide por matrícula, no por curso. */
+  matriculaId: number;
   imagenUrl: string;
   tipo: string;
   categoria: string;
@@ -71,6 +73,7 @@ export class Panel {
       next: (matriculas) => {
         this.cursosActivos.set(matriculas.map((matricula) => ({
           id: matricula.cursoId,
+          matriculaId: matricula.id,
           imagenUrl: matricula.imagenPortadaUrl ?? '',
           tipo: matricula.modalidad,
           categoria: ETIQUETAS_INGRESO[matricula.formaIngreso] ?? matricula.formaIngreso,

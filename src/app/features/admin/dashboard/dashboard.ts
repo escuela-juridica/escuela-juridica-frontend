@@ -2,6 +2,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { NgSelectComponent } from '@ng-select/ng-select';
 
 import { BarraGrafico, GraficoBarras } from '../../../shared/ui/graficos/grafico-barras/grafico-barras';
 import { GraficoSerie } from '../../../shared/ui/graficos/grafico-serie/grafico-serie';
@@ -23,6 +25,20 @@ const COLOR_INGRESO: Record<string, string> = {
   GRATUITA: 'var(--viz-4)',
 };
 
+const PERIODOS: { id: Rango; etiqueta: string }[] = [
+  { id: 'ANIO', etiqueta: 'Este año' },
+  { id: 'ANIO_ANTERIOR', etiqueta: 'Año anterior' },
+  { id: 'ULTIMOS_90', etiqueta: 'Últimos 90 días' },
+  { id: 'MES', etiqueta: 'Este mes' },
+  { id: 'PERSONALIZADO', etiqueta: 'Personalizado' },
+];
+
+const MODALIDADES = [
+  { id: 'VIRTUAL', etiqueta: 'Virtual' },
+  { id: 'EN_VIVO', etiqueta: 'En vivo' },
+  { id: 'HIBRIDO', etiqueta: 'Híbrido' },
+];
+
 /** Rampa secuencial azul (pasos 250 → 600 de la paleta validada). */
 const RAMPA_AZUL = ['#86b6ef', '#5598e7', '#2a78d6', '#1c5cab', '#184f95'];
 
@@ -33,7 +49,7 @@ const RAMPA_AZUL = ['#86b6ef', '#5598e7', '#2a78d6', '#1c5cab', '#184f95'];
  */
 @Component({
   selector: 'app-dashboard',
-  imports: [FormsModule, GraficoSerie, GraficoBarras],
+  imports: [FormsModule, NgSelectComponent, GraficoSerie, GraficoBarras],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
@@ -41,7 +57,11 @@ export class DashboardPantalla {
   private readonly api = inject(DashboardApiService);
   private readonly cursosApi = inject(ReporteAcademicoApiService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly router = inject(Router);
+  private readonly ruta = inject(ActivatedRoute);
 
+  protected readonly periodos = PERIODOS;
+  protected readonly modalidades = MODALIDADES;
   protected readonly formatearPrecio = formatearPrecio;
   protected readonly datos = signal<Dashboard | null>(null);
   protected readonly cursos = signal<OpcionCursoReporte[]>([]);
@@ -49,11 +69,14 @@ export class DashboardPantalla {
   protected readonly error = signal<string | null>(null);
   protected readonly tablas = signal<ReadonlySet<IdGrafico>>(new Set());
 
+  private ultimaPeticion = 0;
+
   protected rango: Rango = 'ANIO';
   protected desde = '';
   protected hasta = '';
   protected cursoId: number | null = null;
-  protected modalidad = '';
+  /** `null` = todas (un texto vacío se vería como un valor elegido en el selector). */
+  protected modalidad: string | null = null;
 
   protected readonly evolucion = computed<PuntoGrafico[]>(() =>
     (this.datos()?.matriculasPorPeriodo ?? []).map((p) => ({ etiqueta: p.etiqueta, valor: p.valor })));
@@ -76,7 +99,20 @@ export class DashboardPantalla {
 
   constructor() {
     this.cursosApi.cursos().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({ next: (c) => this.cursos.set(c) });
-    this.aplicarRango('ANIO');
+    // Los filtros viajan en la URL: recargar o compartir el enlace conserva la misma vista.
+    const q = this.ruta.snapshot.queryParamMap;
+    const curso = Number(q.get('curso'));
+    this.cursoId = Number.isInteger(curso) && curso > 0 ? curso : null;
+    this.modalidad = MODALIDADES.some((m) => m.id === q.get('modalidad')) ? (q.get('modalidad') as string) : null;
+    const rango = PERIODOS.find((p) => p.id === q.get('rango'))?.id ?? 'ANIO';
+    if (rango === 'PERSONALIZADO' && esFecha(q.get('desde')) && esFecha(q.get('hasta'))) {
+      this.rango = rango;
+      this.desde = q.get('desde') as string;
+      this.hasta = q.get('hasta') as string;
+      this.cargar();
+    } else {
+      this.aplicarRango(rango === 'PERSONALIZADO' ? 'ANIO' : rango);
+    }
   }
 
   protected cambiarRango(rango: Rango): void {
@@ -95,21 +131,41 @@ export class DashboardPantalla {
   }
 
   protected cargar(): void {
+    this.cursoId = this.cursoId ?? null;
+    this.modalidad = this.modalidad ?? null;
     this.cargando.set(true);
     this.error.set(null);
-    this.api.consultar({ desde: this.desde, hasta: this.hasta, cursoId: this.cursoId, modalidad: this.modalidad })
+    this.guardarEnUrl();
+    const peticion = ++this.ultimaPeticion;
+    this.api.consultar({ desde: this.desde, hasta: this.hasta, cursoId: this.cursoId, modalidad: this.modalidad ?? '' })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (d) => {
+          if (peticion !== this.ultimaPeticion) return; // Llegó tarde: ya hay una consulta más nueva.
           this.datos.set(d);
           this.cargando.set(false);
         },
         error: (e: HttpErrorResponse) => {
+          if (peticion !== this.ultimaPeticion) return;
           const cuerpo = typeof e.error === 'object' && e.error !== null ? (e.error as { message?: string }) : null;
           this.error.set(cuerpo?.message ?? 'No pudimos cargar el dashboard. Inténtalo nuevamente.');
           this.cargando.set(false);
         },
       });
+  }
+
+  private guardarEnUrl(): void {
+    void this.router.navigate([], {
+      relativeTo: this.ruta,
+      replaceUrl: true,
+      queryParams: {
+        rango: this.rango === 'ANIO' ? null : this.rango,
+        desde: this.rango === 'PERSONALIZADO' ? this.desde : null,
+        hasta: this.rango === 'PERSONALIZADO' ? this.hasta : null,
+        curso: this.cursoId,
+        modalidad: this.modalidad || null,
+      },
+    });
   }
 
   protected alternarTabla(id: IdGrafico): void {
@@ -131,6 +187,7 @@ export class DashboardPantalla {
   }
 
   private aplicarRango(rango: Exclude<Rango, 'PERSONALIZADO'>): void {
+    this.rango = rango;
     const hoy = new Date();
     const anio = hoy.getFullYear();
     switch (rango) {
@@ -155,6 +212,10 @@ export class DashboardPantalla {
     }
     this.cargar();
   }
+}
+
+function esFecha(valor: string | null): boolean {
+  return !!valor && /^\d{4}-\d{2}-\d{2}$/.test(valor) && !Number.isNaN(Date.parse(valor));
 }
 
 /** Fecha local en formato ISO (sin pasar por UTC, que podría correrla un día). */

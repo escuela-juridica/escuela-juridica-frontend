@@ -6,31 +6,21 @@
     </div>
 
     <div class="dash__filtros" role="group" aria-label="Filtros de todos los gráficos">
-      <label class="dash__campo">Periodo
-        <select class="input" [ngModel]="rango" (ngModelChange)="cambiarRango($event)" aria-label="Periodo">
-          <option value="ANIO">Este año</option>
-          <option value="ANIO_ANTERIOR">Año anterior</option>
-          <option value="ULTIMOS_90">Últimos 90 días</option>
-          <option value="MES">Este mes</option>
-          <option value="PERSONALIZADO">Personalizado</option>
-        </select>
-      </label>
+      <div class="dash__campo"><span>Periodo</span>
+        <ng-select [items]="periodos" bindLabel="etiqueta" bindValue="id" [ngModel]="rango" (ngModelChange)="cambiarRango($event)"
+          [clearable]="false" [searchable]="false" appendTo="body" aria-label="Periodo" />
+      </div>
       <label class="dash__campo">Desde<input class="input" type="date" [(ngModel)]="desde" (change)="editarFechas()" /></label>
       <label class="dash__campo">Hasta<input class="input" type="date" [(ngModel)]="hasta" [min]="desde" (change)="editarFechas()" /></label>
-      <label class="dash__campo">Curso
-        <select class="input" [(ngModel)]="cursoId" (ngModelChange)="cargar()" aria-label="Curso">
-          <option [ngValue]="null">Todos los cursos</option>
-          @for (curso of cursos(); track curso.id) { <option [ngValue]="curso.id">{{ curso.etiqueta }}</option> }
-        </select>
-      </label>
-      <label class="dash__campo">Modalidad
-        <select class="input" [(ngModel)]="modalidad" (ngModelChange)="cargar()" aria-label="Modalidad">
-          <option value="">Todas</option>
-          <option value="VIRTUAL">Virtual</option>
-          <option value="EN_VIVO">En vivo</option>
-          <option value="HIBRIDO">Híbrido</option>
-        </select>
-      </label>
+      <div class="dash__campo"><span>Curso</span>
+        <ng-select [items]="cursos()" bindLabel="etiqueta" bindValue="id" [(ngModel)]="cursoId" (change)="cargar()"
+          placeholder="Todos los cursos" notFoundText="Ningún curso coincide" clearAllText="Quitar filtro"
+          [searchable]="true" [clearable]="true" appendTo="body" aria-label="Curso" />
+      </div>
+      <div class="dash__campo"><span>Modalidad</span>
+        <ng-select [items]="modalidades" bindLabel="etiqueta" bindValue="id" [(ngModel)]="modalidad" (change)="cargar()"
+          placeholder="Todas" clearAllText="Quitar filtro" [searchable]="false" [clearable]="true" appendTo="body" aria-label="Modalidad" />
+      </div>
     </div>
   </header>
 
