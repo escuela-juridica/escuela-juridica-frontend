@@ -117,3 +117,89 @@ npm start      # ng serve, http://localhost:4200
 ```
 
 En desarrollo, el frontend espera la API en `http://localhost:8080/api` (`src/environments/environment.ts`). El backend debe tener CORS habilitado para `http://localhost:4200`.
+
+## Despliegue (CI/CD)
+
+Cada push a `main` compila el frontend en modo producción y sube el resultado por `rsync` sobre SSH a la carpeta del subdominio `app.` en el VPS. Se puede lanzar también a mano desde GitHub (Actions → "Deploy frontend" → Run workflow).
+
+```mermaid
+flowchart LR
+    A[push a main] --> B["GitHub Actions<br/>npm ci + ng build<br/>--configuration production"]
+    B -->|"rsync por SSH :21098"| C["VPS: carpeta del subdominio<br/>app.aulavirtual..."]
+    U[Navegador] -->|HTTPS| E["Apache (cPanel)<br/>sirve los archivos estáticos"]
+    C --- E
+    U -->|"HTTPS + cookies"| API["API<br/>api.aulavirtual.escuelajuridica.edu.pe"]
+```
+
+### Infraestructura
+
+- **Frontend:** archivos estáticos servidos por Apache (cPanel) en `https://app.aulavirtual.escuelajuridica.edu.pe`, con certificado Let's Encrypt. No hay servidor de Node en producción.
+- **Carpeta de destino en el VPS:** `/home/aulavirtual/app.aulavirtual.escuelajuridica.edu.pe/`.
+- **API:** otro repositorio (`escuela-juridica-backend`), en `https://api.aulavirtual.escuelajuridica.edu.pe`. Su despliegue se documenta en el README del backend.
+- **SSH:** escucha en el puerto `21098`.
+
+### Archivos del repositorio
+
+| Archivo | Qué hace |
+|---|---|
+| `.github/workflows/deploy-frontend.yml` | Se dispara con push a `main` y manualmente (`workflow_dispatch`). Pasos: `checkout`, Node 20 con caché de npm, `npm ci`, `npx ng build --configuration production`, configurar SSH (guarda la llave en `~/.ssh/id_deploy` y registra el servidor con `ssh-keyscan`) y subir con `rsync`. |
+| `src/.htaccess` | Regla de Apache para la SPA: cualquier ruta que no sea un archivo o carpeta real se sirve con `index.html`. Sin ella, recargar `/app/panel` daría 404. |
+| `angular.json` | Incluye `src/.htaccess` en los `assets`, de modo que se copia a la raíz del build. |
+| `src/environments/environment.prod.ts` | En producción, `ng build` lo usa en lugar de `environment.ts` y apunta la API a `https://api.aulavirtual.escuelajuridica.edu.pe/api`. |
+
+### Secrets de GitHub
+
+| Secret | Para qué sirve |
+|---|---|
+| `VPS_HOST` | Dirección IP del VPS |
+| `VPS_USER` | Usuario Linux que despliega (`deploy`) |
+| `VPS_PORT` | Puerto SSH (`21098`) |
+| `VPS_SSH_KEY` | Llave privada SSH exclusiva para GitHub Actions |
+
+Deben existir en **este** repositorio, además de en el del backend. La carpeta de destino no es un secret: está escrita en el workflow.
+
+### Qué sube el workflow
+
+La carpeta de salida es `dist/escuela-juridica-frontend/browser/` (el builder genera siempre la subcarpeta `browser`); ahí también quedan `index.html` y `.htaccess`. El comando es:
+
+```bash
+rsync -rlz --delete --chmod=D755,F644 \
+  --exclude '.well-known' --exclude 'cgi-bin' \
+  -e "ssh -i ~/.ssh/id_deploy -p <puerto>" \
+  dist/escuela-juridica-frontend/browser/ \
+  <usuario>@<host>:/home/aulavirtual/app.aulavirtual.escuelajuridica.edu.pe/
+```
+
+- `--delete`: la carpeta del servidor queda igual al build. Lo que ya no exista se borra. **Si la ruta de destino fuera incorrecta, borraría archivos ajenos**; compruébala en cPanel antes del primer despliegue.
+- `--exclude '.well-known'` y `'cgi-bin'`: se conservan. `.well-known` es la que usa el certificado SSL (AutoSSL/Let's Encrypt) para renovarse.
+- `--chmod=D755,F644`: carpetas legibles y archivos de solo lectura para Apache.
+- Cada despliegue **reemplaza** el sitio anterior. Los archivos `.js` llevan en el nombre un código que cambia en cada build, así que los viejos desaparecen. Quien tenía la página abierta puede ver un error al abrir una pantalla nueva hasta que recargue (F5).
+- El servidor no guarda copia de la versión anterior.
+
+### Rutas de la aplicación
+
+El sitio se publica en la **raíz** del subdominio (`<base href="/">`); no hay carpeta intermedia. Las rutas del alumno cuelgan de `/app/...`, las de administración de `/admin/...` y el aula de `/aula/...`, por ejemplo `https://app.aulavirtual.escuelajuridica.edu.pe/app/panel`. Son rutas internas de Angular: las resuelve el navegador, y Apache solo devuelve `index.html` gracias al `.htaccess`.
+
+### Operación
+
+- **Relanzar el despliegue a mano:** en GitHub, pestaña *Actions* → *Deploy frontend* → *Run workflow*.
+- **Probar el build de producción en local:**
+  ```bash
+  npx ng build --configuration production
+  ```
+  Comprueba que `dist/escuela-juridica-frontend/browser/.htaccess` exista junto a `index.html`.
+- **Volver a una versión anterior:** se publica de nuevo un commit anterior (revertir y hacer push a `main`).
+- **Verificar tras desplegar:** abre `https://app.aulavirtual.escuelajuridica.edu.pe/catalogo`, entra a una pantalla interna y pulsa F5 para confirmar que no da 404.
+
+### Solución de problemas
+
+| Síntoma | Qué revisar |
+|---|---|
+| **404 al recargar una ruta** (por ejemplo `/app/panel`) | Falta el `.htaccess` en la carpeta del subdominio, o Apache no tiene `mod_rewrite` / `AllowOverride` habilitados para esa carpeta. |
+| **Error de CORS en el navegador** | Es la configuración de la API: `CORS_ALLOWED_ORIGIN` en el `app.env` del backend debe ser exactamente `https://app.aulavirtual.escuelajuridica.edu.pe`, sin `/` final. |
+| **El sitio llama a `localhost:8080`** | El build no fue de producción. Debe ejecutarse con `--configuration production` para que se use `environment.prod.ts`. |
+| **`rsync`: Permission denied** | El usuario `deploy` no puede escribir en la carpeta del subdominio; hay que darle permiso (por ejemplo, con `setfacl` como root). |
+| **`rsync`: command not found** | Falta instalar `rsync` en el servidor. |
+| **Errores de SSH en el workflow** (`Permission denied (publickey)`, tiempo de espera) | Revisa los cuatro secrets, que el puerto sea `21098` y que la llave pública de `VPS_SSH_KEY` esté en `authorized_keys` de `deploy`. |
+| **`npm ci` falla** | Angular 21 necesita Node 20.19 o superior (o 22.12+). Si la 20.x que instala el workflow no alcanza, sube `node-version` a `22`. |
+| **Pantalla en blanco o error de `.js` tras desplegar** | Los archivos con código en el nombre cambiaron; recarga con Ctrl + F5. |
