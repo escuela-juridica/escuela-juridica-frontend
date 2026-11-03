@@ -31,7 +31,10 @@ a {
   text-decoration: none;
 }
 
-a:hover {
+// Los enlaces con aspecto de botón (<a class="btn …">) quedan fuera: su color y su hover los define `.btn`.
+// Sin esta exclusión, `a:hover` (más específico que la clase de la variante) les pintaba el texto del mismo
+// azul del fondo y los subrayaba al pasar el cursor.
+a:not(.btn):hover {
   color: var(--marca-800);
   text-decoration: underline;
 }

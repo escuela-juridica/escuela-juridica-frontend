@@ -5,40 +5,7 @@
   max-width: 1040px;
 }
 
-.corr__volver {
-  align-self: flex-start;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--neutral-600);
-  text-decoration: none;
-}
-
-.corr__etiqueta {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--eyebrow-color);
-}
-
-.corr__titulo {
-  margin: 2px 0 0;
-  font-size: 22px;
-  line-height: 30px;
-  font-weight: 700;
-  color: var(--neutral-950);
-}
-
-.corr__cabecera p {
-  margin: 4px 0 0;
-  color: var(--neutral-600);
-}
-
-.corr__codigo {
-  font-variant-numeric: tabular-nums;
-  font-weight: 600;
-  color: var(--neutral-950);
-}
+// ------------------------------------------------------------------- Tarjetas --
 
 .corr__rejilla {
   display: grid;
@@ -51,17 +18,52 @@
 }
 
 .corr__subtitulo {
-  margin: 0 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 16px;
   font-size: 17px;
   line-height: 24px;
   color: var(--neutral-950);
+}
+
+.corr__subtitulo--suelto {
+  margin-bottom: 6px;
+}
+
+.corr__subtitulo--peligro {
+  color: var(--error);
+}
+
+.corr__icono {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radio-md);
+  background: var(--neutral-100);
+  color: var(--marca-900);
+}
+
+.corr__icono--peligro {
+  background: var(--error-fondo);
+  color: var(--error);
 }
 
 .corr__datos {
   margin: 0;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px 16px;
+  gap: 14px 16px;
+}
+
+.corr__dato {
+  min-width: 0;
+}
+
+.corr__dato--ancho {
+  grid-column: 1 / -1;
 }
 
 .corr__datos dt {
@@ -69,28 +71,97 @@
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--neutral-600);
+  color: var(--neutral-500);
 }
 
 .corr__datos dd {
-  margin: 2px 0 0;
+  margin: 3px 0 0;
+  font-size: 15px;
+  line-height: 22px;
   font-weight: 600;
   color: var(--neutral-950);
+  overflow-wrap: anywhere;
 }
 
 .corr__nota {
-  margin: 0 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0 0;
+  padding: 10px 12px;
+  border-radius: var(--radio-md);
+  background: var(--neutral-050);
   font-size: 13px;
   line-height: 18px;
   color: var(--neutral-600);
 }
 
+.corr__nota svg {
+  flex: none;
+}
+
+.corr__aviso {
+  margin: 0;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--neutral-600);
+}
+
+// Recuadro suave con barra de acento a la izquierda (igual que el texto explicativo de Excepciones de pago).
+.corr__callout {
+  padding: 12px 16px;
+  font-size: 14px;
+  line-height: 22px;
+  font-weight: 500;
+  color: var(--neutral-700, var(--neutral-600));
+  background: var(--neutral-050);
+  border-left: 3px solid var(--acento-500);
+  border-radius: 0 var(--radio-md) var(--radio-md) 0;
+}
+
+// ------------------------------------------------------------ Firmantes impresos --
+
 .corr__firmantes {
   margin: 0;
-  padding-left: 20px;
+  padding: 0;
+  list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+}
+
+.corr__firmantes li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--neutral-100);
+  border-radius: var(--radio-md);
+  background: var(--neutral-050);
+}
+
+.corr__numero {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--marca-900);
+  color: var(--blanco);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.corr__firmante-texto {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.corr__firmante-texto strong {
+  color: var(--neutral-950);
+  font-weight: 600;
 }
 
 .corr__firmantes small,
@@ -99,6 +170,8 @@
   font-size: 12px;
   color: var(--neutral-600);
 }
+
+// ------------------------------------------------------------------- Formulario --
 
 .corr__formulario {
   display: flex;
@@ -129,6 +202,14 @@
   border: 1px solid var(--neutral-200);
   border-radius: var(--radio-md);
   cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.corr__check:hover {
+  border-color: var(--marca-900);
+  background: var(--neutral-050);
 }
 
 .corr__check input {
@@ -170,40 +251,166 @@
   gap: 12px;
 }
 
+// Botones de la página: compactos, como en el resto del panel.
+.corr__btn {
+  height: 38px;
+  padding: 0 16px;
+  gap: 7px;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+// ---------------------------------------------------------------------- Anulación --
+
 .corr__peligro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px 24px;
   border-left: 4px solid var(--error);
 }
 
+// La tarjeta que abre el modal de corrección usa la misma disposición, con acento de marca en vez de rojo.
+.corr__peligro--editar {
+  border-left-color: var(--acento-500);
+}
+
+.corr__peligro-texto {
+  flex: 1;
+  min-width: 260px;
+}
+
+// -------------------------------------------------------------------- Historial --
+
+.corr__vacio {
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px dashed var(--neutral-200);
+  border-radius: var(--radio-md);
+  background: var(--neutral-050);
+  font-size: 14px;
+  text-align: center;
+  color: var(--neutral-500);
+}
+
+// Línea de tiempo: un ícono por cambio unido al siguiente por una raya vertical, con la fecha a la vista.
 .corr__historial {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
+}
+
+.corr__hito {
+  position: relative;
+  display: flex;
   gap: 16px;
+  padding-bottom: 24px;
 }
 
-.corr__historial li {
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--neutral-100);
-}
-
-.corr__historial li:last-child {
+.corr__hito:last-child {
   padding-bottom: 0;
-  border-bottom: 0;
 }
 
-.corr__hist-cab,
-.corr__hist-motivo {
-  margin: 0 0 4px;
+// Raya que conecta con el cambio siguiente (no existe tras el último).
+.corr__hito::before {
+  content: '';
+  position: absolute;
+  top: 34px;
+  bottom: 2px;
+  left: 15px;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--neutral-200);
+}
+
+.corr__hito:last-child::before {
+  display: none;
+}
+
+.corr__hito-icono {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--celeste-050, var(--neutral-100));
+  color: var(--celeste-700, var(--marca-900));
+  box-shadow: 0 0 0 4px var(--blanco);
+}
+
+.corr__hito--anulacion .corr__hito-icono {
+  background: var(--error-fondo);
+  color: var(--error);
+}
+
+.corr__hito--emision .corr__hito-icono {
+  background: var(--exito-fondo);
+  color: var(--exito);
+}
+
+.corr__hito-cuerpo {
+  flex: 1;
+  min-width: 0;
+  padding-top: 2px;
+}
+
+.corr__hito-cab {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+
+.corr__hito-titulo {
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--neutral-950);
+}
+
+.corr__hito-fecha {
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--neutral-500);
+}
+
+.corr__hito-autor {
+  margin: 0;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--neutral-600);
+}
+
+.corr__hito-motivo {
+  margin: 8px 0 0;
+  padding: 8px 12px;
+  border-left: 3px solid var(--neutral-200);
+  border-radius: 0 var(--radio-md) var(--radio-md) 0;
+  background: var(--neutral-050);
   font-size: 14px;
+  line-height: 22px;
+  color: var(--neutral-800);
 }
 
+.corr__hito-motivo span {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--neutral-500);
+}
 .corr__hist-versiones {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
-  margin-top: 8px;
+  margin-top: 10px;
 }
 
 .corr__hist-versiones span {
@@ -225,6 +432,76 @@
   background: var(--neutral-050);
 }
 
+// ------------------------------------------------------------------------ Modales --
+
+// Modal de anulación: advertencia y confirmación escribiendo el nombre del alumno.
+.corr__advertencia {
+  margin-bottom: 16px;
+}
+
+.corr__advertencia .alerta__titulo {
+  margin: 0 0 6px;
+}
+
+.corr__consecuencias {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--neutral-800);
+}
+
+.corr__consecuencias li + li {
+  margin-top: 3px;
+}
+
+.corr__confirmar-nombre {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 16px 0;
+  padding: 14px 16px;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radio-md);
+  background: var(--neutral-050);
+}
+
+.corr__confirmar-nombre .label {
+  display: block;
+  line-height: 22px;
+}
+
+.corr__nombre-objetivo {
+  display: inline-block;
+  margin-top: 2px;
+  padding: 1px 8px;
+  border-radius: var(--radio-md);
+  background: var(--blanco);
+  border: 1px solid var(--neutral-200);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  color: var(--neutral-950);
+  user-select: all;
+}
+
+.corr__confirmar-nombre .input--ok {
+  border-color: var(--exito);
+  box-shadow: 0 0 0 3px var(--exito-fondo);
+}
+
+.corr__coincide {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 13px;
+  color: var(--neutral-500);
+}
+
+.corr__coincide--ok {
+  color: var(--exito);
+  font-weight: 600;
+}
 .corr__confirmar {
   margin: 0 0 16px;
   line-height: 24px;
@@ -259,4 +536,14 @@
   .corr__hist-versiones {
     grid-template-columns: 1fr;
   }
+
+  .corr__cabecera {
+    padding: 18px;
+  }
+}
+
+// Acción para emitir el certificado de reemplazo, dentro del aviso de anulación.
+.corr__reemitir {
+  margin-top: 12px;
+  text-decoration: none;
 }

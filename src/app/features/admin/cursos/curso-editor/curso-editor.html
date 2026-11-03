@@ -34,8 +34,6 @@
     }
   }
 
-  <app-alerta-global />
-
   <div class="editor-tabs" role="tablist">
     @for (pestana of pestanasVisibles(); track pestana.id) {
       <button
@@ -173,6 +171,10 @@
 
         <div class="card editor-card">
           <h2 class="editor-card__titulo">Modalidad y fechas</h2>
+          <p class="editor-nota-registro">
+            <strong>Código de registro:</strong>
+            {{ curso()?.codigoRegistro ?? 'se asigna al publicar el curso' }}
+          </p>
           <div class="editor-campos editor-campos--3">
             <div>
               <label class="label">Modalidad</label>
@@ -189,14 +191,14 @@
                 <div class="campo-error">Obligatoria para esta modalidad.</div>
               }
             </div>
+            <div>
+              <label class="label">{{ esVirtual ? 'Fin (opcional)' : 'Fecha de fin' }}</label>
+              <input class="input" type="date" formControlName="fechaFin" [min]="formInformacion.controls.fechaInicio.value ?? ''" [class.input--error]="campoInvalido('fechaFin')" />
+              @if (campoInvalido('fechaFin')) {
+                <div class="campo-error">Obligatoria para esta modalidad.</div>
+              }
+            </div>
             @if (!esVirtual) {
-              <div>
-                <label class="label">Fecha de fin</label>
-                <input class="input" type="date" formControlName="fechaFin" [class.input--error]="campoInvalido('fechaFin')" />
-                @if (campoInvalido('fechaFin')) {
-                  <div class="campo-error">Obligatoria para esta modalidad.</div>
-                }
-              </div>
               <div>
                 <label class="label"><span>Cierre de matrícula</span><span class="nota-pill">Opcional</span></label>
                 <input class="input" type="date" formControlName="fechaCierreMatricula" />
@@ -207,7 +209,7 @@
             <span class="alerta__icono">i</span>
             <div class="alerta__texto">
               @if (esVirtual) {
-                Un curso virtual no exige fecha de fin. El inicio es opcional.
+                Un curso virtual no exige fechas. Puedes indicar solo el inicio o un rango (inicio y fin); el certificado imprime lo que indiques y, sin fechas, no muestra periodo.
               } @else {
                 Las modalidades en vivo o híbridas exigen inicio y fin. El cierre de matrícula se puede
                 dejar vacío por ahora; más adelante se ajusta según la asistencia obligatoria.

@@ -71,7 +71,7 @@ describe('Registro', () => {
   });
 
   it('permite consultar los documentos legales en otra pestaña sin enviar el formulario', () => {
-    component.formulario.controls.nombres.setValue('Ana');
+    component.formulario.controls.nombres.setValue('ANA');
     for (const ruta of ['/terminos', '/privacidad']) {
       const enlace = fixture.nativeElement.querySelector(
         'a[routerLink="' + ruta + '"]',
@@ -80,7 +80,7 @@ describe('Registro', () => {
       expect(enlace.target).toBe('_blank');
       expect(enlace.rel).toContain('noopener');
     }
-    expect(component.formulario.controls.nombres.value).toBe('Ana');
+    expect(component.formulario.controls.nombres.value).toBe('ANA');
     expect(api.registrarFormulario).not.toHaveBeenCalled();
   });
 
@@ -147,7 +147,7 @@ describe('Registro', () => {
     );
     component.registrar();
     expect(component.errorGeneral).toContain('todavía no está integrado');
-    expect(component.formulario.controls.nombres.value).toBe('Lucía');
+    expect(component.formulario.controls.nombres.value).toBe('LUCÍA');
     expect(component.formulario.controls.evidenciaAntiRobot.value).toBe('');
     expect(router.navigate).not.toHaveBeenCalled();
     expect(component.cuentaCreada).toBe(false);
@@ -202,8 +202,8 @@ describe('Registro', () => {
     component.registrar();
 
     expect(api.registrarFormulario).toHaveBeenCalledWith({
-      nombres: 'Lucía',
-      apellidoPaterno: 'Caminos',
+      nombres: 'LUCÍA',
+      apellidoPaterno: 'CAMINOS',
       apellidoMaterno: null,
       correo: 'lucia@example.com',
       telefono: null,
@@ -264,15 +264,15 @@ describe('Registro', () => {
 
     expect(component.formulario.controls.correo.hasError('servidor')).toBe(true);
     expect(component.mensajeErrorServidor('correo')).toBe('El correo ya se encuentra registrado');
-    expect(component.formulario.controls.nombres.value).toBe('Lucía');
+    expect(component.formulario.controls.nombres.value).toBe('LUCÍA');
   });
 
   it('carga el contexto Google, bloquea el correo y oculta requisitos propios', () => {
     api.obtenerContextoGoogle.mockReturnValue(
       of({
         correo: 'google@example.com',
-        nombres: 'Lucía',
-        apellidos: 'Caminos Quiroz',
+        nombres: 'LUCÍA',
+        apellidos: 'CAMINOS QUIROZ',
       }),
     );
     const route = TestBed.inject(ActivatedRoute);
@@ -287,7 +287,7 @@ describe('Registro', () => {
     expect(component.contextoGoogleValido).toBe(true);
     expect(component.formulario.controls.correo.disabled).toBe(true);
     expect(component.formulario.controls.correo.value).toBe('google@example.com');
-    expect(component.formulario.controls.apellidoPaterno.value).toBe('Caminos Quiroz');
+    expect(component.formulario.controls.apellidoPaterno.value).toBe('CAMINOS QUIROZ');
     expect(component.formulario.controls.contrasena.hasError('required')).toBe(false);
     expect(component.formulario.controls.evidenciaAntiRobot.hasError('required')).toBe(false);
   });
@@ -317,8 +317,8 @@ describe('Registro', () => {
 
     expect(api.completarRegistroGoogle).toHaveBeenCalledWith({
       referencia: 'google-1',
-      nombres: 'Lucía',
-      apellidoPaterno: 'Caminos Quiroz',
+      nombres: 'LUCÍA',
+      apellidoPaterno: 'CAMINOS QUIROZ',
       apellidoMaterno: null,
       telefono: null,
       documentoIdentidad: null,
@@ -348,8 +348,8 @@ describe('Registro', () => {
     api.obtenerContextoGoogle.mockReturnValue(
       of({
         correo: 'google@example.com',
-        nombres: 'Lucía',
-        apellidos: 'Caminos Quiroz',
+        nombres: 'LUCÍA',
+        apellidos: 'CAMINOS QUIROZ',
       }),
     );
     const route = TestBed.inject(ActivatedRoute);

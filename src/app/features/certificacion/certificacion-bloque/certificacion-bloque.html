@@ -42,7 +42,11 @@
               <a class="btn cert__ghost" [routerLink]="['/verificar-certificado']" [queryParams]="{ codigo: e.codigo }" target="_blank">Verificar</a>
             </div>
           }
-          <p class="cert__celebracion-nota">Tu nota, nivel y datos son definitivos. Los exámenes calificados ya no admiten nuevos intentos; las prácticas siguen disponibles.</p>
+          @if (e.estado === 'VIGENTE') {
+            <p class="cert__celebracion-nota">Tu nota, nivel y datos son definitivos. Los exámenes calificados ya no admiten nuevos intentos; las prácticas siguen disponibles.</p>
+          } @else {
+            <p class="cert__celebracion-nota">Este código ya no es válido. Si corresponde, la administración puede emitirte un certificado nuevo; escríbenos si crees que se trata de un error.</p>
+          }
         </div>
         <div class="cert__celebracion-vista">
           <app-diploma-miniatura [titular]="e.nombresImpresos" [curso]="c.curso" [nivel]="e.nivel" [entidad]="e.entidad" [anulado]="e.estado !== 'VIGENTE'" />

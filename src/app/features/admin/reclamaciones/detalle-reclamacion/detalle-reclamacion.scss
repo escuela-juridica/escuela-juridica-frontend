@@ -5,36 +5,6 @@
   max-width: 960px;
 }
 
-.det__volver {
-  align-self: flex-start;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--neutral-600);
-  text-decoration: none;
-}
-
-.det__etiqueta {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--eyebrow-color);
-}
-
-.det__titulo {
-  margin: 2px 0 0;
-  font-size: 22px;
-  line-height: 30px;
-  font-weight: 700;
-  color: var(--neutral-950);
-  font-variant-numeric: tabular-nums;
-}
-
-.det__cabecera p {
-  margin: 4px 0 0;
-  color: var(--neutral-600);
-}
-
 .det__tarjeta {
   padding: 22px 24px;
 }

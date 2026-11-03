@@ -1,0 +1,12 @@
+<header class="cd">
+  <div class="cd__identidad">
+    <span class="cd__avatar" aria-hidden="true"><ng-content select="[cd-icono]" /></span>
+    <div class="cd__texto">
+      <span class="cd__etiqueta">{{ etiqueta() }}</span>
+      <h1 class="cd__titulo">{{ titulo() }}</h1>
+      <div class="cd__meta"><ng-content select="[cd-meta]" /></div>
+    </div>
+  </div>
+
+  <div class="cd__lado"><ng-content select="[cd-lado]" /></div>
+</header>

@@ -1,22 +1,18 @@
 <section class="rev">
-  <a class="rev__volver" routerLink="/admin/evaluaciones/pendientes">
-    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6" /></svg>
-    Evaluaciones por revisar
-  </a>
+  <app-enlace-volver ruta="/admin/evaluaciones/pendientes" texto="Evaluaciones por revisar" />
 
   @if (cargando()) {
     <p class="rev__estado">Cargando intento…</p>
   } @else if (error(); as mensaje) {
     <div class="alerta alerta--error" role="alert"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div>
   } @else if (intento(); as it) {
-    <header class="card rev__cabecera">
-      <div>
-        <span class="rev__eyebrow">Revisión · intento {{ it.numeroIntento }}</span>
-        <h1 class="rev__titulo">{{ it.examen }}</h1>
-        <p class="rev__meta"><strong>{{ it.alumno }}</strong> · {{ it.correo }}</p>
-        <p class="rev__meta">{{ it.curso }} · enviado el {{ it.enviadoEn | date:'dd/MM/yyyy, h:mm a' | lowercase }}</p>
+    <app-cabecera-detalle [etiqueta]="'Revisión · intento ' + it.numeroIntento" [titulo]="it.examen">
+      <svg cd-icono viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" /><rect x="8" y="2" width="8" height="4" rx="1" /><polyline points="9 14 11 16 15 12" /></svg>
+      <div cd-meta>
+        <p><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg> <span><strong>{{ it.alumno }}</strong> · {{ it.correo }}</span></p>
+        <p><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" /></svg> {{ it.curso }} · enviado el {{ it.enviadoEn | date:'dd/MM/yyyy, h:mm a' | lowercase }}</p>
       </div>
-      <div class="rev__estado-plazo">
+      <div cd-lado class="rev__estado-plazo">
         @if (soloLectura()) {
           <span class="badge badge--disp-inmediato">Calificado</span>
           @if (it.calificadoEn) { <small>el {{ it.calificadoEn | date:'dd/MM/yyyy, h:mm a' | lowercase }}</small> }
@@ -25,8 +21,7 @@
           @if (it.fechaLimite) { <small>Límite: {{ it.fechaLimite | date:'dd/MM/yyyy, h:mm a' | lowercase }}</small> }
         }
       </div>
-    </header>
-
+    </app-cabecera-detalle>
     @if (!soloLectura() && it.plazo === 'VENCIDO') {
       <div class="alerta alerta--advertencia" role="status">
         <span class="alerta__icono">!</span>

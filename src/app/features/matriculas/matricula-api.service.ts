@@ -35,15 +35,36 @@ export class MatriculaApiService {
     return this.http.post<{ enviado: boolean; mensaje: string }>(`${API_URL}/matriculas/${id}/reenviar-confirmacion`, {});
   }
 
-  listarAdministrativas(texto = '', estado = '', page = 0, size = 10): Observable<PageResponse<MatriculaAdministrativa>> {
+  listarAdministrativas(
+    filtros: { usuarioId: number | null; cursoId: number | null; estado: string },
+    page = 0,
+    size = 10,
+  ): Observable<PageResponse<MatriculaAdministrativa>> {
     let params = new HttpParams().set('page', page).set('size', size);
-    if (texto.trim()) params = params.set('texto', texto.trim());
-    if (estado) params = params.set('estado', estado);
+    if (filtros.usuarioId) params = params.set('usuarioId', filtros.usuarioId);
+    if (filtros.cursoId) params = params.set('cursoId', filtros.cursoId);
+    if (filtros.estado) params = params.set('estado', filtros.estado);
     return this.http.get<PageResponse<MatriculaAdministrativa>>(`${API_URL}/admin/matriculas`, { params });
   }
 
   obtenerDetalleAdministrativo(matriculaId: number): Observable<MatriculaDetalleAdministrativa> {
     return this.http.get<MatriculaDetalleAdministrativa>(`${API_URL}/admin/matriculas/${matriculaId}`);
+  }
+
+  /** Devuelve a «Activa» una matrícula cancelada; el motivo queda en el historial. */
+  reactivarAdministrativa(matriculaId: number, motivo: string): Observable<Matricula> {
+    return this.http.patch<Matricula>(`${API_URL}/admin/matriculas/${matriculaId}/reactivacion`, { motivo });
+  }
+
+  /** Boleta o captura (PNG, JPG, WEBP o PDF) que respalda un pago manual; reemplaza la anterior si existe. */
+  adjuntarComprobante(matriculaId: number, archivo: File): Observable<void> {
+    const datos = new FormData();
+    datos.append('archivo', archivo);
+    return this.http.post<void>(`${API_URL}/admin/matriculas/${matriculaId}/comprobante`, datos);
+  }
+
+  comprobante(matriculaId: number): Observable<Blob> {
+    return this.http.get(`${API_URL}/admin/matriculas/${matriculaId}/comprobante`, { responseType: 'blob' });
   }
 
   cancelarAdministrativa(matriculaId: number, motivo: string): Observable<unknown> {

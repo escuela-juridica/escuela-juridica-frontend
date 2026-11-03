@@ -1,3 +1,30 @@
+// Aviso flotante: se monta una sola vez en la raíz de la app (app.html), así que se ve en cualquier
+// pantalla y por encima de los modales (z-index 100) y del diálogo de confirmación (200).
 .alerta-global {
-  margin-bottom: 16px;
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  z-index: 300;
+  width: min(560px, calc(100vw - 32px));
+  margin: 0;
+  box-shadow: 0 12px 28px -8px rgba(16, 24, 40, 0.35);
+  transform: translateX(-50%);
+  animation: alerta-global-entrada 0.2s ease;
+}
+
+@keyframes alerta-global-entrada {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -8px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .alerta-global {
+    animation: none;
+  }
 }

@@ -27,7 +27,7 @@
         <div><dt>Sin finalizar</dt><dd>{{ i.alumnosSinFinalizar }}</dd></div>
         <div><dt>Avisos enviados</dt><dd>{{ i.avisosEnviados }} de {{ i.avisosTotal }}</dd></div>
       </dl>
-      <p class="canc__nota">Los alumnos conservan la consulta de lo que ya estaba disponible; no hay nuevas actividades ni sesiones. Quien ya cumplió conserva su certificado; quien no cumplió no recibe uno automático. ESEJUR no devuelve dinero: atiende los pagos de este curso en <a routerLink="/admin/excepciones-pago">Excepciones de pago</a>.</p>
+      <p class="canc__nota">Los alumnos conservan la consulta de lo que ya estaba disponible; no hay nuevas actividades ni sesiones. Quien ya cumplió conserva su certificado; quien no cumplió no recibe uno automático. ESEJUR no devuelve dinero: atiende los pagos de este curso en <a routerLink="/admin/matriculas" [queryParams]="{ tab: 'excepciones' }">Excepciones de pago</a>.</p>
 
       @if (i.avisosConError > 0) {
         <div class="alerta alerta--advertencia" role="status">

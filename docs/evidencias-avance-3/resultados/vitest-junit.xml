@@ -1,0 +1,589 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="233" failures="0" errors="0" time="30.535642">
+    <testsuite name="src/app/app.spec.ts" timestamp="2026-10-29T15:55:50.407Z" hostname="ENRIQUE" tests="2" failures="0" errors="0" skipped="0" time="0.1552475">
+        <testcase classname="src/app/app.spec.ts" name="App &gt; should create the app" time="0.0507632">
+        </testcase>
+        <testcase classname="src/app/app.spec.ts" name="App &gt; renderiza el contenedor de rutas y los elementos globales" time="0.1038487">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/core/session/admin-guard.spec.ts" timestamp="2026-10-29T15:55:50.410Z" hostname="ENRIQUE" tests="1" failures="0" errors="0" skipped="0" time="0.0007271">
+        <testcase classname="src/app/core/session/admin-guard.spec.ts" name="adminGuard &gt; should be created" time="0.0004694">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/core/session/session-guard.spec.ts" timestamp="2026-10-29T15:55:50.412Z" hostname="ENRIQUE" tests="1" failures="0" errors="0" skipped="0" time="0.000582">
+        <testcase classname="src/app/core/session/session-guard.spec.ts" name="sessionGuard &gt; should be created" time="0.0004685">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/core/session/session.spec.ts" timestamp="2026-10-29T15:55:50.413Z" hostname="ENRIQUE" tests="1" failures="0" errors="0" skipped="0" time="0.0030332">
+        <testcase classname="src/app/core/session/session.spec.ts" name="Session &gt; should be created" time="0.002791">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/aula/aula-sesion.service.spec.ts" timestamp="2026-10-29T15:55:50.414Z" hostname="ENRIQUE" tests="9" failures="0" errors="0" skipped="0" time="0.0770074">
+        <testcase classname="src/app/features/aula/aula-sesion.service.spec.ts" name="AulaSesionService &gt; al ingresar al aula pide el temario del curso y muestra el estado de carga hasta recibirlo" time="0.0045057">
+        </testcase>
+        <testcase classname="src/app/features/aula/aula-sesion.service.spec.ts" name="AulaSesionService &gt; aplana módulos y lecciones en el orden del curso con su posición global y por módulo" time="0.0036773">
+        </testcase>
+        <testcase classname="src/app/features/aula/aula-sesion.service.spec.ts" name="AulaSesionService &gt; &quot;Continuar&quot; reabre la lección que indica el servidor" time="0.0029679">
+        </testcase>
+        <testcase classname="src/app/features/aula/aula-sesion.service.spec.ts" name="AulaSesionService &gt; sin lección de continuación válida no hay a dónde continuar" time="0.0153681">
+        </testcase>
+        <testcase classname="src/app/features/aula/aula-sesion.service.spec.ts" name="AulaSesionService &gt; navega a la lección anterior y a la siguiente a partir de la lección actual" time="0.004152">
+        </testcase>
+        <testcase classname="src/app/features/aula/aula-sesion.service.spec.ts" name="AulaSesionService &gt; si el alumno no está matriculado muestra el mensaje real del servidor" time="0.0036648">
+        </testcase>
+        <testcase classname="src/app/features/aula/aula-sesion.service.spec.ts" name="AulaSesionService &gt; ante una falla sin cuerpo usa un mensaje genérico" time="0.0028127">
+        </testcase>
+        <testcase classname="src/app/features/aula/aula-sesion.service.spec.ts" name="AulaSesionService &gt; refrescar vuelve a pedir el temario sin mostrar la pantalla de carga" time="0.0043083">
+        </testcase>
+        <testcase classname="src/app/features/aula/aula-sesion.service.spec.ts" name="AulaSesionService &gt; refrescar sin haber cargado ningún curso no llama al servidor" time="0.0350597">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/cuenta/cuenta.spec.ts" timestamp="2026-10-29T15:55:50.418Z" hostname="ENRIQUE" tests="1" failures="0" errors="0" skipped="0" time="0.0034384">
+        <testcase classname="src/app/features/cuenta/cuenta.spec.ts" name="Cuenta &gt; should be created" time="0.0031677">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/certificacion/certificacion-api.service.spec.ts" timestamp="2026-10-29T15:55:50.419Z" hostname="ENRIQUE" tests="8" failures="0" errors="0" skipped="0" time="0.155421">
+        <testcase classname="src/app/features/certificacion/certificacion-api.service.spec.ts" name="CertificacionApiService &gt; consulta el estado de certificación de un curso" time="0.0038975">
+        </testcase>
+        <testcase classname="src/app/features/certificacion/certificacion-api.service.spec.ts" name="CertificacionApiService &gt; confirma los datos a imprimir con PUT y devuelve la certificación actualizada" time="0.0040246">
+        </testcase>
+        <testcase classname="src/app/features/certificacion/certificacion-api.service.spec.ts" name="CertificacionApiService &gt; emite el certificado con POST" time="0.0037023">
+        </testcase>
+        <testcase classname="src/app/features/certificacion/certificacion-api.service.spec.ts" name="CertificacionApiService &gt; emitir sin cumplir los requisitos devuelve el motivo del servidor" time="0.0098144">
+        </testcase>
+        <testcase classname="src/app/features/certificacion/certificacion-api.service.spec.ts" name="CertificacionApiService &gt; lista solo los certificados del alumno autenticado" time="0.0031196">
+        </testcase>
+        <testcase classname="src/app/features/certificacion/certificacion-api.service.spec.ts" name="CertificacionApiService &gt; verifica un certificado por código sin sesión, codificando el código en la URL" time="0.0029974">
+        </testcase>
+        <testcase classname="src/app/features/certificacion/certificacion-api.service.spec.ts" name="CertificacionApiService &gt; un código inexistente se informa como 404" time="0.0026606">
+        </testcase>
+        <testcase classname="src/app/features/certificacion/certificacion-api.service.spec.ts" name="CertificacionApiService &gt; descarga el PDF privado y lo guarda con el nombre certificado-CODIGO.pdf" time="0.1234953">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/cursos/cursos.spec.ts" timestamp="2026-10-29T15:55:50.423Z" hostname="ENRIQUE" tests="1" failures="0" errors="0" skipped="0" time="0.0030147">
+        <testcase classname="src/app/features/cursos/cursos.spec.ts" name="Cursos &gt; should be created" time="0.0027658">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/leccion/leccion-reproductor-api.service.spec.ts" timestamp="2026-10-29T15:55:50.423Z" hostname="ENRIQUE" tests="5" failures="0" errors="0" skipped="0" time="0.0308865">
+        <testcase classname="src/app/features/leccion/leccion-reproductor-api.service.spec.ts" name="LeccionReproductorApiService &gt; lista los materiales de una lección con GET" time="0.0060138">
+        </testcase>
+        <testcase classname="src/app/features/leccion/leccion-reproductor-api.service.spec.ts" name="LeccionReproductorApiService &gt; sin matrícula el servidor rechaza los materiales y el error llega al llamador" time="0.0025374">
+        </testcase>
+        <testcase classname="src/app/features/leccion/leccion-reproductor-api.service.spec.ts" name="LeccionReproductorApiService &gt; registra el avance del video enviando segundos reproducidos y última posición" time="0.0032583">
+        </testcase>
+        <testcase classname="src/app/features/leccion/leccion-reproductor-api.service.spec.ts" name="LeccionReproductorApiService &gt; completa la lección con POST y cuerpo vacío" time="0.0029833">
+        </testcase>
+        <testcase classname="src/app/features/leccion/leccion-reproductor-api.service.spec.ts" name="LeccionReproductorApiService &gt; una lección bloqueada no se completa: el motivo del servidor llega al llamador" time="0.0155239">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/examen/examen-api.service.spec.ts" timestamp="2026-10-29T15:55:50.426Z" hostname="ENRIQUE" tests="7" failures="0" errors="0" skipped="0" time="0.0245286">
+        <testcase classname="src/app/features/examen/examen-api.service.spec.ts" name="ExamenApiService &gt; consulta la ficha del examen con GET" time="0.0041791">
+        </testcase>
+        <testcase classname="src/app/features/examen/examen-api.service.spec.ts" name="ExamenApiService &gt; inicia un intento con POST y devuelve el intento en progreso" time="0.0040732">
+        </testcase>
+        <testcase classname="src/app/features/examen/examen-api.service.spec.ts" name="ExamenApiService &gt; no inicia otro intento cuando se agotaron: el servidor explica el motivo" time="0.0035764">
+        </testcase>
+        <testcase classname="src/app/features/examen/examen-api.service.spec.ts" name="ExamenApiService &gt; guarda la respuesta de una pregunta con PUT enviando las alternativas marcadas" time="0.0033318">
+        </testcase>
+        <testcase classname="src/app/features/examen/examen-api.service.spec.ts" name="ExamenApiService &gt; guarda una respuesta abierta enviando el texto" time="0.0029226">
+        </testcase>
+        <testcase classname="src/app/features/examen/examen-api.service.spec.ts" name="ExamenApiService &gt; envía el intento y recibe la nota calificada automáticamente" time="0.002934">
+        </testcase>
+        <testcase classname="src/app/features/examen/examen-api.service.spec.ts" name="ExamenApiService &gt; consulta un intento ya existente por su identificador" time="0.0029008">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/examen/examen-pantalla.spec.ts" timestamp="2026-10-29T15:55:50.428Z" hostname="ENRIQUE" tests="11" failures="0" errors="0" skipped="0" time="2.5178437">
+        <testcase classname="src/app/features/examen/examen-pantalla.spec.ts" name="ExamenPantalla &gt; al abrir carga la ficha del examen y la muestra antes de iniciar un intento" time="0.7693644">
+        </testcase>
+        <testcase classname="src/app/features/examen/examen-pantalla.spec.ts" name="ExamenPantalla &gt; si la ficha no se puede abrir muestra el mensaje del servidor" time="0.0359912">
+        </testcase>
+        <testcase classname="src/app/features/examen/examen-pantalla.spec.ts" name="ExamenPantalla &gt; iniciar un intento abre la primera pregunta con todo sin responder" time="0.4913256">
+        </testcase>
+        <testcase classname="src/app/features/examen/examen-pantalla.spec.ts" name="ExamenPantalla &gt; si no se puede iniciar avisa el motivo y vuelve a cargar la ficha" time="0.1977526">
+        </testcase>
+        <testcase classname="src/app/features/examen/examen-pantalla.spec.ts" name="ExamenPantalla &gt; marcar una alternativa guarda la respuesta en el servidor al instante" time="0.2822279">
+        </testcase>
+        <testcase classname="src/app/features/examen/examen-pantalla.spec.ts" name="ExamenPantalla &gt; en una selección múltiple marcar dos alternativas las conserva y desmarcar una la quita" time="0.117557">
+        </testcase>
+        <testcase classname="src/app/features/examen/examen-pantalla.spec.ts" name="ExamenPantalla &gt; enviar con todo respondido muestra la nota y si el alumno aprobó" time="0.1929198">
+        </testcase>
+        <testcase classname="src/app/features/examen/examen-pantalla.spec.ts" name="ExamenPantalla &gt; un intento no aprobado se muestra como resultado con su nota" time="0.069621">
+        </testcase>
+        <testcase classname="src/app/features/examen/examen-pantalla.spec.ts" name="ExamenPantalla &gt; con una respuesta abierta el intento queda pendiente de revisión, sin nota todavía" time="0.0781799">
+        </testcase>
+        <testcase classname="src/app/features/examen/examen-pantalla.spec.ts" name="ExamenPantalla &gt; si el envío falla muestra el error y el alumno puede intentarlo de nuevo" time="0.1055684">
+        </testcase>
+        <testcase classname="src/app/features/examen/examen-pantalla.spec.ts" name="ExamenPantalla &gt; al agotarse el tiempo consulta el intento y muestra el resultado cerrado por tiempo" time="0.1709036">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/matriculas/matricula-api.service.spec.ts" timestamp="2026-10-29T15:55:50.432Z" hostname="ENRIQUE" tests="7" failures="0" errors="0" skipped="0" time="0.0257414">
+        <testcase classname="src/app/features/matriculas/matricula-api.service.spec.ts" name="MatriculaApiService &gt; lista los cursos del alumno autenticado" time="0.0036036">
+        </testcase>
+        <testcase classname="src/app/features/matriculas/matricula-api.service.spec.ts" name="MatriculaApiService &gt; matricula gratis en un curso gratuito con POST" time="0.0035302">
+        </testcase>
+        <testcase classname="src/app/features/matriculas/matricula-api.service.spec.ts" name="MatriculaApiService &gt; una matrícula duplicada se informa con el mensaje del servidor" time="0.0033936">
+        </testcase>
+        <testcase classname="src/app/features/matriculas/matricula-api.service.spec.ts" name="MatriculaApiService &gt; la matrícula administrativa envía la condición económica y la confirmación de la advertencia" time="0.0028031">
+        </testcase>
+        <testcase classname="src/app/features/matriculas/matricula-api.service.spec.ts" name="MatriculaApiService &gt; lista las matrículas administrativas filtrando por texto y estado con paginación del servidor" time="0.0042994">
+        </testcase>
+        <testcase classname="src/app/features/matriculas/matricula-api.service.spec.ts" name="MatriculaApiService &gt; cancela una matrícula con PATCH enviando el motivo" time="0.0039815">
+        </testcase>
+        <testcase classname="src/app/features/matriculas/matricula-api.service.spec.ts" name="MatriculaApiService &gt; el reporte de matrículas envía los filtros y la exportación conserva los mismos" time="0.003762">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/pagos/culqi-checkout.service.spec.ts" timestamp="2026-10-29T15:55:50.435Z" hostname="ENRIQUE" tests="8" failures="0" errors="0" skipped="0" time="0.1501666">
+        <testcase classname="src/app/features/pagos/culqi-checkout.service.spec.ts" name="CulqiCheckoutService &gt; abre el checkout con la llave pública, el monto en céntimos y la orden del intento" time="0.0054213">
+        </testcase>
+        <testcase classname="src/app/features/pagos/culqi-checkout.service.spec.ts" name="CulqiCheckoutService &gt; ofrece tarjeta y Yape y deja fuera banca móvil, agentes y cuotéalo" time="0.0046638">
+        </testcase>
+        <testcase classname="src/app/features/pagos/culqi-checkout.service.spec.ts" name="CulqiCheckoutService &gt; las billeteras no se ofrecen mientras estén deshabilitadas, sea cual sea el monto" time="0.0194612">
+        </testcase>
+        <testcase classname="src/app/features/pagos/culqi-checkout.service.spec.ts" name="CulqiCheckoutService &gt; con tarjeta o Yape cierra el modal y entrega el token para que el servidor cobre" time="0.0065157">
+        </testcase>
+        <testcase classname="src/app/features/pagos/culqi-checkout.service.spec.ts" name="CulqiCheckoutService &gt; con una orden (billetera) avisa pero deja el modal abierto para mostrar el QR" time="0.0036393">
+        </testcase>
+        <testcase classname="src/app/features/pagos/culqi-checkout.service.spec.ts" name="CulqiCheckoutService &gt; si Culqi informa un error entrega su mensaje para el usuario" time="0.0051924">
+        </testcase>
+        <testcase classname="src/app/features/pagos/culqi-checkout.service.spec.ts" name="CulqiCheckoutService &gt; sin mensaje de Culqi usa uno genérico" time="0.0038083">
+        </testcase>
+        <testcase classname="src/app/features/pagos/culqi-checkout.service.spec.ts" name="CulqiCheckoutService &gt; si el script de Culqi no carga la operación se rechaza y se puede reintentar" time="0.1009133">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/pagos/pagos-api.service.spec.ts" timestamp="2026-10-29T15:55:50.438Z" hostname="ENRIQUE" tests="6" failures="0" errors="0" skipped="0" time="0.0284312">
+        <testcase classname="src/app/features/pagos/pagos-api.service.spec.ts" name="PagosApiService &gt; inicia el pago confirmando el importe vigente que vio el alumno" time="0.0032019">
+        </testcase>
+        <testcase classname="src/app/features/pagos/pagos-api.service.spec.ts" name="PagosApiService &gt; si el precio cambió el servidor responde PRICE_CHANGED y no se inicia el pago" time="0.0026389">
+        </testcase>
+        <testcase classname="src/app/features/pagos/pagos-api.service.spec.ts" name="PagosApiService &gt; envía el token del checkout para que el servidor cobre" time="0.0039469">
+        </testcase>
+        <testcase classname="src/app/features/pagos/pagos-api.service.spec.ts" name="PagosApiService &gt; consulta el estado de un intento y sus intentos por curso" time="0.0025587">
+        </testcase>
+        <testcase classname="src/app/features/pagos/pagos-api.service.spec.ts" name="PagosApiService &gt; la constancia solo existe para un pago aprobado: otro estado responde 400" time="0.0109096">
+        </testcase>
+        <testcase classname="src/app/features/pagos/pagos-api.service.spec.ts" name="PagosApiService &gt; reenvía el aviso del resultado con POST" time="0.0047568">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/reclamaciones/reclamaciones-api.service.spec.ts" timestamp="2026-10-29T15:55:50.441Z" hostname="ENRIQUE" tests="5" failures="0" errors="0" skipped="0" time="0.0249238">
+        <testcase classname="src/app/features/reclamaciones/reclamaciones-api.service.spec.ts" name="ReclamacionesApiService &gt; con sesión consulta los datos conocidos para prellenar el formulario" time="0.0050055">
+        </testcase>
+        <testcase classname="src/app/features/reclamaciones/reclamaciones-api.service.spec.ts" name="ReclamacionesApiService &gt; sin sesión presenta el caso por la ruta pública con los datos como parte JSON &quot;datos&quot;" time="0.006836">
+        </testcase>
+        <testcase classname="src/app/features/reclamaciones/reclamaciones-api.service.spec.ts" name="ReclamacionesApiService &gt; con sesión usa la ruta de la cuenta para que el caso quede ligado a ella" time="0.0038193">
+        </testcase>
+        <testcase classname="src/app/features/reclamaciones/reclamaciones-api.service.spec.ts" name="ReclamacionesApiService &gt; adjunta cada imagen como parte &quot;imagenes&quot; conservando su nombre" time="0.0048242">
+        </testcase>
+        <testcase classname="src/app/features/reclamaciones/reclamaciones-api.service.spec.ts" name="ReclamacionesApiService &gt; un DNI inválido es rechazado por el servidor y el mensaje llega al llamador" time="0.0037305">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/sesiones/sesion-alumno-api.service.spec.ts" timestamp="2026-10-29T15:55:50.443Z" hostname="ENRIQUE" tests="5" failures="0" errors="0" skipped="0" time="0.0245781">
+        <testcase classname="src/app/features/sesiones/sesion-alumno-api.service.spec.ts" name="SesionAlumnoApiService &gt; sin fechas pide el calendario sin parámetros (el servidor usa el mes actual)" time="0.0039292">
+        </testcase>
+        <testcase classname="src/app/features/sesiones/sesion-alumno-api.service.spec.ts" name="SesionAlumnoApiService &gt; con un rango pide las sesiones entre esas fechas" time="0.0036703">
+        </testcase>
+        <testcase classname="src/app/features/sesiones/sesion-alumno-api.service.spec.ts" name="SesionAlumnoApiService &gt; un rango invertido se informa con el mensaje del servidor" time="0.0031021">
+        </testcase>
+        <testcase classname="src/app/features/sesiones/sesion-alumno-api.service.spec.ts" name="SesionAlumnoApiService &gt; al ingresar a una sesión en su ventana recibe el enlace de la reunión" time="0.0106476">
+        </testcase>
+        <testcase classname="src/app/features/sesiones/sesion-alumno-api.service.spec.ts" name="SesionAlumnoApiService &gt; fuera de la ventana de la sesión el ingreso se rechaza" time="0.002748">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/core/layout/layout-admin/layout-admin.spec.ts" timestamp="2026-10-29T15:55:50.445Z" hostname="ENRIQUE" tests="1" failures="0" errors="0" skipped="0" time="0.3034171">
+        <testcase classname="src/app/core/layout/layout-admin/layout-admin.spec.ts" name="LayoutAdmin &gt; should create" time="0.3031766">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/core/layout/layout-alumno/layout-alumno.spec.ts" timestamp="2026-10-29T15:55:50.445Z" hostname="ENRIQUE" tests="2" failures="0" errors="0" skipped="0" time="0.3225273">
+        <testcase classname="src/app/core/layout/layout-alumno/layout-alumno.spec.ts" name="LayoutAlumno &gt; should create" time="0.2610332">
+        </testcase>
+        <testcase classname="src/app/core/layout/layout-alumno/layout-alumno.spec.ts" name="LayoutAlumno &gt; cierra la sesión en el backend y navega al catálogo" time="0.0611437">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/core/layout/layout-publico/layout-publico.spec.ts" timestamp="2026-10-29T15:55:50.446Z" hostname="ENRIQUE" tests="1" failures="0" errors="0" skipped="0" time="0.2499973">
+        <testcase classname="src/app/core/layout/layout-publico/layout-publico.spec.ts" name="LayoutPublico &gt; should create" time="0.2297135">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/admin/dashboard/dashboard.spec.ts" timestamp="2026-10-29T15:55:50.447Z" hostname="ENRIQUE" tests="11" failures="0" errors="0" skipped="0" time="2.9116288">
+        <testcase classname="src/app/features/admin/dashboard/dashboard.spec.ts" name="DashboardPantalla &gt; al abrir consulta el año calendario actual sin filtros de curso ni modalidad" time="1.6375769">
+            <system-err>
+ERROR ReferenceError: ResizeObserver is not defined
+    at D:/Enrique/UTP/Ciclo 7/Proyecto Escuela Juridica/Escuela Juridica/escuela-juridica-frontend/src/app/shared/ui/graficos/grafico-serie/grafico-serie.ts:47:26
+    at file:///D:/Enrique/UTP/Ciclo%207/Proyecto%20Escuela%20Juridica/Escuela%20Juridica/escuela-juridica-frontend/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:4415:27
+    at AfterRenderImpl.maybeTrace (file:///D:/Enrique/UTP/Ciclo%207/Proyecto%20Escuela%20Juridica/Escuela%20Juridica/escuela-juridica-frontend/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:4472:75)
+    at file:///D:/Enrique/UTP/Ciclo%207/Proyecto%20Escuela%20Juridica/Escuela%20Juridica/escuela-juridica-frontend/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:4413:78
+    at NoopNgZone.runOutsideAngular (file:///D:/Enrique/UTP/Ciclo%207/Proyecto%20Escuela%20Juridica/Escuela%20Juridica/escuela-juridica-frontend/node_modules/@angular/core/fesm2022/_effect-chunk2.mjs:2618:12)
+    at AfterRenderImpl.execute (file:///D:/Enrique/UTP/Ciclo%207/Proyecto%20Escuela%20Juridica/Escuela%20Juridica/escuela-juridica-frontend/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:4413:49)
+    at AfterRenderManager.execute (file:///D:/Enrique/UTP/Ciclo%207/Proyecto%20Escuela%20Juridica/Escuela%20Juridica/escuela-juridica-frontend/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:4376:16)
+    at ApplicationRef.synchronizeOnce (file:///D:/Enrique/UTP/Ciclo%207/Proyecto%20Escuela%20Juridica/Escuela%20Juridica/escuela-juridica-frontend/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:12485:31)
+    at ApplicationRef.synchronize (file:///D:/Enrique/UTP/Ciclo%207/Proyecto%20Escuela%20Juridica/Escuela%20Juridica/escuela-juridica-frontend/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:12444:14)
+    at ApplicationRef.tickImpl (file:///D:/Enrique/UTP/Ciclo%207/Proyecto%20Escuela%20Juridica/Escuela%20Juridica/escuela-juridica-frontend/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:12419:12)
+ERROR ReferenceError: ResizeObserver is not defined
+    at D:/Enrique/UTP/Ciclo 7/Proyecto Escuela Juridica/Escuela Juridica/escuela-juridica-frontend/src/app/shared/ui/graficos/grafico-serie/grafico-serie.ts:47:26
+    at file:///D:/Enrique/UTP/Ciclo%207/Proyecto%20Escuela%20Juridica/Escuela%20Juridica/escuela-juridica-frontend/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:4415:27
+    at AfterRenderImpl.maybeTrace (file:///D:/Enrique/UTP/Ciclo%207/Proyecto%20Escuela%20Juridica/Escuela%20Juridica/escuela-juridica-frontend/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:4472:75)
+    at file:///D:/Enrique/UTP/Ciclo%207/Proyecto%20Escuela%20Juridica/Escuela%20Juridica/escuela-juridica-frontend/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:4413:78
+    at NoopNgZone.runOutsideAngular (file:///D:/Enrique/UTP/Ciclo%207/Proyecto%20Escuela%20Juridica/Escuela%20Juridica/escuela-juridica-frontend/node_modules/@angular/core/fesm2022/_effect-chunk2.mjs:2618:12)
+    at AfterRenderImpl.execute (file:///D:/Enrique/UTP/Ciclo%207/Proyecto%20Escuela%20Juridica/Escuela%20Juridica/escuela-juridica-frontend/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:4413:49)
+    at AfterRenderManager.execute (file:///D:/Enrique/UTP/Ciclo%207/Proyecto%20Escuela%20Juridica/Escuela%20Juridica/escuela-juridica-frontend/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:4376:16)
+    at ApplicationRef.synchronizeOnce (file:///D:/Enrique/UTP/Ciclo%207/Proyecto%20Escuela%20Juridica/Escuela%20Juridica/escuela-juridica-frontend/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:12485:31)
+    at ApplicationRef.synchronize (file:///D:/Enrique/UTP/Ciclo%207/Proyecto%20Escuela%20Juridica/Escuela%20Juridica/escuela-juridica-frontend/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:12444:14)
+    at ApplicationRef.tickImpl (file:///D:/Enrique/UTP/Ciclo%207/Proyecto%20Escuela%20Juridica/Escuela%20Juridica/escuela-juridica-frontend/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:12419:12)
+
+            </system-err>
+        </testcase>
+        <testcase classname="src/app/features/admin/dashboard/dashboard.spec.ts" name="DashboardPantalla &gt; prepara los datos de cada gráfico: evolución, matrículas por curso, forma de ingreso y pagos" time="0.1390499">
+        </testcase>
+        <testcase classname="src/app/features/admin/dashboard/dashboard.spec.ts" name="DashboardPantalla &gt; los filtros de la URL (curso, modalidad y rango) se aplican en la primera consulta" time="0.3508927">
+        </testcase>
+        <testcase classname="src/app/features/admin/dashboard/dashboard.spec.ts" name="DashboardPantalla &gt; cambiar el rango vuelve a consultar y guarda el filtro en la URL para poder compartirla" time="0.1943392">
+        </testcase>
+        <testcase classname="src/app/features/admin/dashboard/dashboard.spec.ts" name="DashboardPantalla &gt; una fecha final anterior a la inicial no consulta y avisa" time="0.1603668">
+        </testcase>
+        <testcase classname="src/app/features/admin/dashboard/dashboard.spec.ts" name="DashboardPantalla &gt; si el servidor rechaza el rango muestra su mensaje" time="0.1177795">
+        </testcase>
+        <testcase classname="src/app/features/admin/dashboard/dashboard.spec.ts" name="DashboardPantalla &gt; una respuesta que llega tarde no pisa la consulta más reciente" time="0.0737275">
+        </testcase>
+        <testcase classname="src/app/features/admin/dashboard/dashboard.spec.ts" name="DashboardPantalla &gt; cada gráfico puede verse también como tabla" time="0.0690353">
+        </testcase>
+        <testcase classname="src/app/features/admin/dashboard/dashboard.spec.ts" name="DashboardApiService &gt; envía el rango, el curso y la modalidad como parámetros" time="0.0058526">
+        </testcase>
+        <testcase classname="src/app/features/admin/dashboard/dashboard.spec.ts" name="DashboardApiService &gt; sin filtros opcionales solo envía la modalidad vacía" time="0.0401744">
+        </testcase>
+        <testcase classname="src/app/features/admin/dashboard/dashboard.spec.ts" name="DashboardApiService &gt; un usuario sin rol de administrador recibe 403" time="0.1193723">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/admin/excepciones-pago/excepciones-pago.spec.ts" timestamp="2026-10-29T15:55:50.452Z" hostname="ENRIQUE" tests="7" failures="0" errors="0" skipped="0" time="1.1371998">
+        <testcase classname="src/app/features/admin/excepciones-pago/excepciones-pago.spec.ts" name="ExcepcionesPago &gt; al abrir lista las excepciones pendientes, paginadas desde el servidor" time="0.5681157">
+        </testcase>
+        <testcase classname="src/app/features/admin/excepciones-pago/excepciones-pago.spec.ts" name="ExcepcionesPago &gt; filtrar por tipo vuelve a la primera página con ese tipo" time="0.0391783">
+        </testcase>
+        <testcase classname="src/app/features/admin/excepciones-pago/excepciones-pago.spec.ts" name="ExcepcionesPago &gt; si la lista falla informa el error del servidor" time="0.1206394">
+        </testcase>
+        <testcase classname="src/app/features/admin/excepciones-pago/excepciones-pago.spec.ts" name="ExcepcionesPago &gt; revisar una excepción carga su detalle completo" time="0.0575436">
+        </testcase>
+        <testcase classname="src/app/features/admin/excepciones-pago/excepciones-pago.spec.ts" name="ExcepcionesPago &gt; no registra la atención si la descripción es demasiado corta" time="0.0594362">
+        </testcase>
+        <testcase classname="src/app/features/admin/excepciones-pago/excepciones-pago.spec.ts" name="ExcepcionesPago &gt; registra la atención brindada y avisa que el pago y la matrícula no se modificaron" time="0.1538749">
+        </testcase>
+        <testcase classname="src/app/features/admin/excepciones-pago/excepciones-pago.spec.ts" name="ExcepcionesPago &gt; atender dos veces el mismo caso muestra el conflicto del servidor" time="0.1347807">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/aula/aula-resumen/aula-resumen.spec.ts" timestamp="2026-10-29T15:55:50.455Z" hostname="ENRIQUE" tests="8" failures="0" errors="0" skipped="0" time="2.5434832">
+        <testcase classname="src/app/features/aula/aula-resumen/aula-resumen.spec.ts" name="AulaResumen &gt; al entrar al aula no hay una lección abierta y &quot;Continuar&quot; apunta a la primera disponible" time="1.1945916">
+        </testcase>
+        <testcase classname="src/app/features/aula/aula-resumen/aula-resumen.spec.ts" name="AulaResumen &gt; con todo completado ya no ofrece continuar" time="0.2248846">
+        </testcase>
+        <testcase classname="src/app/features/aula/aula-resumen/aula-resumen.spec.ts" name="AulaResumen &gt; si solo queda una lección bloqueada muestra el motivo en lugar de &quot;Continuar&quot;" time="0.2284642">
+        </testcase>
+        <testcase classname="src/app/features/aula/aula-resumen/aula-resumen.spec.ts" name="AulaResumen &gt; identifica el examen que frena el avance y cuenta los calificados pendientes" time="0.2399185">
+        </testcase>
+        <testcase classname="src/app/features/aula/aula-resumen/aula-resumen.spec.ts" name="AulaResumen &gt; lista las próximas sesiones en vivo ordenadas por fecha e ignora las ya realizadas" time="0.1747265">
+        </testcase>
+        <testcase classname="src/app/features/aula/aula-resumen/aula-resumen.spec.ts" name="AulaResumen &gt; ingresar a una sesión registra la asistencia, abre el enlace y refresca el aula" time="0.1003763">
+        </testcase>
+        <testcase classname="src/app/features/aula/aula-resumen/aula-resumen.spec.ts" name="AulaResumen &gt; si el ingreso es rechazado muestra el mensaje del servidor y no abre ninguna ventana" time="0.1951753">
+        </testcase>
+        <testcase classname="src/app/features/aula/aula-resumen/aula-resumen.spec.ts" name="AulaResumen &gt; mientras un ingreso está en curso ignora un segundo clic" time="0.1794596">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/auth/acceso/acceso.spec.ts" timestamp="2026-10-29T15:55:50.459Z" hostname="ENRIQUE" tests="1" failures="0" errors="0" skipped="0" time="0.2412848">
+        <testcase classname="src/app/features/auth/acceso/acceso.spec.ts" name="Acceso &gt; should create" time="0.2407354">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/auth/nueva-password/nueva-password.spec.ts" timestamp="2026-10-29T15:55:50.460Z" hostname="ENRIQUE" tests="1" failures="0" errors="0" skipped="0" time="0.0175938">
+        <testcase classname="src/app/features/auth/nueva-password/nueva-password.spec.ts" name="NuevaPassword &gt; should create" time="0.0171643">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/auth/recuperar-password/recuperar-password.spec.ts" timestamp="2026-10-29T15:55:50.461Z" hostname="ENRIQUE" tests="1" failures="0" errors="0" skipped="0" time="0.0381637">
+        <testcase classname="src/app/features/auth/recuperar-password/recuperar-password.spec.ts" name="RecuperarPassword &gt; should create" time="0.0378223">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/auth/registro/anti-robot.spec.ts" timestamp="2026-10-29T15:55:50.462Z" hostname="ENRIQUE" tests="9" failures="0" errors="0" skipped="0" time="0.3160943">
+        <testcase classname="src/app/features/auth/registro/anti-robot.spec.ts" name="AntiRobot nativo &gt; no solicita desafíos hasta pulsar el botón y no envía formularios por sus botones" time="0.018345">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/anti-robot.spec.ts" name="AntiRobot nativo &gt; solo emite evidencia después de que el servidor acepta la respuesta" time="0.0220608">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/anti-robot.spec.ts" name="AntiRobot nativo &gt; rechaza respuestas no numéricas antes de enviarlas" time="0.0101514">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/anti-robot.spec.ts" name="AntiRobot nativo &gt; muestra el rechazo del servidor y permite corregir la respuesta" time="0.0271226">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/anti-robot.spec.ts" name="AntiRobot nativo &gt; invalida la evidencia al vencer" time="0.0348836">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/anti-robot.spec.ts" name="AntiRobot nativo &gt; descarta una respuesta HTTP tardía cuando vence el desafío" time="0.0445014">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/anti-robot.spec.ts" name="AntiRobot nativo &gt; reinicia después del envío del formulario sin generar otra solicitud automática" time="0.1086828">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/anti-robot.spec.ts" name="AntiRobot nativo &gt; respeta el bloqueo mientras el registro está enviándose" time="0.0302318">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/anti-robot.spec.ts" name="AntiRobot nativo &gt; explica el fallo de conexión y permite volver a solicitar" time="0.0194209">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/auth/registro/registro-api.service.spec.ts" timestamp="2026-10-29T15:55:50.465Z" hostname="ENRIQUE" tests="3" failures="0" errors="0" skipped="0" time="0.020853">
+        <testcase classname="src/app/features/auth/registro/registro-api.service.spec.ts" name="RegistroApiService &gt; envía el registro tradicional mediante POST" time="0.0131204">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/registro-api.service.spec.ts" name="RegistroApiService &gt; codifica la referencia al consultar el contexto Google" time="0.003928">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/registro-api.service.spec.ts" name="RegistroApiService &gt; completa Google mediante POST sin enviar el correo verificado" time="0.0034393">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/auth/registro/registro-contacto.spec.ts" timestamp="2026-10-29T15:55:50.467Z" hostname="ENRIQUE" tests="3" failures="0" errors="0" skipped="0" time="0.5653719">
+        <testcase classname="src/app/features/auth/registro/registro-contacto.spec.ts" name="Ayuda por WhatsApp de HU-002 &gt; no construye enlaces con número ausente o inválido" time="0.003814">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/registro-contacto.spec.ts" name="Ayuda por WhatsApp de HU-002 &gt; informa que falta configuración sin enlazar a un destinatario inventado" time="0.1659916">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/registro-contacto.spec.ts" name="Ayuda por WhatsApp de HU-002 &gt; prepara ayuda en otra pestaña sin crear cuenta ni incluir los datos del formulario" time="0.3952417">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/auth/registro/registro-http.spec.ts" timestamp="2026-10-29T15:55:50.469Z" hostname="ENRIQUE" tests="5" failures="0" errors="0" skipped="0" time="2.0210177">
+        <testcase classname="src/app/features/auth/registro/registro-http.spec.ts" name="Registro: llamadas HTTP reales del componente &gt; entrega a HU-003 la referencia y el fallo SMTP sin recrear la cuenta" time="1.0091097">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/registro-http.spec.ts" name="Registro: llamadas HTTP reales del componente &gt; acepta el contrato Google del backend y entrega la sesión al panel" time="0.3736682">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/registro-http.spec.ts" name="Registro: llamadas HTTP reales del componente &gt; conecta el desafío con el registro y lo reinicia si el envío falla" time="0.333281">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/registro-http.spec.ts" name="Registro: llamadas HTTP reales del componente &gt; abrir el formulario no consulta configuración, sesión ni proveedores retirados" time="0.1694688">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/registro-http.spec.ts" name="Registro: llamadas HTTP reales del componente &gt; con referencia solo consulta la operación Google indicada en el mapa" time="0.1217099">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/auth/registro/registro.spec.ts" timestamp="2026-10-29T15:55:50.471Z" hostname="ENRIQUE" tests="17" failures="0" errors="0" skipped="0" time="3.5880304">
+        <testcase classname="src/app/features/auth/registro/registro.spec.ts" name="Registro &gt; se crea" time="1.1086467">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/registro.spec.ts" name="Registro &gt; permite consultar los documentos legales en otra pestaña sin enviar el formulario" time="0.3946371">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/registro.spec.ts" name="Registro &gt; abre sin error de conexión ni solicitudes innecesarias" time="0.2348206">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/registro.spec.ts" name="Registro &gt; mantiene bloqueado el envío visible sin evidencia aunque los demás datos sean válidos" time="0.1775689">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/registro.spec.ts" name="Registro &gt; explica la integración Google pendiente sin simular un fallo de creación" time="0.2147109">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/registro.spec.ts" name="Registro &gt; informa rechazo del backend por anti-robot pendiente sin navegar ni perder datos" time="0.1549801">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/registro.spec.ts" name="Registro &gt; rechaza el formulario vacío y muestra los errores después del intento" time="0.1185419">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/registro.spec.ts" name="Registro &gt; permite dejar vacíos los tres campos opcionales" time="0.1900356">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/registro.spec.ts" name="Registro &gt; no envía si falta la aceptación legal" time="0.132292">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/registro.spec.ts" name="Registro &gt; no envía si falta el token del control anti-robot" time="0.166148">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/registro.spec.ts" name="Registro &gt; normaliza textos y convierte los opcionales vacíos a null" time="0.101211">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/registro.spec.ts" name="Registro &gt; navega a verificar correo con la referencia recibida" time="0.0910133">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/registro.spec.ts" name="Registro &gt; evita dos solicitudes mientras la primera sigue pendiente" time="0.1299357">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/registro.spec.ts" name="Registro &gt; marca el correo duplicado y conserva los valores escritos" time="0.0888149">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/registro.spec.ts" name="Registro &gt; carga el contexto Google, bloquea el correo y oculta requisitos propios" time="0.2018055">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/registro.spec.ts" name="Registro &gt; bloquea el registro cuando la referencia Google no es válida" time="0.0370369">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/registro.spec.ts" name="Registro &gt; completa Google sin enviar el correo y navega al panel" time="0.0419889">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/auth/registro/registro.validators.spec.ts" timestamp="2026-10-29T15:55:50.477Z" hostname="ENRIQUE" tests="9" failures="0" errors="0" skipped="0" time="0.0059193">
+        <testcase classname="src/app/features/auth/registro/registro.validators.spec.ts" name="validadores de registro &gt; politicaContrasenaValidator &gt; acepta letras españolas y rechaza más de 72 bytes UTF-8" time="0.0017381">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/registro.validators.spec.ts" name="validadores de registro &gt; politicaContrasenaValidator &gt; acepta una contraseña que cumple todas las reglas" time="0.0005436">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/registro.validators.spec.ts" name="validadores de registro &gt; politicaContrasenaValidator &gt; informa cada condición pendiente" time="0.0006588">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/registro.validators.spec.ts" name="validadores de registro &gt; politicaContrasenaValidator &gt; rechaza una contraseña que incumple longitud" time="0.0004354">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/registro.validators.spec.ts" name="validadores de registro &gt; politicaContrasenaValidator &gt; rechaza una contraseña que incumple mayuscula" time="0.0002899">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/registro.validators.spec.ts" name="validadores de registro &gt; politicaContrasenaValidator &gt; rechaza una contraseña que incumple minuscula" time="0.0002368">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/registro.validators.spec.ts" name="validadores de registro &gt; politicaContrasenaValidator &gt; rechaza una contraseña que incumple numero" time="0.0002947">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/registro.validators.spec.ts" name="validadores de registro &gt; contrasenasCoincidenValidator &gt; acepta dos contraseñas iguales" time="0.0007557">
+        </testcase>
+        <testcase classname="src/app/features/auth/registro/registro.validators.spec.ts" name="validadores de registro &gt; contrasenasCoincidenValidator &gt; rechaza dos contraseñas diferentes" time="0.0004573">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/auth/verificar-correo/verificar-correo.spec.ts" timestamp="2026-10-29T15:55:50.480Z" hostname="ENRIQUE" tests="1" failures="0" errors="0" skipped="0" time="0.0190281">
+        <testcase classname="src/app/features/auth/verificar-correo/verificar-correo.spec.ts" name="VerificarCorreo &gt; should create" time="0.0186825">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/cuenta/mi-perfil/mi-perfil.spec.ts" timestamp="2026-10-29T15:55:50.480Z" hostname="ENRIQUE" tests="1" failures="0" errors="0" skipped="0" time="0.0322565">
+        <testcase classname="src/app/features/cuenta/mi-perfil/mi-perfil.spec.ts" name="MiPerfil &gt; should create" time="0.0318414">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/cuenta/panel/panel.spec.ts" timestamp="2026-10-29T15:55:50.481Z" hostname="ENRIQUE" tests="1" failures="0" errors="0" skipped="0" time="0.0801149">
+        <testcase classname="src/app/features/cuenta/panel/panel.spec.ts" name="Panel &gt; should create" time="0.0796203">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/certificacion/certificacion-bloque/certificacion-bloque.spec.ts" timestamp="2026-10-29T15:55:50.483Z" hostname="ENRIQUE" tests="9" failures="0" errors="0" skipped="0" time="2.1969304">
+        <testcase classname="src/app/features/certificacion/certificacion-bloque/certificacion-bloque.spec.ts" name="CertificacionBloque &gt; al abrir consulta la certificación del curso y muestra por qué todavía no está disponible" time="0.7719623">
+        </testcase>
+        <testcase classname="src/app/features/certificacion/certificacion-bloque/certificacion-bloque.spec.ts" name="CertificacionBloque &gt; si no puede consultarla muestra el mensaje del servidor" time="0.1029594">
+        </testcase>
+        <testcase classname="src/app/features/certificacion/certificacion-bloque/certificacion-bloque.spec.ts" name="CertificacionBloque &gt; cuando faltan los datos abre el formulario precargado con los nombres de la cuenta" time="0.4633803">
+        </testcase>
+        <testcase classname="src/app/features/certificacion/certificacion-bloque/certificacion-bloque.spec.ts" name="CertificacionBloque &gt; no envía los datos si el formulario está incompleto" time="0.1584739">
+        </testcase>
+        <testcase classname="src/app/features/certificacion/certificacion-bloque/certificacion-bloque.spec.ts" name="CertificacionBloque &gt; confirma los datos con PUT y pasa a &quot;listo para generar&quot;" time="0.091145">
+        </testcase>
+        <testcase classname="src/app/features/certificacion/certificacion-bloque/certificacion-bloque.spec.ts" name="CertificacionBloque &gt; si el servidor rechaza los datos los conserva en pantalla y muestra el motivo" time="0.147395">
+        </testcase>
+        <testcase classname="src/app/features/certificacion/certificacion-bloque/certificacion-bloque.spec.ts" name="CertificacionBloque &gt; generar el certificado exige confirmar primero y luego lo emite con POST" time="0.0677199">
+        </testcase>
+        <testcase classname="src/app/features/certificacion/certificacion-bloque/certificacion-bloque.spec.ts" name="CertificacionBloque &gt; si la emisión falla informa el motivo y mantiene el diálogo abierto" time="0.1147565">
+        </testcase>
+        <testcase classname="src/app/features/certificacion/certificacion-bloque/certificacion-bloque.spec.ts" name="CertificacionBloque &gt; con el certificado emitido ofrece la descarga y la abre en el visor privado" time="0.2758495">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/certificacion/mis-certificados/mis-certificados.spec.ts" timestamp="2026-10-29T15:55:50.486Z" hostname="ENRIQUE" tests="6" failures="0" errors="0" skipped="0" time="0.5876944">
+        <testcase classname="src/app/features/certificacion/mis-certificados/mis-certificados.spec.ts" name="MisCertificados &gt; al abrir pide los certificados del alumno autenticado y los muestra" time="0.3688778">
+            <system-err>
+NG0955: The provided track expression resulted in duplicated keys for a given collection. Adjust the tracking expression such that it uniquely identifies all the items in the collection. Duplicated keys were: 
+key &quot;ESEJUR-2026-ABCD2345&quot; at index &quot;0&quot; and &quot;1&quot;. Find more at https://v21.angular.dev/errors/NG0955
+
+            </system-err>
+        </testcase>
+        <testcase classname="src/app/features/certificacion/mis-certificados/mis-certificados.spec.ts" name="MisCertificados &gt; sin certificados emitidos la lista queda vacía sin error" time="0.0293402">
+        </testcase>
+        <testcase classname="src/app/features/certificacion/mis-certificados/mis-certificados.spec.ts" name="MisCertificados &gt; si la carga falla informa el mensaje del servidor" time="0.0380313">
+        </testcase>
+        <testcase classname="src/app/features/certificacion/mis-certificados/mis-certificados.spec.ts" name="MisCertificados &gt; ver abre el visor privado del PDF en una pestaña nueva" time="0.0411713">
+        </testcase>
+        <testcase classname="src/app/features/certificacion/mis-certificados/mis-certificados.spec.ts" name="MisCertificados &gt; un certificado anulado no tiene descarga: ver y descargar no hacen nada" time="0.0656063">
+        </testcase>
+        <testcase classname="src/app/features/certificacion/mis-certificados/mis-certificados.spec.ts" name="MisCertificados &gt; si la descarga del PDF falla avisa al alumno" time="0.0442205">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/certificacion/verificar-certificado/verificar-certificado.spec.ts" timestamp="2026-10-29T15:55:50.489Z" hostname="ENRIQUE" tests="7" failures="0" errors="0" skipped="0" time="0.6223238">
+        <testcase classname="src/app/features/certificacion/verificar-certificado/verificar-certificado.spec.ts" name="VerificarCertificado &gt; al abrir sin código no consulta nada y espera a que el usuario lo escriba" time="0.229672">
+        </testcase>
+        <testcase classname="src/app/features/certificacion/verificar-certificado/verificar-certificado.spec.ts" name="VerificarCertificado &gt; un enlace con ?codigo= (el del QR) consulta de inmediato y muestra un certificado vigente" time="0.1881078">
+        </testcase>
+        <testcase classname="src/app/features/certificacion/verificar-certificado/verificar-certificado.spec.ts" name="VerificarCertificado &gt; un certificado anulado se muestra como no válido" time="0.0554801">
+        </testcase>
+        <testcase classname="src/app/features/certificacion/verificar-certificado/verificar-certificado.spec.ts" name="VerificarCertificado &gt; un código que no existe responde &quot;no encontrado&quot; sin mostrar datos" time="0.0219834">
+        </testcase>
+        <testcase classname="src/app/features/certificacion/verificar-certificado/verificar-certificado.spec.ts" name="VerificarCertificado &gt; una falla del servidor se distingue de un código inexistente" time="0.0419954">
+        </testcase>
+        <testcase classname="src/app/features/certificacion/verificar-certificado/verificar-certificado.spec.ts" name="VerificarCertificado &gt; escribir el código a mano lo consulta y lo deja en la URL para poder compartirlo" time="0.0621442">
+        </testcase>
+        <testcase classname="src/app/features/certificacion/verificar-certificado/verificar-certificado.spec.ts" name="VerificarCertificado &gt; con el campo vacío no consulta y marca el campo como pendiente de completar" time="0.0221801">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/cursos/catalogo/catalogo.spec.ts" timestamp="2026-10-29T15:55:50.492Z" hostname="ENRIQUE" tests="1" failures="0" errors="0" skipped="0" time="0.5718712">
+        <testcase classname="src/app/features/cursos/catalogo/catalogo.spec.ts" name="Catalogo &gt; should create" time="0.5714822">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/cursos/ficha-curso/ficha-curso.spec.ts" timestamp="2026-10-29T15:55:50.493Z" hostname="ENRIQUE" tests="1" failures="0" errors="0" skipped="0" time="0.1852988">
+        <testcase classname="src/app/features/cursos/ficha-curso/ficha-curso.spec.ts" name="FichaCurso &gt; should create" time="0.1847527">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/legal/privacidad/privacidad.spec.ts" timestamp="2026-10-29T15:55:50.494Z" hostname="ENRIQUE" tests="4" failures="0" errors="0" skipped="0" time="0.440676">
+        <testcase classname="src/app/features/legal/privacidad/privacidad.spec.ts" name="Privacidad &gt; should create" time="0.0288426">
+        </testcase>
+        <testcase classname="src/app/features/legal/privacidad/privacidad.spec.ts" name="Privacidad &gt; presenta el contenido de la maqueta sin instrucciones de desarrollo" time="0.1236094">
+        </testcase>
+        <testcase classname="src/app/features/legal/privacidad/privacidad.spec.ts" name="Privacidad &gt; incluye índice nativo abierto y destinos accesibles para sus cinco enlaces" time="0.1054784">
+        </testcase>
+        <testcase classname="src/app/features/legal/privacidad/privacidad.spec.ts" name="Privacidad &gt; enlaza al otro documento y al catálogo mediante rutas Angular" time="0.182339">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/legal/terminos/terminos.spec.ts" timestamp="2026-10-29T15:55:50.496Z" hostname="ENRIQUE" tests="4" failures="0" errors="0" skipped="0" time="0.1683743">
+        <testcase classname="src/app/features/legal/terminos/terminos.spec.ts" name="Terminos &gt; should create" time="0.0150214">
+        </testcase>
+        <testcase classname="src/app/features/legal/terminos/terminos.spec.ts" name="Terminos &gt; presenta el contenido de la maqueta sin instrucciones de desarrollo" time="0.0181905">
+        </testcase>
+        <testcase classname="src/app/features/legal/terminos/terminos.spec.ts" name="Terminos &gt; incluye índice nativo abierto y destinos accesibles para sus cinco enlaces" time="0.0761767">
+        </testcase>
+        <testcase classname="src/app/features/legal/terminos/terminos.spec.ts" name="Terminos &gt; enlaza al otro documento y al catálogo mediante rutas Angular" time="0.0585305">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/pagos/checkout-pago/checkout-pago.spec.ts" timestamp="2026-10-29T15:55:50.498Z" hostname="ENRIQUE" tests="11" failures="0" errors="0" skipped="0" time="1.5766558">
+        <testcase classname="src/app/features/pagos/checkout-pago/checkout-pago.spec.ts" name="CheckoutPago &gt; carga el curso y los intentos previos y deja la compra lista para confirmar" time="0.4648909">
+        </testcase>
+        <testcase classname="src/app/features/pagos/checkout-pago/checkout-pago.spec.ts" name="CheckoutPago &gt; si el alumno ya tiene la matrícula activa lo lleva a su panel en lugar de cobrar otra vez" time="0.0723469">
+        </testcase>
+        <testcase classname="src/app/features/pagos/checkout-pago/checkout-pago.spec.ts" name="CheckoutPago &gt; un curso gratuito no pasa por el pago" time="0.0455302">
+        </testcase>
+        <testcase classname="src/app/features/pagos/checkout-pago/checkout-pago.spec.ts" name="CheckoutPago &gt; un curso inexistente informa que no se encontró" time="0.0312839">
+        </testcase>
+        <testcase classname="src/app/features/pagos/checkout-pago/checkout-pago.spec.ts" name="CheckoutPago &gt; sin confirmar el precio no se inicia ningún pago" time="0.0565095">
+        </testcase>
+        <testcase classname="src/app/features/pagos/checkout-pago/checkout-pago.spec.ts" name="CheckoutPago &gt; confirmado el precio inicia el pago, abre Culqi y al recibir el token lo envía y va al resultado" time="0.1341183">
+        </testcase>
+        <testcase classname="src/app/features/pagos/checkout-pago/checkout-pago.spec.ts" name="CheckoutPago &gt; si el cobro del token falla avisa y lleva igual a la pantalla de resultado para ver el estado real" time="0.1692685">
+        </testcase>
+        <testcase classname="src/app/features/pagos/checkout-pago/checkout-pago.spec.ts" name="CheckoutPago &gt; si el precio cambió pide confirmarlo otra vez y vuelve a cargar el precio vigente" time="0.1227872">
+        </testcase>
+        <testcase classname="src/app/features/pagos/checkout-pago/checkout-pago.spec.ts" name="CheckoutPago &gt; un error al iniciar el pago muestra el mensaje del servidor y no abre Culqi" time="0.1144288">
+        </testcase>
+        <testcase classname="src/app/features/pagos/checkout-pago/checkout-pago.spec.ts" name="CheckoutPago &gt; con un intento pendiente se reanuda sin volver a confirmar el precio" time="0.1707541">
+        </testcase>
+        <testcase classname="src/app/features/pagos/checkout-pago/checkout-pago.spec.ts" name="CheckoutPago &gt; muestra los intentos anteriores que no quedaron pendientes" time="0.1902996">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/pagos/resultado-pago/resultado-pago.spec.ts" timestamp="2026-10-29T15:55:50.502Z" hostname="ENRIQUE" tests="8" failures="0" errors="0" skipped="0" time="1.4112517">
+        <testcase classname="src/app/features/pagos/resultado-pago/resultado-pago.spec.ts" name="ResultadoPago &gt; un pago aprobado muestra el resultado y pide la constancia" time="0.6667794">
+        </testcase>
+        <testcase classname="src/app/features/pagos/resultado-pago/resultado-pago.spec.ts" name="ResultadoPago &gt; un pago rechazado no pide constancia y permite volver a intentarlo" time="0.1530133">
+        </testcase>
+        <testcase classname="src/app/features/pagos/resultado-pago/resultado-pago.spec.ts" name="ResultadoPago &gt; un pago con error tampoco concede acceso ni genera constancia" time="0.0406595">
+        </testcase>
+        <testcase classname="src/app/features/pagos/resultado-pago/resultado-pago.spec.ts" name="ResultadoPago &gt; mientras Culqi no comunica el resultado vuelve a consultar cada pocos segundos hasta que cambia" time="0.2111993">
+        </testcase>
+        <testcase classname="src/app/features/pagos/resultado-pago/resultado-pago.spec.ts" name="ResultadoPago &gt; un pedido que no existe informa que no se encontró" time="0.0786802">
+        </testcase>
+        <testcase classname="src/app/features/pagos/resultado-pago/resultado-pago.spec.ts" name="ResultadoPago &gt; una falla del servidor muestra un mensaje genérico para reintentar" time="0.0672742">
+        </testcase>
+        <testcase classname="src/app/features/pagos/resultado-pago/resultado-pago.spec.ts" name="ResultadoPago &gt; reenviar el aviso avisa si el correo salió" time="0.1342832">
+        </testcase>
+        <testcase classname="src/app/features/pagos/resultado-pago/resultado-pago.spec.ts" name="ResultadoPago &gt; si el aviso no se puede reenviar muestra el motivo del servidor" time="0.0563613">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/reclamaciones/libro-reclamaciones/libro-reclamaciones.spec.ts" timestamp="2026-10-29T15:55:50.505Z" hostname="ENRIQUE" tests="12" failures="0" errors="0" skipped="0" time="2.9625235">
+        <testcase classname="src/app/features/reclamaciones/libro-reclamaciones/libro-reclamaciones.spec.ts" name="LibroReclamaciones &gt; sin sesión el formulario arranca vacío y no consulta datos de la cuenta" time="1.0582681">
+        </testcase>
+        <testcase classname="src/app/features/reclamaciones/libro-reclamaciones/libro-reclamaciones.spec.ts" name="LibroReclamaciones &gt; con sesión prellena los datos conocidos para que la persona los revise" time="0.5538002">
+        </testcase>
+        <testcase classname="src/app/features/reclamaciones/libro-reclamaciones/libro-reclamaciones.spec.ts" name="LibroReclamaciones &gt; si falla la precarga el formulario sigue siendo utilizable" time="0.1198181">
+        </testcase>
+        <testcase classname="src/app/features/reclamaciones/libro-reclamaciones/libro-reclamaciones.spec.ts" name="LibroReclamaciones &gt; enviar el formulario vacío no llama al servidor y pide revisar los campos" time="0.0910078">
+        </testcase>
+        <testcase classname="src/app/features/reclamaciones/libro-reclamaciones/libro-reclamaciones.spec.ts" name="LibroReclamaciones &gt; un DNI que no tiene 8 dígitos se marca inválido según el tipo de documento" time="0.1237301">
+        </testcase>
+        <testcase classname="src/app/features/reclamaciones/libro-reclamaciones/libro-reclamaciones.spec.ts" name="LibroReclamaciones &gt; sin aceptar la declaración jurada el caso no se envía" time="0.1777729">
+        </testcase>
+        <testcase classname="src/app/features/reclamaciones/libro-reclamaciones/libro-reclamaciones.spec.ts" name="LibroReclamaciones &gt; con todo en regla presenta el caso por la ruta pública y muestra la constancia" time="0.1094017">
+        </testcase>
+        <testcase classname="src/app/features/reclamaciones/libro-reclamaciones/libro-reclamaciones.spec.ts" name="LibroReclamaciones &gt; con sesión el caso se presenta por la ruta de la cuenta" time="0.1876552">
+        </testcase>
+        <testcase classname="src/app/features/reclamaciones/libro-reclamaciones/libro-reclamaciones.spec.ts" name="LibroReclamaciones &gt; si el servidor rechaza el caso muestra su mensaje y permite corregir" time="0.2701025">
+        </testcase>
+        <testcase classname="src/app/features/reclamaciones/libro-reclamaciones/libro-reclamaciones.spec.ts" name="LibroReclamaciones &gt; solo acepta imágenes PNG, JPG o WEBP" time="0.0993075">
+        </testcase>
+        <testcase classname="src/app/features/reclamaciones/libro-reclamaciones/libro-reclamaciones.spec.ts" name="LibroReclamaciones &gt; rechaza una imagen de más de 5 MB y acepta una válida" time="0.0642887">
+        </testcase>
+        <testcase classname="src/app/features/reclamaciones/libro-reclamaciones/libro-reclamaciones.spec.ts" name="LibroReclamaciones &gt; permite hasta 10 imágenes" time="0.1024252">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/features/admin/reportes/reporte-pagos/reporte-pagos.spec.ts" timestamp="2026-10-29T15:55:50.509Z" hostname="ENRIQUE" tests="10" failures="0" errors="0" skipped="0" time="2.172489">
+        <testcase classname="src/app/features/admin/reportes/reporte-pagos/reporte-pagos.spec.ts" name="ReportePagosPantalla &gt; al abrir carga el detalle, el total confirmado y los medios para el filtro" time="0.9443062">
+        </testcase>
+        <testcase classname="src/app/features/admin/reportes/reporte-pagos/reporte-pagos.spec.ts" name="ReportePagosPantalla &gt; solo el pago aprobado suma: el rechazado aparece en el detalle sin sumar" time="0.2687013">
+        </testcase>
+        <testcase classname="src/app/features/admin/reportes/reporte-pagos/reporte-pagos.spec.ts" name="ReportePagosPantalla &gt; filtrar por estado vuelve al inicio y repite los mismos filtros en detalle y total" time="0.2935232">
+        </testcase>
+        <testcase classname="src/app/features/admin/reportes/reporte-pagos/reporte-pagos.spec.ts" name="ReportePagosPantalla &gt; una fecha final anterior a la inicial no consulta y avisa" time="0.1160345">
+        </testcase>
+        <testcase classname="src/app/features/admin/reportes/reporte-pagos/reporte-pagos.spec.ts" name="ReportePagosPantalla &gt; cambiar de página pide esa página y no sale del rango disponible" time="0.1329199">
+        </testcase>
+        <testcase classname="src/app/features/admin/reportes/reporte-pagos/reporte-pagos.spec.ts" name="ReportePagosPantalla &gt; limpiar los filtros deja todo en blanco y vuelve a consultar" time="0.13706">
+        </testcase>
+        <testcase classname="src/app/features/admin/reportes/reporte-pagos/reporte-pagos.spec.ts" name="ReportePagosPantalla &gt; si el reporte falla muestra el mensaje del servidor" time="0.1632909">
+        </testcase>
+        <testcase classname="src/app/features/admin/reportes/reporte-pagos/reporte-pagos.spec.ts" name="ReportePagosPantalla &gt; exportar a Excel abre la descarga con los mismos filtros de la pantalla" time="0.1007642">
+        </testcase>
+        <testcase classname="src/app/features/admin/reportes/reporte-pagos/reporte-pagos.spec.ts" name="ReportePagosApiService &gt; envía los filtros con valor y omite las fechas y el curso vacíos" time="0.0067204">
+        </testcase>
+        <testcase classname="src/app/features/admin/reportes/reporte-pagos/reporte-pagos.spec.ts" name="ReportePagosApiService &gt; el total y el Excel usan exactamente los mismos filtros que el detalle" time="0.0050494">
+        </testcase>
+    </testsuite>
+</testsuites>

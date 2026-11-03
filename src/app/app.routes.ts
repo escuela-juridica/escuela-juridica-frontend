@@ -251,11 +251,6 @@ export const routes: Routes = [
           ),
       }, // PF-034 (HU-036)
       {
-        path: 'excepciones-pago',
-        loadComponent: () =>
-          import('./features/admin/excepciones-pago/excepciones-pago').then((m) => m.ExcepcionesPago),
-      }, // PF-035 (HU-037)
-      {
         path: 'reclamaciones',
         loadComponent: () =>
           import('./features/admin/reclamaciones/bandeja-reclamaciones/bandeja-reclamaciones').then(
@@ -288,13 +283,6 @@ export const routes: Routes = [
             (m) => m.ReporteAcademicoPantalla,
           ),
       }, // HU-043
-      {
-        path: 'matriculas/:matriculaId/academico',
-        loadComponent: () =>
-          import('./features/admin/matriculas/seguimiento-academico/seguimiento-academico').then(
-            (m) => m.SeguimientoAcademico,
-          ),
-      }, // HU-031
       {
         path: 'reportes/matriculas',
         loadComponent: () =>

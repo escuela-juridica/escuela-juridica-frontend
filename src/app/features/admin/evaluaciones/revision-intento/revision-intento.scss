@@ -11,34 +11,10 @@
   max-width: 980px;
 }
 
-.rev__volver {
-  align-self: flex-start;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 44px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--neutral-600);
-  text-decoration: none;
-}
-
-.rev__volver:hover {
-  color: var(--marca-900);
-}
-
 .rev__estado {
   padding: 24px 0;
   text-align: center;
   color: var(--neutral-600);
-}
-
-.rev__cabecera {
-  padding: 20px 24px;
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 16px;
 }
 
 .rev__eyebrow {
@@ -48,22 +24,6 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--eyebrow-color);
-}
-
-// Títulos de pantalla admin: 22/30 px.
-.rev__titulo {
-  margin: 2px 0 6px;
-  font-size: 22px;
-  line-height: 30px;
-  font-weight: 700;
-  color: var(--neutral-950);
-}
-
-.rev__meta {
-  margin: 2px 0 0;
-  font-size: 14px;
-  line-height: 20px;
-  color: var(--neutral-600);
 }
 
 .rev__estado-plazo {
@@ -234,7 +194,6 @@
 }
 
 @media (max-width: 767px) {
-  .rev__cabecera,
   .rev__pregunta {
     padding: 16px;
   }

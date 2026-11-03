@@ -1,26 +1,42 @@
 <section class="emision">
-  <a class="emision__volver" routerLink="/admin/certificados">← Certificados</a>
+  <app-enlace-volver ruta="/admin/certificados" texto="Certificados" />
 
   @if (cargando()) {
     <p>Cargando…</p>
   } @else if (error(); as mensaje) {
     <div class="alerta alerta--error" role="alert"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div>
   } @else if (situacion(); as s) {
-    <header class="emision__cabecera">
-      <span class="emision__etiqueta">Emisión excepcional</span>
-      <h1 class="emision__titulo">{{ s.alumno }}</h1>
-      <p>{{ s.correo }} · {{ s.curso }}</p>
-    </header>
-
+    <app-cabecera-detalle etiqueta="Emisión excepcional" [titulo]="s.alumno">
+      <svg cd-icono viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6" /><path d="M15.5 13.5 17 22l-5-3-5 3 1.5-8.5" /></svg>
+      <div cd-meta>
+        <p><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 7-10 6L2 7" /></svg> {{ s.correo }}</p>
+        <p><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" /></svg> {{ s.curso }}</p>
+      </div>
+      <div cd-lado class="cd-fila">
+        @if (s.certificado; as c) {
+          @if (c.estado === 'VIGENTE') { <span class="badge badge--disp-inmediato"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12" /></svg> Vigente</span> } @else { <span class="badge badge--disp-cancelado"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg> Anulado</span> }
+          <span class="cd-chip" title="Código del certificado">{{ c.codigo }}</span>
+        } @else {
+          <span class="badge badge--disp-proximo">Sin certificado</span>
+        }
+      </div>
+    </app-cabecera-detalle>
     @if (s.certificado; as c) {
-      <div class="card emision__tarjeta emision__emitido">
-        <div class="emision__emitido-icono" aria-hidden="true">✓</div>
+      <div class="card emision__tarjeta emision__emitido" [class.emision__emitido--anulado]="c.estado !== 'VIGENTE'">
+        <div class="emision__emitido-icono" aria-hidden="true">{{ c.estado === 'VIGENTE' ? '✓' : '✕' }}</div>
         <div>
           <h2 class="emision__subtitulo">Certificado {{ c.estado === 'VIGENTE' ? 'vigente' : 'anulado' }}</h2>
           <p class="emision__codigo">{{ c.codigo }}</p>
           <p class="emision__nota">{{ etiquetaEmision(c.tipoEmision) }} · {{ c.nivel === 'REFRENDADO' ? 'Refrendado' : 'Normal' }} · emitido el {{ c.emitidoEn | date:'dd/MM/yyyy HH:mm' }}</p>
           @if (c.motivoEmisionManual) { <p class="emision__nota"><strong>Motivo:</strong> {{ c.motivoEmisionManual }}</p> }
+          @if (c.estado !== 'VIGENTE') { <p class="emision__nota">Este código ya no es válido y se conserva como historial. Abajo puedes emitir un certificado nuevo, con otro código.</p> }
         </div>
+        @if (c.estado === 'VIGENTE') {
+          <button type="button" class="btn btn--secundario emision__ver" title="Abre el PDF en otra pestaña" (click)="verCertificado(c.codigo)">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /></svg>
+            Ver certificado
+          </button>
+        }
       </div>
     }
 
@@ -42,7 +58,14 @@
       <div class="card emision__tarjeta">
         <h2 class="emision__subtitulo">Lo que se congelaría</h2>
         <dl class="emision__datos">
-          <div><dt>Nombres a imprimir</dt><dd>{{ s.nombresConfirmados ?? 'Aún sin confirmar por el alumno' }}</dd></div>
+          <div>
+            <dt>Nombres a imprimir</dt>
+            <dd>
+              {{ nombresAImprimir(s) }}
+              @if (confirmaAdministracion(s)) { <small class="emision__origen">{{ s.datosConfirmados ? 'Los confirmarás tú al reemitir: puedes corregirlos.' : 'Los confirmarás tú: el alumno aún no lo hizo.' }}</small> }
+              @else { <small class="emision__origen">Confirmados por el alumno.</small> }
+            </dd>
+          </div>
           <div><dt>Nota final</dt><dd>@if (s.notaFinal !== null) { {{ s.notaFinal | number:'1.0-2' }} } @else { Sin nota: no se imprime ninguna }</dd></div>
           <div><dt>Nivel</dt><dd>{{ s.nivel === 'REFRENDADO' ? 'Refrendado' : 'Normal' }}@if (s.entidad) { · {{ s.entidad }} }</dd></div>
           <div><dt>Finalización</dt><dd>{{ s.fechaFinalizacion ? (s.fechaFinalizacion | date:'dd/MM/yyyy') : 'Sin registrar' }}</dd></div>
@@ -52,52 +75,161 @@
     </div>
 
     @if (s.bloqueo; as bloqueo) {
-      @if (!s.certificado) {
+      @if (s.certificado?.estado !== 'VIGENTE') {
         <div class="alerta alerta--advertencia" role="status"><span class="alerta__icono">!</span><div><p class="alerta__titulo">No se puede emitir todavía</p><p class="alerta__texto">{{ bloqueo }}</p></div></div>
       }
     } @else {
       <form class="card emision__tarjeta emision__formulario" [formGroup]="formulario" (ngSubmit)="pedirConfirmacion()" novalidate>
-        <h2 class="emision__subtitulo">Emitir el certificado</h2>
-        <div>
-          <label class="label" for="em-motivo">Motivo de la excepción</label>
-          <textarea id="em-motivo" class="input" rows="4" formControlName="motivo" [class.input--error]="invalido('motivo')"
-            placeholder="Explica por qué corresponde emitirlo (queda registrado con tu nombre y la fecha)."></textarea>
-          @if (invalido('motivo')) { <p class="campo-error">Explica el motivo (mínimo 10 caracteres).</p> }
-        </div>
-        @if (necesitaFecha(s)) {
-          <div>
-            <label class="label" for="em-fecha"><span>Fecha de finalización</span><span class="nota-pill">Opcional</span></label>
-            <input id="em-fecha" type="date" class="input" formControlName="fechaFinalizacion" [min]="s.fechaMinimaFinalizacion" [max]="s.fechaMaximaFinalizacion" />
-            <p class="emision__nota">El alumno aún no tiene fecha de finalización. Si no indicas una, se usa la fecha de hoy; debe estar entre su matrícula y hoy.</p>
+        <h2 class="emision__subtitulo">{{ esReemision(s) ? 'Emitir un certificado nuevo' : 'Emisión excepcional' }}</h2>
+        @if (esReemision(s)) {
+          <p class="emision__nota emision__nota--sola">El certificado anulado seguirá anulado. El nuevo tendrá otro código y quedará enlazado al anterior en el historial.</p>
+        } @else {
+          <p class="emision__nota emision__nota--sola">Lo normal es esperar a que el alumno termine el curso y obtenga su certificado por sí mismo. Usa esta opción solo como último recurso.</p>
+        }
+        @if (exigeNombre(s)) {
+          <div class="alerta alerta--advertencia" role="alert">
+            <span class="alerta__icono">!</span>
+            <div>
+              <p class="alerta__titulo">Este alumno todavía no cumple los requisitos del curso</p>
+              <p class="alerta__texto">{{ s.frase }} Emitir ahora es una excepción: quedará registrado con tu nombre y el motivo.</p>
+            </div>
           </div>
         }
         <label class="emision__check">
           <input type="checkbox" formControlName="entiendo" />
           <span>Entiendo que es definitivo: se congelan la nota, el nivel y los datos, y se cierran los nuevos intentos de exámenes calificados. Los de práctica siguen disponibles.</span>
         </label>
-        @if (invalido('entiendo')) { <p class="campo-error">Confirma que entiendes el impacto.</p> }
         <div class="emision__acciones">
-          <a class="btn btn--secundario" routerLink="/admin/certificados">Cancelar</a>
-          <button type="submit" class="btn btn--acento">Emitir certificado</button>
+          <a class="btn btn--secundario" routerLink="/admin/certificados">Volver</a>
+          <button type="submit" class="btn btn--secundario" [disabled]="formulario.controls.entiendo.invalid">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="6" /><path d="M15.5 13.5 17 22l-5-3-5 3 1.5-8.5" /></svg>
+            {{ esReemision(s) ? 'Emitir certificado nuevo…' : 'Emitir excepcionalmente…' }}
+          </button>
         </div>
       </form>
     }
 
     @if (confirmando()) {
-      <app-modal titulo="Confirmar emisión excepcional" (cerrar)="cerrarConfirmacion()">
-        @if (errorEmision(); as mensaje) {
-          <div class="alerta alerta--error" role="alert"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div>
-        }
-        <p class="emision__confirmar">
-          Se emitirá un certificado a nombre de <strong>{{ s.nombresConfirmados }}</strong> para <strong>{{ s.curso }}</strong>,
-          @if (s.notaFinal !== null) { con nota <strong>{{ s.notaFinal | number:'1.0-2' }}</strong> y nivel <strong>{{ s.nivel === 'REFRENDADO' ? 'refrendado' : 'normal' }}</strong> }
-          @else { sin nota y con nivel <strong>normal</strong> }.
-          El alumno recibirá un aviso con el enlace de descarga.
-        </p>
-        <div class="editor-form__acciones">
-          <button type="button" class="btn btn--secundario" [disabled]="emitiendo()" (click)="cerrarConfirmacion()">Volver</button>
-          <button type="button" class="btn btn--acento" [disabled]="emitiendo()" (click)="emitir()">{{ emitiendo() ? 'Emitiendo…' : 'Sí, emitir' }}</button>
-        </div>
+      <app-modal [titulo]="esReemision(s) ? 'Emitir certificado nuevo' : 'Emitir certificado excepcional'" ancho="lg" (cerrar)="cerrarConfirmacion()">
+        <form class="emision__modal" [formGroup]="formulario" (ngSubmit)="emitir()" novalidate>
+          @if (errorEmision(); as mensaje) {
+            <div class="alerta alerta--error" role="alert"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div>
+          }
+
+          <div class="emision__alumno">
+            <span class="emision__alumno-nombre">{{ s.alumno }}</span>
+            <span class="emision__alumno-curso">{{ s.curso }}</span>
+          </div>
+
+          <section class="emision__seccion">
+            <h3 class="emision__seccion-titulo">{{ esReemision(s) ? 'Motivo de la reemisión' : 'Motivo de la excepción' }}</h3>
+            <textarea id="em-motivo" class="input" rows="3" formControlName="motivo" [class.input--error]="invalido('motivo')"
+              aria-label="Motivo"
+              placeholder="Explica por qué corresponde emitirlo (queda registrado con tu nombre y la fecha)."></textarea>
+            @if (invalido('motivo')) { <p class="campo-error">Explica el motivo (mínimo 10 caracteres).</p> }
+          </section>
+
+          @if (confirmaAdministracion(s) || necesitaFecha(s)) {
+            <section class="emision__seccion">
+              <h3 class="emision__seccion-titulo">Datos que se completan ahora</h3>
+              @if (confirmaAdministracion(s)) {
+                <div class="emision__campo">
+                  <label class="label" for="em-nombres">Nombres y apellidos que se imprimirán</label>
+                  <input id="em-nombres" class="input" formControlName="nombres" autocomplete="off" [class.input--error]="intentoEmitir() && !nombresAImprimir(s)" />
+                  @if (intentoEmitir() && !nombresAImprimir(s)) { <p class="campo-error">Indica los nombres que se imprimirán (máximo 240 caracteres).</p> }
+                  <p class="emision__ayuda">{{ s.datosConfirmados ? 'Se parte de los nombres del certificado anulado; corrígelos si el error estaba ahí.' : 'El alumno no los confirmó: se propone el nombre de su cuenta.' }} Quedará registrado que los confirmó la administración y el alumno no podrá cambiarlos.</p>
+                </div>
+              }
+              @if (necesitaFecha(s)) {
+                <div class="emision__campo">
+                  <label class="label" for="em-fecha"><span>Fecha de finalización</span><span class="nota-pill">Opcional</span></label>
+                  <input id="em-fecha" type="date" class="input" formControlName="fechaFinalizacion" [min]="s.fechaMinimaFinalizacion" [max]="s.fechaMaximaFinalizacion" />
+                  <p class="emision__ayuda">El alumno aún no tiene fecha de finalización. Si no indicas una, se usa la de hoy; debe estar entre su matrícula y hoy.</p>
+                </div>
+              }
+            </section>
+          }
+
+          <section class="emision__seccion">
+            <h3 class="emision__seccion-titulo">Así quedará el certificado</h3>
+            <dl class="emision__resumen">
+              @if (s.certificado; as anterior) {
+                <div class="emision__resumen-ancho"><dt>Reemplaza a</dt><dd>{{ anterior.codigo }} <span class="badge badge--disp-cancelado">Anulado</span></dd></div>
+              }
+              <div class="emision__resumen-ancho"><dt>A nombre de</dt><dd>{{ nombresAImprimir(s) || '—' }}</dd></div>
+              <div class="emision__resumen-ancho"><dt>Curso</dt><dd>{{ s.curso }}</dd></div>
+              <div><dt>Tipo de curso</dt><dd>{{ s.tipoCurso }}</dd></div>
+              <div><dt>Horas académicas</dt><dd>{{ s.horas | number:'1.0-2' }}</dd></div>
+              <div><dt>Nota final</dt><dd>@if (s.notaFinal !== null) { {{ s.notaFinal | number:'1.0-2' }} } @else { Sin nota (no se imprime) }</dd></div>
+              <div>
+                <dt>Nivel</dt>
+                <dd>
+                  @if (s.nivel === 'REFRENDADO') { <span class="badge badge--ingreso-manual">Refrendado</span> } @else { <span class="badge badge--disp-cerrado">Normal</span> }
+                  @if (s.entidad) { <small class="emision__resumen-sub">{{ s.entidad }}</small> }
+                </dd>
+              </div>
+              @if (s.fechaInicio) {
+                <div class="emision__resumen-ancho">
+                  <dt>Periodo</dt>
+                  <dd>
+                    @if (s.fechaFinCurso) { {{ s.fechaInicio | date:'dd/MM/yyyy' }} – {{ s.fechaFinCurso | date:'dd/MM/yyyy' }} }
+                    @else { {{ s.fechaInicio | date:'dd/MM/yyyy' }} }
+                  </dd>
+                </div>
+              }
+              <div><dt>Tipo de emisión</dt><dd>Manual administrativa</dd></div>
+              <div><dt>Aviso al alumno</dt><dd>Recibirá el enlace de descarga</dd></div>
+              <div class="emision__resumen-ancho">
+                <dt>Firmantes</dt>
+                <dd>
+                  @if (s.firmantes.length) {
+                    <ol class="emision__firmantes">
+                      @for (f of s.firmantes; track f.nombre; let i = $index) {
+                        <li><span class="emision__numero">{{ i + 1 }}</span><span><strong>{{ f.nombre }}</strong><small>{{ f.cargo }}</small></span></li>
+                      }
+                    </ol>
+                  } @else {
+                    <span class="emision__sin-firmantes">Este curso no tiene firmantes configurados: el certificado saldrá sin firmas.</span>
+                  }
+                </dd>
+              </div>
+            </dl>
+          </section>
+
+          @if (exigeNombre(s)) {
+            <section class="emision__seccion emision__seccion--alerta">
+              <div class="alerta alerta--advertencia" role="alert">
+                <span class="alerta__icono">!</span>
+                <div>
+                  <p class="alerta__titulo">El alumno no cumple los requisitos</p>
+                  <p class="alerta__texto">{{ s.frase }}</p>
+                </div>
+              </div>
+              <div class="emision__confirmar-nombre">
+                <label class="label" for="em-confirmar-nombre">
+                  Para confirmar, escribe el nombre completo del alumno:
+                  <strong class="emision__nombre-objetivo">{{ s.alumno }}</strong>
+                </label>
+                <input id="em-confirmar-nombre" class="input" autocomplete="off" spellcheck="false"
+                  [value]="nombreConfirmacion()" (input)="nombreConfirmacion.set($any($event.target).value)"
+                  [class.input--ok]="coincideNombre(s)" [attr.placeholder]="s.alumno" />
+                @if (coincideNombre(s)) { <p class="emision__coincide emision__coincide--ok">El nombre coincide.</p> }
+                @else { <p class="emision__coincide">«Sí, emitir» se habilita cuando el nombre coincide exactamente.</p> }
+              </div>
+            </section>
+          }
+
+          <div class="editor-form__acciones">
+            <button type="button" class="btn btn--peligro" [disabled]="emitiendo()" (click)="cerrarConfirmacion()">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn--acento" [disabled]="emitiendo() || (exigeNombre(s) && !coincideNombre(s))">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12" /></svg>
+              {{ emitiendo() ? 'Emitiendo…' : 'Sí, emitir' }}
+            </button>
+          </div>
+        </form>
       </app-modal>
     }
   }

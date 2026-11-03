@@ -2,6 +2,13 @@
 
 export type EstadoCertificadoGestion = 'SIN_CERTIFICADO' | 'VIGENTE' | 'ANULADO';
 
+/** Filtros de la lista de certificados: alumno y curso por identificador y la situación del certificado. */
+export interface FiltrosGestion {
+  usuarioId: number | null;
+  cursoId: number | null;
+  estado: string;
+}
+
 export interface CertificadoGestion {
   matriculaId: number;
   certificadoId: number | null;
@@ -16,6 +23,12 @@ export interface CertificadoGestion {
   tipoEmision: string | null;
   emitidoEn: string | null;
   puedeEmitirManual: boolean;
+  /** Porcentaje de avance del alumno en el curso. */
+  avance: number;
+  /** Ya reúne todas las condiciones para certificarse. */
+  cumpleRequisitos: boolean;
+  /** Fecha en que se matriculó el alumno. */
+  fechaMatricula: string;
 }
 
 export interface CondicionAvance {
@@ -51,6 +64,14 @@ export interface EmisionManualSituacion {
   notaFinal: number | null;
   nivel: string;
   entidad: string | null;
+  /** Lo que se imprimiría (o ya se imprimió): horas, tipo de curso, periodo y firmantes. */
+  horas: number;
+  tipoCurso: string;
+  /** Inicio del curso; null en un curso virtual sin fechas (el certificado no imprime periodo). */
+  fechaInicio: string | null;
+  /** Fin que fija el curso; null si no lo tiene (curso virtual con solo inicio o sin fechas). */
+  fechaFinCurso: string | null;
+  firmantes: { nombre: string; cargo: string }[];
   condiciones: CondicionAvance[];
   cumpleTodo: boolean;
   frase: string;
@@ -61,6 +82,8 @@ export interface EmisionManualSituacion {
 export interface EmitirCertificadoManual {
   motivo: string;
   fechaFinalizacion: string | null;
+  /** Nombres que se imprimirán; solo se envían si el alumno no los confirmó (los confirma la administración). */
+  nombres?: string | null;
 }
 
 /** HU-036 — Corrección y anulación de un certificado. */
@@ -92,6 +115,7 @@ export interface CertificadoDetalle {
   alumno: string;
   correo: string;
   cursoId: number;
+  matriculaId: number;
   nombres: string;
   titulo: string;
   tipoCurso: string;
@@ -114,6 +138,9 @@ export interface CorregirCertificado {
   entidad: string | null;
   firmanteIds: number[];
 }
+
+/** Igual que la corrección, sin el motivo: la vista previa no guarda nada. */
+export type VistaPreviaCertificado = Omit<CorregirCertificado, 'motivo'>;
 
 export interface AnularCertificado {
   motivo: string;

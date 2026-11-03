@@ -1,0 +1,40 @@
+
+> escuela-juridica-frontend@0.0.0 build
+> ng build
+
+❯ Building...
+✔ Building...
+Initial chunk files | Names                 |  Raw size | Estimated transfer size
+chunk-EXX3GUCR.js   | -                     | 219.42 kB |                63.15 kB
+chunk-MIPH7YAY.js   | -                     |  91.72 kB |                23.08 kB
+styles-TBJZ2KFW.css | styles                |  42.87 kB |                 7.30 kB
+main-2VP3RAE3.js    | main                  |  19.07 kB |                 5.80 kB
+chunk-5Z3GN5PV.js   | -                     |   1.38 kB |               538 bytes
+chunk-7CGTOI24.js   | -                     | 618 bytes |               618 bytes
+chunk-MFAEB2RV.js   | -                     | 503 bytes |               503 bytes
+chunk-CHQV2R2J.js   | -                     | 236 bytes |               236 bytes
+
+                    | Initial total         | 375.83 kB |               101.22 kB
+
+Lazy chunk files    | Names                 |  Raw size | Estimated transfer size
+chunk-7DSSAOBS.js   | calendario            | 328.21 kB |                82.10 kB
+chunk-MDKJL72Z.js   | curso-editor          | 196.63 kB |                35.30 kB
+chunk-ZTJEBYCN.js   | swiper-element-bundle | 183.92 kB |                45.56 kB
+chunk-DZSJNI3D.js   | dashboard             | 102.88 kB |                24.20 kB
+chunk-7ZDMBWZC.js   | examen-pantalla       |  50.03 kB |                11.56 kB
+chunk-LIWYNSRB.js   | -                     |  48.65 kB |                 9.63 kB
+chunk-73Y5NGI3.js   | aula-resumen          |  45.50 kB |                10.69 kB
+chunk-D4U3ZU3D.js   | ficha-curso           |  38.23 kB |                 9.06 kB
+chunk-VASCKD66.js   | registro              |  37.98 kB |                 9.65 kB
+chunk-TZ77PXEC.js   | informacion-base      |  37.05 kB |                 7.32 kB
+chunk-WLD5PYHH.js   | usuarios-listado      |  35.27 kB |                 8.08 kB
+chunk-EZCUISPK.js   | libro-reclamaciones   |  28.34 kB |                 7.46 kB
+chunk-QT3IHYXJ.js   | matriculas-listado    |  26.38 kB |                 6.30 kB
+chunk-UQUTJOTA.js   | leccion-reproductor   |  26.21 kB |                 7.06 kB
+chunk-KVA62OD7.js   | mi-perfil             |  25.82 kB |                 5.55 kB
+...and 57 more lazy chunks files. Use "--verbose" to show all the files.
+
+Application bundle generation complete. [13.192 seconds] - 2026-10-29T15:53:54.151Z
+
+Output location: D:\Enrique\UTP\Ciclo 7\Proyecto Escuela Juridica\Escuela Juridica\escuela-juridica-frontend\dist\escuela-juridica-frontend
+

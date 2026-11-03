@@ -338,10 +338,12 @@
 }
 .ficha-docente__foto {
   flex: 0 0 140px;
+  width: 140px;
   min-height: 160px;
+  align-self: stretch;
+  object-fit: cover;
+  object-position: center;
   background-color: var(--neutral-200);
-  background-size: cover;
-  background-position: center;
 }
 .ficha-docente__info {
   flex: 1 1 260px;

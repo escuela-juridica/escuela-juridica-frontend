@@ -11,6 +11,8 @@ import {
   CorregirCertificado,
   EmisionManualSituacion,
   EmitirCertificadoManual,
+  FiltrosGestion,
+  VistaPreviaCertificado,
 } from './certificados-admin.model';
 
 /** HU-035 — Consume `/api/admin/certificados`. */
@@ -19,8 +21,10 @@ export class CertificadosAdminApiService {
   private readonly http = inject(HttpClient);
   private readonly url = `${API_URL}/admin/certificados`;
 
-  listar(texto: string, estado: string, page: number, size: number): Observable<PageResponse<CertificadoGestion>> {
-    const params = new HttpParams().set('texto', texto).set('estado', estado).set('page', page).set('size', size);
+  listar(filtros: FiltrosGestion, page: number, size: number): Observable<PageResponse<CertificadoGestion>> {
+    let params = new HttpParams().set('estado', filtros.estado).set('page', page).set('size', size);
+    if (filtros.usuarioId) params = params.set('usuarioId', filtros.usuarioId);
+    if (filtros.cursoId) params = params.set('cursoId', filtros.cursoId);
     return this.http.get<PageResponse<CertificadoGestion>>(`${this.url}/gestion`, { params });
   }
 
@@ -43,5 +47,10 @@ export class CertificadosAdminApiService {
 
   anular(certificadoId: number, datos: AnularCertificado): Observable<CertificadoDetalle> {
     return this.http.post<CertificadoDetalle>(`${this.url}/${certificadoId}/anular`, datos);
+  }
+
+  /** PDF de borrador (con marca de agua) de cómo quedaría la corrección; no guarda nada. */
+  vistaPrevia(certificadoId: number, datos: VistaPreviaCertificado): Observable<Blob> {
+    return this.http.post(`${this.url}/${certificadoId}/vista-previa`, datos, { responseType: 'blob' });
   }
 }

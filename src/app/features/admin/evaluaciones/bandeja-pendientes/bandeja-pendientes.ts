@@ -5,6 +5,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
+import { Subscription } from 'rxjs';
+
+import { crearBusquedaDinamica } from '../../../../shared/util/busqueda-dinamica';
 import { ReporteAcademicoApiService } from '../../reportes/reporte-academico/reporte-academico-api.service';
 import { OpcionCursoReporte } from '../../reportes/reporte-academico/reporte-academico.model';
 import { EvaluacionesApiService } from '../evaluaciones-api.service';
@@ -22,6 +25,10 @@ export class BandejaPendientes {
   private readonly api = inject(EvaluacionesApiService);
   private readonly cursosApi = inject(ReporteAcademicoApiService);
   private readonly destroyRef = inject(DestroyRef);
+  private peticion?: Subscription;
+
+  /** Búsqueda al escribir: consulta al servidor cuando el usuario hace una pausa. */
+  protected readonly alEscribir = crearBusquedaDinamica(this.destroyRef, () => this.buscar());
 
   protected readonly filas = signal<IntentoPendiente[]>([]);
   protected readonly cursos = signal<OpcionCursoReporte[]>([]);
@@ -68,7 +75,8 @@ export class BandejaPendientes {
     this.cargando.set(true);
     this.error.set(null);
     this.api.resumen().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({ next: (r) => this.resumen.set(r) });
-    this.api
+    this.peticion?.unsubscribe();
+    this.peticion = this.api
       .bandeja({ texto: this.texto, cursoId: this.cursoId, plazo: this.plazo }, this.pagina(), 20)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({

@@ -17,6 +17,7 @@ import {
   formatearPrecio,
 } from '../curso-formato.util';
 import { FichaCursoDetalle, LeccionFicha, VistaPrevia } from '../curso.model';
+import { resolverUrlApi } from '../../../core/api/api.config';
 import { Session } from '../../../core/session/session';
 import { MatriculaApiService } from '../../matriculas/matricula-api.service';
 import { AlertaGlobalService } from '../../../core/notificaciones/alerta-global.service';
@@ -40,6 +41,8 @@ export class FichaCurso implements OnInit {
   private readonly session = inject(Session);
   private readonly router = inject(Router);
   protected readonly descripcionMedios = descripcionMedios;
+  /** Imagen que se muestra cuando un docente no tiene foto o su archivo no se puede cargar. */
+  protected readonly fotoDocentePorDefecto = 'img/instructores/docente-por-defecto.svg';
   private readonly matriculasApi = inject(MatriculaApiService);
   private readonly alertas = inject(AlertaGlobalService);
 
@@ -142,6 +145,19 @@ export class FichaCurso implements OnInit {
 
   protected reintentar(): void {
     this.reintentarBusqueda.next();
+  }
+
+  /** Las fotos subidas por administración vienen como /uploads/... (servidas por el backend); las demás rutas se usan tal cual. */
+  protected urlFotoDocente(fotoUrl: string | null): string {
+    return fotoUrl ? resolverUrlApi(fotoUrl) : this.fotoDocentePorDefecto;
+  }
+
+  /** Si la foto del docente no existe o no carga, se reemplaza una sola vez por la imagen por defecto. */
+  protected alFallarFotoDocente(evento: Event): void {
+    const imagen = evento.target as HTMLImageElement;
+    if (!imagen.src.endsWith(this.fotoDocentePorDefecto)) {
+      imagen.src = this.fotoDocentePorDefecto;
+    }
   }
 
   protected alternarDescripcion(): void {

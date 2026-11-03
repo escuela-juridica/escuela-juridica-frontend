@@ -5,7 +5,7 @@
   </header>
 
   <div class="ban__filtros">
-    <input class="input" [(ngModel)]="texto" (keyup.enter)="buscar()" placeholder="N.º de caso, documento, nombre o correo" aria-label="Buscar" />
+    <input class="input" [ngModel]="texto" (ngModelChange)="texto = $event; alEscribir()" (keyup.enter)="buscar()" placeholder="N.º de caso, documento, nombre o correo" aria-label="Buscar" />
     <select class="input" [(ngModel)]="estado" (ngModelChange)="buscar()" aria-label="Estado">
       <option value="">Todos los estados</option>
       <option value="PENDIENTE_RESPUESTA">Pendientes de respuesta</option>
@@ -16,7 +16,6 @@
       <option value="QUEJA">Queja</option>
       <option value="RECLAMO">Reclamo</option>
     </select>
-    <button type="button" class="btn btn--acento" (click)="buscar()">Buscar</button>
     <button type="button" class="btn btn--secundario" (click)="limpiar()">Limpiar</button>
   </div>
 

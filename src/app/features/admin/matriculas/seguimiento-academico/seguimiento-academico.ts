@@ -1,10 +1,8 @@
 import { DatePipe, DecimalPipe, LowerCasePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, effect, inject, input, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { distinctUntilChanged, map } from 'rxjs';
 
 import { AlertaGlobalService } from '../../../../core/notificaciones/alerta-global.service';
 import { Modal } from '../../../../shared/ui/modal/modal';
@@ -30,15 +28,17 @@ const MOTIVO_MINIMO = 10;
  */
 @Component({
   selector: 'app-seguimiento-academico',
-  imports: [DatePipe, DecimalPipe, LowerCasePipe, FormsModule, RouterLink, Modal, AvanceCertificadoBloque],
+  imports: [DatePipe, DecimalPipe, LowerCasePipe, FormsModule, Modal, AvanceCertificadoBloque],
   templateUrl: './seguimiento-academico.html',
   styleUrl: './seguimiento-academico.scss',
 })
 export class SeguimientoAcademico {
   private readonly api = inject(SeguimientoAcademicoApiService);
   private readonly alertas = inject(AlertaGlobalService);
-  private readonly ruta = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
+
+  /** Se muestra dentro de un modal de Matrículas y pagos: el id de la matrícula llega por aquí. */
+  readonly matriculaIdEntrada = input.required<number>({ alias: 'matriculaId' });
 
   protected readonly formatearFechaHoraCorta = formatearFechaHoraCorta;
   protected readonly detalle = signal<SeguimientoAcademicoDetalle | null>(null);
@@ -76,16 +76,12 @@ export class SeguimientoAcademico {
   private readonly motivoTexto = signal('');
 
   constructor() {
-    this.ruta.paramMap
-      .pipe(
-        map((p) => Number(p.get('matriculaId'))),
-        distinctUntilChanged(),
-        takeUntilDestroyed(this.destroyRef),
-      )
-      .subscribe((id) => {
-        this.matriculaId = id;
-        this.cargar();
-      });
+    effect(() => {
+      this.matriculaId = this.matriculaIdEntrada();
+      // cargar() lee y escribe señales: sin untracked el effect se re-ejecutaba con cada respuesta
+      // y volvía a pedir el seguimiento en bucle.
+      untracked(() => this.cargar());
+    });
   }
 
   protected cargar(): void {
