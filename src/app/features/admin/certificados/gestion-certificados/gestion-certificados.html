@@ -5,15 +5,76 @@
   </header>
 
   <div class="gestion__filtros">
-    <input class="input" [(ngModel)]="texto" (keyup.enter)="buscar()" placeholder="Alumno, correo, curso o código" aria-label="Buscar" />
-    <select class="input" [(ngModel)]="estado" (ngModelChange)="buscar()" aria-label="Situación del certificado">
-      <option value="">Cualquier situación</option>
-      <option value="SIN_CERTIFICADO">Sin certificado</option>
-      <option value="VIGENTE">Vigente</option>
-      <option value="ANULADO">Anulado</option>
-    </select>
-    <button type="button" class="btn btn--acento" (click)="buscar()">Buscar</button>
-    <button type="button" class="btn btn--secundario" (click)="limpiar()">Limpiar</button>
+    <div class="gestion__campo">
+      <span class="gestion__etiqueta" id="filtro-alumno">Alumno</span>
+      <ng-select
+        [items]="filtroAlumno.opciones()"
+        bindLabel="etiqueta"
+        bindValue="id"
+        [(ngModel)]="alumnoId"
+        [typeahead]="filtroAlumno.busqueda$"
+        [loading]="filtroAlumno.buscando()"
+        placeholder="Todos los alumnos"
+        typeToSearchText="Escribe para buscar"
+        notFoundText="Ningún alumno coincide"
+        loadingText="Buscando…"
+        clearAllText="Quitar selección"
+        [clearable]="true"
+        ariaLabelledBy="filtro-alumno"
+      >
+        <ng-template ng-option-tmp let-item="item">
+          <span class="gestion__opcion"><strong>{{ item.etiqueta }}</strong></span>
+        </ng-template>
+      </ng-select>
+    </div>
+    <div class="gestion__campo">
+      <span class="gestion__etiqueta" id="filtro-curso">Curso</span>
+      <ng-select
+        [items]="filtroCurso.opciones()"
+        bindLabel="etiqueta"
+        bindValue="id"
+        [(ngModel)]="cursoId"
+        [typeahead]="filtroCurso.busqueda$"
+        [loading]="filtroCurso.buscando()"
+        placeholder="Todos los cursos"
+        typeToSearchText="Escribe para buscar"
+        notFoundText="Ningún curso coincide"
+        loadingText="Buscando…"
+        clearAllText="Quitar selección"
+        [clearable]="true"
+        ariaLabelledBy="filtro-curso"
+      >
+        <ng-template ng-option-tmp let-item="item">
+          <span class="gestion__opcion"><strong>{{ item.etiqueta }}</strong></span>
+        </ng-template>
+      </ng-select>
+    </div>
+    <div class="gestion__campo">
+      <label class="gestion__etiqueta" for="filtro-situacion">Situación del certificado</label>
+      <select id="filtro-situacion" class="input" [(ngModel)]="estado">
+        <option value="">Cualquier situación</option>
+        <option value="SIN_CERTIFICADO">Sin certificado</option>
+        <option value="VIGENTE">Vigente</option>
+        <option value="ANULADO">Anulado</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="gestion__barra">
+    <button type="button" class="btn gestion__btn-filtro gestion__btn-limpiar" (click)="limpiar()">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <line x1="18" y1="6" x2="6" y2="18" />
+        <line x1="6" y1="6" x2="18" y2="18" />
+      </svg>
+      Limpiar
+    </button>
+    <button type="button" class="btn btn--acento gestion__btn-filtro" (click)="buscar()">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="7" />
+        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+      </svg>
+      Buscar
+    </button>
   </div>
 
   @if (cargando()) {
@@ -23,38 +84,120 @@
   } @else if (filas().length === 0) {
     <div class="estado-vacio">
       <h3 class="estado-vacio__titulo">No encontramos matrículas con esos filtros</h3>
-      <p class="estado-vacio__texto">Prueba con otro nombre, curso o situación.</p>
+      <p class="estado-vacio__texto">Prueba con otro alumno, curso o situación.</p>
     </div>
   } @else {
-    <p class="gestion__resumen">{{ totalFilas() }} {{ totalFilas() === 1 ? 'matrícula' : 'matrículas' }}</p>
+    <app-tabla-paginacion
+      [pagina]="pagina()"
+      [tamano]="tamano"
+      [total]="totalFilas()"
+      (cambiar)="irAPagina($event)"
+    />
+
     <div class="gestion__tabla">
       <table>
         <thead>
-          <tr><th>Alumno y curso</th><th>Matrícula</th><th>Certificado</th><th>Código</th><th>Acciones</th></tr>
+          <tr>
+            <th>Alumno y curso</th>
+            <th class="gestion__col-matricula">Matrícula</th>
+            <th class="gestion__col-fecha">Fecha de matrícula</th>
+            <th>Certificado</th>
+            <th class="gestion__col-avance">Avance</th>
+            <th class="gestion__col-codigo">Código</th>
+            <th>Acciones</th>
+          </tr>
         </thead>
         <tbody>
           @for (fila of filas(); track fila.matriculaId) {
             <tr>
-              <td><strong>{{ fila.alumno }}</strong><small>{{ fila.correo }}</small><small>{{ fila.curso }}</small></td>
-              <td>{{ etiquetaMatricula(fila.estadoMatricula) }}</td>
+              <td>
+                <strong>{{ fila.alumno }}</strong><small>{{ fila.curso }}</small>
+                <small class="gestion__compacto">Matrícula {{ etiquetaMatricula(fila.estadoMatricula).toLowerCase() }} · {{ fila.fechaMatricula | date:'dd/MM/yyyy' }}</small>
+                @if (fila.estadoMatricula !== 'CANCELADA') { <small class="gestion__compacto-avance">Avance {{ fila.avance }} %</small> }
+              </td>
+              <td class="gestion__col-matricula">
+                <span [class]="claseMatricula(fila.estadoMatricula)">{{ etiquetaMatricula(fila.estadoMatricula) }}</span>
+              </td>
+              <td class="gestion__col-fecha">{{ fila.fechaMatricula | date:'dd/MM/yyyy' }}</td>
               <td>
                 @switch (fila.estadoCertificado) {
-                  @case ('VIGENTE') { <span class="badge badge--disp-inmediato">Vigente</span> }
-                  @case ('ANULADO') { <span class="badge badge--disp-cancelado">Anulado</span> }
-                  @default { <span class="badge badge--disp-proximo">Sin certificado</span> }
+                  @case ('VIGENTE') {
+                    <span class="badge badge--disp-inmediato gestion__estado">
+                      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12" /></svg>
+                      Vigente
+                    </span>
+                  }
+                  @case ('ANULADO') {
+                    <span class="badge badge--disp-cancelado gestion__estado">
+                      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+                      Anulado
+                    </span>
+                  }
+                  @default {
+                    <span class="badge badge--disp-proximo gestion__estado">
+                      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12" /></svg>
+                      Sin certificado
+                    </span>
+                  }
                 }
                 @if (fila.emitidoEn) {
                   <small>{{ etiquetaEmision(fila.tipoEmision) }} · {{ fila.emitidoEn | date:'dd/MM/yyyy' }}</small>
                 }
+                @if (fila.codigo) {
+                  <small class="gestion__compacto gestion__codigo">{{ fila.codigo }}</small>
+                }
               </td>
-              <td class="gestion__codigo">{{ fila.codigo ?? '—' }}</td>
-              <td>
-                @if (fila.puedeEmitirManual) {
-                  <a class="btn btn--secundario" [routerLink]="['/admin/certificados/manual', fila.matriculaId]">Emitir manualmente</a>
-                } @else if (fila.certificadoId !== null) {
-                  <a class="btn btn--secundario" [routerLink]="['/admin/certificados', fila.certificadoId]">{{ fila.estadoCertificado === 'VIGENTE' ? 'Corregir o anular' : 'Ver historial' }}</a>
+              <td class="gestion__col-avance">
+                @if (fila.estadoMatricula === 'CANCELADA') {
+                  <span class="gestion__sin-avance">—</span>
+                  <small>Sin acceso al curso</small>
                 } @else {
-                  <a class="btn btn--secundario" [routerLink]="['/admin/certificados/manual', fila.matriculaId]">Ver situación</a>
+                  <div class="gestion__avance" [attr.aria-label]="'Avance ' + fila.avance + ' %'">
+                    <div class="gestion__avance-barra"><span [class.gestion__avance-relleno--ok]="fila.cumpleRequisitos" [style.width.%]="fila.avance"></span></div>
+                    <strong>{{ fila.avance }} %</strong>
+                  </div>
+                  @if (fila.estadoCertificado === 'SIN_CERTIFICADO') {
+                    <small [class.gestion__avance-ok]="fila.cumpleRequisitos">{{ notaAvance(fila) }}</small>
+                  }
+                }
+              </td>
+              <td class="gestion__col-codigo gestion__codigo">{{ fila.codigo ?? '—' }}</td>
+              <td>
+                @if (fila.certificadoId === null) {
+                  <a class="btn btn--secundario gestion__btn-fila" [routerLink]="['/admin/certificados/manual', fila.matriculaId]">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M3 3v18h18" />
+                      <path d="m7 14 4-4 3 3 5-6" />
+                    </svg>
+                    {{ textoVer(fila) }}
+                  </a>
+                } @else if (fila.certificadoId !== null) {
+                  <div class="gestion__acciones">
+                  @if (fila.estadoCertificado === 'VIGENTE' && fila.codigo) {
+                    <button type="button" class="btn btn--secundario gestion__btn-fila" title="Abre el PDF en otra pestaña" (click)="verCertificado(fila.codigo)">
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                      Ver certificado
+                    </button>
+                  }
+                  <a class="btn btn--secundario gestion__btn-fila" [routerLink]="['/admin/certificados', fila.certificadoId]">
+                    @if (fila.estadoCertificado === 'VIGENTE') {
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M12 20h9" />
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                      </svg>
+                      Corregir o anular
+                    } @else {
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="12" cy="12" r="10" />
+                        <polyline points="12 6 12 12 16 14" />
+                      </svg>
+                      Ver situación
+                    }
+                  </a>
+                  </div>
                 }
               </td>
             </tr>
@@ -62,13 +205,5 @@
         </tbody>
       </table>
     </div>
-
-    @if (totalPaginas() > 1) {
-      <div class="gestion__paginacion">
-        <button type="button" class="btn btn--secundario" [disabled]="pagina() === 0" (click)="irAPagina(pagina() - 1)">Anterior</button>
-        <span>Página {{ pagina() + 1 }} de {{ totalPaginas() }}</span>
-        <button type="button" class="btn btn--secundario" [disabled]="pagina() + 1 >= totalPaginas()" (click)="irAPagina(pagina() + 1)">Siguiente</button>
-      </div>
-    }
   }
 </section>

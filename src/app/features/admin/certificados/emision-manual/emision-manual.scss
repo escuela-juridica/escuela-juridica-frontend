@@ -5,32 +5,61 @@
   max-width: 1040px;
 }
 
-.emision__volver {
-  align-self: flex-start;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--neutral-600);
-  text-decoration: none;
+// Confirmación escribiendo el nombre (alumno que no cumple los requisitos).
+.emision__advertencia {
+  margin-bottom: 16px;
 }
 
-.emision__etiqueta {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--eyebrow-color);
+.emision__confirmar-nombre {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radio-md);
+  background: var(--neutral-050);
 }
 
-.emision__titulo {
-  margin: 2px 0 0;
-  font-size: 22px;
-  line-height: 30px;
-  font-weight: 700;
+.emision__confirmar-nombre .label {
+  display: block;
+  line-height: 22px;
+}
+
+.emision__nombre-objetivo {
+  display: inline-block;
+  margin-top: 2px;
+  padding: 1px 8px;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radio-md);
+  background: var(--blanco);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
   color: var(--neutral-950);
+  user-select: all;
 }
 
-.emision__cabecera p {
-  margin: 4px 0 0;
+.emision__confirmar-nombre .input--ok {
+  border-color: var(--exito);
+  box-shadow: 0 0 0 3px var(--exito-fondo);
+}
+
+.emision__coincide {
+  margin: 0;
+  font-size: 13px;
+  color: var(--neutral-500);
+}
+
+.emision__coincide--ok {
+  color: var(--exito);
+  font-weight: 600;
+}
+
+.emision__origen {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 500;
   color: var(--neutral-600);
 }
 
@@ -130,11 +159,23 @@
   color: var(--neutral-600);
 }
 
+.emision__nota--sola {
+  margin: -6px 0 0;
+}
+
 .emision__emitido {
   display: flex;
   gap: 16px;
   align-items: flex-start;
   border-left: 4px solid var(--exito);
+}
+
+.emision__emitido--anulado {
+  border-left-color: var(--error);
+}
+
+.emision__emitido--anulado .emision__emitido-icono {
+  background: var(--error);
 }
 
 .emision__emitido-icono {
@@ -148,6 +189,19 @@
   background: var(--exito);
   color: #fff;
   font-size: 20px;
+}
+
+.emision__emitido {
+  flex-wrap: wrap;
+}
+
+.emision__ver {
+  margin-left: auto;
+  height: 38px;
+  padding: 0 16px;
+  gap: 7px;
+  font-size: 13px;
+  line-height: 18px;
 }
 
 .emision__emitido .emision__subtitulo {
@@ -184,6 +238,157 @@
   accent-color: var(--marca-900);
 }
 
+// ----------------------------------------------------------------- Modal de emisión --
+
+.emision__modal {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.emision__alumno {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 16px;
+  border-left: 4px solid var(--acento-500);
+  border-radius: var(--radio-md);
+  background: var(--neutral-050);
+}
+
+.emision__alumno-nombre {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 24px;
+  color: var(--neutral-950);
+}
+
+.emision__alumno-curso {
+  font-size: 14px;
+  color: var(--neutral-600);
+}
+
+.emision__seccion {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.emision__seccion + .emision__seccion:not(.emision__seccion--alerta) {
+  padding-top: 24px;
+  border-top: 1px solid var(--neutral-100);
+}
+
+.emision__seccion--alerta {
+  gap: 16px;
+}
+
+.emision__seccion-titulo {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--neutral-600);
+}
+
+.emision__campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.emision__campo .label {
+  margin: 0;
+}
+
+.emision__ayuda {
+  margin: 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--neutral-600);
+}
+
+.emision__resumen {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 24px;
+  margin: 0;
+}
+
+.emision__resumen > div {
+  min-width: 0;
+}
+
+.emision__resumen-ancho {
+  grid-column: 1 / -1;
+}
+
+.emision__resumen dt {
+  margin-bottom: 3px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--neutral-600);
+}
+
+.emision__resumen dd {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 22px;
+  color: var(--neutral-950);
+  overflow-wrap: anywhere;
+}
+
+.emision__resumen-sub {
+  display: block;
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--neutral-600);
+}
+
+.emision__firmantes {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 2px 0 0;
+  padding: 0;
+}
+
+.emision__firmantes li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.emision__firmantes small {
+  display: block;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--neutral-600);
+}
+
+.emision__numero {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--marca-900);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.emision__sin-firmantes {
+  font-weight: 500;
+  color: #92400e;
+}
+
 .emision__acciones {
   display: flex;
   justify-content: flex-end;
@@ -198,5 +403,9 @@
 @media (max-width: 860px) {
   .emision__rejilla {
     grid-template-columns: 1fr;
+  }
+
+  .emision__resumen {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

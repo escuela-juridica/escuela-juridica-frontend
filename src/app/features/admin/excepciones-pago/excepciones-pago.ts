@@ -4,8 +4,12 @@ import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 
+import { Subscription } from 'rxjs';
+
+import { crearBusquedaDinamica } from '../../../shared/util/busqueda-dinamica';
 import { AlertaGlobalService } from '../../../core/notificaciones/alerta-global.service';
 import { Modal } from '../../../shared/ui/modal/modal';
+import { TablaPaginacion } from '../../../shared/ui/tabla-paginacion/tabla-paginacion';
 import { formatearPrecio } from '../../cursos/curso-formato.util';
 import { ExcepcionesPagoApiService } from './excepciones-pago-api.service';
 import { Excepcion, TipoExcepcion } from './excepciones-pago.model';
@@ -19,7 +23,7 @@ const TAMANO_PAGINA = 20;
  */
 @Component({
   selector: 'app-excepciones-pago',
-  imports: [FormsModule, ReactiveFormsModule, DatePipe, Modal],
+  imports: [FormsModule, ReactiveFormsModule, DatePipe, Modal, TablaPaginacion],
   templateUrl: './excepciones-pago.html',
   styleUrl: './excepciones-pago.scss',
 })
@@ -27,8 +31,13 @@ export class ExcepcionesPago {
   private readonly api = inject(ExcepcionesPagoApiService);
   private readonly alertas = inject(AlertaGlobalService);
   private readonly destroyRef = inject(DestroyRef);
+  private peticion?: Subscription;
+
+  /** Búsqueda al escribir: consulta al servidor cuando el usuario hace una pausa. */
+  protected readonly alEscribir = crearBusquedaDinamica(this.destroyRef, () => this.buscar());
 
   protected readonly formatearPrecio = formatearPrecio;
+  protected readonly tamano = TAMANO_PAGINA;
   protected readonly filas = signal<Excepcion[]>([]);
   protected readonly cargando = signal(true);
   protected readonly error = signal<string | null>(null);
@@ -143,7 +152,8 @@ export class ExcepcionesPago {
   private cargar(): void {
     this.cargando.set(true);
     this.error.set(null);
-    this.api.listar(this.texto.trim(), this.estado, this.tipo, this.pagina(), TAMANO_PAGINA).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    this.peticion?.unsubscribe();
+    this.peticion = this.api.listar(this.texto.trim(), this.estado, this.tipo, this.pagina(), TAMANO_PAGINA).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (r) => {
         this.filas.set(r.items);
         this.totalPaginas.set(r.totalPages);

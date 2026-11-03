@@ -35,7 +35,6 @@ import {
 import { CursoAdminApiService } from '../curso-admin-api.service';
 import { CursoEditorRespuesta, ModalidadCurso, TipoVentaCurso } from '../curso-admin.model';
 import { Modal } from '../../../../shared/ui/modal/modal';
-import { AlertaGlobalComponent } from '../../../../shared/ui/alerta-global/alerta-global';
 import { ExamenesTab } from './examenes-tab/examenes-tab';
 import { PublicacionTab } from './publicacion-tab/publicacion-tab';
 import { RequisitosTab } from './requisitos-tab/requisitos-tab';
@@ -71,7 +70,6 @@ interface SesionEnVivoEditor {
     ExamenesTab,
     RequisitosTab,
     PublicacionTab,
-    AlertaGlobalComponent,
     ModalReprogramarSesion,
     ModalCancelarSesion,
     ModalCorregirSesion,
@@ -1246,7 +1244,7 @@ export class CursoEditor implements OnInit {
         promocionInicioEn: this.aInstante(v.promocionInicioEn),
         promocionFinEn: this.aInstante(v.promocionFinEn),
         fechaInicio: v.fechaInicio,
-        fechaFin: v.modalidad === 'VIRTUAL' ? null : v.fechaFin,
+        fechaFin: v.fechaFin,
         fechaCierreMatricula: v.modalidad === 'VIRTUAL' ? null : v.fechaCierreMatricula,
         cupoMaximo: v.cupoMaximo,
         horasAcademicas: v.horasAcademicas,

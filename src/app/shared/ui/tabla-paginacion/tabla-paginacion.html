@@ -1,0 +1,41 @@
+<div class="tp">
+  <span class="tp__resumen" role="status" aria-live="polite">
+    Mostrando <strong>{{ desde() }}</strong> a <strong>{{ hasta() }}</strong> de <strong>{{ total() }}</strong>
+    {{ total() === 1 ? 'registro' : 'registros' }}
+  </span>
+
+  @if (totalPaginas() > 1) {
+    <nav class="tp__nav" aria-label="Paginación">
+      <button type="button" class="tp__boton" [disabled]="pagina() <= 0" (click)="ir(pagina() - 1)">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="15 18 9 12 15 6" />
+        </svg>
+        Anterior
+      </button>
+
+      @for (n of paginas(); track $index) {
+        @if (n === null) {
+          <span class="tp__puntos" aria-hidden="true">…</span>
+        } @else {
+          <button
+            type="button"
+            class="tp__numero"
+            [class.tp__numero--activa]="n === pagina()"
+            [attr.aria-current]="n === pagina() ? 'page' : null"
+            [attr.aria-label]="'Página ' + (n + 1)"
+            (click)="ir(n)"
+          >
+            {{ n + 1 }}
+          </button>
+        }
+      }
+
+      <button type="button" class="tp__boton" [disabled]="pagina() + 1 >= totalPaginas()" (click)="ir(pagina() + 1)">
+        Siguiente
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="9 18 15 12 9 6" />
+        </svg>
+      </button>
+    </nav>
+  }
+</div>

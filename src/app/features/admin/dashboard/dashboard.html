@@ -8,18 +8,18 @@
     <div class="dash__filtros" role="group" aria-label="Filtros de todos los gráficos">
       <div class="dash__campo"><span>Periodo</span>
         <ng-select [items]="periodos" bindLabel="etiqueta" bindValue="id" [ngModel]="rango" (ngModelChange)="cambiarRango($event)"
-          [clearable]="false" [searchable]="false" appendTo="body" aria-label="Periodo" />
+          [clearable]="false" [searchable]="false" aria-label="Periodo" />
       </div>
       <label class="dash__campo">Desde<input class="input" type="date" [(ngModel)]="desde" (change)="editarFechas()" /></label>
       <label class="dash__campo">Hasta<input class="input" type="date" [(ngModel)]="hasta" [min]="desde" (change)="editarFechas()" /></label>
       <div class="dash__campo"><span>Curso</span>
         <ng-select [items]="cursos()" bindLabel="etiqueta" bindValue="id" [(ngModel)]="cursoId" (change)="cargar()"
           placeholder="Todos los cursos" notFoundText="Ningún curso coincide" clearAllText="Quitar filtro"
-          [searchable]="true" [clearable]="true" appendTo="body" aria-label="Curso" />
+          [searchable]="true" [clearable]="true" aria-label="Curso" />
       </div>
       <div class="dash__campo"><span>Modalidad</span>
         <ng-select [items]="modalidades" bindLabel="etiqueta" bindValue="id" [(ngModel)]="modalidad" (change)="cargar()"
-          placeholder="Todas" clearAllText="Quitar filtro" [searchable]="false" [clearable]="true" appendTo="body" aria-label="Modalidad" />
+          placeholder="Todas" clearAllText="Quitar filtro" [searchable]="false" [clearable]="true" aria-label="Modalidad" />
       </div>
     </div>
   </header>

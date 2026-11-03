@@ -33,12 +33,12 @@
   <div class="infobase-card__cabecera">
     <h2 class="infobase-card__titulo">{{ tituloPestanaActiva }}</h2>
     <div class="infobase-card__acciones">
-      <label class="infobase-interruptor">
-        <input type="checkbox" class="infobase-interruptor__entrada" [checked]="mostrarTodos()" (change)="alternarMostrarTodos()" />
-        <span class="infobase-interruptor__pista"><span class="infobase-interruptor__perilla"></span></span>
-        <span class="infobase-interruptor__texto">Mostrar todos</span>
-      </label>
       @if (modoFormulario() === null) {
+        <label class="infobase-interruptor">
+          <input type="checkbox" class="infobase-interruptor__entrada" [checked]="mostrarTodos()" (change)="alternarMostrarTodos()" />
+          <span class="infobase-interruptor__pista"><span class="infobase-interruptor__perilla"></span></span>
+          <span class="infobase-interruptor__texto">Mostrar todos</span>
+        </label>
         <button type="button" class="btn btn--secundario" (click)="abrirCrear()">Agregar valor</button>
       }
     </div>
@@ -59,15 +59,33 @@
           <div class="infobase-campos infobase-campos--3">
             <div>
               <label class="label" for="tc-codigo">Código</label>
-              <input id="tc-codigo" class="input" formControlName="codigo" placeholder="DIPLOMADO" />
+              <input id="tc-codigo" class="input" formControlName="codigo" placeholder="DIPLOMADO" [class.input--error]="!!mensajeCampo('codigo')" />
+              @if (mensajeCampo('codigo'); as mensaje) {
+                <div class="campo-error">{{ mensaje }}</div>
+              }
             </div>
             <div>
               <label class="label" for="tc-nombre">Nombre</label>
-              <input id="tc-nombre" class="input" formControlName="nombre" placeholder="Diplomado" />
+              <input id="tc-nombre" class="input" formControlName="nombre" placeholder="Diplomado" [class.input--error]="!!mensajeCampo('nombre')" />
+              @if (mensajeCampo('nombre'); as mensaje) {
+                <div class="campo-error">{{ mensaje }}</div>
+              }
             </div>
             <div>
               <label class="label" for="tc-orden">Orden</label>
-              <input id="tc-orden" type="number" class="input" formControlName="orden" />
+              <input id="tc-orden" type="number" class="input" formControlName="orden" [class.input--error]="!!mensajeCampo('orden')" />
+              @if (mensajeCampo('orden'); as mensaje) {
+                <div class="campo-error">{{ mensaje }}</div>
+              }
+            </div>
+            <div>
+              <label class="label" for="tc-sigla">Sigla del código de registro</label>
+              <input id="tc-sigla" class="input" formControlName="siglaRegistro" placeholder="DP" maxlength="4" [class.input--error]="!!mensajeCampo('siglaRegistro')" />
+              @if (mensajeCampo('siglaRegistro'); as mensaje) {
+                <div class="campo-error">{{ mensaje }}</div>
+              } @else {
+                <p class="campo-ayuda">Va en el código de registro de los cursos de este tipo (01-{{ formTipoCurso.controls.siglaRegistro.value.toUpperCase() || 'DP' }}_2026). Cambiarla solo afecta a los cursos que se publiquen después.</p>
+              }
             </div>
           </div>
         }
@@ -75,15 +93,24 @@
           <div class="infobase-campos infobase-campos--3">
             <div>
               <label class="label" for="cat-codigo">Código</label>
-              <input id="cat-codigo" class="input" formControlName="codigo" placeholder="DERECHO_REGISTRAL" />
+              <input id="cat-codigo" class="input" formControlName="codigo" placeholder="DERECHO_REGISTRAL" [class.input--error]="!!mensajeCampo('codigo')" />
+              @if (mensajeCampo('codigo'); as mensaje) {
+                <div class="campo-error">{{ mensaje }}</div>
+              }
             </div>
             <div>
               <label class="label" for="cat-nombre">Nombre</label>
-              <input id="cat-nombre" class="input" formControlName="nombre" placeholder="Derecho Registral" />
+              <input id="cat-nombre" class="input" formControlName="nombre" placeholder="Derecho Registral" [class.input--error]="!!mensajeCampo('nombre')" />
+              @if (mensajeCampo('nombre'); as mensaje) {
+                <div class="campo-error">{{ mensaje }}</div>
+              }
             </div>
             <div>
               <label class="label" for="cat-orden">Orden</label>
-              <input id="cat-orden" type="number" class="input" formControlName="orden" />
+              <input id="cat-orden" type="number" class="input" formControlName="orden" [class.input--error]="!!mensajeCampo('orden')" />
+              @if (mensajeCampo('orden'); as mensaje) {
+                <div class="campo-error">{{ mensaje }}</div>
+              }
             </div>
           </div>
         }
@@ -112,11 +139,15 @@
             </div>
             <div>
               <label class="label" for="doc-cargo">Cargo profesional</label>
-              <input id="doc-cargo" class="input" formControlName="cargoProfesional" placeholder="Docente especialista en..." />
+              <input id="doc-cargo" class="input" formControlName="cargoProfesional" placeholder="Docente especialista en..." [class.input--error]="!!mensajeCampo('cargoProfesional')" />
+              @if (mensajeCampo('cargoProfesional'); as mensaje) {
+                <div class="campo-error">{{ mensaje }}</div>
+              }
             </div>
             <div>
               <label class="label"><span>Foto</span><span class="nota-pill">Opcional</span></label>
-              <input class="input" formControlName="fotoUrl" placeholder="img/instructores/..." />
+              <app-imagen-subida tipo="FOTO" [valor]="formDocente.controls.fotoUrl.value"
+                (cambio)="formDocente.controls.fotoUrl.setValue($event)" />
             </div>
             <div class="infobase-campo--ancho">
               <label class="label"><span>Biografía profesional</span><span class="nota-pill">Opcional</span></label>
@@ -128,7 +159,10 @@
           <div class="infobase-campos infobase-campos--2">
             <div>
               <label class="label" for="ent-nombre">Nombre</label>
-              <input id="ent-nombre" class="input" formControlName="nombre" placeholder="Colegio de Abogados de Lima" />
+              <input id="ent-nombre" class="input" formControlName="nombre" placeholder="Colegio de Abogados de Lima" [class.input--error]="!!mensajeCampo('nombre')" />
+              @if (mensajeCampo('nombre'); as mensaje) {
+                <div class="campo-error">{{ mensaje }}</div>
+              }
             </div>
             <div>
               <label class="label"><span>Logo</span><span class="nota-pill">Opcional</span></label>
@@ -162,28 +196,15 @@
             </div>
             <div>
               <label class="label" for="fir-cargo">Cargo que firma</label>
-              <input id="fir-cargo" class="input" formControlName="cargoFirma" placeholder="Directora Ejecutiva" />
+              <input id="fir-cargo" class="input" formControlName="cargoFirma" placeholder="Directora Ejecutiva" [class.input--error]="!!mensajeCampo('cargoFirma')" />
+              @if (mensajeCampo('cargoFirma'); as mensaje) {
+                <div class="campo-error">{{ mensaje }}</div>
+              }
             </div>
             <div class="infobase-campo--ancho">
-              <label class="label"><span>Imagen de firma</span><span class="nota-pill">Opcional</span></label>
+              <label class="label"><span>Imagen de firma</span><span class="nota-pill">Obligatoria para publicar cursos</span></label>
               <app-imagen-subida tipo="FIRMA" [valor]="formFirmante.controls.imagenFirmaUrl.value"
                 (cambio)="formFirmante.controls.imagenFirmaUrl.setValue($event)" />
-            </div>
-          </div>
-        }
-        @case ('tipoMaterial') {
-          <div class="infobase-campos infobase-campos--2">
-            <div>
-              <label class="label" for="tm-codigo">Código</label>
-              <input id="tm-codigo" class="input" formControlName="codigo" placeholder="PDF" />
-            </div>
-            <div>
-              <label class="label" for="tm-nombre">Nombre</label>
-              <input id="tm-nombre" class="input" formControlName="nombre" placeholder="Documento PDF" />
-            </div>
-            <div class="infobase-campo--ancho">
-              <label class="label"><span>Descripción</span><span class="nota-pill">Opcional</span></label>
-              <textarea class="input" rows="2" formControlName="descripcion"></textarea>
             </div>
           </div>
         }
@@ -213,6 +234,7 @@
           <div class="infobase-fila">
             <div class="infobase-fila__principal">
               <span class="infobase-fila__nombre">{{ item.nombre }}</span>
+              <small class="infobase-fila__detalle">Sigla de registro: {{ item.siglaRegistro }}</small>
             </div>
             <span class="badge" [class.badge--disp-inmediato]="item.activo" [class.badge--disp-cerrado]="!item.activo">
               {{ item.activo ? 'Activo' : 'Inactivo' }}
@@ -269,6 +291,14 @@
               <span class="infobase-fila__nombre">{{ item.nombreCompleto }}</span>
               <span class="infobase-fila__subtitulo">{{ item.cargoProfesional }}</span>
             </div>
+            <span
+              class="badge"
+              [class.badge--disp-inmediato]="item.fotoUrl"
+              [class.badge--advertencia-suave]="!item.fotoUrl"
+              [title]="item.fotoUrl ? 'Este docente tiene foto' : 'Este docente no tiene foto: se muestra una imagen por defecto'"
+            >
+              {{ item.fotoUrl ? '✓ Con foto' : '✗ Sin foto' }}
+            </span>
             <span class="badge" [class.badge--disp-inmediato]="item.activo" [class.badge--disp-cerrado]="!item.activo">
               {{ item.activo ? 'Activo' : 'Inactivo' }}
             </span>
@@ -323,33 +353,6 @@
             <div class="infobase-fila__principal">
               <span class="infobase-fila__nombre">{{ item.nombreCompleto }}</span>
               <span class="infobase-fila__subtitulo">{{ item.cargoFirma }}</span>
-            </div>
-            <span class="badge" [class.badge--disp-inmediato]="item.activo" [class.badge--disp-cerrado]="!item.activo">
-              {{ item.activo ? 'Activo' : 'Inactivo' }}
-            </span>
-            <div class="infobase-fila__acciones">
-              <button type="button" class="btn btn--acento infobase-fila__accion" (click)="abrirEditar(item.id)">Editar</button>
-              <button
-                type="button"
-                class="btn infobase-fila__accion"
-                [class.btn--exito]="!item.activo"
-                [class.btn--peligro]="item.activo"
-                (click)="cambiarActivo(item.id, !item.activo)"
-              >
-                {{ item.activo ? 'Desactivar' : 'Activar' }}
-              </button>
-            </div>
-          </div>
-        }
-      }
-      @case ('tipoMaterial') {
-        @if (tiposMaterial().length === 0) {
-          <p class="infobase-estado">Todavía no hay valores en esta sección.</p>
-        }
-        @for (item of tiposMaterial(); track item.id) {
-          <div class="infobase-fila">
-            <div class="infobase-fila__principal">
-              <span class="infobase-fila__nombre">{{ item.nombre }}</span>
             </div>
             <span class="badge" [class.badge--disp-inmediato]="item.activo" [class.badge--disp-cerrado]="!item.activo">
               {{ item.activo ? 'Activo' : 'Inactivo' }}

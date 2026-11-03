@@ -1,0 +1,96 @@
+
+> escuela-juridica-frontend@0.0.0 test
+> ng test --watch=false
+
+❯ Building...
+✔ Building...
+Initial chunk files                                                            | Names                                                                       |  Raw size
+spec-app-features-examen-examen-pantalla.js                                    | spec-app-features-examen-examen-pantalla                                    | 158.51 kB | 
+spec-app-features-cursos-ficha-curso-ficha-curso.js                            | spec-app-features-cursos-ficha-curso-ficha-curso                            | 115.76 kB | 
+spec-app-features-admin-dashboard-dashboard.js                                 | spec-app-features-admin-dashboard-dashboard                                 |  96.83 kB | 
+chunk-WLKK37M7.js                                                              | -                                                                           |  89.68 kB | 
+spec-app-features-reclamaciones-libro-reclamaciones-libro-reclamaciones.js     | spec-app-features-reclamaciones-libro-reclamaciones-libro-reclamaciones     |  85.73 kB | 
+spec-app-features-aula-aula-resumen-aula-resumen.js                            | spec-app-features-aula-aula-resumen-aula-resumen                            |  80.49 kB | 
+spec-app-features-cuenta-mi-perfil-mi-perfil.js                                | spec-app-features-cuenta-mi-perfil-mi-perfil                                |  78.82 kB | 
+chunk-47TCJTS6.js                                                              | -                                                                           |  68.15 kB | 
+spec-app-features-cursos-catalogo-catalogo.js                                  | spec-app-features-cursos-catalogo-catalogo                                  |  65.72 kB | 
+spec-app-features-admin-reportes-reporte-pagos-reporte-pagos.js                | spec-app-features-admin-reportes-reporte-pagos-reporte-pagos                |  58.35 kB | 
+spec-app-features-admin-excepciones-pago-excepciones-pago.js                   | spec-app-features-admin-excepciones-pago-excepciones-pago                   |  56.57 kB | 
+styles.css                                                                     | styles                                                                      |  51.68 kB | 
+spec-app-features-pagos-resultado-pago-resultado-pago.js                       | spec-app-features-pagos-resultado-pago-resultado-pago                       |  45.06 kB | 
+spec-app-features-pagos-checkout-pago-checkout-pago.js                         | spec-app-features-pagos-checkout-pago-checkout-pago                         |  44.66 kB | 
+spec-app-core-layout-layout-publico-layout-publico.js                          | spec-app-core-layout-layout-publico-layout-publico                          |  38.73 kB | 
+spec-app-core-layout-layout-admin-layout-admin.js                              | spec-app-core-layout-layout-admin-layout-admin                              |  37.42 kB | 
+spec-app-features-cuenta-panel-panel.js                                        | spec-app-features-cuenta-panel-panel                                        |  36.08 kB | 
+spec-app-features-certificacion-verificar-certificado-verificar-certificado.js | spec-app-features-certificacion-verificar-certificado-verificar-certificado |  34.30 kB | 
+spec-app-features-certificacion-mis-certificados-mis-certificados.js           | spec-app-features-certificacion-mis-certificados-mis-certificados           |  30.87 kB | 
+spec-app-core-layout-layout-alumno-layout-alumno.js                            | spec-app-core-layout-layout-alumno-layout-alumno                            |  26.67 kB | 
+spec-app-features-auth-verificar-correo-verificar-correo.js                    | spec-app-features-auth-verificar-correo-verificar-correo                    |  25.56 kB | 
+spec-app-features-auth-nueva-password-nueva-password.js                        | spec-app-features-auth-nueva-password-nueva-password                        |  24.97 kB | 
+spec-app-features-auth-acceso-acceso.js                                        | spec-app-features-auth-acceso-acceso                                        |  21.84 kB | 
+spec-app-features-legal-terminos-terminos.js                                   | spec-app-features-legal-terminos-terminos                                   |  18.33 kB | 
+spec-app-features-legal-privacidad-privacidad.js                               | spec-app-features-legal-privacidad-privacidad                               |  18.31 kB | 
+spec-app-features-auth-recuperar-password-recuperar-password.js                | spec-app-features-auth-recuperar-password-recuperar-password                |  15.22 kB | 
+spec-app-app.js                                                                | spec-app-app                                                                |  14.77 kB | 
+chunk-TPITUT3T.js                                                              | -                                                                           |  13.58 kB | 
+spec-app-features-auth-registro-registro.js                                    | spec-app-features-auth-registro-registro                                    |  11.98 kB | 
+chunk-HTUCQCFG.js                                                              | -                                                                           |  11.90 kB | 
+chunk-SACPGPGE.js                                                              | -                                                                           |  10.29 kB | 
+spec-app-features-certificacion-certificacion-bloque-certificacion-bloque.js   | spec-app-features-certificacion-certificacion-bloque-certificacion-bloque   |   8.55 kB | 
+chunk-K7EKBK6P.js                                                              | -                                                                           |   8.54 kB | 
+chunk-MGINZNVR.js                                                              | -                                                                           |   8.45 kB | 
+spec-app-features-auth-registro-registro-http.js                               | spec-app-features-auth-registro-registro-http                               |   7.17 kB | 
+chunk-ODIK24G4.js                                                              | -                                                                           |   6.35 kB | 
+spec-app-features-certificacion-certificacion-api.service.js                   | spec-app-features-certificacion-certificacion-api.service                   |   5.30 kB | 
+spec-app-features-aula-aula-sesion.service.js                                  | spec-app-features-aula-aula-sesion.service                                  |   5.20 kB | 
+chunk-72IWHFWJ.js                                                              | -                                                                           |   5.18 kB | 
+spec-app-features-auth-registro-anti-robot.js                                  | spec-app-features-auth-registro-anti-robot                                  |   5.08 kB | 
+chunk-RSTWSNOR.js                                                              | -                                                                           |   4.75 kB | 
+spec-app-features-matriculas-matricula-api.service.js                          | spec-app-features-matriculas-matricula-api.service                          |   4.49 kB | 
+spec-app-features-leccion-leccion-reproductor-api.service.js                   | spec-app-features-leccion-leccion-reproductor-api.service                   |   4.47 kB | 
+spec-app-features-pagos-culqi-checkout.service.js                              | spec-app-features-pagos-culqi-checkout.service                              |   4.42 kB | 
+chunk-N2O4PHL3.js                                                              | -                                                                           |   3.86 kB | 
+spec-app-features-reclamaciones-reclamaciones-api.service.js                   | spec-app-features-reclamaciones-reclamaciones-api.service                   |   3.83 kB | 
+spec-app-features-examen-examen-api.service.js                                 | spec-app-features-examen-examen-api.service                                 |   3.72 kB | 
+chunk-QK3KEXWR.js                                                              | -                                                                           |   3.71 kB | 
+spec-app-features-pagos-pagos-api.service.js                                   | spec-app-features-pagos-pagos-api.service                                   |   3.67 kB | 
+chunk-RZWFDAVH.js                                                              | -                                                                           |   3.26 kB | 
+chunk-2EKIJKZ7.js                                                              | -                                                                           |   3.15 kB | 
+spec-app-features-sesiones-sesion-alumno-api.service.js                        | spec-app-features-sesiones-sesion-alumno-api.service                        |   3.13 kB | 
+spec-app-features-auth-registro-registro-contacto.js                           | spec-app-features-auth-registro-registro-contacto                           |   2.69 kB | 
+spec-app-features-auth-registro-registro-api.service.js                        | spec-app-features-auth-registro-registro-api.service                        |   2.68 kB | 
+chunk-FTXCSZN3.js                                                              | -                                                                           |   2.40 kB | 
+spec-app-features-auth-registro-registro.validators.js                         | spec-app-features-auth-registro-registro.validators                         |   2.24 kB | 
+chunk-LX44Z644.js                                                              | -                                                                           |   2.06 kB | 
+chunk-HL5KDYDT.js                                                              | -                                                                           |   1.68 kB | 
+chunk-AJJPDVB5.js                                                              | -                                                                           |   1.58 kB | 
+chunk-SB5IQP45.js                                                              | -                                                                           |   1.52 kB | 
+chunk-2IRZFY4E.js                                                              | -                                                                           |   1.45 kB | 
+chunk-T4UGCXQK.js                                                              | -                                                                           |   1.43 kB | 
+chunk-Y4MGBAKR.js                                                              | -                                                                           |   1.38 kB | 
+chunk-YIXEJPBC.js                                                              | -                                                                           |   1.33 kB | 
+chunk-DMSU6YQ3.js                                                              | -                                                                           |   1.23 kB | 
+init-testbed.js                                                                | init-testbed                                                                |   1.21 kB | 
+spec-app-features-cuenta-cuenta.js                                             | spec-app-features-cuenta-cuenta                                             |   1.05 kB | 
+spec-app-features-cursos-cursos.js                                             | spec-app-features-cursos-cursos                                             |   1.05 kB | 
+chunk-UFBW72CG.js                                                              | -                                                                           |   1.02 kB | 
+vitest-mock-patch.js                                                           | vitest-mock-patch                                                           | 974 bytes | 
+spec-app-core-session-admin-guard.js                                           | spec-app-core-session-admin-guard                                           | 973 bytes | 
+spec-app-core-session-session-guard.js                                         | spec-app-core-session-session-guard                                         | 932 bytes | 
+spec-app-core-session-session.js                                               | spec-app-core-session-session                                               | 687 bytes | 
+chunk-3KTG5TFV.js                                                              | -                                                                           | 483 bytes | 
+chunk-BOIEOTQQ.js                                                              | -                                                                           | 443 bytes | 
+
+                                                                               | Initial total                                                               |   1.63 MB
+
+Application bundle generation complete. [22.223 seconds] - 2026-10-29T15:53:19.703Z
+
+
+ RUN  v4.1.11 D:/Enrique/UTP/Ciclo 7/Proyecto Escuela Juridica/Escuela Juridica/escuela-juridica-frontend
+
+
+ Test Files  45 passed (45)
+      Tests  233 passed (233)
+   Start at  10:53:20
+   Duration  13.98s (transform 14.18s, setup 18.01s, import 30.48s, tests 41.15s, environment 171.71s)
+

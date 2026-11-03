@@ -121,7 +121,7 @@
         @for (fila of filas(); track fila.matriculaId) {
         <tr>
           <td>
-            <a class="reporte__enlace" [routerLink]="['/admin/matriculas', fila.matriculaId, 'academico']"><strong>{{ fila.alumno }}</strong></a>
+            <a class="reporte__enlace" routerLink="/admin/matriculas" [queryParams]="{ seguimiento: fila.matriculaId }"><strong>{{ fila.alumno }}</strong></a>
             <small>{{ fila.correo }}</small>
             <small>{{ fila.curso }} · {{ etiquetaModalidad(fila.modalidad) }}</small>
             <small>Matriculado el {{ fila.fechaMatricula | date:'dd/MM/yyyy' }}</small>

@@ -6,6 +6,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { distinctUntilChanged, map } from 'rxjs';
 
 import { AlertaGlobalService } from '../../../../core/notificaciones/alerta-global.service';
+import { CabeceraDetalle, EnlaceVolver } from '../../../../shared/ui/cabecera-detalle/cabecera-detalle';
 import { Modal } from '../../../../shared/ui/modal/modal';
 import { EvaluacionesApiService } from '../evaluaciones-api.service';
 import { PreguntaRevision, RevisionIntento } from '../evaluaciones.model';
@@ -22,7 +23,7 @@ interface Captura {
  */
 @Component({
   selector: 'app-revision-intento',
-  imports: [DatePipe, DecimalPipe, LowerCasePipe, RouterLink, Modal],
+  imports: [DatePipe, DecimalPipe, LowerCasePipe, RouterLink, Modal, CabeceraDetalle, EnlaceVolver],
   templateUrl: './revision-intento.html',
   styleUrl: './revision-intento.scss',
 })

@@ -29,36 +29,102 @@
   color: var(--neutral-600);
 }
 
+// ------------------------------------------------------------------- Pestañas --
+// Mismo aspecto que las secciones del centro de reportes.
+
+.matriculas__tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--neutral-200);
+}
+
+.matriculas__tab {
+  appearance: none;
+  background: none;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -1px;
+  min-height: 44px;
+  padding: 0 16px;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  color: var(--neutral-600);
+  cursor: pointer;
+}
+
+.matriculas__tab:hover {
+  color: var(--marca-900);
+}
+
+.matriculas__tab--activa {
+  color: var(--marca-900);
+  border-bottom-color: var(--acento-500);
+}
+
 // ----------------------------------------------------------------- Filtros --
 
 .matriculas__filtros {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: end;
+  gap: 16px 20px;
+  margin: 24px 0 16px;
+}
+
+.matriculas__campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.matriculas__etiqueta {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--neutral-700);
+}
+
+// Las opciones del desplegable se muestran completas (el nombre no se corta contra el borde).
+.matriculas__opcion {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 3px 0;
+  white-space: normal;
+}
+
+.matriculas__opcion strong {
+  font-weight: 600;
+  color: var(--neutral-950);
+}
+
+.matriculas__barra-filtros {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-end;
-  gap: 12px;
-  margin: 24px 0;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 24px;
 }
 
-.matriculas__busqueda {
-  display: grid;
-  gap: 6px;
-  flex: 1;
-  min-width: 240px;
-  color: var(--neutral-600);
-  font-size: 12px;
-  font-weight: 600;
+.matriculas__btn-filtro {
+  height: 38px;
+  padding: 0 16px;
+  gap: 7px;
+  font-size: 13px;
+  line-height: 18px;
 }
 
-.matriculas__estado-filtro {
-  display: grid;
-  gap: 6px;
-  color: var(--neutral-600);
-  font-size: 12px;
-  font-weight: 600;
+// «Limpiar» en gris con X, igual que en el centro de reportes.
+.matriculas__btn-limpiar {
+  background: var(--neutral-600);
+  color: var(--blanco);
 }
 
-.matriculas__estado-filtro .input {
-  width: auto;
+.matriculas__btn-limpiar:hover {
+  background: var(--neutral-800);
 }
 
 .matriculas__mensaje {
@@ -115,20 +181,219 @@
   flex-wrap: wrap;
 }
 
+// Botones de la fila: mismo ancho, vayan en una línea o apilados cuando la pantalla es angosta.
+// Los botones van lado a lado si hay espacio y se apilan (con el mismo ancho) si la ventana es angosta;
+// forzarlos a una sola línea hacía que la tabla se saliera del ancho y recortara el de la derecha.
+.matriculas__acciones--fila {
+  flex-wrap: wrap;
+  min-width: 112px;
+}
+
+.matriculas__acciones--fila .matriculas__btn-fila {
+  width: 112px;
+}
+
+// Pie del modal de detalle: botones pegados a la derecha.
+.matriculas__acciones--pie {
+  justify-content: flex-end;
+}
+
+// Comprobante opcional de un pago manual.
+.matriculas__opcional {
+  color: var(--neutral-500);
+  font-weight: 500;
+}
+
+.matriculas__archivo-oculto {
+  display: none;
+}
+
+.formulario-matricula .matriculas__subida {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 18px 16px;
+  border: 1.5px dashed var(--neutral-300);
+  border-radius: var(--radio-md);
+  background: var(--neutral-050);
+  color: var(--marca-900);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.18s ease, background-color 0.18s ease;
+}
+
+.formulario-matricula .matriculas__subida:hover {
+  border-color: var(--acento-500);
+  background: var(--acento-100);
+}
+
+.matriculas__subida-titulo {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.matriculas__subida small {
+  color: var(--neutral-500);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.matriculas__archivo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radio-md);
+  background: var(--neutral-050);
+  color: var(--marca-900);
+}
+
+.matriculas__archivo svg {
+  flex-shrink: 0;
+}
+
+.matriculas__archivo-nombre {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--neutral-950);
+}
+
+.matriculas__archivo small {
+  color: var(--neutral-500);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.matriculas__archivo-quitar {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--neutral-500);
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radio-completo);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.matriculas__archivo-quitar:hover {
+  background: var(--error-fondo);
+  color: var(--error);
+}
+
+.matriculas__comprobante {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+}
+
+// Botón de fila solo con ícono (p. ej. «Reemplazar» cuando ya hay comprobante): cuadrado de 32 px.
+.matriculas__btn-icono {
+  width: 32px;
+  padding: 0;
+}
+
+// Modal de cancelación: resumen de la matrícula y consecuencias.
+.cancelacion__resumen {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 24px;
+  padding: 16px 18px;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radio-md);
+  background: var(--neutral-050);
+}
+
+.cancelacion__dato {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.cancelacion__dato--ancho {
+  grid-column: 1 / -1;
+}
+
+.cancelacion__dato span {
+  color: var(--neutral-500);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.cancelacion__dato strong {
+  color: var(--neutral-950);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  overflow-wrap: anywhere;
+}
+
+.cancelacion__dato small {
+  color: var(--neutral-500);
+  font-size: 12px;
+}
+
+.cancelacion__aviso {
+  align-items: flex-start;
+}
+
+.cancelacion__aviso .alerta__titulo {
+  margin: 0 0 6px;
+}
+
+.cancelacion__consecuencias {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--neutral-800);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.cancelacion__consecuencias li + li {
+  margin-top: 3px;
+}
+
+.matriculas__pie-seguimiento {
+  margin-top: 20px;
+}
+
+.matriculas__ingreso {
+  white-space: nowrap;
+}
+
+.matriculas__ingreso svg {
+  flex-shrink: 0;
+}
+
+// Botones de fila: el .btn global mide 44px, demasiado para una tabla densa.
+.matriculas__btn-fila {
+  height: 32px;
+  padding: 0 12px;
+  gap: 6px;
+  font-size: 13px;
+  line-height: 18px;
+  text-decoration: none;
+}
+
+.matriculas__btn-fila svg {
+  flex-shrink: 0;
+}
+
 .matriculas__vacio {
   text-align: center;
   color: var(--neutral-500);
   padding: 32px 16px;
-}
-
-.matriculas__paginacion {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  margin-top: 20px;
-  font-size: 14px;
-  color: var(--neutral-600);
 }
 
 // ------------------------------------------------------------- Detalle (modal) --
@@ -162,14 +427,170 @@
   font-size: 0.9rem;
 }
 
+// Datos de la matrícula en rejilla etiqueta/valor.
+.matriculas__datos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px 24px;
+  margin: 0;
+}
+
+.matriculas__dato {
+  min-width: 0;
+}
+
+.matriculas__dato--ancho {
+  grid-column: span 2;
+}
+
+.matriculas__dato dt {
+  color: var(--neutral-500);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.matriculas__dato dd {
+  margin: 0;
+  color: var(--neutral-800);
+  font-size: 14px;
+  line-height: 20px;
+  overflow-wrap: anywhere;
+}
+
+.matriculas__dato dd strong {
+  display: block;
+  color: var(--neutral-950);
+  font-weight: 600;
+}
+
+.matriculas__dato dd small {
+  display: block;
+  color: var(--neutral-500);
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.matriculas__correo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 24px;
+  flex-wrap: wrap;
+}
+
+.matriculas__detalle .matriculas__correo p {
+  flex: 1;
+  min-width: 260px;
+  margin: 0;
+  color: var(--neutral-600);
+}
+
+.matriculas__sin-datos {
+  color: var(--neutral-500);
+  background: var(--neutral-050);
+  border: 1px dashed var(--neutral-200);
+  border-radius: 8px;
+  padding: 14px 16px;
+  text-align: center;
+}
+
+// Tablas del detalle (historial económico y de acceso): se ajustan al ancho del modal, sin
+// scroll horizontal salvo en pantallas muy angostas.
+.matriculas__subtabla-contenedor {
+  overflow-x: auto;
+  border: 1px solid var(--neutral-200);
+  border-radius: 10px;
+}
+
+.matriculas__subtabla {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.matriculas__subtabla th,
+.matriculas__subtabla td {
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: middle;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--neutral-800);
+  border-bottom: 1px solid var(--neutral-100);
+  overflow-wrap: anywhere;
+}
+
+.matriculas__subtabla th {
+  background: var(--neutral-050);
+  color: var(--neutral-500);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.matriculas__subtabla tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.matriculas__subtabla tbody tr:hover td {
+  background: var(--neutral-050);
+}
+
+.matriculas__subtabla .matriculas__num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.matriculas__subtabla td strong {
+  color: var(--neutral-950);
+  font-weight: 600;
+}
+
+.matriculas__referencia {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+}
+
+.matriculas__subtabla .badge {
+  white-space: nowrap;
+}
+
 // ----------------------------------------------------------- Formulario modal --
 
 .formulario-matricula {
   display: grid;
+  // minmax(0, 1fr): sin esto, un valor largo ensancha la columna y los selects se salen del modal.
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
 }
 
-.formulario-matricula label {
+.formulario-matricula > * {
+  min-width: 0;
+}
+
+.formulario-matricula__opcion {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.formulario-matricula__opcion strong {
+  font-weight: 600;
+  color: var(--neutral-950);
+}
+
+.formulario-matricula__opcion small {
+  font-size: 12px;
+  color: var(--neutral-500);
+}
+
+.formulario-matricula label,
+.formulario-matricula__campo {
   display: grid;
   gap: 7px;
   color: var(--neutral-800);
@@ -213,12 +634,38 @@
   font-size: 0.9rem;
 }
 
+// La tabla se adapta en vez de obligar a hacer scroll horizontal: con poco ancho se ocultan las columnas
+// secundarias (siguen visibles en el detalle de la matrícula).
+@media (max-width: 1320px) {
+  .matriculas__col-fecha {
+    display: none;
+  }
+}
+
+@media (max-width: 1100px) {
+  .matriculas__col-ingreso {
+    display: none;
+  }
+
+  .matriculas__tabla th,
+  .matriculas__tabla td {
+    padding: 12px 10px;
+  }
+}
+
 @media (max-width: 700px) {
+  .matriculas__dato--ancho {
+    grid-column: auto;
+  }
+
   .matriculas__cabecera,
-  .matriculas__filtros,
   .formulario-matricula__dos {
     flex-direction: column;
     align-items: stretch;
     display: flex;
+  }
+
+  .matriculas__filtros {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

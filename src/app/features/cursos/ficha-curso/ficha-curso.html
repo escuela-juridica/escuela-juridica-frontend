@@ -242,10 +242,12 @@
               <div class="ficha-docentes">
                 @for (docente of curso.docentes; track docente.personaId) {
                   <div class="card ficha-docente">
-                    <div
+                    <img
                       class="ficha-docente__foto"
-                      [style.background-image]="docente.fotoUrl ? ('url(\'' + docente.fotoUrl + '\')') : null"
-                    ></div>
+                      [src]="urlFotoDocente(docente.fotoUrl)"
+                      [alt]="'Foto de ' + docente.nombreCompleto"
+                      (error)="alFallarFotoDocente($event)"
+                    />
                     <div class="ficha-docente__info">
                       <h3 class="ficha-docente__nombre">{{ docente.nombreCompleto }}</h3>
                       @if (docente.cargoProfesional) {
