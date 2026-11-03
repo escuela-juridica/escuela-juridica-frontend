@@ -16,7 +16,7 @@
     </p>
     <section class="confirmacion-matricula__curso" aria-label="Curso seleccionado">
       @if (c.imagenPortadaUrl) {
-        <img class="confirmacion-matricula__imagen" [src]="c.imagenPortadaUrl" [alt]="'Portada de ' + c.titulo" />
+        <img class="confirmacion-matricula__imagen" [src]="urlPortada(c.imagenPortadaUrl)" [alt]="'Portada de ' + c.titulo" />
       }
       <div>
         <span class="confirmacion-matricula__etiqueta">{{ etiquetaModalidad() }} · {{ c.tipoCursoNombre || 'Curso' }}</span>

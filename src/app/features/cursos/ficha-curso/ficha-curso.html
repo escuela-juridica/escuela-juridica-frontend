@@ -36,7 +36,7 @@
     @if (ficha(); as curso) {
       <div class="ficha-hero">
         <div class="hero-media">
-          <div class="hero-media__imagen" [style.background-image]="'url(\'' + (curso.imagenPortadaUrl ?? '') + '\')'"></div>
+          <div class="hero-media__imagen" [style.background-image]="'url(\'' + urlPortada(curso.imagenPortadaUrl) + '\')'"></div>
         </div>
         <div class="hero-overlay ficha-hero__degradado"></div>
         <div class="ficha-hero__blob"></div>

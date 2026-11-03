@@ -15,6 +15,7 @@ import {
   formatearFechaHora,
   formatearHora,
   formatearPrecio,
+  urlPortadaCurso,
 } from '../curso-formato.util';
 import { FichaCursoDetalle, LeccionFicha, VistaPrevia } from '../curso.model';
 import { resolverUrlApi } from '../../../core/api/api.config';
@@ -145,6 +146,10 @@ export class FichaCurso implements OnInit {
 
   protected reintentar(): void {
     this.reintentarBusqueda.next();
+  }
+
+  protected urlPortada(ruta: string | null): string {
+    return urlPortadaCurso(ruta);
   }
 
   /** Las fotos subidas por administración vienen como /uploads/... (servidas por el backend); las demás rutas se usan tal cual. */

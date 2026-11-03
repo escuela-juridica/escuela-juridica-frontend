@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 
 import { AlertaGlobalService } from '../../../core/notificaciones/alerta-global.service';
 import { AnilloProgreso } from '../../../shared/ui/anillo-progreso/anillo-progreso';
-import { formatearFechaHora } from '../../cursos/curso-formato.util';
+import { formatearFechaHora, urlPortadaCurso } from '../../cursos/curso-formato.util';
 import { SesionAlumnoApiService } from '../../sesiones/sesion-alumno-api.service';
 import { CertificacionBloque } from '../../certificacion/certificacion-bloque/certificacion-bloque';
 import { AvanceCertificadoBloque } from '../avance-certificado/avance-certificado';
@@ -36,6 +36,7 @@ export class AulaResumen {
   protected readonly ingresando = signal<number | null>(null);
   protected readonly pestana = signal<PestanaResumen>('resumen');
   protected readonly formatearFechaHora = formatearFechaHora;
+  protected readonly urlPortada = urlPortadaCurso;
 
   /** La lección donde seguir, solo si todavía hay algo por hacer en ella. */
   protected readonly continuar = computed<LeccionDelCurso | null>(() => {

@@ -6,7 +6,7 @@ import { switchMap, tap } from 'rxjs';
 
 import { AlertaGlobalService } from '../../../core/notificaciones/alerta-global.service';
 import { CursoApiService } from '../../cursos/curso-api.service';
-import { etiquetaModalidad, formatearPrecio, mediosDePago } from '../../cursos/curso-formato.util';
+import { etiquetaModalidad, formatearPrecio, mediosDePago, urlPortadaCurso } from '../../cursos/curso-formato.util';
 import { FichaCursoDetalle } from '../../cursos/curso.model';
 import { CulqiCheckoutService } from '../culqi-checkout.service';
 import { InstruccionesQr } from '../instrucciones-qr/instrucciones-qr';
@@ -33,6 +33,7 @@ export class CheckoutPago {
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly formatearPrecio = formatearPrecio;
+  protected readonly urlPortada = urlPortadaCurso;
   protected readonly etiquetaModalidad = etiquetaModalidad;
 
   protected readonly ficha = signal<FichaCursoDetalle | null>(null);

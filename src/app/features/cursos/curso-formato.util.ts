@@ -1,4 +1,11 @@
+import { resolverUrlApi } from '../../core/api/api.config';
 import { CodigoEstadoComercial, Modalidad } from './curso.model';
+
+/** Dirección usable de la portada de un curso: las subidas desde administración vienen como /uploads/... (las sirve el
+ * backend) y las demás ("img/cursos/..." o un enlace completo) se usan tal cual. */
+export function urlPortadaCurso(ruta: string | null | undefined): string {
+  return ruta ? resolverUrlApi(ruta) : '';
+}
 
 export function claseModalidad(modalidad: Modalidad | null): string {
   switch (modalidad) {

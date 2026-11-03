@@ -44,6 +44,13 @@ export class CursoAdminApiService {
     return this.http.get<CursoEditorRespuesta>(`${this.url}/${cursoId}`);
   }
 
+  /** Sube la portada del curso; el servidor la guarda como {id}-{marca de tiempo} y devuelve su referencia. */
+  subirPortada(cursoId: number, archivo: File): Observable<{ referencia: string }> {
+    const datos = new FormData();
+    datos.append('archivo', archivo);
+    return this.http.post<{ referencia: string }>(`${this.url}/${cursoId}/portada`, datos);
+  }
+
   actualizarInformacion(
     cursoId: number,
     peticion: ActualizarInformacionCursoPeticion,

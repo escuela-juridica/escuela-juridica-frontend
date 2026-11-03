@@ -1,5 +1,5 @@
 import { Component, input, output } from '@angular/core';
-import { formatearFecha, formatearPrecio } from '../../curso-formato.util';
+import { formatearFecha, formatearPrecio, urlPortadaCurso } from '../../curso-formato.util';
 import { FichaCursoDetalle } from '../../curso.model';
 import { Modal } from '../../../../shared/ui/modal/modal';
 
@@ -20,6 +20,8 @@ export class ConfirmacionMatricula {
 
   readonly cancelar = output<void>();
   readonly confirmar = output<void>();
+
+  protected readonly urlPortada = urlPortadaCurso;
 
   protected formatearPrecio(monto: number): string {
     return formatearPrecio(monto);

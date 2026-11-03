@@ -5,39 +5,70 @@
   <swiper-container #heroSwiper init="false" class="hero-media">
     @for (img of heroImgs; track img) {
       <swiper-slide>
-        <div class="hero-media__imagen" [style.background-image]="'url(' + img + ')'"></div>
+        <div
+          class="hero-media__imagen"
+          [style.background-image]="'url(' + img.src + ')'"
+          [style.background-position]="img.posicion"
+        ></div>
       </swiper-slide>
     }
   </swiper-container>
   <div class="hero-overlay hero-catalogo__degradado"></div>
 
-  <button type="button" class="hero-catalogo__flecha hero-catalogo__flecha--anterior" aria-label="Foto anterior" (click)="heroPrev()">‹</button>
-  <button type="button" class="hero-catalogo__flecha hero-catalogo__flecha--siguiente" aria-label="Foto siguiente" (click)="heroNext()">›</button>
+  <button type="button" class="hero-catalogo__flecha hero-catalogo__flecha--anterior" aria-label="Foto anterior" (click)="heroPrev()">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
+  </button>
+  <button type="button" class="hero-catalogo__flecha hero-catalogo__flecha--siguiente" aria-label="Foto siguiente" (click)="heroNext()">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
+  </button>
 
   <div class="hero-catalogo__contenido">
-    <div class="hero-catalogo__etiqueta">Formación jurídica especializada</div>
-    <h1 class="tipo-display hero-catalogo__titulo">Especialízate con quienes ejercen el derecho todos los días</h1>
+    <span class="hero-catalogo__filete" aria-hidden="true"></span>
+    <h1 class="tipo-display hero-catalogo__titulo">
+      Bienvenido al aula virtual de <span class="hero-catalogo__titulo-destacado">Escuela Jurídica</span>
+    </h1>
     <p class="hero-catalogo__texto">
-      Diplomados y cursos con certificado verificable en línea, dictados por registradores, procuradores y
-      magistrados en ejercicio.
+      Diplomados, cursos y seminarios dictados por registradores, procuradores y magistrados en ejercicio, con
+      certificado verificable en línea.
     </p>
     <div class="hero-catalogo__buscador">
+      <svg class="hero-catalogo__buscador-icono" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" /></svg>
       <input
-        class="input"
+        class="hero-catalogo__buscador-input"
         [formControl]="filtros.controls.texto"
-        placeholder="Busca por título o descripción del curso"
+        placeholder="Busca un curso o tema"
+        aria-label="Buscar por título o descripción del curso"
       />
-      <button type="button" class="btn btn--grande btn--acento" (click)="reintentar()">Buscar</button>
+      <button type="button" class="btn btn--acento hero-catalogo__buscador-boton" (click)="reintentar()">Buscar</button>
     </div>
-    <div class="hero-catalogo__puntos">
-      @for (img of heroImgs; track img; let i = $index) {
-        <span
-          (click)="heroIrA(i)"
-          [style.background]="i === heroIndexActivo() ? '#ffffff' : 'rgba(255, 255, 255, 0.4)'"
-          class="hero-catalogo__punto"
-        ></span>
-      }
-    </div>
+    <ul class="hero-catalogo__ventajas">
+      <li>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><path d="m9 12 2 2 4-4" /></svg>
+        Certificado verificable
+      </li>
+      <li>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18" /><path d="M5 21V8l7-5 7 5v13" /><path d="M9 21v-6h6v6" /></svg>
+        Docentes en ejercicio
+      </li>
+      <li>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10 12 5 2 10l10 5 10-5z" /><path d="M6 12v5c3 2 9 2 12 0v-5" /></svg>
+        Diplomados, cursos y seminarios
+      </li>
+    </ul>
+  </div>
+
+  <div class="hero-catalogo__puntos" role="tablist" aria-label="Fotos de la portada">
+    @for (img of heroImgs; track img; let i = $index) {
+      <button
+        type="button"
+        role="tab"
+        class="hero-catalogo__punto"
+        [class.hero-catalogo__punto--activo]="i === heroIndexActivo()"
+        [attr.aria-selected]="i === heroIndexActivo()"
+        [attr.aria-label]="'Foto ' + (i + 1)"
+        (click)="heroIrA(i)"
+      ></button>
+    }
   </div>
 </div>
 

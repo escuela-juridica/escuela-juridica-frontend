@@ -5,6 +5,7 @@ import { RouterLink } from '@angular/router';
 import { Session } from '../../../core/session/session';
 import { MatriculaApiService } from '../../matriculas/matricula-api.service';
 import { AlertaGlobalService } from '../../../core/notificaciones/alerta-global.service';
+import { urlPortadaCurso } from '../../cursos/curso-formato.util';
 
 const ETIQUETAS_INGRESO: Record<string, string> = {
   GRATUITA: 'Gratuita',
@@ -74,7 +75,7 @@ export class Panel {
         this.cursosActivos.set(matriculas.map((matricula) => ({
           id: matricula.cursoId,
           matriculaId: matricula.id,
-          imagenUrl: matricula.imagenPortadaUrl ?? '',
+          imagenUrl: urlPortadaCurso(matricula.imagenPortadaUrl),
           tipo: matricula.modalidad,
           categoria: ETIQUETAS_INGRESO[matricula.formaIngreso] ?? matricula.formaIngreso,
           nombre: matricula.cursoTitulo,

@@ -1,7 +1,7 @@
 @if (estado.aula(); as aula) {
   <div class="resumen">
     <!-- ============================================================ Portada == -->
-    <section class="hero" [style.--portada]="aula.imagenPortadaUrl ? 'url(' + aula.imagenPortadaUrl + ')' : 'none'" aria-labelledby="hero-titulo">
+    <section class="hero" [style.--portada]="aula.imagenPortadaUrl ? 'url(' + urlPortada(aula.imagenPortadaUrl) + ')' : 'none'" aria-labelledby="hero-titulo">
       <div class="hero__velo"></div>
       <div class="hero__contenido">
         <div class="hero__texto">

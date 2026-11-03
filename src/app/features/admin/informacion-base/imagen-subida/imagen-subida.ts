@@ -1,11 +1,13 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, computed, inject, input, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { throwError } from 'rxjs';
 
 import { resolverUrlApi } from '../../../../core/api/api.config';
+import { CursoAdminApiService } from '../../cursos/curso-admin-api.service';
 import { InformacionBaseApiService } from '../informacion-base-api.service';
 
-/** HU-009 — Campo para subir la imagen de una firma, el logo de una entidad o la foto de un docente, con vista previa. */
+/** HU-009 — Campo para subir la imagen de una firma, el logo de una entidad, la foto de un docente o la portada de un curso, con vista previa. */
 @Component({
   selector: 'app-imagen-subida',
   templateUrl: './imagen-subida.html',
@@ -13,11 +15,14 @@ import { InformacionBaseApiService } from '../informacion-base-api.service';
 })
 export class ImagenSubida {
   private readonly api = inject(InformacionBaseApiService);
+  private readonly cursosApi = inject(CursoAdminApiService);
   private readonly destroyRef = inject(DestroyRef);
 
   /** Referencia actual: vacía o la de una imagen ya subida ({@code /uploads/...}). */
   readonly valor = input('');
-  readonly tipo = input.required<'FIRMA' | 'LOGO' | 'FOTO'>();
+  readonly tipo = input.required<'FIRMA' | 'LOGO' | 'FOTO' | 'PORTADA'>();
+  /** Solo para {@code PORTADA}: el curso al que pertenece la imagen (el servidor la nombra con su id). */
+  readonly cursoId = input<number | null>(null);
   readonly cambio = output<string>();
 
   protected readonly subiendo = signal(false);
@@ -34,7 +39,11 @@ export class ImagenSubida {
     if (local && local.referencia === valor) {
       return local.url;
     }
-    return valor.startsWith('/uploads/') ? resolverUrlApi(valor) : null;
+    if (valor.startsWith('/uploads/')) {
+      return resolverUrlApi(valor);
+    }
+    // Las portadas de los cursos de demostración son archivos del propio sitio ("img/cursos/...") o enlaces completos.
+    return this.tipo() === 'PORTADA' && valor ? (/^(https?:)?\/\//.test(valor) || valor.startsWith('/') ? valor : '/' + valor) : null;
   });
 
   constructor() {
@@ -46,10 +55,18 @@ export class ImagenSubida {
   protected readonly nota = computed(() =>
     this.tipo() === 'FIRMA'
       ? 'PNG con fondo transparente, horizontal (entre 2:1 y 5:1) y de al menos 300 px de ancho, por ejemplo 600 × 180 px. Hasta 2 MB.'
-      : 'PNG o JPG de hasta 2 MB.');
+      : this.tipo() === 'PORTADA'
+        ? 'PNG o JPG horizontal (entre 1.3:1 y 2.4:1) y de al menos 800 px de ancho, por ejemplo 1200 × 675 px. Hasta 5 MB.'
+        : 'PNG o JPG de hasta 2 MB.');
 
   protected readonly textoAlterno = computed(() =>
-    this.tipo() === 'FIRMA' ? 'Imagen de la firma' : this.tipo() === 'FOTO' ? 'Foto del docente' : 'Logo de la entidad');
+    this.tipo() === 'FIRMA'
+      ? 'Imagen de la firma'
+      : this.tipo() === 'FOTO'
+        ? 'Foto del docente'
+        : this.tipo() === 'PORTADA'
+          ? 'Portada del curso'
+          : 'Logo de la entidad');
 
   protected elegir(evento: Event): void {
     const entrada = evento.target as HTMLInputElement;
@@ -59,6 +76,18 @@ export class ImagenSubida {
       return;
     }
     this.error.set(null);
+    if (this.tipo() === 'PORTADA') {
+      this.subiendo.set(true);
+      void this.validarPortada(archivo).then((mensaje) => {
+        this.subiendo.set(false);
+        if (mensaje) {
+          this.error.set(mensaje);
+          return;
+        }
+        this.subir(archivo);
+      });
+      return;
+    }
     if (this.tipo() !== 'FIRMA') {
       this.subir(archivo);
       return;
@@ -73,6 +102,28 @@ export class ImagenSubida {
       }
       this.subir(archivo);
     });
+  }
+
+  /** La portada se recorta en tarjetas y cabeceras anchas: se avisa de inmediato si no es horizontal o es muy pequeña. */
+  private async validarPortada(archivo: File): Promise<string | null> {
+    if (archivo.size > 5 * 1024 * 1024) {
+      return 'La portada supera el tamaño máximo permitido (5 MB).';
+    }
+    try {
+      const imagen = await createImageBitmap(archivo);
+      const { width, height } = imagen;
+      imagen.close();
+      const proporcion = height === 0 ? 0 : width / height;
+      if (width < 800 || proporcion < 1.3 || proporcion > 2.4) {
+        return 'La portada debe ser horizontal (entre 1.3:1 y 2.4:1) y de al menos 800 px de ancho, por ejemplo 1200 x 675 px.';
+      }
+      if (width > 6000) {
+        return 'La portada es demasiado grande: usa como máximo 6000 px de ancho.';
+      }
+      return null;
+    } catch {
+      return 'No pudimos leer la imagen. Prueba con otro PNG o JPG.';
+    }
   }
 
   private async validarFirma(archivo: File): Promise<string | null> {
@@ -98,8 +149,15 @@ export class ImagenSubida {
 
   private subir(archivo: File): void {
     this.subiendo.set(true);
-    this.api
-      .subirImagenCertificado(this.tipo(), archivo)
+    const tipo = this.tipo();
+    const cursoId = this.cursoId();
+    const peticion =
+      tipo === 'PORTADA' && cursoId !== null
+        ? this.cursosApi.subirPortada(cursoId, archivo)
+        : tipo === 'PORTADA'
+          ? throwError(() => new HttpErrorResponse({ error: { message: 'Guarda el curso antes de subir su portada.' } }))
+          : this.api.subirImagenCertificado(tipo, archivo);
+    peticion
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (respuesta) => {

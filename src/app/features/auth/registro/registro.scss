@@ -1,25 +1,33 @@
 // PF-004 · Estilos propios de la pantalla de creación de cuenta.
 
+// Escritorio: panel de marca fijo a la izquierda y formulario (largo) a la derecha, que es el que hace scroll.
+// Bajo 900px el panel pasa a ser una franja compacta arriba.
 .registro-fila {
   display: flex;
-  align-items: stretch;
+  align-items: flex-start;
   min-height: 100vh;
-  flex-wrap: wrap;
+  min-height: 100dvh;
 }
 
 .registro-hero-col {
-  flex: 1 1 360px;
-  min-width: 280px;
+  flex: 1 1 45%;
+  min-width: 0;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  height: 100vh;
+  height: 100dvh;
   color: #ffffff;
-  padding: 96px 48px 48px;
+  padding: 48px 56px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  position: relative;
+  justify-content: center;
+  gap: 32px;
   overflow: hidden;
 }
 
 .registro-hero-overlay {
+  z-index: 1;
   background: linear-gradient(
     160deg,
     rgba(11, 23, 40, 0.92) 0%,
@@ -36,28 +44,42 @@
   height: 260px;
   border-radius: 999px;
   background: rgba(200, 62, 77, 0.14);
+  z-index: 2;
 }
 
-.registro-hero-cita {
-  max-width: 360px;
-  margin: 0 auto;
+.registro-hero-logo {
+  height: 56px;
+  width: auto;
+  background: #ffffff;
+  border-radius: var(--radio-lg);
+  padding: 8px 14px;
+  align-self: flex-start;
   position: relative;
+  z-index: 3;
+}
+
+// z-index por encima del degradado: sin él, el velo azul se dibujaba sobre el texto y lo dejaba difuso.
+.registro-hero-cita {
+  max-width: 440px;
+  position: relative;
+  z-index: 3;
 }
 
 .registro-hero-comillas {
   font-family: var(--fuente-editorial);
-  font-size: 48px;
+  font-size: 56px;
   line-height: 1;
   color: var(--acento-500);
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .registro-hero-texto {
   font-family: var(--fuente-editorial);
-  font-size: 24px;
-  line-height: 34px;
+  font-size: clamp(26px, 2.8vw, 34px);
+  line-height: 1.3;
   font-weight: 700;
   margin: 0;
+  text-wrap: balance;
 }
 
 .registro-hero-firma {
@@ -77,11 +99,13 @@
 }
 
 .registro-form-col {
-  flex: 1 1 480px;
-  min-width: 300px;
+  flex: 1 1 55%;
+  min-width: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
   display: grid;
   place-items: center;
-  padding: 48px 24px;
+  padding: 40px 24px;
   background: #ffffff;
 }
 
@@ -217,21 +241,43 @@ app-boton-google-pendiente {
   color: var(--acento-700);
 }
 
-@media (max-width: 767px) {
-  .registro-hero-col {
-    flex-basis: 100%;
-    min-height: 280px;
-    padding: 56px 24px 40px;
+@media (min-width: 900px) and (max-height: 760px) {
+  .registro-hero-col { padding: 32px 48px; gap: 20px; }
+  .registro-hero-logo { height: 48px; }
+  .registro-hero-comillas { font-size: 44px; }
+}
+
+@media (max-width: 899px) {
+  .registro-fila {
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  .registro-hero-cita {
-    margin: auto 0;
+  .registro-hero-col {
+    flex: 0 0 auto;
+    align-self: stretch;
+    position: relative;
+    height: auto;
+    padding: 20px 24px;
+    gap: 0;
   }
+
+  .registro-hero-logo { height: 44px; padding: 6px 12px; }
+
+  .registro-hero-cita,
+  .registro-hero-blob { display: none; }
 
   .registro-form-col {
-    flex-basis: 100%;
-    min-width: 0;
-    padding: 32px 20px 48px;
+    flex: 1 0 auto;
+    min-height: 0;
+    padding: 28px 24px 48px;
+    place-items: start center;
+  }
+}
+
+@media (max-width: 767px) {
+  .registro-form-col {
+    padding: 28px 20px 48px;
   }
 
   .registro-volver {

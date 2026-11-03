@@ -15,6 +15,7 @@ import {
   switchMap,
 } from 'rxjs';
 
+import { ImagenSubida } from '../../informacion-base/imagen-subida/imagen-subida';
 import { InformacionBaseApiService } from '../../informacion-base/informacion-base-api.service';
 import {
   CategoriaRespuesta,
@@ -67,6 +68,7 @@ interface SesionEnVivoEditor {
     ReactiveFormsModule,
     RouterLink,
     Modal,
+    ImagenSubida,
     ExamenesTab,
     RequisitosTab,
     PublicacionTab,
@@ -197,6 +199,12 @@ export class CursoEditor implements OnInit {
   protected readonly materialOrigenActual = signal('');
   protected readonly materialOrigenCodigo = signal('');
   protected readonly materialTipoNombreActual = signal('');
+
+  /** La imagen subida llega como referencia (/uploads/portadas/...); vacía si se quita. Marca el formulario como modificado. */
+  protected cambiarPortada(referencia: string): void {
+    this.formInformacion.controls.imagenPortadaUrl.setValue(referencia);
+    this.formInformacion.controls.imagenPortadaUrl.markAsDirty();
+  }
 
   protected readonly formInformacion = this.fb.group({
     titulo: ['', [Validators.required, Validators.maxLength(220)]],
