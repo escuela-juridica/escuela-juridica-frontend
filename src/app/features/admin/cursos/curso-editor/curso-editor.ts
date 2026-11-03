@@ -1244,7 +1244,7 @@ export class CursoEditor implements OnInit {
         promocionInicioEn: this.aInstante(v.promocionInicioEn),
         promocionFinEn: this.aInstante(v.promocionFinEn),
         fechaInicio: v.fechaInicio,
-        fechaFin: v.modalidad === 'VIRTUAL' ? null : v.fechaFin,
+        fechaFin: v.fechaFin,
         fechaCierreMatricula: v.modalidad === 'VIRTUAL' ? null : v.fechaCierreMatricula,
         cupoMaximo: v.cupoMaximo,
         horasAcademicas: v.horasAcademicas,

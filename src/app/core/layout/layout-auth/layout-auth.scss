@@ -2,6 +2,19 @@
 // botones "Iniciar sesión"/"Crear cuenta" — no tiene sentido mostrarlos en
 // ese mismo flujo (acceso/registro van sin header en absoluto, aparte).
 
+// Pie pegado abajo: el layout ocupa al menos toda la altura de la ventana y el contenido absorbe el espacio sobrante,
+// de modo que en páginas cortas o en pantallas altas el pie no queda flotando a mitad de página.
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+main {
+  flex: 1 0 auto;
+}
+
 header {
   background: #ffffff;
   border-bottom: 1px solid var(--neutral-200);

@@ -346,3 +346,14 @@
     justify-content: center;
   }
 }
+
+// Código de registro del curso (NN-SIGLA_AAAA): solo lectura, lo asigna el sistema al publicar.
+.editor-nota-registro {
+  margin: -4px 0 16px;
+  font-size: 14px;
+  color: var(--neutral-600);
+}
+
+.editor-nota-registro strong {
+  color: var(--neutral-800);
+}

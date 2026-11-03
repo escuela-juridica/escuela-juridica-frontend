@@ -168,10 +168,15 @@
                   @if (s.entidad) { <small class="emision__resumen-sub">{{ s.entidad }}</small> }
                 </dd>
               </div>
-              <div class="emision__resumen-ancho">
-                <dt>Periodo</dt>
-                <dd>{{ s.fechaInicio | date:'dd/MM/yyyy' }} – {{ fechaFinPrevista(s) | date:'dd/MM/yyyy' }}</dd>
-              </div>
+              @if (s.fechaInicio) {
+                <div class="emision__resumen-ancho">
+                  <dt>Periodo</dt>
+                  <dd>
+                    @if (s.fechaFinCurso) { {{ s.fechaInicio | date:'dd/MM/yyyy' }} – {{ s.fechaFinCurso | date:'dd/MM/yyyy' }} }
+                    @else { {{ s.fechaInicio | date:'dd/MM/yyyy' }} }
+                  </dd>
+                </div>
+              }
               <div><dt>Tipo de emisión</dt><dd>Manual administrativa</dd></div>
               <div><dt>Aviso al alumno</dt><dd>Recibirá el enlace de descarga</dd></div>
               <div class="emision__resumen-ancho">

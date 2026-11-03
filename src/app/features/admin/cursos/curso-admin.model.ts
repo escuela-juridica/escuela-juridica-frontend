@@ -66,6 +66,8 @@ export interface CursoEditorRespuesta {
   docentes: DocenteCursoRespuesta[];
   firmantes: FirmanteCursoRespuesta[];
   creadoEn: string;
+  /** Código de registro (p. ej. 02-DP_2026); se asigna al publicar el curso. */
+  codigoRegistro: string | null;
 }
 
 export interface CrearCursoPeticion {

@@ -92,11 +92,6 @@ export class EmisionManual {
     return normalizar(this.nombreConfirmacion()) === normalizar(s.alumno);
   }
 
-  /** Fin que se imprimirá: el del curso (en vivo/híbrido) o, en virtual, la finalización elegida, la ya registrada u hoy. */
-  protected fechaFinPrevista(s: EmisionManualSituacion): string {
-    return s.fechaFinCurso ?? (this.formulario.controls.fechaFinalizacion.value || s.fechaFinalizacion || s.fechaMaximaFinalizacion);
-  }
-
   protected invalido(campo: 'motivo'): boolean {
     const c = this.formulario.controls[campo];
     return c.invalid && (c.touched || c.dirty);

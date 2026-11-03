@@ -85,6 +85,7 @@ export class InformacionBase {
     codigo: ['', [Validators.required, Validators.maxLength(50)]],
     nombre: ['', [Validators.required, Validators.maxLength(120)]],
     orden: [0, [Validators.required]],
+    siglaRegistro: ['', [Validators.required, Validators.pattern(/^[A-Za-z]{2,4}$/)]],
   });
 
   protected readonly formCategoria = this.fb.group({
@@ -186,7 +187,7 @@ export class InformacionBase {
     const tab = this.tabActiva();
     if (tab === 'tipoCurso') {
       const item = this.tiposCurso().find((t) => t.id === id);
-      if (item) this.formTipoCurso.setValue({ codigo: item.codigo, nombre: item.nombre, orden: item.orden });
+      if (item) this.formTipoCurso.setValue({ codigo: item.codigo, nombre: item.nombre, orden: item.orden, siglaRegistro: item.siglaRegistro });
     } else if (tab === 'categoria') {
       const item = this.categorias().find((t) => t.id === id);
       if (item) this.formCategoria.setValue({ codigo: item.codigo, nombre: item.nombre, orden: item.orden });
@@ -227,7 +228,7 @@ export class InformacionBase {
 
   private resetearFormularioActivo(): void {
     switch (this.tabActiva()) {
-      case 'tipoCurso': this.formTipoCurso.reset({ codigo: '', nombre: '', orden: 0 }); break;
+      case 'tipoCurso': this.formTipoCurso.reset({ codigo: '', nombre: '', orden: 0, siglaRegistro: '' }); break;
       case 'categoria': this.formCategoria.reset({ codigo: '', nombre: '', orden: 0 }); break;
       case 'docente': this.formDocente.reset({ nombres: '', apellidoPaterno: '', apellidoMaterno: '', fotoUrl: '', cargoProfesional: '', biografiaProfesional: '' }); break;
       case 'entidad': this.formEntidad.reset({ nombre: '', logoUrl: '' }); break;
@@ -246,6 +247,9 @@ export class InformacionBase {
     }
     if (control.hasError('maxlength')) {
       return 'Supera la longitud máxima permitida.';
+    }
+    if (control.hasError('pattern')) {
+      return 'Usa solo letras, de 2 a 4.';
     }
     return 'Revisa este valor.';
   }

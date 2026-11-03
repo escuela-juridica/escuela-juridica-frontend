@@ -78,6 +78,15 @@
                 <div class="campo-error">{{ mensaje }}</div>
               }
             </div>
+            <div>
+              <label class="label" for="tc-sigla">Sigla del código de registro</label>
+              <input id="tc-sigla" class="input" formControlName="siglaRegistro" placeholder="DP" maxlength="4" [class.input--error]="!!mensajeCampo('siglaRegistro')" />
+              @if (mensajeCampo('siglaRegistro'); as mensaje) {
+                <div class="campo-error">{{ mensaje }}</div>
+              } @else {
+                <p class="campo-ayuda">Va en el código de registro de los cursos de este tipo (01-{{ formTipoCurso.controls.siglaRegistro.value.toUpperCase() || 'DP' }}_2026). Cambiarla solo afecta a los cursos que se publiquen después.</p>
+              }
+            </div>
           </div>
         }
         @case ('categoria') {
@@ -225,6 +234,7 @@
           <div class="infobase-fila">
             <div class="infobase-fila__principal">
               <span class="infobase-fila__nombre">{{ item.nombre }}</span>
+              <small class="infobase-fila__detalle">Sigla de registro: {{ item.siglaRegistro }}</small>
             </div>
             <span class="badge" [class.badge--disp-inmediato]="item.activo" [class.badge--disp-cerrado]="!item.activo">
               {{ item.activo ? 'Activo' : 'Inactivo' }}

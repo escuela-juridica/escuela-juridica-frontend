@@ -67,8 +67,9 @@ export interface EmisionManualSituacion {
   /** Lo que se imprimiría (o ya se imprimió): horas, tipo de curso, periodo y firmantes. */
   horas: number;
   tipoCurso: string;
-  fechaInicio: string;
-  /** Fin impuesto por el curso (en vivo/híbrido); null si el fin es la finalización del alumno. */
+  /** Inicio del curso; null en un curso virtual sin fechas (el certificado no imprime periodo). */
+  fechaInicio: string | null;
+  /** Fin que fija el curso; null si no lo tiene (curso virtual con solo inicio o sin fechas). */
   fechaFinCurso: string | null;
   firmantes: { nombre: string; cargo: string }[];
   condiciones: CondicionAvance[];

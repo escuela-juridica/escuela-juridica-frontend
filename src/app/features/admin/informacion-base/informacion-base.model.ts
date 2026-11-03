@@ -6,12 +6,14 @@ export interface TipoCursoRespuesta {
   nombre: string;
   activo: boolean;
   orden: number;
+  siglaRegistro: string;
 }
 
 export interface TipoCursoPeticion {
   codigo: string;
   nombre: string;
   orden: number;
+  siglaRegistro: string;
 }
 
 export interface CategoriaRespuesta {
