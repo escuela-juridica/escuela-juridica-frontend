@@ -5,32 +5,61 @@
   max-width: 1040px;
 }
 
-.emision__volver {
-  align-self: flex-start;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--neutral-600);
-  text-decoration: none;
+// Confirmación escribiendo el nombre (alumno que no cumple los requisitos).
+.emision__advertencia {
+  margin-bottom: 16px;
 }
 
-.emision__etiqueta {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--eyebrow-color);
+.emision__confirmar-nombre {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radio-md);
+  background: var(--neutral-050);
 }
 
-.emision__titulo {
-  margin: 2px 0 0;
-  font-size: 22px;
-  line-height: 30px;
-  font-weight: 700;
+.emision__confirmar-nombre .label {
+  display: block;
+  line-height: 22px;
+}
+
+.emision__nombre-objetivo {
+  display: inline-block;
+  margin-top: 2px;
+  padding: 1px 8px;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radio-md);
+  background: var(--blanco);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
   color: var(--neutral-950);
+  user-select: all;
 }
 
-.emision__cabecera p {
-  margin: 4px 0 0;
+.emision__confirmar-nombre .input--ok {
+  border-color: var(--exito);
+  box-shadow: 0 0 0 3px var(--exito-fondo);
+}
+
+.emision__coincide {
+  margin: 0;
+  font-size: 13px;
+  color: var(--neutral-500);
+}
+
+.emision__coincide--ok {
+  color: var(--exito);
+  font-weight: 600;
+}
+
+.emision__origen {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 500;
   color: var(--neutral-600);
 }
 
@@ -150,6 +179,19 @@
   font-size: 20px;
 }
 
+.emision__emitido {
+  flex-wrap: wrap;
+}
+
+.emision__ver {
+  margin-left: auto;
+  height: 38px;
+  padding: 0 16px;
+  gap: 7px;
+  font-size: 13px;
+  line-height: 18px;
+}
+
 .emision__emitido .emision__subtitulo {
   margin-bottom: 4px;
 }
@@ -196,7 +238,65 @@
 }
 
 @media (max-width: 860px) {
-  .emision__rejilla {
+  // Confirmación escribiendo el nombre (alumno que no cumple los requisitos).
+.emision__advertencia {
+  margin-bottom: 16px;
+}
+
+.emision__confirmar-nombre {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radio-md);
+  background: var(--neutral-050);
+}
+
+.emision__confirmar-nombre .label {
+  display: block;
+  line-height: 22px;
+}
+
+.emision__nombre-objetivo {
+  display: inline-block;
+  margin-top: 2px;
+  padding: 1px 8px;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radio-md);
+  background: var(--blanco);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  color: var(--neutral-950);
+  user-select: all;
+}
+
+.emision__confirmar-nombre .input--ok {
+  border-color: var(--exito);
+  box-shadow: 0 0 0 3px var(--exito-fondo);
+}
+
+.emision__coincide {
+  margin: 0;
+  font-size: 13px;
+  color: var(--neutral-500);
+}
+
+.emision__coincide--ok {
+  color: var(--exito);
+  font-weight: 600;
+}
+
+.emision__origen {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--neutral-600);
+}
+
+.emision__rejilla {
     grid-template-columns: 1fr;
   }
 }

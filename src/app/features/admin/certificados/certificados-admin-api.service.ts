@@ -11,6 +11,7 @@ import {
   CorregirCertificado,
   EmisionManualSituacion,
   EmitirCertificadoManual,
+  VistaPreviaCertificado,
 } from './certificados-admin.model';
 
 /** HU-035 — Consume `/api/admin/certificados`. */
@@ -43,5 +44,10 @@ export class CertificadosAdminApiService {
 
   anular(certificadoId: number, datos: AnularCertificado): Observable<CertificadoDetalle> {
     return this.http.post<CertificadoDetalle>(`${this.url}/${certificadoId}/anular`, datos);
+  }
+
+  /** PDF de borrador (con marca de agua) de cómo quedaría la corrección; no guarda nada. */
+  vistaPrevia(certificadoId: number, datos: VistaPreviaCertificado): Observable<Blob> {
+    return this.http.post(`${this.url}/${certificadoId}/vista-previa`, datos, { responseType: 'blob' });
   }
 }

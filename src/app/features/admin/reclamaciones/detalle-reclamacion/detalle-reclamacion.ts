@@ -3,9 +3,10 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, OnDestroy, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 
 import { AlertaGlobalService } from '../../../../core/notificaciones/alerta-global.service';
+import { CabeceraDetalle, EnlaceVolver } from '../../../../shared/ui/cabecera-detalle/cabecera-detalle';
 import { Modal } from '../../../../shared/ui/modal/modal';
 import { formatearPrecio } from '../../../cursos/curso-formato.util';
 import { ReclamacionesAdminApiService } from '../reclamaciones-admin-api.service';
@@ -18,7 +19,7 @@ import { ReclamacionDetalle } from '../reclamaciones-admin.model';
  */
 @Component({
   selector: 'app-detalle-reclamacion',
-  imports: [ReactiveFormsModule, DatePipe, RouterLink, Modal],
+  imports: [ReactiveFormsModule, DatePipe, Modal, CabeceraDetalle, EnlaceVolver],
   templateUrl: './detalle-reclamacion.html',
   styleUrl: './detalle-reclamacion.scss',
 })

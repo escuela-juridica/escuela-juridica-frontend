@@ -1,0 +1,107 @@
+:host {
+  display: block;
+}
+
+.cd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+  padding: 20px 24px;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radio-lg);
+  background: var(--blanco);
+}
+
+.cd__identidad {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.cd__avatar {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radio-lg);
+  background: var(--acento-100);
+  color: var(--marca-900);
+}
+
+.cd__texto {
+  min-width: 0;
+}
+
+.cd__etiqueta {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--eyebrow-color);
+}
+
+.cd__titulo {
+  margin: 2px 0 0;
+  font-size: 22px;
+  line-height: 30px;
+  font-weight: 700;
+  color: var(--neutral-950);
+  overflow-wrap: anywhere;
+}
+
+// Líneas de contexto proyectadas: cada una es un <p> con su ícono opcional.
+.cd__meta {
+  margin-top: 4px;
+}
+
+.cd__meta ::ng-deep p {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 2px 0 0;
+  font-size: 14px;
+  color: var(--neutral-600);
+  overflow-wrap: anywhere;
+}
+
+.cd__meta ::ng-deep p svg {
+  flex: none;
+}
+
+.cd__lado {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.cd__lado ::ng-deep .cd-fila {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+// Código u otro identificador destacado, siempre completo (nunca se corta).
+.cd__lado ::ng-deep .cd-chip {
+  padding: 5px 12px;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radio-md);
+  background: var(--neutral-050);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--neutral-950);
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 860px) {
+  .cd {
+    padding: 18px;
+  }
+}

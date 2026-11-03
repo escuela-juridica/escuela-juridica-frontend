@@ -61,6 +61,8 @@ export interface EmisionManualSituacion {
 export interface EmitirCertificadoManual {
   motivo: string;
   fechaFinalizacion: string | null;
+  /** Nombres que se imprimirán; solo se envían si el alumno no los confirmó (los confirma la administración). */
+  nombres?: string | null;
 }
 
 /** HU-036 — Corrección y anulación de un certificado. */
@@ -114,6 +116,9 @@ export interface CorregirCertificado {
   entidad: string | null;
   firmanteIds: number[];
 }
+
+/** Igual que la corrección, sin el motivo: la vista previa no guarda nada. */
+export type VistaPreviaCertificado = Omit<CorregirCertificado, 'motivo'>;
 
 export interface AnularCertificado {
   motivo: string;

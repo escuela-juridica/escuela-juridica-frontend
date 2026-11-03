@@ -1,20 +1,28 @@
 <section class="corr">
-  <a class="corr__volver" routerLink="/admin/certificados">← Certificados</a>
+  <app-enlace-volver ruta="/admin/certificados" texto="Certificados" />
 
   @if (cargando()) {
     <p>Cargando…</p>
   } @else if (error(); as mensaje) {
     <div class="alerta alerta--error" role="alert"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div>
   } @else if (detalle(); as d) {
-    <header class="corr__cabecera">
-      <span class="corr__etiqueta">Corrección y anulación</span>
-      <h1 class="corr__titulo">{{ d.alumno }}</h1>
-      <p>{{ d.correo }} · <span class="corr__codigo">{{ d.codigo }}</span>
-        @if (d.estado === 'VIGENTE') { <span class="badge badge--disp-inmediato">Vigente</span> }
-        @else { <span class="badge badge--disp-cancelado">Anulado</span> }
-      </p>
-    </header>
-
+    <app-cabecera-detalle etiqueta="Corrección y anulación" [titulo]="d.alumno">
+      <svg cd-icono viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6" /><path d="M15.5 13.5 17 22l-5-3-5 3 1.5-8.5" /></svg>
+      <div cd-meta>
+        <p><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 7-10 6L2 7" /></svg> {{ d.correo }}</p>
+        <p><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" /></svg> {{ d.titulo }}</p>
+      </div>
+      <div cd-lado class="cd-fila">
+        @if (d.estado === 'VIGENTE') { <span class="badge badge--disp-inmediato"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12" /></svg> Vigente</span> } @else { <span class="badge badge--disp-cancelado"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg> Anulado</span> }
+        <span class="cd-chip" title="Código del certificado">{{ d.codigo }}</span>
+        @if (d.estado === 'VIGENTE') {
+          <button type="button" class="btn btn--secundario corr__btn" title="Abre el PDF vigente en otra pestaña" (click)="verCertificado(d)">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /></svg>
+            Ver certificado
+          </button>
+        }
+      </div>
+    </app-cabecera-detalle>
     @if (d.estado === 'ANULADO') {
       <div class="alerta alerta--error" role="status">
         <span class="alerta__icono">!</span>
@@ -28,28 +36,137 @@
 
     <div class="corr__rejilla">
       <div class="card corr__tarjeta">
-        <h2 class="corr__subtitulo">Datos congelados</h2>
+        <h2 class="corr__subtitulo">
+          <span class="corr__icono" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg></span>
+          Datos congelados
+        </h2>
         <dl class="corr__datos">
-          <div><dt>Nivel</dt><dd>{{ d.nivel === 'REFRENDADO' ? 'Refrendado' : 'Normal' }}</dd></div>
-          <div><dt>Nota</dt><dd>@if (d.nota !== null) { {{ d.nota | number:'1.0-2' }} } @else { Sin nota }</dd></div>
-          <div><dt>Emisión</dt><dd>{{ etiquetaEmision(d.tipoEmision) }} · {{ d.emitidoEn | date:'dd/MM/yyyy HH:mm' }}</dd></div>
-          <div><dt>Tipo de curso</dt><dd>{{ d.tipoCurso }}</dd></div>
+          <div class="corr__dato corr__dato--ancho"><dt>Curso</dt><dd>{{ d.titulo }}</dd></div>
+          <div class="corr__dato">
+            <dt>Nivel</dt>
+            <dd>
+              @if (d.nivel === 'REFRENDADO') { <span class="badge badge--ingreso-manual">Refrendado</span> }
+              @else { <span class="badge badge--disp-cerrado">Normal</span> }
+            </dd>
+          </div>
+          <div class="corr__dato"><dt>Nota</dt><dd>@if (d.nota !== null) { {{ d.nota | number:'1.0-2' }} } @else { Sin nota }</dd></div>
+          <div class="corr__dato"><dt>Horas académicas</dt><dd>{{ d.horas }}</dd></div>
+          <div class="corr__dato"><dt>Tipo de curso</dt><dd>{{ d.tipoCurso }}</dd></div>
+          <div class="corr__dato corr__dato--ancho"><dt>Emisión</dt><dd>{{ etiquetaEmision(d.tipoEmision) }} · {{ d.emitidoEn | date:'dd/MM/yyyy HH:mm' }}</dd></div>
         </dl>
-        <p class="corr__nota">La nota y el nivel no se corrigen libremente: salen de la evaluación del curso.</p>
+        <p class="corr__nota">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+          La nota y el nivel no se corrigen libremente: salen de la evaluación del curso.
+        </p>
       </div>
 
       <div class="card corr__tarjeta">
-        <h2 class="corr__subtitulo">Firmantes impresos</h2>
+        <h2 class="corr__subtitulo">
+          <span class="corr__icono" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg></span>
+          Firmantes impresos
+        </h2>
         <ol class="corr__firmantes">
-          @for (f of d.firmantes; track f.firmanteId) { <li><strong>{{ f.nombre }}</strong><small>{{ f.cargo }}</small></li> }
+          @for (f of d.firmantes; track f.firmanteId; let i = $index) {
+            <li>
+              <span class="corr__numero">{{ i + 1 }}</span>
+              <span class="corr__firmante-texto"><strong>{{ f.nombre }}</strong><small>{{ f.cargo }}</small></span>
+            </li>
+          }
         </ol>
       </div>
     </div>
 
     @if (d.puedeModificar) {
-      <form class="card corr__tarjeta corr__formulario" [formGroup]="formulario" (ngSubmit)="revisarCorreccion()" novalidate>
-        <h2 class="corr__subtitulo">Corregir datos documentales</h2>
-        <p class="corr__nota">Se conserva el código y el estado vigente; se regenera el PDF y la versión anterior deja de descargarse pero queda en el historial.</p>
+      <div class="card corr__tarjeta corr__peligro corr__peligro--editar">
+        <div class="corr__peligro-texto">
+          <h2 class="corr__subtitulo corr__subtitulo--suelto">
+            <span class="corr__icono" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg></span>
+            Corregir datos documentales
+          </h2>
+          <p class="corr__aviso">Cambia nombres, título, horas, entidad o firmantes. Se conserva el código y el estado vigente; se regenera el PDF y la versión anterior queda en el historial.</p>
+        </div>
+        <button type="button" class="btn btn--acento corr__btn" (click)="abrirEdicion()">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg>
+          Corregir datos…
+        </button>
+      </div>
+      <div class="card corr__tarjeta corr__peligro">
+        <div class="corr__peligro-texto">
+          <h2 class="corr__subtitulo corr__subtitulo--suelto corr__subtitulo--peligro">
+            <span class="corr__icono corr__icono--peligro" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" /><line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg></span>
+            Anular certificado
+          </h2>
+          <p class="corr__aviso">Retira el PDF y deja el código informando «Certificado anulado — no válido». No se puede deshacer ni reactivar.</p>
+        </div>
+        <button type="button" class="btn btn--peligro corr__btn" (click)="abrirAnulacion()">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" /></svg>
+          Anular certificado…
+        </button>
+      </div>
+    }
+
+    <div class="card corr__tarjeta">
+      <h2 class="corr__subtitulo">
+        <span class="corr__icono" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg></span>
+        Historial
+      </h2>
+        <ol class="corr__historial">
+          @for (c of d.historial; track c.id) {
+            <li class="corr__hito" [class.corr__hito--anulacion]="c.accion === 'ANULACION'" [class.corr__hito--emision]="c.accion === 'EMISION_MANUAL'">
+              <span class="corr__hito-icono" aria-hidden="true">
+                @switch (c.accion) {
+                  @case ('ANULACION') {
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" /></svg>
+                  }
+                  @case ('EMISION_MANUAL') {
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6" /><path d="M15.5 13.5 17 22l-5-3-5 3 1.5-8.5" /></svg>
+                  }
+                  @default {
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg>
+                  }
+                }
+              </span>
+              <div class="corr__hito-cuerpo">
+                <div class="corr__hito-cab">
+                  <strong class="corr__hito-titulo">{{ etiquetaAccion(c.accion) }}</strong>
+                  <time class="corr__hito-fecha">{{ c.realizadoEn | date:'dd/MM/yyyy · HH:mm' }}</time>
+                </div>
+                <p class="corr__hito-autor">por {{ c.realizadoPor }}</p>
+                <p class="corr__hito-motivo"><span>Motivo</span>{{ c.motivo }}</p>
+                @if (c.accion === 'CORRECCION') {
+                  <div class="corr__hist-versiones">
+                    <div><span>Antes</span><pre>{{ c.datosAnteriores }}</pre></div>
+                    <div><span>Después</span><pre>{{ c.datosNuevos }}</pre></div>
+                  </div>
+                }
+              </div>
+            </li>
+          }
+
+          @if (!hayEmisionManual(d)) {
+            <li class="corr__hito corr__hito--emision">
+              <span class="corr__hito-icono" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6" /><path d="M15.5 13.5 17 22l-5-3-5 3 1.5-8.5" /></svg>
+              </span>
+              <div class="corr__hito-cuerpo">
+                <div class="corr__hito-cab">
+                  <strong class="corr__hito-titulo">Certificado emitido</strong>
+                  <time class="corr__hito-fecha">{{ d.emitidoEn | date:'dd/MM/yyyy · HH:mm' }}</time>
+                </div>
+                <p class="corr__hito-autor">{{ etiquetaEmision(d.tipoEmision) }} · código {{ d.codigo }}</p>
+              </div>
+            </li>
+          }
+        </ol>
+    </div>
+
+    @if (modal() === 'editar') {
+      <app-modal titulo="Corregir datos documentales" ancho="lg" (cerrar)="cerrarModal()">
+      <form class="corr__formulario" [formGroup]="formulario" (ngSubmit)="revisarCorreccion()" novalidate>
+        @if (errorModal(); as mensaje) {
+          <div class="alerta alerta--error" role="alert"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div>
+        }
+        <p class="corr__aviso corr__callout">Se conserva el código y el estado vigente; se regenera el PDF y la versión anterior deja de descargarse pero queda en el historial.</p>
 
         <div>
           <label class="label" for="co-nombres">Nombres impresos</label>
@@ -93,41 +210,23 @@
             placeholder="Explica qué estaba mal y por qué se corrige (queda registrado con tu nombre y la fecha)."></textarea>
           @if (invalido(formulario, 'motivo')) { <p class="campo-error">Explica el motivo (mínimo 10 caracteres).</p> }
         </div>
-        <div class="corr__acciones">
-          <button type="submit" class="btn btn--acento">Revisar cambios</button>
+        <div class="editor-form__acciones">
+          <button type="button" class="btn btn--peligro" (click)="cerrarModal()">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+            Cancelar
+          </button>
+          <button type="button" class="btn btn--secundario" [disabled]="previsualizando()" (click)="previsualizar()">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /></svg>
+            {{ previsualizando() ? 'Generando…' : 'Vista previa' }}
+          </button>
+          <button type="submit" class="btn btn--acento">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12" /></svg>
+            Revisar cambios
+          </button>
         </div>
       </form>
-
-      <div class="card corr__tarjeta corr__peligro">
-        <h2 class="corr__subtitulo">Anular certificado</h2>
-        <p class="corr__nota">Retira el PDF y deja el código informando «Certificado anulado — no válido». No se puede deshacer ni reactivar.</p>
-        <div class="corr__acciones">
-          <button type="button" class="btn btn--peligro" (click)="abrirAnulacion()">Anular certificado…</button>
-        </div>
-      </div>
+      </app-modal>
     }
-
-    <div class="card corr__tarjeta">
-      <h2 class="corr__subtitulo">Historial</h2>
-      @if (d.historial.length === 0) {
-        <p class="corr__nota">Este certificado no tiene cambios administrativos.</p>
-      } @else {
-        <ol class="corr__historial">
-          @for (c of d.historial; track c.id) {
-            <li>
-              <p class="corr__hist-cab"><strong>{{ etiquetaAccion(c.accion) }}</strong> · {{ c.realizadoEn | date:'dd/MM/yyyy HH:mm' }} · {{ c.realizadoPor }}</p>
-              <p class="corr__hist-motivo"><strong>Motivo:</strong> {{ c.motivo }}</p>
-              @if (c.accion === 'CORRECCION') {
-                <div class="corr__hist-versiones">
-                  <div><span>Antes</span><pre>{{ c.datosAnteriores }}</pre></div>
-                  <div><span>Después</span><pre>{{ c.datosNuevos }}</pre></div>
-                </div>
-              }
-            </li>
-          }
-        </ol>
-      }
-    </div>
 
     @if (modal() === 'corregir') {
       <app-modal titulo="Confirmar corrección" ancho="lg" (cerrar)="cerrarModal()">
@@ -142,33 +241,97 @@
           </tbody>
         </table>
         <div class="editor-form__acciones">
-          <button type="button" class="btn btn--secundario" [disabled]="enviando()" (click)="cerrarModal()">Volver</button>
-          <button type="button" class="btn btn--acento" [disabled]="enviando()" (click)="confirmarCorreccion()">{{ enviando() ? 'Corrigiendo…' : 'Sí, corregir' }}</button>
+          <button type="button" class="btn btn--secundario" [disabled]="enviando()" (click)="volverAEdicion()">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5" /><path d="m12 19-7-7 7-7" /></svg>
+            Volver
+          </button>
+          <button type="button" class="btn btn--secundario" [disabled]="enviando() || previsualizando()" (click)="previsualizar()">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /></svg>
+            {{ previsualizando() ? 'Generando…' : 'Vista previa' }}
+          </button>
+          <button type="button" class="btn btn--acento" [disabled]="enviando()" (click)="confirmarCorreccion()">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12" /></svg>
+            {{ enviando() ? 'Corrigiendo…' : 'Sí, corregir' }}
+          </button>
         </div>
       </app-modal>
     }
 
     @if (modal() === 'anular') {
       <app-modal titulo="Anular certificado" (cerrar)="cerrarModal()">
-        <form [formGroup]="formularioAnulacion" (ngSubmit)="confirmarAnulacion()" novalidate>
+        <form [formGroup]="formularioAnulacion" (ngSubmit)="pedirConfirmacionAnulacion()" novalidate>
           @if (errorModal(); as mensaje) {
             <div class="alerta alerta--error" role="alert"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div>
           }
-          <p class="corr__confirmar">Vas a anular el certificado <strong>{{ d.codigo }}</strong> de <strong>{{ d.alumno }}</strong>. Su PDF dejará de descargarse y su código informará que no es válido. <strong>No se puede deshacer.</strong></p>
+
+          <div class="alerta alerta--error corr__advertencia" role="alert">
+            <span class="alerta__icono">!</span>
+            <div>
+              <p class="alerta__titulo">Esta acción es irreversible</p>
+              <ul class="corr__consecuencias">
+                <li>El PDF del certificado <strong>{{ d.codigo }}</strong> dejará de poder descargarse.</li>
+                <li>El código pasará a informar «Certificado anulado — no válido».</li>
+                <li>No se podrá corregir ni reactivar nunca más.</li>
+              </ul>
+            </div>
+          </div>
+
           <div>
             <label class="label" for="an-motivo">Motivo de la anulación</label>
             <textarea id="an-motivo" class="input" rows="3" formControlName="motivo" [class.input--error]="invalido(formularioAnulacion, 'motivo')"
               placeholder="El motivo es privado: lo verá solo la administración."></textarea>
             @if (invalido(formularioAnulacion, 'motivo')) { <p class="campo-error">Explica el motivo (mínimo 10 caracteres).</p> }
           </div>
-          <label class="corr__check corr__check--confirmar">
-            <input type="checkbox" formControlName="confirmo" />
-            <span>Entiendo que la anulación es irreversible.</span>
-          </label>
-          @if (invalido(formularioAnulacion, 'confirmo')) { <p class="campo-error">Confirma que entiendes que es irreversible.</p> }
+
           <div class="editor-form__acciones">
-            <button type="button" class="btn btn--secundario" [disabled]="enviando()" (click)="cerrarModal()">Volver</button>
-            <button type="submit" class="btn btn--peligro" [disabled]="enviando()">{{ enviando() ? 'Anulando…' : 'Anular certificado' }}</button>
+            <button type="button" class="btn btn--secundario" (click)="cerrarModal()">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5" /><path d="m12 19-7-7 7-7" /></svg>
+              Volver
+            </button>
+            <button type="submit" class="btn btn--peligro">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" /></svg>
+              Entiendo, anular este certificado
+            </button>
+          </div>
+        </form>
+      </app-modal>
+    }
+
+    @if (modal() === 'confirmarAnulacion') {
+      <app-modal titulo="Confirmar anulación" (cerrar)="cerrarModal()">
+        <form [formGroup]="formularioAnulacion" (ngSubmit)="confirmarAnulacion()" novalidate>
+          @if (errorModal(); as mensaje) {
+            <div class="alerta alerta--error" role="alert"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div>
+          }
+
+          <p class="corr__confirmar">Vas a anular el certificado <strong>{{ d.codigo }}</strong>. Esta acción <strong>no se puede deshacer</strong>.</p>
+
+          <div class="corr__confirmar-nombre">
+            <label class="label" for="an-nombre">
+              Para confirmar, escribe el nombre completo del alumno:
+              <strong class="corr__nombre-objetivo">{{ d.alumno }}</strong>
+            </label>
+            <input id="an-nombre" class="input" formControlName="nombre" autocomplete="off" spellcheck="false"
+              [class.input--ok]="coincideNombre()" [attr.placeholder]="d.alumno" />
+            @if (coincideNombre()) {
+              <p class="corr__coincide corr__coincide--ok">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12" /></svg>
+                El nombre coincide.
+              </p>
+            } @else {
+              <p class="corr__coincide">«Aceptar» se habilita cuando el nombre coincide exactamente.</p>
+            }
+          </div>
+
+          <div class="editor-form__acciones">
+            <button type="button" class="btn btn--secundario" [disabled]="enviando()" (click)="volverAlMotivo()">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5" /><path d="m12 19-7-7 7-7" /></svg>
+              Volver
+            </button>
+            <button type="submit" class="btn btn--peligro" [disabled]="enviando() || !coincideNombre()">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12" /></svg>
+              {{ enviando() ? 'Anulando…' : 'Aceptar' }}
+            </button>
           </div>
         </form>
       </app-modal>

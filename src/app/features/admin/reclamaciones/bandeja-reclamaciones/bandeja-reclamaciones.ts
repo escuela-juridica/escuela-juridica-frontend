@@ -5,6 +5,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
+import { Subscription } from 'rxjs';
+
+import { crearBusquedaDinamica } from '../../../../shared/util/busqueda-dinamica';
 import { ReclamacionesAdminApiService } from '../reclamaciones-admin-api.service';
 import { EstadoRespuesta, ReclamacionBandeja } from '../reclamaciones-admin.model';
 
@@ -23,6 +26,10 @@ const TAMANO_PAGINA = 20;
 export class BandejaReclamaciones {
   private readonly api = inject(ReclamacionesAdminApiService);
   private readonly destroyRef = inject(DestroyRef);
+  private peticion?: Subscription;
+
+  /** Búsqueda al escribir: consulta al servidor cuando el usuario hace una pausa. */
+  protected readonly alEscribir = crearBusquedaDinamica(this.destroyRef, () => this.buscar());
 
   protected readonly filas = signal<ReclamacionBandeja[]>([]);
   protected readonly cargando = signal(true);
@@ -75,7 +82,8 @@ export class BandejaReclamaciones {
   private cargar(): void {
     this.cargando.set(true);
     this.error.set(null);
-    this.api.bandeja(this.texto.trim(), this.estado, this.tipo, this.pagina(), TAMANO_PAGINA).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    this.peticion?.unsubscribe();
+    this.peticion = this.api.bandeja(this.texto.trim(), this.estado, this.tipo, this.pagina(), TAMANO_PAGINA).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (r) => {
         this.filas.set(r.items);
         this.totalPaginas.set(r.totalPages);

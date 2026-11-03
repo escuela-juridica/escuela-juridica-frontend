@@ -18,15 +18,34 @@
 
 .gestion__filtros {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto auto;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto;
+  align-items: center;
   gap: 12px;
   margin-bottom: 20px;
 }
 
-.gestion__resumen {
-  margin: 0 0 8px;
-  font-size: 14px;
-  color: var(--neutral-600);
+.gestion__filtros-acciones {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+// Botones de filtro compactos; «Limpiar» en gris como en el centro de reportes.
+.gestion__btn-filtro {
+  height: 38px;
+  padding: 0 16px;
+  gap: 7px;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.gestion__btn-limpiar {
+  background: var(--neutral-600);
+  color: var(--blanco);
+}
+
+.gestion__btn-limpiar:hover {
+  background: var(--neutral-800);
 }
 
 .gestion__tabla {
@@ -70,22 +89,65 @@
   color: var(--neutral-600);
 }
 
-.gestion__codigo {
-  font-variant-numeric: tabular-nums;
-  font-size: 13px;
+.gestion__estado {
   white-space: nowrap;
 }
 
-.gestion__paginacion {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  margin-top: 20px;
+.gestion__codigo {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  white-space: nowrap;
 }
 
-@media (max-width: 800px) {
+// Botón de fila: el .btn global mide 44 px; aquí 32 px, todos del mismo ancho.
+.gestion__btn-fila {
+  width: 168px;
+  height: 32px;
+  padding: 0 12px;
+  gap: 6px;
+  font-size: 13px;
+  line-height: 18px;
+  text-decoration: none;
+}
+
+// Dos acciones en la misma celda (ver + corregir): una debajo de la otra, del mismo ancho.
+.gestion__acciones {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.gestion__btn-fila svg {
+  flex-shrink: 0;
+}
+
+// Líneas que solo se ven cuando la columna correspondiente se oculta por falta de ancho.
+.gestion__tabla .gestion__compacto {
+  display: none;
+}
+
+// La tabla se adapta en vez de obligar a hacer scroll horizontal: con poco ancho las columnas «Matrícula» y
+// «Código» pasan a una línea dentro de «Alumno y curso» y «Certificado».
+@media (max-width: 1180px) {
+  .gestion__col-matricula,
+  .gestion__col-codigo {
+    display: none;
+  }
+
+  .gestion__tabla .gestion__compacto {
+    display: block;
+  }
+
+  .gestion__tabla th,
+  .gestion__tabla td {
+    padding: 12px 10px;
+  }
+}
+
+@media (max-width: 1000px) {
   .gestion__filtros {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }

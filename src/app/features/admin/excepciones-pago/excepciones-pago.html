@@ -4,7 +4,7 @@
   </header>
 
   <div class="exc__filtros">
-    <input class="input" [(ngModel)]="texto" (keyup.enter)="buscar()" placeholder="Alumno, correo o curso" aria-label="Buscar" />
+    <input class="input" [ngModel]="texto" (ngModelChange)="texto = $event; alEscribir()" (keyup.enter)="buscar()" placeholder="Alumno, correo o curso" aria-label="Buscar" />
     <select class="input" [(ngModel)]="estado" (ngModelChange)="buscar()" aria-label="Estado">
       <option value="">Cualquier estado</option>
       <option value="PENDIENTE">Pendientes</option>
@@ -18,13 +18,6 @@
       <option value="MATRICULA_CANCELADA">Pago tras cancelar la matrícula</option>
     </select>
     <div class="exc__filtros-acciones">
-      <button type="button" class="btn btn--acento exc__btn-filtro" (click)="buscar()">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="11" cy="11" r="7" />
-          <line x1="21" y1="21" x2="16.65" y2="16.65" />
-        </svg>
-        Buscar
-      </button>
       <button type="button" class="btn exc__btn-filtro exc__btn-limpiar" (click)="limpiar()">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <line x1="18" y1="6" x2="6" y2="18" />
