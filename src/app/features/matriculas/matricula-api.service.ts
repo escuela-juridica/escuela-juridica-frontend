@@ -46,6 +46,22 @@ export class MatriculaApiService {
     return this.http.get<MatriculaDetalleAdministrativa>(`${API_URL}/admin/matriculas/${matriculaId}`);
   }
 
+  /** Devuelve a «Activa» una matrícula cancelada; el motivo queda en el historial. */
+  reactivarAdministrativa(matriculaId: number, motivo: string): Observable<Matricula> {
+    return this.http.patch<Matricula>(`${API_URL}/admin/matriculas/${matriculaId}/reactivacion`, { motivo });
+  }
+
+  /** Boleta o captura (PNG, JPG, WEBP o PDF) que respalda un pago manual; reemplaza la anterior si existe. */
+  adjuntarComprobante(matriculaId: number, archivo: File): Observable<void> {
+    const datos = new FormData();
+    datos.append('archivo', archivo);
+    return this.http.post<void>(`${API_URL}/admin/matriculas/${matriculaId}/comprobante`, datos);
+  }
+
+  comprobante(matriculaId: number): Observable<Blob> {
+    return this.http.get(`${API_URL}/admin/matriculas/${matriculaId}/comprobante`, { responseType: 'blob' });
+  }
+
   cancelarAdministrativa(matriculaId: number, motivo: string): Observable<unknown> {
     return this.http.patch(`${API_URL}/admin/matriculas/${matriculaId}/cancelacion`, { motivo });
   }

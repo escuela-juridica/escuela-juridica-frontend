@@ -16,9 +16,12 @@ export class ConfirmacionDialog {
   private readonly servicio = inject(ConfirmacionService);
   protected readonly solicitud = this.servicio.solicitud;
 
-  @HostListener('document:keydown.escape')
-  protected alEscape(): void {
+  @HostListener('document:keydown.escape', ['$event'])
+  protected alEscape(evento: Event): void {
     if (this.solicitud()) {
+      // Este listener se registra antes que los de los modales: al frenar el evento, Escape cierra
+      // solo la pregunta y no el modal que hay debajo.
+      evento.stopImmediatePropagation();
       this.cancelar();
     }
   }

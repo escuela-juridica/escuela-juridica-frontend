@@ -1,0 +1,86 @@
+:host {
+  display: block;
+}
+
+.tp {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  // Va encima de la tabla, entre los filtros y el encabezado.
+  margin-bottom: 12px;
+}
+
+.tp__resumen {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--neutral-600);
+}
+
+.tp__resumen strong {
+  color: var(--neutral-950);
+  font-weight: 600;
+}
+
+.tp__nav {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.tp__boton,
+.tp__numero {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 34px;
+  min-width: 34px;
+  padding: 0 10px;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radio-md);
+  background: var(--blanco);
+  color: var(--neutral-800);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.tp__boton:hover:not(:disabled),
+.tp__numero:hover:not(.tp__numero--activa) {
+  border-color: var(--marca-900);
+  color: var(--marca-900);
+  background: var(--neutral-050);
+}
+
+.tp__numero--activa {
+  border-color: var(--marca-900);
+  background: var(--marca-900);
+  color: var(--blanco);
+  cursor: default;
+}
+
+.tp__boton:disabled {
+  color: var(--neutral-400);
+  background: var(--neutral-050);
+  cursor: not-allowed;
+}
+
+.tp__puntos {
+  min-width: 20px;
+  text-align: center;
+  color: var(--neutral-500);
+}
+
+@media (max-width: 600px) {
+  .tp {
+    justify-content: center;
+  }
+}

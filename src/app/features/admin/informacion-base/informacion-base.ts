@@ -15,7 +15,6 @@ import {
   FirmanteRespuesta,
   TabInformacionBase,
   TipoCursoRespuesta,
-  TipoMaterialRespuesta,
 } from './informacion-base.model';
 
 interface ErrorApiAdmin {
@@ -37,7 +36,6 @@ const PESTANAS: DefinicionPestana[] = [
   { id: 'docente', etiqueta: 'Docentes públicos' },
   { id: 'entidad', etiqueta: 'Entidades' },
   { id: 'firmante', etiqueta: 'Firmantes' },
-  { id: 'tipoMaterial', etiqueta: 'Tipos de material' },
 ];
 
 /** HU-009 — PF-012: valores reutilizables que después se seleccionan al crear o editar un
@@ -68,13 +66,14 @@ export class InformacionBase {
   /** Confirmación tras guardar o cambiar el estado de un elemento: desaparece sola o con la X. */
   protected readonly mensaje = signal<{ tipo: 'error' | 'exito'; texto: string } | null>(null);
   private mensajeTimeout: ReturnType<typeof setTimeout> | null = null;
+  /** Numera cada carga: si el usuario cambia de pestaña o de filtro mientras otra carga sigue en curso, la respuesta vieja se ignora. */
+  private cargaActual = 0;
 
   protected readonly tiposCurso = signal<TipoCursoRespuesta[]>([]);
   protected readonly categorias = signal<CategoriaRespuesta[]>([]);
   protected readonly docentes = signal<DocenteRespuesta[]>([]);
   protected readonly entidades = signal<EntidadRespuesta[]>([]);
   protected readonly firmantes = signal<FirmanteRespuesta[]>([]);
-  protected readonly tiposMaterial = signal<TipoMaterialRespuesta[]>([]);
 
   /** Paginación server-side: como solo una pestaña está visible a la vez, basta un único par de
    * señales que se reinicia al cambiar de pestaña o de filtro. */
@@ -116,12 +115,6 @@ export class InformacionBase {
     imagenFirmaUrl: ['', [Validators.maxLength(300)]],
   });
 
-  protected readonly formTipoMaterial = this.fb.group({
-    codigo: ['', [Validators.required, Validators.maxLength(30)]],
-    nombre: ['', [Validators.required, Validators.maxLength(100)]],
-    descripcion: ['', []],
-  });
-
   constructor() {
     this.cargarPestanaActiva();
 
@@ -154,7 +147,6 @@ export class InformacionBase {
       case 'docente': return this.formDocente;
       case 'entidad': return this.formEntidad;
       case 'firmante': return this.formFirmante;
-      case 'tipoMaterial': return this.formTipoMaterial;
     }
   }
 
@@ -224,9 +216,6 @@ export class InformacionBase {
           imagenFirmaUrl: item.imagenFirmaUrl ?? '',
         });
       }
-    } else if (tab === 'tipoMaterial') {
-      const item = this.tiposMaterial().find((t) => t.id === id);
-      if (item) this.formTipoMaterial.setValue({ codigo: item.codigo, nombre: item.nombre, descripcion: item.descripcion ?? '' });
     }
     this.modoFormulario.set(id);
   }
@@ -243,8 +232,22 @@ export class InformacionBase {
       case 'docente': this.formDocente.reset({ nombres: '', apellidoPaterno: '', apellidoMaterno: '', fotoUrl: '', cargoProfesional: '', biografiaProfesional: '' }); break;
       case 'entidad': this.formEntidad.reset({ nombre: '', logoUrl: '' }); break;
       case 'firmante': this.formFirmante.reset({ nombres: '', apellidoPaterno: '', apellidoMaterno: '', cargoFirma: '', imagenFirmaUrl: '' }); break;
-      case 'tipoMaterial': this.formTipoMaterial.reset({ codigo: '', nombre: '', descripcion: '' }); break;
     }
+  }
+
+  /** Mensaje de error de un campo del formulario activo, solo si ya se tocó o se intentó guardar. */
+  protected mensajeCampo(campo: string): string | null {
+    const control = this.formularioActivo.get(campo);
+    if (!control || !control.invalid || !control.touched) {
+      return null;
+    }
+    if (control.hasError('required')) {
+      return 'Este campo es obligatorio.';
+    }
+    if (control.hasError('maxlength')) {
+      return 'Supera la longitud máxima permitida.';
+    }
+    return 'Revisa este valor.';
   }
 
   protected campoDocenteInvalido(campo: 'nombres' | 'apellidoPaterno' | 'apellidoMaterno'): boolean {
@@ -270,7 +273,6 @@ export class InformacionBase {
       case 'docente': this.guardarDocente(modo); break;
       case 'entidad': this.guardarEntidad(modo); break;
       case 'firmante': this.guardarFirmante(modo); break;
-      case 'tipoMaterial': this.guardarTipoMaterial(modo); break;
     }
   }
 
@@ -290,6 +292,7 @@ export class InformacionBase {
         this.tiposCurso.update((lista) => this.upsert(lista, item, (x) => x.id));
         this.cerrarFormulario();
         this.mostrarMensaje('exito', 'Guardado.');
+        this.cargarPestanaActiva();
         this.detector.markForCheck();
       },
       error: (e: HttpErrorResponse) => this.manejarErrorFormulario(e),
@@ -312,6 +315,7 @@ export class InformacionBase {
         this.categorias.update((lista) => this.upsert(lista, item, (x) => x.id));
         this.cerrarFormulario();
         this.mostrarMensaje('exito', 'Guardado.');
+        this.cargarPestanaActiva();
         this.detector.markForCheck();
       },
       error: (e: HttpErrorResponse) => this.manejarErrorFormulario(e),
@@ -340,6 +344,7 @@ export class InformacionBase {
         this.docentes.update((lista) => this.upsert(lista, item, (x) => x.personaId));
         this.cerrarFormulario();
         this.mostrarMensaje('exito', 'Guardado.');
+        this.cargarPestanaActiva();
         this.detector.markForCheck();
       },
       error: (e: HttpErrorResponse) => this.manejarErrorFormulario(e),
@@ -361,6 +366,7 @@ export class InformacionBase {
         this.entidades.update((lista) => this.upsert(lista, item, (x) => x.id));
         this.cerrarFormulario();
         this.mostrarMensaje('exito', 'Guardado.');
+        this.cargarPestanaActiva();
         this.detector.markForCheck();
       },
       error: (e: HttpErrorResponse) => this.manejarErrorFormulario(e),
@@ -388,27 +394,7 @@ export class InformacionBase {
         this.firmantes.update((lista) => this.upsert(lista, item, (x) => x.id));
         this.cerrarFormulario();
         this.mostrarMensaje('exito', 'Guardado.');
-        this.detector.markForCheck();
-      },
-      error: (e: HttpErrorResponse) => this.manejarErrorFormulario(e),
-    });
-  }
-
-  private guardarTipoMaterial(modo: 'nuevo' | number): void {
-    if (this.formTipoMaterial.invalid) {
-      this.formTipoMaterial.markAllAsTouched();
-      return;
-    }
-    const v = this.formTipoMaterial.getRawValue();
-    const peticion = { codigo: v.codigo.trim(), nombre: v.nombre.trim(), descripcion: this.textoOpcional(v.descripcion) };
-    this.guardando.set(true);
-    const obs = modo === 'nuevo' ? this.api.crearTipoMaterial(peticion) : this.api.actualizarTipoMaterial(modo, peticion);
-    obs.subscribe({
-      next: (item) => {
-        this.guardando.set(false);
-        this.tiposMaterial.update((lista) => this.upsert(lista, item, (x) => x.id));
-        this.cerrarFormulario();
-        this.mostrarMensaje('exito', 'Guardado.');
+        this.cargarPestanaActiva();
         this.detector.markForCheck();
       },
       error: (e: HttpErrorResponse) => this.manejarErrorFormulario(e),
@@ -456,22 +442,14 @@ export class InformacionBase {
           error: falla,
         });
         break;
-      case 'tipoMaterial':
-        this.api.cambiarActivoTipoMaterial(id, activo).subscribe({
-          next: (item) => { this.tiposMaterial.update((l) => this.aplicarCambioActivo(l, item, (x) => x.id)); exito(); this.detector.markForCheck(); },
-          error: falla,
-        });
-        break;
     }
   }
 
-  /** `forzar`: vuelve a pedir la página actual aunque ya se haya cargado (tras crear, editar o
-   * cambiar el estado de un elemento). */
-  private cargarPestanaActiva(forzar = false): void {
+  /** Pide al servidor la página actual de la pestaña activa. Siempre carga (también al cambiar de pestaña o de filtro
+   * mientras otra carga sigue en curso) y descarta las respuestas que llegan tarde. */
+  private cargarPestanaActiva(): void {
     const tab = this.tabActiva();
-    if (!forzar && this.cargando()) {
-      return;
-    }
+    const carga = ++this.cargaActual;
     this.cargando.set(true);
     this.error.set(null);
     const incluirInactivos = this.mostrarTodos();
@@ -481,12 +459,18 @@ export class InformacionBase {
     const manejar = <T>(obs: Observable<PageResponse<T>>, set: (v: T[]) => void) => {
       obs.subscribe({
         next: (respuesta) => {
+          if (carga !== this.cargaActual) {
+            return;
+          }
           set(respuesta.items);
           this.totalPaginas.set(respuesta.totalPages);
           this.cargando.set(false);
           this.detector.markForCheck();
         },
         error: () => {
+          if (carga !== this.cargaActual) {
+            return;
+          }
           this.error.set('No pudimos cargar la información. Inténtalo nuevamente.');
           this.cargando.set(false);
           this.detector.markForCheck();
@@ -500,7 +484,6 @@ export class InformacionBase {
       case 'docente': manejar(this.api.listarDocentes(incluirInactivos, pagina, tamano), (v) => this.docentes.set(v)); break;
       case 'entidad': manejar(this.api.listarEntidades(incluirInactivos, pagina, tamano), (v) => this.entidades.set(v)); break;
       case 'firmante': manejar(this.api.listarFirmantes(incluirInactivos, pagina, tamano), (v) => this.firmantes.set(v)); break;
-      case 'tipoMaterial': manejar(this.api.listarTiposMaterial(incluirInactivos, pagina, tamano), (v) => this.tiposMaterial.set(v)); break;
     }
   }
 

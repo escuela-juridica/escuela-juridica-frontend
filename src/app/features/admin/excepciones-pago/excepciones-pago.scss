@@ -1,32 +1,61 @@
-.exc__titulo {
-  margin: 0;
-  font-size: 22px;
-  line-height: 30px;
-  font-weight: 700;
-  color: var(--neutral-950);
-}
-
 .exc__cabecera {
   margin-bottom: 24px;
 }
 
+// Texto explicativo: tamaño de lectura cómodo y recuadro suave con barra de acento, en vez de un
+// párrafo grande y gris suelto sobre los filtros.
 .exc__cabecera p {
   margin: 4px 0 0;
-  max-width: 780px;
-  color: var(--neutral-600);
+  max-width: 860px;
+  padding: 12px 16px;
+  font-size: 14px;
+  line-height: 22px;
+  font-weight: 500;
+  color: var(--neutral-700, var(--neutral-600));
+  background: var(--neutral-050);
+  border-left: 3px solid var(--acento-500);
+  border-radius: 0 var(--radio-md) var(--radio-md) 0;
+}
+
+// Botón de fila: el .btn global mide 44 px, demasiado para una tabla.
+.exc__btn-fila {
+  height: 32px;
+  padding: 0 12px;
+  gap: 6px;
+  font-size: 13px;
+  line-height: 18px;
 }
 
 .exc__filtros {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1.4fr) auto auto;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1.4fr) auto;
   gap: 12px;
   margin-bottom: 20px;
 }
 
-.exc__resumen {
-  margin: 0 0 8px;
-  font-size: 14px;
-  color: var(--neutral-600);
+.exc__filtros-acciones {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+// Botones de filtro compactos y centrados con los campos; «Limpiar» en gris como en el centro de reportes.
+.exc__btn-filtro {
+  align-self: center;
+  height: 38px;
+  padding: 0 16px;
+  gap: 7px;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.exc__btn-limpiar {
+  background: var(--neutral-600);
+  color: var(--blanco);
+}
+
+.exc__btn-limpiar:hover {
+  background: var(--neutral-800);
 }
 
 .exc__tabla {
@@ -73,14 +102,6 @@
 
 .exc__atenuado {
   color: var(--neutral-500);
-}
-
-.exc__paginacion {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  margin-top: 20px;
 }
 
 .exc__descripcion {
@@ -141,9 +162,35 @@
   gap: 4px;
 }
 
+// La tabla se adapta en vez de obligar a hacer scroll horizontal: con poco ancho la columna «Pago» pasa
+// a una línea dentro de «Alumno y curso» y se reduce el relleno.
+.exc__tabla .exc__pago-compacto {
+  display: none;
+}
+
+@media (max-width: 1100px) {
+  .exc__col-pago {
+    display: none;
+  }
+
+  .exc__tabla .exc__pago-compacto {
+    display: block;
+  }
+
+  .exc__tabla th,
+  .exc__tabla td {
+    padding: 12px 10px;
+  }
+}
+
 @media (max-width: 1000px) {
   .exc__filtros {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .exc__filtros > input,
+  .exc__filtros-acciones {
+    grid-column: 1 / -1;
   }
 
   .exc__bloques {

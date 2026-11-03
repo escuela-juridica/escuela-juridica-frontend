@@ -6,6 +6,7 @@ import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 
 import { AlertaGlobalService } from '../../../core/notificaciones/alerta-global.service';
 import { Modal } from '../../../shared/ui/modal/modal';
+import { TablaPaginacion } from '../../../shared/ui/tabla-paginacion/tabla-paginacion';
 import { formatearPrecio } from '../../cursos/curso-formato.util';
 import { ExcepcionesPagoApiService } from './excepciones-pago-api.service';
 import { Excepcion, TipoExcepcion } from './excepciones-pago.model';
@@ -19,7 +20,7 @@ const TAMANO_PAGINA = 20;
  */
 @Component({
   selector: 'app-excepciones-pago',
-  imports: [FormsModule, ReactiveFormsModule, DatePipe, Modal],
+  imports: [FormsModule, ReactiveFormsModule, DatePipe, Modal, TablaPaginacion],
   templateUrl: './excepciones-pago.html',
   styleUrl: './excepciones-pago.scss',
 })
@@ -29,6 +30,7 @@ export class ExcepcionesPago {
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly formatearPrecio = formatearPrecio;
+  protected readonly tamano = TAMANO_PAGINA;
   protected readonly filas = signal<Excepcion[]>([]);
   protected readonly cargando = signal(true);
   protected readonly error = signal<string | null>(null);

@@ -53,6 +53,11 @@
     background: var(--input-fondo);
   }
 
+  // Campo obligatorio sin completar (mismo criterio que `.input--error`).
+  &.input--error:not(.ng-select-opened) > .ng-select-container {
+    border-color: var(--error);
+  }
+
   // El área de escritura ocupa todo el alto: los botones de quitar y abrir deben quedar por encima para recibir el clic.
   .ng-clear-wrapper,
   .ng-arrow-wrapper {

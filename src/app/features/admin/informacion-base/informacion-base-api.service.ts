@@ -96,8 +96,8 @@ export class InformacionBaseApiService {
     return this.http.patch<EntidadRespuesta>(`${this.url}/entidades/${id}/activo`, { activo });
   }
 
-  /** Sube la imagen de una firma o el logo de una entidad y devuelve la referencia que se guarda en el formulario. */
-  subirImagenCertificado(tipo: 'FIRMA' | 'LOGO', archivo: File): Observable<{ referencia: string }> {
+  /** Sube la imagen de una firma, el logo de una entidad o la foto de un docente y devuelve la referencia que se guarda en el formulario. */
+  subirImagenCertificado(tipo: 'FIRMA' | 'LOGO' | 'FOTO', archivo: File): Observable<{ referencia: string }> {
     const datos = new FormData();
     datos.append('tipo', tipo);
     datos.append('archivo', archivo);

@@ -200,6 +200,61 @@
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
+}
+
+// Hover común a todas las variantes: el botón se eleva un poco y proyecta una sombra del color de
+// su variante. Los deshabilitados no reaccionan.
+.btn:not(:disabled):not(.btn--deshabilitado):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px -4px rgba(16, 24, 40, 0.28);
+}
+
+.btn:not(:disabled):not(.btn--deshabilitado):active {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.2);
+}
+
+.btn--primario:not(:disabled):hover {
+  box-shadow: 0 8px 16px -6px rgba(15, 35, 62, 0.55);
+}
+
+.btn--acento:not(:disabled):hover {
+  box-shadow: 0 8px 16px -6px rgba(0, 92, 96, 0.5);
+}
+
+.btn--exito:not(:disabled):hover {
+  box-shadow: 0 8px 16px -6px rgba(1, 97, 57, 0.5);
+}
+
+.btn--peligro:not(:disabled):hover {
+  box-shadow: 0 8px 16px -6px rgba(143, 27, 19, 0.5);
+}
+
+.btn--info:not(:disabled):hover {
+  box-shadow: 0 8px 16px -6px rgba(14, 70, 148, 0.5);
+}
+
+.btn--secundario:not(:disabled):hover,
+.btn--neutro:not(:disabled):hover,
+.btn--google:not(:disabled):hover {
+  box-shadow: 0 4px 10px -4px rgba(16, 24, 40, 0.22);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn {
+    transition: none;
+  }
+
+  .btn:not(:disabled):not(.btn--deshabilitado):hover,
+  .btn:not(:disabled):not(.btn--deshabilitado):active {
+    transform: none;
+  }
 }
 
 .btn--grande {

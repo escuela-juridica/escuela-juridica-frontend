@@ -144,6 +144,10 @@ export class ReportePagosPantalla {
       case 'YAPE': return 'Yape';
       case 'BILLETERA': return 'Billetera móvil';
       case 'TRANSFERENCIA': return 'Transferencia';
+      case 'DEPOSITO': return 'Depósito bancario';
+      case 'PLIN': return 'Plin';
+      case 'EFECTIVO': return 'Efectivo';
+      case 'OTRO': return 'Otro';
       default: return medio ?? '—';
     }
   }

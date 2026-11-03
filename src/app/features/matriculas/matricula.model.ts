@@ -74,6 +74,8 @@ export interface PagoMatriculaDetalle {
   registradoPorUsuarioId: number | null;
   registradoPor: string;
   resultadoEn: string | null;
+  /** Hay una boleta o captura adjunta (solo pagos manuales). */
+  tieneComprobante: boolean;
 }
 
 export interface HistorialEstadoMatricula {

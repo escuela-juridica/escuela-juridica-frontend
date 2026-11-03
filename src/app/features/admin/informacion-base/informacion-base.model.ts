@@ -1,4 +1,4 @@
-export type TabInformacionBase = 'tipoCurso' | 'categoria' | 'docente' | 'entidad' | 'firmante' | 'tipoMaterial';
+export type TabInformacionBase = 'tipoCurso' | 'categoria' | 'docente' | 'entidad' | 'firmante';
 
 export interface TipoCursoRespuesta {
   id: number;

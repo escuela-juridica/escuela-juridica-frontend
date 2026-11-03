@@ -1,6 +1,5 @@
 <section class="exc">
   <header class="exc__cabecera">
-    <h1 class="exc__titulo">Excepciones de matrículas y pagos</h1>
     <p>Sobrecupos y pagos aprobados tarde o después de cancelar el curso o la matrícula. La Escuela resuelve la comunicación o la devolución por su propio canal y aquí registra qué atención brindó; ESEJUR no devuelve dinero ni cambia el resultado de Culqi.</p>
   </header>
 
@@ -18,8 +17,22 @@
       <option value="CURSO_CANCELADO">Pago tras cancelar el curso</option>
       <option value="MATRICULA_CANCELADA">Pago tras cancelar la matrícula</option>
     </select>
-    <button type="button" class="btn btn--acento" (click)="buscar()">Buscar</button>
-    <button type="button" class="btn btn--secundario" (click)="limpiar()">Limpiar</button>
+    <div class="exc__filtros-acciones">
+      <button type="button" class="btn btn--acento exc__btn-filtro" (click)="buscar()">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        Buscar
+      </button>
+      <button type="button" class="btn exc__btn-filtro exc__btn-limpiar" (click)="limpiar()">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+        Limpiar
+      </button>
+    </div>
   </div>
 
   @if (cargando()) {
@@ -32,18 +45,29 @@
       <p class="estado-vacio__texto">Cuando un pago llegue tarde o un curso supere su cupo, aparecerá aquí.</p>
     </div>
   } @else {
-    <p class="exc__resumen">{{ totalFilas() }} {{ totalFilas() === 1 ? 'excepción' : 'excepciones' }}</p>
+    <app-tabla-paginacion
+      [pagina]="pagina()"
+      [tamano]="tamano"
+      [total]="totalFilas()"
+      (cambiar)="irAPagina($event)"
+    />
+
     <div class="exc__tabla">
       <table>
         <thead>
-          <tr><th>Excepción</th><th>Alumno y curso</th><th>Pago</th><th>Estado</th><th>Acciones</th></tr>
+          <tr><th>Excepción</th><th>Alumno y curso</th><th class="exc__col-pago">Pago</th><th>Estado</th><th>Acciones</th></tr>
         </thead>
         <tbody>
           @for (fila of filas(); track fila.id) {
             <tr>
               <td><strong>{{ etiquetaTipo(fila.tipo) }}</strong><small>{{ fila.creadoEn | date:'dd/MM/yyyy HH:mm' }}</small></td>
-              <td><strong>{{ fila.alumno }}</strong><small>{{ fila.correo }}</small><small>{{ fila.curso }}</small></td>
               <td>
+                <strong>{{ fila.alumno }}</strong><small>{{ fila.correo }}</small><small>{{ fila.curso }}</small>
+                @if (fila.pago; as p) {
+                  <small class="exc__pago-compacto">Pago {{ p.numeroPedido }} · {{ formatearPrecio(p.importe) }} · {{ p.estado }}</small>
+                }
+              </td>
+              <td class="exc__col-pago">
                 @if (fila.pago; as p) { <strong>{{ p.numeroPedido }}</strong><small>{{ formatearPrecio(p.importe) }} · {{ p.estado }}</small> }
                 @else { <span class="exc__atenuado">—</span> }
               </td>
@@ -51,20 +75,31 @@
                 @if (fila.estado === 'PENDIENTE') { <span class="badge badge--advertencia-suave">Pendiente</span> }
                 @else { <span class="badge badge--disp-inmediato">Atendida</span> }
               </td>
-              <td><button type="button" class="btn btn--secundario" (click)="revisar(fila)">{{ fila.estado === 'PENDIENTE' ? 'Revisar y atender' : 'Ver atención' }}</button></td>
+              <td>
+                <button type="button" class="btn exc__btn-fila" [class.btn--primario]="fila.estado === 'PENDIENTE'"
+                  [class.btn--secundario]="fila.estado !== 'PENDIENTE'" (click)="revisar(fila)">
+                  @if (fila.estado === 'PENDIENTE') {
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                      <rect x="8" y="2" width="8" height="4" rx="1" />
+                      <polyline points="9 14 11 16 15 12" />
+                    </svg>
+                    Revisar y atender
+                  } @else {
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                    Ver atención
+                  }
+                </button>
+              </td>
             </tr>
           }
         </tbody>
       </table>
     </div>
 
-    @if (totalPaginas() > 1) {
-      <div class="exc__paginacion">
-        <button type="button" class="btn btn--secundario" [disabled]="pagina() === 0" (click)="irAPagina(pagina() - 1)">Anterior</button>
-        <span>Página {{ pagina() + 1 }} de {{ totalPaginas() }}</span>
-        <button type="button" class="btn btn--secundario" [disabled]="pagina() + 1 >= totalPaginas()" (click)="irAPagina(pagina() + 1)">Siguiente</button>
-      </div>
-    }
   }
 
   @if (seleccionada(); as e) {

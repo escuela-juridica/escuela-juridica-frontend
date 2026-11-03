@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" role="img" aria-label="Docente sin foto">
+  <rect width="200" height="240" fill="#e5e7eb"/>
+  <circle cx="100" cy="92" r="38" fill="#9ca3af"/>
+  <path d="M28 240c0-46 32-78 72-78s72 32 72 78z" fill="#9ca3af"/>
+</svg>

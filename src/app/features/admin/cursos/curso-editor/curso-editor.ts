@@ -35,7 +35,6 @@ import {
 import { CursoAdminApiService } from '../curso-admin-api.service';
 import { CursoEditorRespuesta, ModalidadCurso, TipoVentaCurso } from '../curso-admin.model';
 import { Modal } from '../../../../shared/ui/modal/modal';
-import { AlertaGlobalComponent } from '../../../../shared/ui/alerta-global/alerta-global';
 import { ExamenesTab } from './examenes-tab/examenes-tab';
 import { PublicacionTab } from './publicacion-tab/publicacion-tab';
 import { RequisitosTab } from './requisitos-tab/requisitos-tab';
@@ -71,7 +70,6 @@ interface SesionEnVivoEditor {
     ExamenesTab,
     RequisitosTab,
     PublicacionTab,
-    AlertaGlobalComponent,
     ModalReprogramarSesion,
     ModalCancelarSesion,
     ModalCorregirSesion,
