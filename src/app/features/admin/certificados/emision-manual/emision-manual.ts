@@ -33,6 +33,8 @@ export class EmisionManual {
   protected readonly errorEmision = signal<string | null>(null);
   /** Nombre escrito para confirmar la emisión cuando el alumno aún no cumple los requisitos. */
   protected readonly nombreConfirmacion = signal('');
+  /** Se intentó emitir con el modal abierto: a partir de ahí se señalan los campos que faltan. */
+  protected readonly intentoEmitir = signal(false);
 
   protected readonly formulario = new FormGroup({
     motivo: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(10), Validators.maxLength(1000)] }),
@@ -50,7 +52,8 @@ export class EmisionManual {
         next: (s) => {
           this.situacion.set(s);
           // Si el alumno aún no los confirmó, la administración los confirma: se propone el nombre de su cuenta.
-          if (!s.datosConfirmados) this.formulario.controls.nombres.setValue(s.alumno);
+          // Si se reemite, se parte de los nombres del certificado anulado para poder corregirlos.
+          if (this.confirmaAdministracion(s)) this.formulario.controls.nombres.setValue(s.nombresConfirmados ?? s.alumno);
           this.cargando.set(false);
         },
         error: (e: HttpErrorResponse) => {
@@ -64,14 +67,19 @@ export class EmisionManual {
     return s.fechaFinalizacion === null;
   }
 
-  /** La administración debe confirmar los nombres impresos porque el alumno no lo hizo. */
+  /** El certificado actual está anulado: el que se emite lo reemplaza, con otro código. */
+  protected esReemision(s: EmisionManualSituacion): boolean {
+    return s.certificado?.estado === 'ANULADO';
+  }
+
+  /** La administración confirma los nombres impresos: porque el alumno no lo hizo o porque se reemite y pueden corregirse. */
   protected confirmaAdministracion(s: EmisionManualSituacion): boolean {
-    return !s.datosConfirmados;
+    return !s.datosConfirmados || this.esReemision(s);
   }
 
   /** Nombres que se imprimirán: los del alumno si ya los confirmó o, si no, los que escribe la administración. */
   protected nombresAImprimir(s: EmisionManualSituacion): string {
-    return s.datosConfirmados ? (s.nombresConfirmados ?? s.alumno) : this.formulario.controls.nombres.value.trim().replace(/\s+/g, ' ');
+    return this.confirmaAdministracion(s) ? this.formulario.controls.nombres.value.trim().replace(/\s+/g, ' ') : (s.nombresConfirmados ?? s.alumno);
   }
 
   /** Emitir sin cumplir los requisitos es la excepción más delicada: se exige escribir el nombre del alumno. */
@@ -84,23 +92,21 @@ export class EmisionManual {
     return normalizar(this.nombreConfirmacion()) === normalizar(s.alumno);
   }
 
-  protected invalido(campo: 'motivo' | 'entiendo' | 'nombres'): boolean {
+  /** Fin que se imprimirá: el del curso (en vivo/híbrido) o, en virtual, la finalización elegida, la ya registrada u hoy. */
+  protected fechaFinPrevista(s: EmisionManualSituacion): string {
+    return s.fechaFinCurso ?? (this.formulario.controls.fechaFinalizacion.value || s.fechaFinalizacion || s.fechaMaximaFinalizacion);
+  }
+
+  protected invalido(campo: 'motivo'): boolean {
     const c = this.formulario.controls[campo];
     return c.invalid && (c.touched || c.dirty);
   }
 
+  /** La casilla habilita el botón y el botón abre el modal con el motivo, los datos y la confirmación final. */
   protected pedirConfirmacion(): void {
-    const s = this.situacion();
-    if (s && this.confirmaAdministracion(s) && !this.nombresAImprimir(s)) {
-      this.formulario.controls.nombres.markAsTouched();
-      this.formulario.controls.nombres.setErrors({ required: true });
-      return;
-    }
-    if (this.formulario.invalid) {
-      this.formulario.markAllAsTouched();
-      return;
-    }
+    if (this.formulario.controls.entiendo.invalid) return;
     this.errorEmision.set(null);
+    this.intentoEmitir.set(false);
     this.nombreConfirmacion.set('');
     this.confirmando.set(true);
   }
@@ -112,12 +118,16 @@ export class EmisionManual {
   protected emitir(): void {
     const s = this.situacion();
     if (!s || this.emitiendo()) return;
+    this.intentoEmitir.set(true);
+    this.formulario.controls.motivo.markAsTouched();
+    if (this.formulario.controls.motivo.invalid) return;
+    if (this.confirmaAdministracion(s) && (this.formulario.controls.nombres.invalid || !this.nombresAImprimir(s))) return;
     if (this.exigeNombre(s) && !this.coincideNombre(s)) return;
     const v = this.formulario.getRawValue();
     this.emitiendo.set(true);
     this.errorEmision.set(null);
     this.api
-            .emitir(this.matriculaId, {
+      .emitir(this.matriculaId, {
         motivo: v.motivo.trim(),
         fechaFinalizacion: this.necesitaFecha(s) && v.fechaFinalizacion ? v.fechaFinalizacion : null,
         nombres: this.confirmaAdministracion(s) ? this.nombresAImprimir(s) : null,

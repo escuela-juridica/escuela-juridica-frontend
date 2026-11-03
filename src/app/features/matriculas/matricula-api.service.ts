@@ -35,10 +35,15 @@ export class MatriculaApiService {
     return this.http.post<{ enviado: boolean; mensaje: string }>(`${API_URL}/matriculas/${id}/reenviar-confirmacion`, {});
   }
 
-  listarAdministrativas(texto = '', estado = '', page = 0, size = 10): Observable<PageResponse<MatriculaAdministrativa>> {
+  listarAdministrativas(
+    filtros: { usuarioId: number | null; cursoId: number | null; estado: string },
+    page = 0,
+    size = 10,
+  ): Observable<PageResponse<MatriculaAdministrativa>> {
     let params = new HttpParams().set('page', page).set('size', size);
-    if (texto.trim()) params = params.set('texto', texto.trim());
-    if (estado) params = params.set('estado', estado);
+    if (filtros.usuarioId) params = params.set('usuarioId', filtros.usuarioId);
+    if (filtros.cursoId) params = params.set('cursoId', filtros.cursoId);
+    if (filtros.estado) params = params.set('estado', filtros.estado);
     return this.http.get<PageResponse<MatriculaAdministrativa>>(`${API_URL}/admin/matriculas`, { params });
   }
 

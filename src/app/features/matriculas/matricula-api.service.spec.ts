@@ -62,11 +62,12 @@ describe('MatriculaApiService', () => {
     solicitud.flush({ id: 7 });
   });
 
-  it('lista las matrículas administrativas filtrando por texto y estado con paginación del servidor', () => {
-    servicio.listarAdministrativas('  ana  ', 'ACTIVA', 1, 10).subscribe();
+  it('lista las matrículas administrativas filtrando por alumno, curso y estado con paginación del servidor', () => {
+    servicio.listarAdministrativas({ usuarioId: 5, cursoId: 200, estado: 'ACTIVA' }, 1, 10).subscribe();
 
     const solicitud = http.expectOne((r) => r.url === `${API_URL}/admin/matriculas`);
-    expect(solicitud.request.params.get('texto')).toBe('ana');
+    expect(solicitud.request.params.get('usuarioId')).toBe('5');
+    expect(solicitud.request.params.get('cursoId')).toBe('200');
     expect(solicitud.request.params.get('estado')).toBe('ACTIVA');
     expect(solicitud.request.params.get('page')).toBe('1');
     expect(solicitud.request.params.get('size')).toBe('10');

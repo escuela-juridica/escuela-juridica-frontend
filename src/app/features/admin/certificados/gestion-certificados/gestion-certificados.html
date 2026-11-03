@@ -5,22 +5,76 @@
   </header>
 
   <div class="gestion__filtros">
-    <input class="input" [ngModel]="texto" (ngModelChange)="texto = $event; alEscribir()" (keyup.enter)="buscar()" placeholder="Alumno, correo, curso o código" aria-label="Buscar" />
-    <select class="input" [(ngModel)]="estado" (ngModelChange)="buscar()" aria-label="Situación del certificado">
-      <option value="">Cualquier situación</option>
-      <option value="SIN_CERTIFICADO">Sin certificado</option>
-      <option value="VIGENTE">Vigente</option>
-      <option value="ANULADO">Anulado</option>
-    </select>
-    <div class="gestion__filtros-acciones">
-      <button type="button" class="btn gestion__btn-filtro gestion__btn-limpiar" (click)="limpiar()">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <line x1="18" y1="6" x2="6" y2="18" />
-          <line x1="6" y1="6" x2="18" y2="18" />
-        </svg>
-        Limpiar
-      </button>
+    <div class="gestion__campo">
+      <span class="gestion__etiqueta" id="filtro-alumno">Alumno</span>
+      <ng-select
+        [items]="filtroAlumno.opciones()"
+        bindLabel="etiqueta"
+        bindValue="id"
+        [(ngModel)]="alumnoId"
+        [typeahead]="filtroAlumno.busqueda$"
+        [loading]="filtroAlumno.buscando()"
+        placeholder="Todos los alumnos"
+        typeToSearchText="Escribe para buscar"
+        notFoundText="Ningún alumno coincide"
+        loadingText="Buscando…"
+        clearAllText="Quitar selección"
+        [clearable]="true"
+        ariaLabelledBy="filtro-alumno"
+      >
+        <ng-template ng-option-tmp let-item="item">
+          <span class="gestion__opcion"><strong>{{ item.etiqueta }}</strong></span>
+        </ng-template>
+      </ng-select>
     </div>
+    <div class="gestion__campo">
+      <span class="gestion__etiqueta" id="filtro-curso">Curso</span>
+      <ng-select
+        [items]="filtroCurso.opciones()"
+        bindLabel="etiqueta"
+        bindValue="id"
+        [(ngModel)]="cursoId"
+        [typeahead]="filtroCurso.busqueda$"
+        [loading]="filtroCurso.buscando()"
+        placeholder="Todos los cursos"
+        typeToSearchText="Escribe para buscar"
+        notFoundText="Ningún curso coincide"
+        loadingText="Buscando…"
+        clearAllText="Quitar selección"
+        [clearable]="true"
+        ariaLabelledBy="filtro-curso"
+      >
+        <ng-template ng-option-tmp let-item="item">
+          <span class="gestion__opcion"><strong>{{ item.etiqueta }}</strong></span>
+        </ng-template>
+      </ng-select>
+    </div>
+    <div class="gestion__campo">
+      <label class="gestion__etiqueta" for="filtro-situacion">Situación del certificado</label>
+      <select id="filtro-situacion" class="input" [(ngModel)]="estado">
+        <option value="">Cualquier situación</option>
+        <option value="SIN_CERTIFICADO">Sin certificado</option>
+        <option value="VIGENTE">Vigente</option>
+        <option value="ANULADO">Anulado</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="gestion__barra">
+    <button type="button" class="btn gestion__btn-filtro gestion__btn-limpiar" (click)="limpiar()">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <line x1="18" y1="6" x2="6" y2="18" />
+        <line x1="6" y1="6" x2="18" y2="18" />
+      </svg>
+      Limpiar
+    </button>
+    <button type="button" class="btn btn--acento gestion__btn-filtro" (click)="buscar()">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="7" />
+        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+      </svg>
+      Buscar
+    </button>
   </div>
 
   @if (cargando()) {
@@ -30,7 +84,7 @@
   } @else if (filas().length === 0) {
     <div class="estado-vacio">
       <h3 class="estado-vacio__titulo">No encontramos matrículas con esos filtros</h3>
-      <p class="estado-vacio__texto">Prueba con otro nombre, curso o situación.</p>
+      <p class="estado-vacio__texto">Prueba con otro alumno, curso o situación.</p>
     </div>
   } @else {
     <app-tabla-paginacion
@@ -46,7 +100,9 @@
           <tr>
             <th>Alumno y curso</th>
             <th class="gestion__col-matricula">Matrícula</th>
+            <th class="gestion__col-fecha">Fecha de matrícula</th>
             <th>Certificado</th>
+            <th class="gestion__col-avance">Avance</th>
             <th class="gestion__col-codigo">Código</th>
             <th>Acciones</th>
           </tr>
@@ -55,12 +111,14 @@
           @for (fila of filas(); track fila.matriculaId) {
             <tr>
               <td>
-                <strong>{{ fila.alumno }}</strong><small>{{ fila.correo }}</small><small>{{ fila.curso }}</small>
-                <small class="gestion__compacto">Matrícula {{ etiquetaMatricula(fila.estadoMatricula).toLowerCase() }}</small>
+                <strong>{{ fila.alumno }}</strong><small>{{ fila.curso }}</small>
+                <small class="gestion__compacto">Matrícula {{ etiquetaMatricula(fila.estadoMatricula).toLowerCase() }} · {{ fila.fechaMatricula | date:'dd/MM/yyyy' }}</small>
+                @if (fila.estadoMatricula !== 'CANCELADA') { <small class="gestion__compacto-avance">Avance {{ fila.avance }} %</small> }
               </td>
               <td class="gestion__col-matricula">
                 <span [class]="claseMatricula(fila.estadoMatricula)">{{ etiquetaMatricula(fila.estadoMatricula) }}</span>
               </td>
+              <td class="gestion__col-fecha">{{ fila.fechaMatricula | date:'dd/MM/yyyy' }}</td>
               <td>
                 @switch (fila.estadoCertificado) {
                   @case ('VIGENTE') {
@@ -89,15 +147,29 @@
                   <small class="gestion__compacto gestion__codigo">{{ fila.codigo }}</small>
                 }
               </td>
+              <td class="gestion__col-avance">
+                @if (fila.estadoMatricula === 'CANCELADA') {
+                  <span class="gestion__sin-avance">—</span>
+                  <small>Sin acceso al curso</small>
+                } @else {
+                  <div class="gestion__avance" [attr.aria-label]="'Avance ' + fila.avance + ' %'">
+                    <div class="gestion__avance-barra"><span [class.gestion__avance-relleno--ok]="fila.cumpleRequisitos" [style.width.%]="fila.avance"></span></div>
+                    <strong>{{ fila.avance }} %</strong>
+                  </div>
+                  @if (fila.estadoCertificado === 'SIN_CERTIFICADO') {
+                    <small [class.gestion__avance-ok]="fila.cumpleRequisitos">{{ notaAvance(fila) }}</small>
+                  }
+                }
+              </td>
               <td class="gestion__col-codigo gestion__codigo">{{ fila.codigo ?? '—' }}</td>
               <td>
-                @if (fila.puedeEmitirManual) {
-                  <a class="btn btn--primario gestion__btn-fila" [routerLink]="['/admin/certificados/manual', fila.matriculaId]">
+                @if (fila.certificadoId === null) {
+                  <a class="btn btn--secundario gestion__btn-fila" [routerLink]="['/admin/certificados/manual', fila.matriculaId]">
                     <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                      <circle cx="12" cy="8" r="6" />
-                      <path d="M15.5 13.5 17 22l-5-3-5 3 1.5-8.5" />
+                      <path d="M3 3v18h18" />
+                      <path d="m7 14 4-4 3 3 5-6" />
                     </svg>
-                    Emitir manualmente
+                    {{ textoVer(fila) }}
                   </a>
                 } @else if (fila.certificadoId !== null) {
                   <div class="gestion__acciones">
@@ -122,18 +194,10 @@
                         <circle cx="12" cy="12" r="10" />
                         <polyline points="12 6 12 12 16 14" />
                       </svg>
-                      Ver historial
+                      Ver situación
                     }
                   </a>
                   </div>
-                } @else {
-                  <a class="btn btn--secundario gestion__btn-fila" [routerLink]="['/admin/certificados/manual', fila.matriculaId]">
-                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                      <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z" />
-                      <circle cx="12" cy="12" r="3" />
-                    </svg>
-                    Ver situación
-                  </a>
                 }
               </td>
             </tr>

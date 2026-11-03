@@ -28,8 +28,13 @@
         <span class="alerta__icono">!</span>
         <div>
           <p class="alerta__titulo">Certificado anulado el {{ d.anuladoEn | date:'dd/MM/yyyy HH:mm' }}</p>
-          <p class="alerta__texto">La anulación es irreversible: no se puede corregir ni reactivar y su PDF ya no se descarga. La página pública solo informa que no es válido y la fecha; el motivo es privado.</p>
+          <p class="alerta__texto">Este código no se reactiva ni se corrige: su PDF ya no se descarga y la página pública solo informa que no es válido y la fecha; el motivo es privado.</p>
           <p class="alerta__texto"><strong>Motivo (privado):</strong> {{ d.motivoAnulacion }}</p>
+          <p class="alerta__texto">Si corresponde, puedes emitirle al alumno un certificado nuevo, con otro código; este quedará como historial.</p>
+          <a class="btn btn--secundario corr__btn corr__reemitir" [routerLink]="['/admin/certificados/manual', d.matriculaId]">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="6" /><path d="M15.5 13.5 17 22l-5-3-5 3 1.5-8.5" /></svg>
+            Emitir un certificado nuevo
+          </a>
         </div>
       </div>
     }
@@ -96,7 +101,7 @@
             <span class="corr__icono corr__icono--peligro" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" /><line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg></span>
             Anular certificado
           </h2>
-          <p class="corr__aviso">Retira el PDF y deja el código informando «Certificado anulado — no válido». No se puede deshacer ni reactivar.</p>
+          <p class="corr__aviso">Retira el PDF y deja el código informando «Certificado anulado — no válido». Ese código no se reactiva; si corresponde, luego puedes emitirle uno nuevo al alumno.</p>
         </div>
         <button type="button" class="btn btn--peligro corr__btn" (click)="abrirAnulacion()">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" /></svg>
@@ -267,11 +272,12 @@
           <div class="alerta alerta--error corr__advertencia" role="alert">
             <span class="alerta__icono">!</span>
             <div>
-              <p class="alerta__titulo">Esta acción es irreversible</p>
+              <p class="alerta__titulo">Esta acción no se puede deshacer</p>
               <ul class="corr__consecuencias">
                 <li>El PDF del certificado <strong>{{ d.codigo }}</strong> dejará de poder descargarse.</li>
                 <li>El código pasará a informar «Certificado anulado — no válido».</li>
-                <li>No se podrá corregir ni reactivar nunca más.</li>
+                <li>Este código no se podrá corregir ni reactivar.</li>
+                <li>Si corresponde, después podrás emitirle al alumno un certificado nuevo, con otro código.</li>
               </ul>
             </div>
           </div>
@@ -304,7 +310,7 @@
             <div class="alerta alerta--error" role="alert"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div>
           }
 
-          <p class="corr__confirmar">Vas a anular el certificado <strong>{{ d.codigo }}</strong>. Esta acción <strong>no se puede deshacer</strong>.</p>
+          <p class="corr__confirmar">Vas a anular el certificado <strong>{{ d.codigo }}</strong>. Ese código <strong>no se puede reactivar</strong>; si corresponde, podrás emitirle uno nuevo.</p>
 
           <div class="corr__confirmar-nombre">
             <label class="label" for="an-nombre">

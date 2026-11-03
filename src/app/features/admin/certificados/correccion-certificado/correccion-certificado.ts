@@ -3,7 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { resolverUrlApi } from '../../../../core/api/api.config';
 import { AlertaGlobalService } from '../../../../core/notificaciones/alerta-global.service';
@@ -25,7 +25,7 @@ interface Diferencia {
  */
 @Component({
   selector: 'app-correccion-certificado',
-  imports: [ReactiveFormsModule, DatePipe, DecimalPipe, Modal, CabeceraDetalle, EnlaceVolver],
+  imports: [ReactiveFormsModule, DatePipe, DecimalPipe, RouterLink, Modal, CabeceraDetalle, EnlaceVolver],
   templateUrl: './correccion-certificado.html',
   styleUrl: './correccion-certificado.scss',
 })
@@ -272,7 +272,7 @@ export class CorreccionCertificado {
     const v = this.formularioAnulacion.getRawValue();
     this.enviar(
       this.api.anular(this.certificadoId, { motivo: v.motivo.trim(), confirmo: true }),
-      'El certificado fue anulado. Su código sigue informando que no es válido.',
+      'El certificado fue anulado. Su código sigue informando que no es válido; si corresponde, ya puedes emitirle uno nuevo.',
     );
   }
 

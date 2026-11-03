@@ -36,44 +36,78 @@
     <app-excepciones-pago />
   } @else {
     <div class="matriculas__filtros">
-    <label class="matriculas__busqueda">
-      <span>Buscar matrícula</span>
-      <input
-        class="input"
-        type="search"
-        placeholder="Buscar por alumno, correo o curso..."
-        [ngModel]="texto()"
-        (ngModelChange)="cambiarTexto($event)"
-      />
-    </label>
+      <div class="matriculas__campo">
+        <span class="matriculas__etiqueta" id="filtro-alumno">Alumno</span>
+        <ng-select
+          [items]="filtroAlumno.opciones()"
+          bindLabel="etiqueta"
+          bindValue="id"
+          [(ngModel)]="filtroAlumnoId"
+          [typeahead]="filtroAlumno.busqueda$"
+          [loading]="filtroAlumno.buscando()"
+          placeholder="Todos los alumnos"
+          typeToSearchText="Escribe para buscar"
+          notFoundText="Ningún alumno coincide"
+          loadingText="Buscando…"
+          clearAllText="Quitar selección"
+          [clearable]="true"
+          ariaLabelledBy="filtro-alumno"
+        >
+          <ng-template ng-option-tmp let-item="item">
+            <span class="matriculas__opcion"><strong>{{ item.etiqueta }}</strong></span>
+          </ng-template>
+        </ng-select>
+      </div>
+      <div class="matriculas__campo">
+        <span class="matriculas__etiqueta" id="filtro-curso">Curso</span>
+        <ng-select
+          [items]="filtroCurso.opciones()"
+          bindLabel="etiqueta"
+          bindValue="id"
+          [(ngModel)]="filtroCursoId"
+          [typeahead]="filtroCurso.busqueda$"
+          [loading]="filtroCurso.buscando()"
+          placeholder="Todos los cursos"
+          typeToSearchText="Escribe para buscar"
+          notFoundText="Ningún curso coincide"
+          loadingText="Buscando…"
+          clearAllText="Quitar selección"
+          [clearable]="true"
+          ariaLabelledBy="filtro-curso"
+        >
+          <ng-template ng-option-tmp let-item="item">
+            <span class="matriculas__opcion"><strong>{{ item.etiqueta }}</strong></span>
+          </ng-template>
+        </ng-select>
+      </div>
+      <div class="matriculas__campo">
+        <label class="matriculas__etiqueta" for="filtro-estado">Estado</label>
+        <select id="filtro-estado" class="input" [(ngModel)]="filtroEstado">
+          <option value="">Todos los estados</option>
+          <option value="ACTIVA">Activa</option>
+          <option value="CANCELADA">Cancelada</option>
+          <option value="FINALIZADA">Finalizada</option>
+          <option value="VENCIDA">Vencida</option>
+        </select>
+      </div>
+    </div>
 
-    <label class="matriculas__estado-filtro">
-      <span>Estado</span>
-      <select
-        class="input"
-        [ngModel]="estado()"
-        (ngModelChange)="cambiarEstado($event)"
-      >
-        <option value="">Todos los estados</option>
-        <option value="ACTIVA">Activa</option>
-        <option value="CANCELADA">Cancelada</option>
-        <option value="FINALIZADA">Finalizada</option>
-        <option value="VENCIDA">Vencida</option>
-      </select>
-    </label>
-
-    <button
-      type="button"
-      class="btn matriculas__btn-limpiar"
-      (click)="limpiarFiltros()"
-    >
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <line x1="18" y1="6" x2="6" y2="18" />
-        <line x1="6" y1="6" x2="18" y2="18" />
-      </svg>
-      Limpiar
-    </button>
-  </div>
+    <div class="matriculas__barra-filtros">
+      <button type="button" class="btn matriculas__btn-filtro matriculas__btn-limpiar" (click)="limpiarFiltros()">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+        Limpiar
+      </button>
+      <button type="button" class="btn btn--acento matriculas__btn-filtro" (click)="buscar()">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        Buscar
+      </button>
+    </div>
 
   @if (cargando()) {
     <p class="matriculas__mensaje">Cargando matrículas...</p>

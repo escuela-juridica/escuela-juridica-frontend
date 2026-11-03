@@ -78,8 +78,10 @@
   }
 }
 
-// Panel de opciones.
-.ng-dropdown-panel {
+// Panel de opciones. Con `appendTo="body"` cuelga del <body>; sin él queda dentro de `.ng-select` y el tema de la
+// librería (más específico) lo pisaría, por eso se declaran los dos casos.
+.ng-dropdown-panel,
+.ng-select .ng-dropdown-panel {
   margin-top: 4px;
   border: 1px solid var(--neutral-200);
   border-radius: var(--radio-md);
@@ -93,6 +95,9 @@
     font-size: 15px;
     line-height: 22px;
     color: var(--neutral-800);
+    // Los nombres largos pasan a la línea siguiente en vez de cortarse con «…».
+    white-space: normal;
+    text-overflow: clip;
   }
 
   .ng-dropdown-panel-items .ng-option.ng-option-marked {

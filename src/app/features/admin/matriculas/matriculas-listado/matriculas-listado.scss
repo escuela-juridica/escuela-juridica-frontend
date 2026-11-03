@@ -67,45 +67,58 @@
 // ----------------------------------------------------------------- Filtros --
 
 .matriculas__filtros {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: end;
+  gap: 16px 20px;
+  margin: 24px 0 16px;
+}
+
+.matriculas__campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.matriculas__etiqueta {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--neutral-700);
+}
+
+// Las opciones del desplegable se muestran completas (el nombre no se corta contra el borde).
+.matriculas__opcion {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 3px 0;
+  white-space: normal;
+}
+
+.matriculas__opcion strong {
+  font-weight: 600;
+  color: var(--neutral-950);
+}
+
+.matriculas__barra-filtros {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-end;
-  gap: 12px;
-  margin: 24px 0;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 24px;
 }
 
-.matriculas__busqueda {
-  display: grid;
-  gap: 6px;
-  flex: 1;
-  min-width: 240px;
-  color: var(--neutral-600);
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.matriculas__estado-filtro {
-  display: grid;
-  gap: 6px;
-  color: var(--neutral-600);
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.matriculas__estado-filtro .input {
-  width: auto;
-}
-
-// Igual que en el centro de reportes (gris con X), con la misma altura que los campos de la fila
-// para que búsqueda, estado y botón queden alineados.
-.matriculas__btn-limpiar {
-  // La fila alinea al borde inferior de los campos (48 px): 5 px abajo centran el botón de 38 px.
-  margin-bottom: 5px;
+.matriculas__btn-filtro {
   height: 38px;
   padding: 0 16px;
   gap: 7px;
   font-size: 13px;
   line-height: 18px;
+}
+
+// «Limpiar» en gris con X, igual que en el centro de reportes.
+.matriculas__btn-limpiar {
   background: var(--neutral-600);
   color: var(--blanco);
 }
@@ -646,10 +659,13 @@
   }
 
   .matriculas__cabecera,
-  .matriculas__filtros,
   .formulario-matricula__dos {
     flex-direction: column;
     align-items: stretch;
     display: flex;
+  }
+
+  .matriculas__filtros {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

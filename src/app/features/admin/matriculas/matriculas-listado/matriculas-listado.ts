@@ -18,6 +18,7 @@ import { NgOptionTemplateDirective, NgSelectComponent } from '@ng-select/ng-sele
 import { SeguimientoAcademico } from '../seguimiento-academico/seguimiento-academico';
 import { ExcepcionesPago } from '../../excepciones-pago/excepciones-pago';
 import { TablaPaginacion } from '../../../../shared/ui/tabla-paginacion/tabla-paginacion';
+import { crearSelectorBusqueda } from '../../../../shared/util/selector-busqueda';
 
 // HU-020 (listado, filtros, detalle, cancelar) se retiró deliberadamente — ver
 // docs/epica-4/HU-020-MAPA-TECNICO-CONTROL-MATRICULAS.md en el backend para reconstruirla.
@@ -91,8 +92,21 @@ export class MatriculasListado {
   // Mismo patrón que examenes-tab.ts: se activa al intentar guardar, y recién ahí los campos
   // vacíos se marcan en rojo (.input--error) — no desde que se abre el formulario.
   protected readonly intentoRegistrar = signal(false);
-  protected readonly texto = signal('');
-  protected readonly estado = signal('');
+  // Filtros: se editan sin consultar y se aplican con «Buscar».
+  protected filtroAlumnoId: number | null = null;
+  protected filtroCursoId: number | null = null;
+  protected filtroEstado = '';
+  private aplicados = { usuarioId: null as number | null, cursoId: null as number | null, estado: '' };
+  protected readonly filtroAlumno = crearSelectorBusqueda(
+    this.destroyRef,
+    (texto) => this.consultarAlumnos(texto),
+    () => this.filtroAlumnoId,
+  );
+  protected readonly filtroCurso = crearSelectorBusqueda(
+    this.destroyRef,
+    (texto) => this.consultarTodosLosCursos(texto),
+    () => this.filtroCursoId,
+  );
   protected readonly filas = signal<MatriculaAdministrativa[]>([]);
   protected readonly cargando = signal(false);
   protected readonly error = signal('');
@@ -159,6 +173,14 @@ private consultarAlumnos(texto: string) {
   );
 }
 
+/** Todos los cursos, también los terminados: una matrícula antigua se sigue consultando. */
+private consultarTodosLosCursos(texto: string) {
+  return this.cursosApi.listar(texto, 0, TAMANO_BUSQUEDA).pipe(
+    map((r) => r.items.map((c: CursoResumenRespuesta): OpcionSelect => ({ id: c.id, etiqueta: c.titulo }))),
+    catchError(() => of([] as OpcionSelect[])),
+  );
+}
+
 private consultarCursos(texto: string) {
   return this.cursosApi.listar(texto, 0, TAMANO_BUSQUEDA).pipe(
     map((r) => r.items
@@ -181,8 +203,7 @@ protected cargar(): void {
   this.error.set('');
 
   this.api.listarAdministrativas(
-    this.texto(),
-    this.estado(),
+    this.aplicados,
     this.pagina(),
     this.tamanoPagina
   )
@@ -204,23 +225,18 @@ protected cargar(): void {
   });
 }
 
-protected cambiarTexto(valor: string): void {
-  this.texto.set(valor);
-  this.pagina.set(0);
-  this.cargar();
-}
-
-protected cambiarEstado(valor: string): void {
-  this.estado.set(valor);
+/** Aplica los filtros elegidos y vuelve a la primera página. */
+protected buscar(): void {
+  this.aplicados = { usuarioId: this.filtroAlumnoId, cursoId: this.filtroCursoId, estado: this.filtroEstado };
   this.pagina.set(0);
   this.cargar();
 }
 
 protected limpiarFiltros(): void {
-  this.texto.set('');
-  this.estado.set('');
-  this.pagina.set(0);
-  this.cargar();
+  this.filtroAlumnoId = null;
+  this.filtroCursoId = null;
+  this.filtroEstado = '';
+  this.buscar();
 }
 
 protected irAPagina(numero: number): void {
