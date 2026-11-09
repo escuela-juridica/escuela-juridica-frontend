@@ -43,7 +43,7 @@
       </p>
 
       @if (!modoGoogle) {
-        <app-boton-google-pendiente mensaje="El registro con Google todavía no está disponible." />
+        <app-boton-google texto="signup_with" (credencial)="continuarConGoogle($event)" />
         <div class="divisor-con-texto registro-divisor">
           <span class="divisor-con-texto__linea"></span>o completa el formulario<span
             class="divisor-con-texto__linea"

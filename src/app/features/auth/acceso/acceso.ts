@@ -4,9 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
-import { BotonGooglePendiente } from '../../../shared/ui/boton-google-pendiente/boton-google-pendiente';
+import { BotonGoogle } from '../../../shared/ui/boton-google/boton-google';
 import { Session } from '../../../core/session/session';
 import { AccesoApiService } from './acceso-api.service';
+import { correoDeCredencialGoogle } from './google-credencial.util';
 
 interface ErrorApiAcceso {
   code?: string;
@@ -15,7 +16,7 @@ interface ErrorApiAcceso {
 
 @Component({
   selector: 'app-acceso',
-  imports: [FormsModule, RouterLink, BotonGooglePendiente],
+  imports: [FormsModule, RouterLink, BotonGoogle],
   templateUrl: './acceso.html',
   styleUrl: './acceso.scss',
 })
@@ -62,6 +63,40 @@ export class Acceso {
       });
   }
 
+  accederConGoogle(credencial: string): void {
+    if (this.cargando) {
+      return;
+    }
+
+    this.cargando = true;
+    this.mensajeError = '';
+
+    this.accesoApi
+      .accederConGoogle(credencial)
+      .pipe(
+        finalize(() => {
+          this.cargando = false;
+          this.detector.markForCheck();
+        }),
+      )
+      .subscribe({
+        next: (respuesta) => {
+          if (respuesta.estado === 'REGISTRO' && respuesta.referenciaRegistro) {
+            void this.router.navigate(['/registro'], {
+              queryParams: { referenciaGoogle: respuesta.referenciaRegistro },
+            });
+            return;
+          }
+          if (respuesta.sesion) {
+            this.session.iniciarSesion(respuesta.sesion);
+            this.navegarSegunRol(respuesta.sesion.rolPrincipal);
+          }
+        },
+        error: (error: HttpErrorResponse) =>
+          this.manejarErrorGoogle(error, correoDeCredencialGoogle(credencial)),
+      });
+  }
+
   togglePassword(): void {
     this.mostrarPassword = !this.mostrarPassword;
   }
@@ -77,6 +112,16 @@ export class Acceso {
       return;
     }
     this.mensajeError = cuerpo?.message?.trim() || 'El correo o la contraseña no son correctos.';
+  }
+
+  private manejarErrorGoogle(error: HttpErrorResponse, correo: string): void {
+    const cuerpo = this.obtenerErrorApi(error);
+    if (cuerpo?.code === 'PENDING_EMAIL_VERIFICATION') {
+      void this.router.navigate(['/verificar-correo'], { state: { correo } });
+      return;
+    }
+    this.mensajeError =
+      cuerpo?.message?.trim() || 'No pudimos iniciar sesión con Google. Inténtalo nuevamente.';
   }
 
   private obtenerErrorApi(error: HttpErrorResponse): ErrorApiAcceso | null {

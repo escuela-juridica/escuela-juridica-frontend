@@ -78,7 +78,7 @@ El componente más complejo es `CursoEditor` (~1360 líneas): `FormGroup` reacti
 ## Funcionalidades principales
 
 - **Catálogo público** — listado filtrable con carrusel, ficha de curso por URL amigable con panel de precio/matrícula.
-- **Autenticación** — acceso, registro (formulario + flujo Google, con desafío anti-robot), verificación de correo, recuperación de contraseña.
+- **Autenticación** — acceso, registro (formulario o Google, con desafío anti-robot), verificación de correo, recuperación de contraseña. El botón "Continuar con Google" usa Google Identity Services (`BotonGoogle`, `GoogleIdentityService`) con el ID de cliente de `environment.googleClientId`; los orígenes de la app deben estar autorizados en Google Cloud.
 - **Cuenta del alumno** — panel con cursos activos y progreso, edición de perfil y seguridad.
 - **Admin / Usuarios** — listado paginado; crear y editar en modales.
 - **Admin / Información base** — catálogos maestros para crear/editar cursos.
@@ -143,7 +143,7 @@ flowchart LR
 | Archivo | Qué hace |
 |---|---|
 | `.github/workflows/deploy-frontend.yml` | Se dispara con push a `main` y manualmente (`workflow_dispatch`). Pasos: `checkout`, Node 20 con caché de npm, `npm ci`, `npx ng build --configuration production`, configurar SSH (guarda la llave en `~/.ssh/id_deploy` y registra el servidor con `ssh-keyscan`) y subir con `rsync`. |
-| `src/.htaccess` | Regla de Apache para la SPA: cualquier ruta que no sea un archivo o carpeta real se sirve con `index.html`. Sin ella, recargar `/app/panel` daría 404. |
+| `src/.htaccess` | Regla de Apache para la SPA: cualquier ruta que no sea un archivo o carpeta real se sirve con `index.html`. Sin ella, recargar `/app/panel` daría 404. Además fija la cabecera `Cross-Origin-Opener-Policy: same-origin-allow-popups`, necesaria para el popup de Google. |
 | `angular.json` | Incluye `src/.htaccess` en los `assets`, de modo que se copia a la raíz del build. |
 | `src/environments/environment.prod.ts` | En producción, `ng build` lo usa en lugar de `environment.ts` y apunta la API a `https://api.aulavirtual.escuelajuridica.edu.pe/api`. |
 

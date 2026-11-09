@@ -17,7 +17,7 @@
           </div>
         }
 
-        <app-boton-google-pendiente mensaje="El acceso con Google todavía no está disponible." />
+        <app-boton-google texto="signin_with" (credencial)="accederConGoogle($event)" />
 
         @if (mensajeError) {
           <div class="alerta alerta--error">

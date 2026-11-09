@@ -13,8 +13,10 @@ import { finalize } from 'rxjs';
 import { RegistroApiService } from './registro-api.service';
 import { AntiRobot } from './anti-robot';
 import { WHATSAPP_REGISTRO, enlaceAyudaRegistro } from './registro-contacto';
-import { BotonGooglePendiente } from '../../../shared/ui/boton-google-pendiente/boton-google-pendiente';
+import { BotonGoogle } from '../../../shared/ui/boton-google/boton-google';
 import { Session } from '../../../core/session/session';
+import { AccesoApiService } from '../acceso/acceso-api.service';
+import { correoDeCredencialGoogle } from '../acceso/google-credencial.util';
 import {
   ApiErrorRespuesta,
   ContextoRegistroGoogle,
@@ -45,7 +47,7 @@ const PATRON_NOMBRE_OPCIONAL = /^([A-ZÁÉÍÓÚÑÜ][A-ZÁÉÍÓÚÑÜ '-]*)?$/
 
 @Component({
   selector: 'app-registro',
-  imports: [RouterLink, ReactiveFormsModule, AntiRobot, BotonGooglePendiente],
+  imports: [RouterLink, ReactiveFormsModule, AntiRobot, BotonGoogle],
   templateUrl: './registro.html',
   styleUrl: './registro.scss',
 })
@@ -56,6 +58,7 @@ export class Registro implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly registroApi = inject(RegistroApiService);
+  private readonly accesoApi = inject(AccesoApiService);
   private readonly sesion = inject(Session);
   private readonly detector = inject(ChangeDetectorRef);
   private readonly erroresServidor: Partial<Record<NombreCampoRegistro, string>> = {};
@@ -67,6 +70,7 @@ export class Registro implements OnInit {
   mostrarConfirmacion = false;
   modoGoogle = false;
   cargandoContextoGoogle = false;
+  validandoGoogle = false;
   contextoGoogleValido = false;
   referenciaGoogle: string | null = null;
 
@@ -193,6 +197,40 @@ export class Registro implements OnInit {
     this.detector.markForCheck();
   }
 
+  continuarConGoogle(credencial: string): void {
+    if (this.validandoGoogle || this.enviando || this.cargandoContextoGoogle || this.cuentaCreada) {
+      return;
+    }
+
+    this.validandoGoogle = true;
+    this.errorGeneral = '';
+
+    this.accesoApi
+      .accederConGoogle(credencial)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => {
+          this.validandoGoogle = false;
+          this.detector.markForCheck();
+        }),
+      )
+      .subscribe({
+        next: (respuesta) => {
+          if (respuesta.estado === 'REGISTRO' && respuesta.referenciaRegistro) {
+            this.cargarContextoGoogle(respuesta.referenciaRegistro);
+            return;
+          }
+          if (respuesta.sesion) {
+            this.sesion.iniciarSesion(respuesta.sesion);
+            void this.router.navigate([
+              respuesta.sesion.rolPrincipal === 'ADMINISTRADOR' ? '/admin/dashboard' : '/app/panel',
+            ]);
+          }
+        },
+        error: (error: HttpErrorResponse) => this.manejarErrorAccesoGoogle(error, credencial),
+      });
+  }
+
   reiniciarGoogle(): void {
     this.modoGoogle = false;
     this.contextoGoogleValido = false;
@@ -252,13 +290,15 @@ export class Registro implements OnInit {
   }
 
   private aplicarContextoGoogle(contexto: ContextoRegistroGoogle): void {
-    const apellidoPrincipal = contexto.apellidoPaterno?.trim() || contexto.apellidos?.trim() || '';
+    const mayusculas = (valor?: string | null): string =>
+      (valor ?? '').trim().replace(/\s+/g, ' ').toLocaleUpperCase('es-PE');
+    const apellidoPrincipal = mayusculas(contexto.apellidoPaterno) || mayusculas(contexto.apellidos);
 
     this.formulario.patchValue(
       {
-        nombres: contexto.nombres?.trim() ?? '',
+        nombres: mayusculas(contexto.nombres),
         apellidoPaterno: apellidoPrincipal,
-        apellidoMaterno: contexto.apellidoMaterno?.trim() ?? '',
+        apellidoMaterno: mayusculas(contexto.apellidoMaterno),
         correo: contexto.correo,
       },
       { emitEvent: false },
@@ -384,6 +424,18 @@ export class Registro implements OnInit {
     }
 
     this.errorGeneral = respuesta?.message ?? 'No pudimos crear tu cuenta. Inténtalo nuevamente.';
+  }
+
+  private manejarErrorAccesoGoogle(error: HttpErrorResponse, credencial: string): void {
+    const respuesta = this.obtenerErrorApi(error);
+    if (respuesta?.code === 'PENDING_EMAIL_VERIFICATION') {
+      void this.router.navigate(['/verificar-correo'], {
+        state: { correo: correoDeCredencialGoogle(credencial) },
+      });
+      return;
+    }
+    this.errorGeneral =
+      respuesta?.message ?? 'No pudimos iniciar sesión con Google. Inténtalo nuevamente.';
   }
 
   private manejarErrorContextoGoogle(error: HttpErrorResponse): void {
