@@ -117,6 +117,8 @@
             · {{ examen.tiempoLimiteMinutos ? examen.tiempoLimiteMinutos + ' min' : 'Sin límite de tiempo' }}
             · Respuestas: {{ etiquetaMostrarRespuestas(examen.mostrarRespuestas) }}
             · Revisión de abiertas: {{ examen.diasRevision }} día(s)
+            · {{ examen.modoNavegacion === 'SECUENCIAL' ? 'Una por una, sin volver atrás' : 'Todas las preguntas a la vez' }}
+            · {{ examen.permiteOmitirPreguntas ? 'Se pueden dejar preguntas sin responder' : 'Responder todas es obligatorio' }}
           </p>
 
           @if (examen.preguntas.length === 0) {
@@ -307,6 +309,37 @@
             }
             <option value="NUNCA">Nunca</option>
           </select>
+        </div>
+      </div>
+
+      <div class="editor-campos editor-campos--2">
+        <div>
+          <label class="label">Cómo se rinde el examen</label>
+          <select class="input" [value]="examenModoNavegacion()" (change)="examenModoNavegacion.set($any($event.target).value)">
+            <option value="LIBRE">Todas las preguntas a la vez</option>
+            <option value="SECUENCIAL">Una por una, sin volver atrás</option>
+          </select>
+          <p class="editor-material-info examenes-tab__ayuda-campo">
+            @if (examenModoNavegacion() === 'SECUENCIAL') {
+              El alumno ve una pregunta a la vez y usa «Siguiente». «Revisar y enviar» aparece en la última pregunta.
+            } @else {
+              El alumno ve todas las preguntas juntas y las responde en cualquier orden. «Revisar y enviar» aparece al final.
+            }
+          </p>
+        </div>
+        <div class="editor-subform__switches">
+          <label class="interruptor">
+            <input type="checkbox" class="interruptor__entrada" [checked]="examenPermiteOmitir()" (change)="examenPermiteOmitir.set($any($event.target).checked)" />
+            <span class="interruptor__pista"><span class="interruptor__perilla"></span></span>
+            <span class="interruptor__texto">Permitir dejar preguntas sin responder</span>
+          </label>
+          <p class="editor-material-info examenes-tab__ayuda-campo">
+            @if (examenPermiteOmitir()) {
+              El alumno puede enviar aunque deje preguntas en blanco (valen cero).
+            } @else {
+              El alumno debe responder todas las preguntas para avanzar o enviar. Es lo recomendado.
+            }
+          </p>
         </div>
       </div>
 

@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 
 import { adminGuard } from './core/session/admin-guard';
+import { salidaDeExamenGuard } from './features/examen/salida-examen.guard';
 import { sessionGuard } from './core/session/session-guard';
 
 export const routes: Routes = [
@@ -144,6 +145,10 @@ export const routes: Routes = [
               import('./features/aula/aula-resumen/aula-resumen').then((m) => m.AulaResumen),
           },
           {
+            path: 'modulos/:moduloId',
+            loadComponent: () => import('./features/aula/aula-modulo/aula-modulo').then((m) => m.AulaModulo),
+          },
+          {
             path: 'lecciones/:leccionId',
             loadComponent: () =>
               import('./features/leccion/leccion-reproductor').then((m) => m.LeccionReproductor),
@@ -151,6 +156,7 @@ export const routes: Routes = [
           {
             path: 'examenes/:examenId',
             loadComponent: () => import('./features/examen/examen-pantalla').then((m) => m.ExamenPantalla),
+            canDeactivate: [salidaDeExamenGuard],
           },
         ],
       },

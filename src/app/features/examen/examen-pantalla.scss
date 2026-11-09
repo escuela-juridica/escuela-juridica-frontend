@@ -592,3 +592,71 @@
     line-height: 52px;
   }
 }
+
+.examen__progreso {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.examen__progreso-texto {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--neutral-950);
+}
+
+.examen__progreso-pista {
+  height: 10px;
+  border-radius: var(--radio-completo);
+  background: var(--neutral-200);
+  overflow: hidden;
+}
+
+.examen__progreso-relleno {
+  height: 100%;
+  border-radius: var(--radio-completo);
+  background: var(--acento-500);
+  transition: width 250ms ease;
+}
+
+.examen__progreso-aviso {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--neutral-600);
+}
+
+.examen__pie-ayuda {
+  flex: 1 1 100%;
+  margin: 0;
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 600;
+  color: var(--neutral-600);
+}
+
+.examen__pie-ayuda--error {
+  color: var(--error);
+}
+
+.examen__pregunta {
+  scroll-margin-top: 104px;
+}
+
+.examen__pregunta--faltante {
+  border-color: var(--error);
+  box-shadow: 0 0 0 2px var(--error-borde);
+}
+
+.examen__faltante {
+  margin: 12px 0 0;
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 700;
+  color: var(--error);
+}

@@ -1,16 +1,14 @@
-import { NgTemplateOutlet } from '@angular/common';
-import { Component, HostListener, effect, inject, signal, untracked } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
 import { distinctUntilChanged, filter, map, startWith } from 'rxjs';
 
-import { formatearDuracion } from '../../cursos/curso-formato.util';
 import { AulaSesionService } from '../aula-sesion.service';
-import { ExamenAulaRespuesta, LeccionAulaRespuesta, ModuloAulaRespuesta } from '../aula.model';
+import { ModuloAulaRespuesta } from '../aula.model';
 
 @Component({
   selector: 'app-aula-shell',
-  imports: [RouterOutlet, RouterLink, NgTemplateOutlet],
+  imports: [RouterOutlet, RouterLink],
   providers: [AulaSesionService],
   templateUrl: './aula-shell.html',
   styleUrl: './aula-shell.scss',
@@ -20,9 +18,27 @@ export class AulaShell {
   private readonly ruta = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
-  protected readonly panelAbierto = signal(false);
-  protected readonly modulosAbiertos = signal<ReadonlySet<number>>(new Set());
   protected readonly examenActualId = signal<number | null>(null);
+  private readonly moduloRutaId = signal<number | null>(null);
+
+  protected readonly esInicio = signal(true);
+
+  protected readonly enRutaModulo = computed(() => this.moduloRutaId() !== null);
+
+  protected readonly moduloActual = computed(() => {
+    const id = this.moduloActualId();
+    return id === null ? null : (this.estado.aula()?.modulos.find((modulo) => modulo.id === id) ?? null);
+  });
+
+  protected readonly moduloActualId = computed(() => {
+    const deLaRuta = this.moduloRutaId();
+    if (deLaRuta !== null) return deLaRuta;
+    const deLaLeccion = this.estado.leccionActual()?.modulo.id;
+    if (deLaLeccion !== undefined) return deLaLeccion;
+    const examenId = this.examenActualId();
+    if (examenId === null) return null;
+    return this.estado.aula()?.modulos.find((modulo) => modulo.examenes.some((examen) => examen.id === examenId))?.id ?? null;
+  });
 
   constructor() {
     this.ruta.paramMap
@@ -37,59 +53,20 @@ export class AulaShell {
       .pipe(
         filter((e) => e instanceof NavigationEnd),
         startWith(null),
-        map(() => /\/examenes\/(\d+)/.exec(this.router.url)),
-        map((m) => (m ? Number(m[1]) : null)),
+        map(() => this.router.url),
         takeUntilDestroyed(),
       )
-      .subscribe((id) => this.examenActualId.set(id));
-
-    effect(() => {
-      const aula = this.estado.aula();
-      if (!aula) return;
-      const referencia = this.estado.leccionActual() ?? this.estado.leccionParaContinuar();
-      const idModulo = referencia?.modulo.id ?? aula.modulos[0]?.id;
-      if (idModulo == null) return;
-      untracked(() => this.modulosAbiertos.update((abiertos) => new Set(abiertos).add(idModulo)));
-    });
+      .subscribe((url) => {
+        const examen = /\/examenes\/(\d+)/.exec(url);
+        const modulo = /\/modulos\/(\d+)/.exec(url);
+        this.esInicio.set(/^\/aula\/\d+\/?(?:[?#].*)?$/.test(url));
+        this.examenActualId.set(examen ? Number(examen[1]) : null);
+        this.moduloRutaId.set(modulo ? Number(modulo[1]) : null);
+      });
   }
 
-  @HostListener('document:keydown.escape')
-  protected cerrarConEscape(): void {
-    this.panelAbierto.set(false);
-  }
-
-  protected alternarModulo(id: number): void {
-    this.modulosAbiertos.update((abiertos) => {
-      const copia = new Set(abiertos);
-      if (!copia.delete(id)) copia.add(id);
-      return copia;
-    });
-  }
-
-  protected completadasDelModulo(modulo: ModuloAulaRespuesta): number {
-    return modulo.lecciones.filter((leccion) => leccion.estado === 'COMPLETADA').length;
-  }
-
-  protected detalle(leccion: LeccionAulaRespuesta): string {
-    const tipo = leccion.tipo === 'EN_VIVO' ? 'En vivo' : 'Lección';
-    return leccion.duracionSegundos ? `${tipo} · ${formatearDuracion(leccion.duracionSegundos)}` : tipo;
-  }
-
-  protected detalleExamen(examen: ExamenAulaRespuesta): string {
-    const nota = examen.mejorNota !== null ? ` · nota ${examen.mejorNota}` : '';
-    switch (examen.estado) {
-      case 'APROBADO': return `Aprobado${nota}`;
-      case 'EN_CURSO': return 'Intento en curso · continúalo';
-      case 'EN_REVISION': return 'En revisión · esperando calificación';
-      case 'NO_APROBADO': {
-        const quedan = examen.intentosMaximos === null ? '' : examen.intentosUsados >= examen.intentosMaximos ? ' · sin intentos' : '';
-        return `No aprobado${nota}${quedan}`;
-      }
-      default:
-        if (!examen.habilitado) return examen.motivoNoHabilitado ?? 'Aún no habilitado';
-        if (examen.tipo === 'PRACTICA') return 'Práctica · no bloquea el avance';
-        return examen.bloqueaSiguienteModulo ? 'Pendiente · libera el siguiente módulo' : 'Examen pendiente';
-    }
+  protected numeroDe(modulo: ModuloAulaRespuesta): number {
+    return (this.estado.aula()?.modulos.findIndex((candidato) => candidato.id === modulo.id) ?? 0) + 1;
   }
 
   protected etiquetaModalidad(modalidad: string): string {

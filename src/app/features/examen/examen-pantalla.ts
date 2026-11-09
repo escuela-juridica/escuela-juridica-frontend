@@ -1,10 +1,11 @@
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, NgTemplateOutlet } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, HostListener, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Observable, distinctUntilChanged, forkJoin, map, of } from 'rxjs';
 
+import { ConfirmacionService } from '../../core/dialogo/confirmacion.service';
 import { AlertaGlobalService } from '../../core/notificaciones/alerta-global.service';
 import { AnilloProgreso } from '../../shared/ui/anillo-progreso/anillo-progreso';
 import { Modal } from '../../shared/ui/modal/modal';
@@ -24,7 +25,7 @@ const ESPERA_GUARDADO_TEXTO_MS = 700;
 
 @Component({
   selector: 'app-examen-pantalla',
-  imports: [RouterLink, DecimalPipe, Modal, AnilloProgreso, ExamenFichaCabecera, ExamenNavegador],
+  imports: [RouterLink, DecimalPipe, NgTemplateOutlet, Modal, AnilloProgreso, ExamenFichaCabecera, ExamenNavegador],
   templateUrl: './examen-pantalla.html',
   styleUrl: './examen-pantalla.scss',
 })
@@ -32,6 +33,7 @@ export class ExamenPantalla {
   private readonly ruta = inject(ActivatedRoute);
   private readonly api = inject(ExamenApiService);
   private readonly alertas = inject(AlertaGlobalService);
+  private readonly confirmacion = inject(ConfirmacionService);
   private readonly destroyRef = inject(DestroyRef);
   protected readonly aula = inject(AulaSesionService);
 
@@ -51,6 +53,7 @@ export class ExamenPantalla {
   protected readonly guardado = signal<EstadoGuardado>('idle');
   protected readonly segundos = signal<number | null>(null);
   protected readonly marcadas = signal<ReadonlySet<number>>(new Set());
+  protected readonly mostrarFaltantes = signal(false);
   private readonly local = signal<ReadonlyMap<number, RespuestaLocal>>(new Map());
 
   private examenId: number | null = null;
@@ -65,6 +68,15 @@ export class ExamenPantalla {
     const intento = this.intento();
     if (intento) return intento.estado === 'EN_PROGRESO' ? 'rindiendo' : 'resultado';
     return 'ficha';
+  });
+
+  protected readonly esSecuencial = computed(() => this.intento()?.modoNavegacion === 'SECUENCIAL');
+
+  protected readonly permiteOmitir = computed(() => this.intento()?.permiteOmitirPreguntas ?? false);
+
+  protected readonly puedeAvanzar = computed(() => {
+    const pregunta = this.preguntaActual();
+    return this.permiteOmitir() || (pregunta !== null && this.estaRespondida(pregunta));
   });
 
   protected readonly preguntaActual = computed<PreguntaIntento | null>(
@@ -131,6 +143,7 @@ export class ExamenPantalla {
     this.guardado.set('idle');
     this.indice.set(0);
     this.sucias.clear();
+    this.mostrarFaltantes.set(false);
     window.scrollTo({ top: 0 });
   }
 
@@ -202,7 +215,8 @@ export class ExamenPantalla {
     }
     this.local.set(mapa);
     this.marcadas.set(this.leerMarcas(intento.id));
-    this.indice.set(0);
+    this.indice.set(this.indiceInicial(intento));
+    this.mostrarFaltantes.set(false);
     this.guardado.set('idle');
     this.sucias.clear();
     this.intento.set(intento);
@@ -211,9 +225,58 @@ export class ExamenPantalla {
   }
 
   protected irA(i: number): void {
-    const total = this.intento()?.preguntas.length ?? 0;
-    if (i < 0 || i >= total) return;
+    const intento = this.intento();
+    if (!intento || intento.modoNavegacion === 'SECUENCIAL') return;
+    if (i < 0 || i >= intento.preguntas.length) return;
     this.indice.set(i);
+    const id = intento.preguntas[i].id;
+    setTimeout(() => document.getElementById(`pregunta-card-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+  }
+
+  protected siguiente(): void {
+    const intento = this.intento();
+    if (!intento || !this.puedeAvanzar()) return;
+    const proximo = Math.min(this.indice() + 1, intento.preguntas.length - 1);
+    this.indice.set(proximo);
+    this.guardarIndice(intento.id, proximo);
+    window.scrollTo({ top: 0 });
+  }
+
+  protected revisarYEnviar(): void {
+    const intento = this.intento();
+    if (!intento) return;
+    const faltantes = this.sinResponder();
+    if (!this.permiteOmitir() && faltantes.length > 0) {
+      this.mostrarFaltantes.set(true);
+      if (intento.modoNavegacion !== 'SECUENCIAL') this.irA(faltantes[0].posicion - 1);
+      return;
+    }
+    this.abrirConfirmacion();
+  }
+
+  protected esFaltante(p: PreguntaIntento): boolean {
+    return this.mostrarFaltantes() && !this.estaRespondida(p);
+  }
+
+  confirmarSalida(): boolean | Promise<boolean> {
+    if (this.vista() !== 'rindiendo' || this.enviando()) return true;
+    const conTiempo = this.segundos() !== null;
+    return this.confirmacion.preguntar({
+      titulo: '¿Salir del examen?',
+      mensaje: conTiempo
+        ? 'Si sales, el tiempo seguirá corriendo y el examen se enviará solo cuando llegue a cero. Tus respuestas ya están guardadas.'
+        : 'Si sales, tu intento seguirá abierto con las respuestas que ya guardaste. Podrás continuarlo cuando quieras.',
+      textoConfirmar: 'Salir del examen',
+      textoCancelar: 'Seguir en el examen',
+      variante: 'peligro',
+    });
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  protected avisarAntesDeCerrar(evento: BeforeUnloadEvent): void {
+    if (this.vista() !== 'rindiendo' || this.enviando()) return;
+    evento.preventDefault();
+    evento.returnValue = '';
   }
 
   protected abrirConfirmacion(): void {
@@ -261,6 +324,10 @@ export class ExamenPantalla {
     this.sucias.clear();
     this.intento.set(resultado);
     this.borrarMarcas(resultado.id);
+    try {
+      localStorage.removeItem(`esejur.examen.indice.${resultado.id}`);
+    } catch {
+    }
     this.aula.refrescar();
     window.scrollTo({ top: 0 });
   }
@@ -438,6 +505,31 @@ export class ExamenPantalla {
   private mensaje(e: HttpErrorResponse): string | null {
     const cuerpo = typeof e.error === 'object' && e.error !== null ? (e.error as { message?: string }) : null;
     return cuerpo?.message ?? null;
+  }
+
+  private indiceInicial(intento: Intento): number {
+    if (intento.modoNavegacion !== 'SECUENCIAL') return 0;
+    const total = intento.preguntas.length;
+    const primeraSinResponder = intento.preguntas.findIndex((p) => !p.respondida);
+    const base = primeraSinResponder === -1 ? total - 1 : primeraSinResponder;
+    return Math.min(total - 1, Math.max(this.leerIndice(intento.id), base));
+  }
+
+  private leerIndice(intentoId: number): number {
+    try {
+      const crudo = localStorage.getItem(`esejur.examen.indice.${intentoId}`);
+      const valor = crudo === null ? 0 : Number(crudo);
+      return Number.isFinite(valor) && valor >= 0 ? valor : 0;
+    } catch {
+      return 0;
+    }
+  }
+
+  private guardarIndice(intentoId: number, indice: number): void {
+    try {
+      localStorage.setItem(`esejur.examen.indice.${intentoId}`, String(indice));
+    } catch {
+    }
   }
 
   private leerMarcas(intentoId: number): Set<number> {

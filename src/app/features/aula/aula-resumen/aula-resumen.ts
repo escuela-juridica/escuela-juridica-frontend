@@ -7,6 +7,7 @@ import { AnilloProgreso } from '../../../shared/ui/anillo-progreso/anillo-progre
 import { formatearFechaHora, urlPortadaCurso } from '../../cursos/curso-formato.util';
 import { SesionAlumnoApiService } from '../../sesiones/sesion-alumno-api.service';
 import { CertificacionBloque } from '../../certificacion/certificacion-bloque/certificacion-bloque';
+import { AulaModulosLista } from '../aula-modulos-lista/aula-modulos-lista';
 import { AvanceCertificadoBloque } from '../avance-certificado/avance-certificado';
 import { AulaSesionService, LeccionDelCurso } from '../aula-sesion.service';
 import { ExamenAulaRespuesta } from '../aula.model';
@@ -20,7 +21,7 @@ export type PestanaResumen = 'resumen' | 'evaluaciones' | 'certificado';
 
 @Component({
   selector: 'app-aula-resumen',
-  imports: [RouterLink, AvanceCertificadoBloque, CertificacionBloque, AnilloProgreso],
+  imports: [RouterLink, AulaModulosLista, AvanceCertificadoBloque, CertificacionBloque, AnilloProgreso],
   templateUrl: './aula-resumen.html',
   styleUrl: './aula-resumen.scss',
 })

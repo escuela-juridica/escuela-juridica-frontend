@@ -2,8 +2,10 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { EMPTY, Observable, tap } from 'rxjs';
 
+import { AlertaGlobalService } from '../../core/notificaciones/alerta-global.service';
 import { AulaApiService } from './aula-api.service';
 import { AulaRespuesta, LeccionAulaRespuesta, ModuloAulaRespuesta } from './aula.model';
+import { estadoModulo } from './aula-ruta.util';
 
 export interface LeccionDelCurso {
   leccion: LeccionAulaRespuesta;
@@ -15,6 +17,7 @@ export interface LeccionDelCurso {
 @Injectable()
 export class AulaSesionService {
   private readonly api = inject(AulaApiService);
+  private readonly alertas = inject(AlertaGlobalService);
 
   readonly cursoId = signal<number | null>(null);
   readonly aula = signal<AulaRespuesta | null>(null);
@@ -80,6 +83,21 @@ export class AulaSesionService {
   refrescar$(): Observable<AulaRespuesta> {
     const cursoId = this.cursoId();
     if (cursoId == null) return EMPTY;
-    return this.api.temario(cursoId).pipe(tap((respuesta) => this.aula.set(respuesta)));
+    return this.api.temario(cursoId).pipe(
+      tap((respuesta) => {
+        this.avisarModulosFinalizados(this.aula(), respuesta);
+        this.aula.set(respuesta);
+      }),
+    );
+  }
+
+  private avisarModulosFinalizados(antes: AulaRespuesta | null, despues: AulaRespuesta): void {
+    if (!antes) return;
+    const yaCompletos = new Set(antes.modulos.filter((modulo) => estadoModulo(modulo) === 'COMPLETADO').map((modulo) => modulo.id));
+    despues.modulos.forEach((modulo, indice) => {
+      if (estadoModulo(modulo) === 'COMPLETADO' && !yaCompletos.has(modulo.id)) {
+        this.alertas.mostrar('exito', `Has finalizado el módulo ${indice + 1}: ${modulo.titulo}.`);
+      }
+    });
   }
 }

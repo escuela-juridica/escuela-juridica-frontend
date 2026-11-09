@@ -81,6 +81,11 @@
 
     @switch (pestana()) {
       @case ('resumen') {
+        <section class="card resumen__bloque" aria-labelledby="resumen-modulos">
+          <h2 id="resumen-modulos" class="resumen__subtitulo">Módulos del curso</h2>
+          <app-aula-modulos-lista [aula]="aula" />
+        </section>
+
         <div class="resumen__rejilla">
           <section class="card resumen__bloque" aria-labelledby="resumen-avance">
             <h2 id="resumen-avance" class="resumen__subtitulo">Tu avance hacia el certificado</h2>

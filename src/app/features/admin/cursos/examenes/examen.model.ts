@@ -1,6 +1,7 @@
 export type TipoExamen = 'CALIFICADO' | 'PRACTICA';
 export type FinalidadExamen = 'MODULO' | 'FINAL';
 export type MostrarRespuestas = 'AL_APROBAR' | 'AL_AGOTAR' | 'NUNCA';
+export type ModoNavegacionExamen = 'LIBRE' | 'SECUENCIAL';
 export type TipoPregunta = 'SELECCION_UNICA' | 'SELECCION_MULTIPLE' | 'VERDADERO_FALSO' | 'RESPUESTA_ABIERTA';
 
 export interface OpcionRespuesta {
@@ -40,6 +41,8 @@ export interface ExamenRespuesta {
   diasRevision: number;
   activo: boolean;
   examenOrigenId: number | null;
+  modoNavegacion: ModoNavegacionExamen;
+  permiteOmitirPreguntas: boolean;
   preguntas: PreguntaRespuesta[];
 }
 
@@ -57,6 +60,8 @@ export interface CrearExamenPeticion {
   fechaHabilitacion: string | null;
   bloqueaSiguienteModulo: boolean;
   diasRevision: number | null;
+  modoNavegacion: ModoNavegacionExamen;
+  permiteOmitirPreguntas: boolean;
 }
 
 export interface CrearOpcionPeticion {

@@ -13,6 +13,7 @@ import {
   CrearPreguntaPeticion,
   ExamenRespuesta,
   FinalidadExamen,
+  ModoNavegacionExamen,
   MostrarRespuestas,
   PreguntaRespuesta,
   TipoExamen,
@@ -71,6 +72,8 @@ export class ExamenesTab implements OnChanges {
   protected readonly examenMostrarRespuestas = signal<MostrarRespuestas>('AL_APROBAR');
   protected readonly examenFechaHabilitacion = signal('');
   protected readonly examenBloquea = signal(false);
+  protected readonly examenModoNavegacion = signal<ModoNavegacionExamen>('LIBRE');
+  protected readonly examenPermiteOmitir = signal(false);
   protected readonly examenDiasRevision = signal('3');
   protected readonly guardandoExamen = signal(false);
   protected readonly intentoGuardarExamen = signal(false);
@@ -193,6 +196,8 @@ export class ExamenesTab implements OnChanges {
     this.examenMostrarRespuestas.set('AL_APROBAR');
     this.examenFechaHabilitacion.set('');
     this.examenBloquea.set(false);
+    this.examenModoNavegacion.set('LIBRE');
+    this.examenPermiteOmitir.set(false);
     this.examenDiasRevision.set('3');
     this.mostrarFormExamen.set(true);
   }
@@ -213,6 +218,8 @@ export class ExamenesTab implements OnChanges {
     this.examenMostrarRespuestas.set(examen.mostrarRespuestas);
     this.examenFechaHabilitacion.set(this.aDatetimeLocal(examen.fechaHabilitacion) ?? '');
     this.examenBloquea.set(examen.bloqueaSiguienteModulo);
+    this.examenModoNavegacion.set(examen.modoNavegacion ?? 'LIBRE');
+    this.examenPermiteOmitir.set(examen.permiteOmitirPreguntas ?? false);
     this.examenDiasRevision.set(String(examen.diasRevision));
     this.mostrarFormExamen.set(true);
   }
@@ -291,6 +298,8 @@ export class ExamenesTab implements OnChanges {
       fechaHabilitacion: this.esVirtual() ? null : this.aInstante(this.examenFechaHabilitacion() || null),
       bloqueaSiguienteModulo: this.examenFinalidad() === 'MODULO' && this.examenTipo() === 'CALIFICADO' && this.examenBloquea(),
       diasRevision: diasRevision ?? 3,
+      modoNavegacion: this.examenModoNavegacion(),
+      permiteOmitirPreguntas: this.examenPermiteOmitir(),
     };
     const editId = this.examenEditId();
     const llamada = editId

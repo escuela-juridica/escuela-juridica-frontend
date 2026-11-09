@@ -1,6 +1,7 @@
 export type TipoExamen = 'CALIFICADO' | 'PRACTICA';
 export type TipoPregunta = 'SELECCION_UNICA' | 'SELECCION_MULTIPLE' | 'VERDADERO_FALSO' | 'RESPUESTA_ABIERTA';
 export type EstadoIntento = 'EN_PROGRESO' | 'PENDIENTE_REVISION' | 'CALIFICADO' | 'VENCIDO';
+export type ModoNavegacion = 'LIBRE' | 'SECUENCIAL';
 
 export interface IntentoResumen {
   id: number;
@@ -40,6 +41,8 @@ export interface ExamenFicha {
   intentoEnCursoId: number | null;
   aprobado: boolean;
   mejorNota: number | null;
+  modoNavegacion: ModoNavegacion;
+  permiteOmitirPreguntas: boolean;
   intentos: IntentoResumen[];
 }
 
@@ -87,6 +90,8 @@ export interface Intento {
   fechaLimiteRevision: string | null;
   respuestasVisibles: boolean;
   afectaCertificacion: boolean;
+  modoNavegacion: ModoNavegacion;
+  permiteOmitirPreguntas: boolean;
   preguntas: PreguntaIntento[];
 }
 
