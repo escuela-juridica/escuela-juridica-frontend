@@ -13,7 +13,6 @@ const DATOS: PresentarReclamacion = {
   pedido: 'Solicito la activación de mi matrícula.', declaracionJurada: true, autorizaRespuestaCorreo: true,
 };
 
-/** EP06 · HU-039 — Libro de Reclamaciones: precarga con sesión y presentación con o sin sesión. */
 describe('ReclamacionesApiService', () => {
   let servicio: ReclamacionesApiService;
   let http: HttpTestingController;

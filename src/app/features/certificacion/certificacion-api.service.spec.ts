@@ -5,8 +5,6 @@ import { TestBed } from '@angular/core/testing';
 import { API_URL } from '../../core/api/api.config';
 import { CertificacionApiService } from './certificacion-api.service';
 
-/** EP05 · HU-032 a HU-034 — Estado de la certificación, confirmación de datos, emisión, mis certificados,
- * descarga y verificación pública. */
 describe('CertificacionApiService', () => {
   let servicio: CertificacionApiService;
   let http: HttpTestingController;

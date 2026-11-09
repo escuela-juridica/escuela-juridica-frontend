@@ -1,6 +1,5 @@
 import { EstadoSesion } from '../sesiones/sesion-alumno.model';
 
-/** HU-022 — Ingresar y continuar un curso. Espejo de `AulaRespuesta` (backend). */
 export type TipoLeccionAula = 'GRABADA' | 'EN_VIVO';
 export type EstadoLeccionAula = 'COMPLETADA' | 'DISPONIBLE' | 'BLOQUEADA';
 
@@ -11,21 +10,17 @@ export interface LeccionAulaRespuesta {
   orden: number;
   esObligatoria: boolean;
   estado: EstadoLeccionAula;
-  /** Solo viene relleno cuando `estado === 'BLOQUEADA'`. */
   motivoBloqueo: string | null;
-  /** Informados solo cuando `tipo === 'EN_VIVO'`; `null` en lecciones GRABADA. */
   fechaHoraInicio: string | null;
   fechaHoraFin: string | null;
   estadoSesion: EstadoSesion | null;
   grabacionDisponible: boolean;
   descripcion: string | null;
-  /** Duración del video más largo de la lección, si se conoce. */
   duracionSegundos: number | null;
 }
 
 export type EstadoExamenAula = 'PENDIENTE' | 'EN_CURSO' | 'EN_REVISION' | 'APROBADO' | 'NO_APROBADO';
 
-/** HU-025 / HU-028 — Examen del aula (de un módulo o final) con su estado para el alumno. */
 export interface ExamenAulaRespuesta {
   id: number;
   titulo: string;
@@ -38,12 +33,10 @@ export interface ExamenAulaRespuesta {
   habilitado: boolean;
   motivoNoHabilitado: string | null;
   intentosUsados: number;
-  /** null = intentos ilimitados. */
   intentosMaximos: number | null;
   fechaLimiteRevision: string | null;
 }
 
-/** HU-025 — Una condición activa del certificado con su valor real y su meta. */
 export interface CondicionAvance {
   codigo: 'PROGRESO' | 'EXAMENES' | 'NOTA' | 'ASISTENCIA';
   titulo: string;
@@ -78,7 +71,6 @@ export interface AulaRespuesta {
   examenesFinales: ExamenAulaRespuesta[];
   imagenPortadaUrl: string | null;
   horasAcademicas: number | null;
-  /** HU-038: el curso fue cancelado; el alumno solo consulta lo que ya tenía. */
   cursoCancelado: boolean;
   motivoCancelacionCurso: string | null;
 }

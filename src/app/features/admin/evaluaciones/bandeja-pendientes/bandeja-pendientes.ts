@@ -13,8 +13,6 @@ import { OpcionCursoReporte } from '../../reportes/reporte-academico/reporte-aca
 import { EvaluacionesApiService } from '../evaluaciones-api.service';
 import { IntentoPendiente, PlazoRevision, ResumenBandeja } from '../evaluaciones.model';
 
-/** HU-030 — Bandeja de intentos pendientes de revisión: ordenada por la fecha límite más cercana,
- * separa lo vencido y lo próximo a vencer. Paginada en el servidor. */
 @Component({
   selector: 'app-bandeja-pendientes',
   imports: [FormsModule, DatePipe, LowerCasePipe, RouterLink],
@@ -27,7 +25,6 @@ export class BandejaPendientes {
   private readonly destroyRef = inject(DestroyRef);
   private peticion?: Subscription;
 
-  /** Búsqueda al escribir: consulta al servidor cuando el usuario hace una pausa. */
   protected readonly alEscribir = crearBusquedaDinamica(this.destroyRef, () => this.buscar());
 
   protected readonly filas = signal<IntentoPendiente[]>([]);
@@ -98,7 +95,6 @@ export class BandejaPendientes {
     return plazo === 'VENCIDO' ? 'badge--disp-cancelado' : plazo === 'PROXIMO' ? 'badge--advertencia-suave' : 'badge--disp-proximo';
   }
 
-  /** "Vence en 5 h" / "Vencido hace 2 días": lo que importa para decidir qué atender primero. */
   protected textoPlazo(fila: IntentoPendiente): string {
     const minutos = Math.abs(fila.minutosRestantes);
     const cantidad = minutos < 60 ? `${Math.max(minutos, 1)} min`

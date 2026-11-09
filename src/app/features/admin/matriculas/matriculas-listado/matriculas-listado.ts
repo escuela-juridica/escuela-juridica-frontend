@@ -20,10 +20,6 @@ import { ExcepcionesPago } from '../../excepciones-pago/excepciones-pago';
 import { TablaPaginacion } from '../../../../shared/ui/tabla-paginacion/tabla-paginacion';
 import { crearSelectorBusqueda } from '../../../../shared/util/selector-busqueda';
 
-// HU-020 (listado, filtros, detalle, cancelar) se retiró deliberadamente — ver
-// docs/epica-4/HU-020-MAPA-TECNICO-CONTROL-MATRICULAS.md en el backend para reconstruirla.
-// Lo de HU-019 ("+ Nueva matrícula") se quedó funcionando tal cual estaba.
-/** Datos mínimos para reactivar una matrícula: sirven tanto una fila de la tabla como el detalle abierto. */
 interface ResumenMatricula {
   id: number;
   alumno: string;
@@ -36,7 +32,6 @@ interface ResumenMatricula {
 interface OpcionSelect {
   id: number;
   etiqueta: string;
-  /** Texto secundario que solo se ve en la lista desplegable (p. ej. el correo del alumno). */
   detalle?: string;
 }
 
@@ -61,16 +56,12 @@ export class MatriculasListado {
   private readonly usuariosApi = inject(AdminUsuariosApiService);
   private readonly cursosApi = inject(CursoAdminApiService);
 
-  // Selectores con búsqueda: cada tecleo consulta al servidor (con retardo) en vez de filtrar una lista
-  // recortada, así el alumno o el curso aparece aunque no esté entre los primeros resultados.
   protected readonly alumnoOpciones = signal<OpcionSelect[]>([]);
   protected readonly cursoOpciones = signal<OpcionSelect[]>([]);
   protected readonly buscandoAlumno = signal(false);
   protected readonly buscandoCurso = signal(false);
   protected readonly busquedaAlumno$ = new Subject<string>();
   protected readonly busquedaCurso$ = new Subject<string>();
-  // Medios de un pago registrado a mano. Los códigos siguen la convención de los pagos en línea
-  // (TARJETA, YAPE...) para que el reporte de pagos los agrupe y los filtre igual.
   protected readonly mediosPago = [
     { id: 'TRANSFERENCIA', etiqueta: 'Transferencia' },
     { id: 'DEPOSITO', etiqueta: 'Depósito bancario' },
@@ -89,10 +80,7 @@ export class MatriculasListado {
   protected readonly advertencia = signal<AdvertenciaMatricula | null>(null);
   protected readonly consultandoAdvertencia = signal(false);
   protected readonly errorAdvertencia = signal(false);
-  // Mismo patrón que examenes-tab.ts: se activa al intentar guardar, y recién ahí los campos
-  // vacíos se marcan en rojo (.input--error) — no desde que se abre el formulario.
   protected readonly intentoRegistrar = signal(false);
-  // Filtros: se editan sin consultar y se aplican con «Buscar».
   protected filtroAlumnoId: number | null = null;
   protected filtroCursoId: number | null = null;
   protected filtroEstado = '';
@@ -126,10 +114,8 @@ export class MatriculasListado {
   protected readonly matriculaReactivar = signal<ResumenMatricula | null>(null);
   protected readonly motivoReactivacion = signal('');
   protected readonly reactivando = signal(false);
-  // Seguimiento académico: se abre en un modal encima del detalle (el id de la matrícula abierta).
   protected readonly seguimientoMatriculaId = signal<number | null>(null);
   protected readonly reenviando = signal(false);
-  // Comprobante opcional de un pago manual: se elige en el formulario y se sube justo después de registrar.
   protected readonly comprobante = signal<File | null>(null);
   protected readonly errorComprobante = signal('');
   protected readonly subiendoComprobante = signal(false);
@@ -138,8 +124,6 @@ export class MatriculasListado {
  constructor() {
   this.cargar();
 
-  // Enlaces desde otras pantallas (?tab=excepciones, ?seguimiento=ID): abren la pestaña o el modal
-  // correspondiente en esta misma página, sin rutas propias.
   this.ruta.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
     if (params.get('tab') === 'excepciones') this.pestana.set('excepciones');
     const matriculaId = Number(params.get('seguimiento'));
@@ -150,7 +134,6 @@ export class MatriculasListado {
     .pipe(
       debounceTime(RETARDO_BUSQUEDA_MS),
       tap(() => this.buscandoAlumno.set(true)),
-      // ng-select emite null al elegir una opción: se trata como búsqueda vacía.
       switchMap((texto) => this.consultarAlumnos(texto ?? '')),
       takeUntilDestroyed(this.destroyRef),
     )
@@ -173,7 +156,6 @@ private consultarAlumnos(texto: string) {
   );
 }
 
-/** Todos los cursos, también los terminados: una matrícula antigua se sigue consultando. */
 private consultarTodosLosCursos(texto: string) {
   return this.cursosApi.listar(texto, 0, TAMANO_BUSQUEDA).pipe(
     map((r) => r.items.map((c: CursoResumenRespuesta): OpcionSelect => ({ id: c.id, etiqueta: c.titulo }))),
@@ -190,8 +172,6 @@ private consultarCursos(texto: string) {
   );
 }
 
-/** Publica las opciones nuevas conservando la ya elegida: si el filtro actual no la incluye, el
- * select perdería la etiqueta del valor seleccionado. */
 private publicarOpciones(destino: WritableSignal<OpcionSelect[]>, nuevas: OpcionSelect[], seleccionada: number, buscando: WritableSignal<boolean>): void {
   const elegida = seleccionada ? destino().find((o) => o.id === seleccionada) : undefined;
   destino.set(elegida && !nuevas.some((o) => o.id === elegida.id) ? [elegida, ...nuevas] : nuevas);
@@ -225,7 +205,6 @@ protected cargar(): void {
   });
 }
 
-/** Aplica los filtros elegidos y vuelve a la primera página. */
 protected buscar(): void {
   this.aplicados = { usuarioId: this.filtroAlumnoId, cursoId: this.filtroCursoId, estado: this.filtroEstado };
   this.pagina.set(0);
@@ -270,11 +249,9 @@ protected fechaHora(valor: string | null): string {
   const dia = new Intl.DateTimeFormat('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(fecha);
   const hora = new Intl.DateTimeFormat('es-PE', { hour: 'numeric', minute: '2-digit', hour12: true }).format(fecha);
 
-  // es-PE entrega «11:26 p. m.»: se normaliza a «11:26 pm».
   return `${dia} ${hora.toLowerCase().replace(/\./g, '').replace(/\s+/g, ' ').replace(/ ([ap]) m$/, ' $1m')}`;
 }
 
-/** REGISTRADO_MANUAL → "Registrado manual"; textos vacíos se muestran como guion. */
 protected humanizar(valor: string | null | undefined): string {
   if (!valor?.trim()) return '—';
 
@@ -283,7 +260,6 @@ protected humanizar(valor: string | null | undefined): string {
   return texto.charAt(0).toUpperCase() + texto.slice(1);
 }
 
-/** Origen de un pago del historial económico. */
 protected etiquetaOrigen(valor: string | null): string {
   const etiquetas: Record<string, string> = { EN_LINEA: 'En línea', MANUAL: 'Manual', EXONERADO: 'Exonerado' };
 
@@ -326,7 +302,6 @@ protected etiquetaIngreso(valor: string): string {
   return etiquetas[valor] ?? this.humanizar(valor);
 }
 
-/** Clase de color y tipo de ícono del badge de forma de ingreso. */
 protected presentacionIngreso(valor: string): { clase: string; icono: 'tarjeta' | 'regalo' | 'usuario' | 'mano' | 'cinta' | 'punto' } {
   switch (valor) {
     case 'PAGO_EN_LINEA':
@@ -457,7 +432,6 @@ protected claseEstado(valor: string): string {
             this.cargar();
             return;
           }
-          // La matrícula ya existe: si el comprobante falla no se pierde nada, se puede adjuntar desde el detalle.
           this.api.adjuntarComprobante(matricula.id, archivo)
             .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => { this.enviando.set(false); this.cargar(); }))
             .subscribe({
@@ -499,7 +473,6 @@ protected cerrarDetalle(): void {
   this.seguimientoMatriculaId.set(null);
 }
 
-/** Cierra el modal de seguimiento y, si se abrió por enlace, limpia ?seguimiento de la URL. */
 protected cerrarSeguimiento(): void {
   this.seguimientoMatriculaId.set(null);
   if (this.ruta.snapshot.queryParamMap.has('seguimiento')) {
@@ -557,7 +530,6 @@ protected async reactivarMatricula(): Promise<void> {
         this.motivoReactivacion.set('');
         this.alertas.mostrar('exito', 'Matrícula reactivada correctamente.');
         this.cargar();
-        // Si el detalle de esa matrícula está abierto, se refresca para mostrar el estado nuevo.
         if (this.detalle()?.id === matricula.id) {
           this.api.obtenerDetalleAdministrativo(matricula.id)
             .pipe(takeUntilDestroyed(this.destroyRef))
@@ -597,7 +569,6 @@ protected async cancelarMatricula(): Promise<void> {
     return;
   }
 
-  // Última barrera antes de una acción que no se puede revertir desde el panel.
   const confirmado = await this.confirmacion.preguntar({
     titulo: '¿Cancelar esta matrícula?',
     mensaje:
@@ -634,7 +605,6 @@ protected async cancelarMatricula(): Promise<void> {
     });
 }
 
-/** Devuelve el motivo por el que el archivo no sirve como comprobante, o cadena vacía si es válido. */
 private validarComprobante(archivo: File): string {
   if (!COMPROBANTE_TIPOS.includes(archivo.type)) return 'El comprobante debe ser una imagen (PNG, JPG o WEBP) o un PDF.';
   if (archivo.size > COMPROBANTE_MAXIMO_BYTES) return 'El comprobante supera el máximo de 5 MB.';
@@ -660,7 +630,6 @@ protected tamanoArchivo(bytes: number): string {
   return bytes >= 1024 * 1024 ? (bytes / (1024 * 1024)).toFixed(1) + ' MB' : Math.max(1, Math.round(bytes / 1024)) + ' KB';
 }
 
-/** Adjunta (o reemplaza) el comprobante desde el detalle de una matrícula con pago manual. */
 protected adjuntarDesdeDetalle(evento: Event, matriculaId: number): void {
   const entrada = evento.target as HTMLInputElement;
   const archivo = entrada.files?.[0] ?? null;
@@ -685,7 +654,6 @@ protected adjuntarDesdeDetalle(evento: Event, matriculaId: number): void {
     });
 }
 
-/** Abre el comprobante en otra pestaña. La ventana se abre antes de la descarga para que el navegador no la bloquee. */
 protected verComprobante(matriculaId: number): void {
   const ventana = window.open('', '_blank');
   this.api.comprobante(matriculaId)

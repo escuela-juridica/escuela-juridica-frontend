@@ -23,7 +23,6 @@ function pagina(items: Excepcion[]): PageResponse<Excepcion> {
   return { items, page: 0, size: 20, totalElements: items.length, totalPages: 1, first: true, last: true };
 }
 
-/** EP06 · HU-037 — Excepciones de matrícula y pago: consulta por estado y registro de la atención brindada. */
 describe('ExcepcionesPago', () => {
   let fixture: ComponentFixture<ExcepcionesPago>;
   let http: HttpTestingController;
@@ -49,7 +48,6 @@ describe('ExcepcionesPago', () => {
     http.verify();
   });
 
-  /** Abre el detalle de la primera excepción de una lista pendiente. */
   function abrirDetalle(): void {
     const lista = http.expectOne((r) => r.url === URL);
     lista.flush(pagina([excepcion(1)]));

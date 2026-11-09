@@ -8,8 +8,6 @@
   gap: 20px;
 }
 
-// =============================================================== Portada ==
-// Imagen del curso bajo un degradado de marca: da identidad y deja el texto siempre legible.
 .hero {
   position: relative;
   overflow: hidden;
@@ -161,7 +159,6 @@
 
 .hero__cta {
   flex: none;
-  // Sobre el degradado oscuro el botón turquesa de marca (texto azul) es el que más contrasta.
   background: var(--acento-500);
   border-color: var(--acento-500);
   color: var(--marca-900);
@@ -173,7 +170,6 @@
   color: var(--marca-900);
 }
 
-// ============================================================== Pestañas ==
 .pestanas {
   display: flex;
   gap: 4px;
@@ -229,7 +225,6 @@
   background: var(--exito);
 }
 
-// ============================================================ Contenido ==
 .resumen__rejilla {
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
@@ -260,7 +255,6 @@
   color: var(--neutral-600);
 }
 
-// Sesiones en vivo con "ficha de calendario" a la izquierda.
 .sesiones {
   list-style: none;
   margin: 0;
@@ -322,7 +316,6 @@
   color: var(--neutral-600);
 }
 
-// Evaluaciones: tarjeta con franja de color según el estado.
 .examenes {
   list-style: none;
   margin: 0;
@@ -419,7 +412,6 @@
   gap: 12px;
 }
 
-// ============================================================ Responsivo ==
 @media (max-width: 1023px) {
   .resumen__rejilla {
     grid-template-columns: minmax(0, 1fr);

@@ -12,7 +12,6 @@ import { Modal } from '../../../../shared/ui/modal/modal';
 import { CertificadosAdminApiService } from '../certificados-admin-api.service';
 import { EmisionManualSituacion } from '../certificados-admin.model';
 
-/** HU-035 — PF-034: situación del alumno, motivo y confirmación del impacto antes de emitir un certificado excepcional. */
 @Component({
   selector: 'app-emision-manual',
   imports: [ReactiveFormsModule, DatePipe, DecimalPipe, RouterLink, Modal, CabeceraDetalle, EnlaceVolver],
@@ -31,15 +30,12 @@ export class EmisionManual {
   protected readonly confirmando = signal(false);
   protected readonly emitiendo = signal(false);
   protected readonly errorEmision = signal<string | null>(null);
-  /** Nombre escrito para confirmar la emisión cuando el alumno aún no cumple los requisitos. */
   protected readonly nombreConfirmacion = signal('');
-  /** Se intentó emitir con el modal abierto: a partir de ahí se señalan los campos que faltan. */
   protected readonly intentoEmitir = signal(false);
 
   protected readonly formulario = new FormGroup({
     motivo: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(10), Validators.maxLength(1000)] }),
     fechaFinalizacion: new FormControl('', { nonNullable: true }),
-    // Nombres que se imprimirán cuando el alumno no los confirmó; se precargan con el nombre de su cuenta.
     nombres: new FormControl('', { nonNullable: true, validators: [Validators.maxLength(240)] }),
     entiendo: new FormControl(false, { nonNullable: true, validators: [Validators.requiredTrue] }),
   });
@@ -51,8 +47,6 @@ export class EmisionManual {
       .subscribe({
         next: (s) => {
           this.situacion.set(s);
-          // Si el alumno aún no los confirmó, la administración los confirma: se propone el nombre de su cuenta.
-          // Si se reemite, se parte de los nombres del certificado anulado para poder corregirlos.
           if (this.confirmaAdministracion(s)) this.formulario.controls.nombres.setValue(s.nombresConfirmados ?? s.alumno);
           this.cargando.set(false);
         },
@@ -67,22 +61,18 @@ export class EmisionManual {
     return s.fechaFinalizacion === null;
   }
 
-  /** El certificado actual está anulado: el que se emite lo reemplaza, con otro código. */
   protected esReemision(s: EmisionManualSituacion): boolean {
     return s.certificado?.estado === 'ANULADO';
   }
 
-  /** La administración confirma los nombres impresos: porque el alumno no lo hizo o porque se reemite y pueden corregirse. */
   protected confirmaAdministracion(s: EmisionManualSituacion): boolean {
     return !s.datosConfirmados || this.esReemision(s);
   }
 
-  /** Nombres que se imprimirán: los del alumno si ya los confirmó o, si no, los que escribe la administración. */
   protected nombresAImprimir(s: EmisionManualSituacion): string {
     return this.confirmaAdministracion(s) ? this.formulario.controls.nombres.value.trim().replace(/\s+/g, ' ') : (s.nombresConfirmados ?? s.alumno);
   }
 
-  /** Emitir sin cumplir los requisitos es la excepción más delicada: se exige escribir el nombre del alumno. */
   protected exigeNombre(s: EmisionManualSituacion): boolean {
     return !s.cumpleTodo;
   }
@@ -97,7 +87,6 @@ export class EmisionManual {
     return c.invalid && (c.touched || c.dirty);
   }
 
-  /** La casilla habilita el botón y el botón abre el modal con el motivo, los datos y la confirmación final. */
   protected pedirConfirmacion(): void {
     if (this.formulario.controls.entiendo.invalid) return;
     this.errorEmision.set(null);
@@ -142,7 +131,6 @@ export class EmisionManual {
       });
   }
 
-  /** Abre el PDF vigente en otra pestaña, igual que lo ve el alumno. */
   protected verCertificado(codigo: string): void {
     window.open(`${resolverUrlApi(`/api/app/certificados/${encodeURIComponent(codigo)}/descargar`)}?enLinea=true`, '_blank');
   }

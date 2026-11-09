@@ -1,4 +1,3 @@
-// usuarios-listado.ts
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectorRef, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -12,9 +11,6 @@ import { UsuarioDetalle } from '../usuario-detalle/usuario-detalle';
 import { CrearUsuarioAdminRespuesta, RolUsuarioAdmin, UsuarioAdminRespuesta } from '../usuario-admin.model';
 import { claseEstadoCuenta, etiquetaEstadoCuenta } from '../usuario-admin-etiquetas';
 
-/** HU-008 — Gestionar usuarios administrativamente. Listado paginado contra la API real; crear
- * y editar se hacen en modales, no en pantallas aparte.
- * Diseño según el Figma EP02-PF-010-HU-008-Gestión de usuarios. */
 @Component({
   selector: 'app-usuarios-listado',
   imports: [FormsModule, Modal, UsuarioCrear, UsuarioDetalle],
@@ -34,7 +30,6 @@ export class UsuariosListado implements OnInit {
   protected readonly pagina = signal(0);
   protected readonly totalPaginas = signal(0);
 
-  /** null: ningún modal abierto. 'nuevo': modal de creación. número: editando ese usuarioId. */
   protected readonly modalAbierto = signal<'nuevo' | number | null>(null);
 
   protected readonly etiquetaEstadoCuenta = etiquetaEstadoCuenta;
@@ -76,14 +71,11 @@ export class UsuariosListado implements OnInit {
     this.modalAbierto.set(null);
   }
 
-  /** Solo el número de usuario en edición; null en cualquier otro caso (incluido 'nuevo'). */
   protected get idEnEdicion(): number | null {
     const modal = this.modalAbierto();
     return typeof modal === 'number' ? modal : null;
   }
 
-  /** Una cuenta creada u editada puede no estar en la página actual; recargar es más simple y
-   * correcto que intentar insertarla a mano en la lista paginada. */
   protected alCrear(respuesta: CrearUsuarioAdminRespuesta): void {
     this.cargar();
     this.modalAbierto.set(respuesta.usuario.usuarioId);

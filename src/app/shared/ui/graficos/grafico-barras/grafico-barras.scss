@@ -53,12 +53,10 @@
   align-items: center;
   gap: 8px;
   min-width: 0;
-  // Línea de base recta y recesiva a la izquierda de las barras.
   border-left: 1px solid var(--viz-base, #c3c2b7);
   min-height: 24px;
 }
 
-// Hasta 24 px de grosor; el extremo de datos redondeado a 4 px y el arranque recto.
 .barras__barra {
   flex: 0 1 auto;
   height: 22px;

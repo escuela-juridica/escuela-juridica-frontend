@@ -1,4 +1,3 @@
-/** HU-044 — Reporte de certificados emitidos (administrador). Espejo de los DTO del backend. */
 export type FormaEmision = 'AUTOMATICA' | 'SOLICITADA' | 'MANUAL';
 
 export interface ReporteCertificado {
@@ -8,7 +7,6 @@ export interface ReporteCertificado {
   cursoId: number;
   curso: string;
   nivel: 'NORMAL' | 'REFRENDADO';
-  /** `null` cuando lo emite la Escuela Jurídica (nivel Normal). */
   entidad: string | null;
   fechaFinalizacion: string | null;
   fechaEmision: string;

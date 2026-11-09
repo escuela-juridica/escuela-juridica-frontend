@@ -1,4 +1,3 @@
-/** HU-032 — Obtener mi certificado. Espejo de los DTO del backend. */
 import { CondicionAvance } from '../aula/aula.model';
 
 export type EstadoCertificacion =
@@ -25,7 +24,6 @@ export interface CertificadoEmitido {
   emitidoEn: string;
   nombresImpresos: string;
   entidad: string | null;
-  /** Ruta relativa al API; se resuelve con `resolverUrlApi`. */
   descargaUrl: string;
 }
 
@@ -37,7 +35,6 @@ export interface Certificacion {
   condiciones: CondicionAvance[];
   fraseAccionable: string;
   exigeExamenes: boolean;
-  /** Proyección con lo que lleva hasta hoy; el nivel final se congela al emitir. */
   notaFinal: number | null;
   nivelProyectado: 'NORMAL' | 'REFRENDADO';
   entidadProyectada: string | null;
@@ -58,10 +55,8 @@ export interface ConfirmarDatos {
   apellidoMaterno: string;
 }
 
-/** HU-033 — Un certificado del alumno. Solo uno VIGENTE trae `descargaUrl`. */
 export interface MiCertificado {
   codigo: string;
-  /** Nombre tal como quedó impreso. */
   titular: string;
   cursoId: number;
   curso: string;
@@ -74,7 +69,6 @@ export interface MiCertificado {
   descargaUrl: string | null;
 }
 
-/** HU-034 — Lo único que se muestra públicamente de un certificado. */
 export interface VerificacionCertificado {
   estado: 'VIGENTE' | 'ANULADO';
   codigo: string;

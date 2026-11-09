@@ -17,7 +17,6 @@ function certificado(estado: 'VIGENTE' | 'ANULADO'): MiCertificado {
   };
 }
 
-/** EP05 · HU-033 — Mis certificados: solo los del alumno; uno vigente se descarga, uno anulado queda sin descarga. */
 describe('MisCertificados', () => {
   let fixture: ComponentFixture<MisCertificados>;
   let http: HttpTestingController;

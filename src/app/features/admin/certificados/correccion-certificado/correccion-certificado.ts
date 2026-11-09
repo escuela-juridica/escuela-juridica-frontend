@@ -18,11 +18,6 @@ interface Diferencia {
   despues: string;
 }
 
-/**
- * HU-036 — PF-034: corrige datos documentales (nombres, título, horas, entidad, firmantes) conservando el código y el
- * estado VIGENTE, o anula el certificado de forma irreversible. Muestra la comparación antes de confirmar y el
- * historial completo de cambios. La nota y el nivel congelados solo se muestran.
- */
 @Component({
   selector: 'app-correccion-certificado',
   imports: [ReactiveFormsModule, DatePipe, DecimalPipe, RouterLink, Modal, CabeceraDetalle, EnlaceVolver],
@@ -39,10 +34,6 @@ export class CorreccionCertificado {
   protected readonly cargando = signal(true);
   protected readonly error = signal<string | null>(null);
   protected readonly firmantes = signal<number[]>([]);
-  /**
-   * editar: formulario de corrección · corregir: confirmación con el antes/después · anular: advertencia y motivo de la
-   * anulación · confirmarAnulacion: segundo paso, escribir el nombre del alumno y aceptar.
-   */
   protected readonly modal = signal<'editar' | 'corregir' | 'anular' | 'confirmarAnulacion' | null>(null);
   protected readonly diferencias = signal<Diferencia[]>([]);
   protected readonly enviando = signal(false);
@@ -59,7 +50,6 @@ export class CorreccionCertificado {
 
   protected readonly formularioAnulacion = new FormGroup({
     motivo: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(10), Validators.maxLength(2000)] }),
-    // Confirmación al estilo GitHub: hay que escribir el nombre completo del alumno para habilitar la anulación.
     nombre: new FormControl('', { nonNullable: true }),
   });
 
@@ -96,7 +86,6 @@ export class CorreccionCertificado {
     this.firmantes.update((lista) => (lista.includes(id) ? lista.filter((x) => x !== id) : [...lista, id]));
   }
 
-  /** Todo lo que se imprime es válido (el motivo no cuenta: solo hace falta para guardar). */
   private datosImpresosValidos(): boolean {
     const c = this.formulario.controls;
     const n = this.firmantes().length;
@@ -104,12 +93,10 @@ export class CorreccionCertificado {
       && c.nombres.value.trim().length > 0 && c.titulo.value.trim().length > 0 && n >= 1 && n <= 4;
   }
 
-  /** Abre el certificado vigente tal como lo ve el alumno (el PDF se regenera si faltara en el servidor). */
   protected verCertificado(d: CertificadoDetalle): void {
     window.open(`${resolverUrlApi(`/api/app/certificados/${encodeURIComponent(d.codigo)}/descargar`)}?enLinea=true`, '_blank');
   }
 
-  /** Dibuja el PDF de borrador con lo escrito en el formulario, sin guardar nada, y lo abre en otra pestaña. */
   protected previsualizar(): void {
     if (this.previsualizando() || this.enviando()) return;
     if (!this.datosImpresosValidos()) {
@@ -146,7 +133,6 @@ export class CorreccionCertificado {
       });
   }
 
-  /** Con `responseType: 'blob'` el cuerpo del error también llega como Blob: se lee para mostrar el mensaje del servidor. */
   private async mensajeDeBlob(e: HttpErrorResponse): Promise<string | null> {
     if (!(e.error instanceof Blob)) return this.mensaje(e);
     try {
@@ -193,7 +179,6 @@ export class CorreccionCertificado {
     this.modal.set('editar');
   }
 
-  /** Desde la confirmación se vuelve al formulario con lo ya escrito, sin perder los cambios. */
   protected volverAEdicion(): void {
     if (this.enviando()) return;
     this.errorModal.set(null);
@@ -205,7 +190,6 @@ export class CorreccionCertificado {
     this.modal.set('anular');
   }
 
-  /** Paso 1 → 2: con el motivo escrito se pasa a la confirmación escribiendo el nombre. */
   protected pedirConfirmacionAnulacion(): void {
     const motivo = this.formularioAnulacion.controls.motivo;
     if (motivo.invalid) {
@@ -217,7 +201,6 @@ export class CorreccionCertificado {
     this.modal.set('confirmarAnulacion');
   }
 
-  /** Desde la confirmación se vuelve al motivo sin perderlo. */
   protected volverAlMotivo(): void {
     if (this.enviando()) return;
     this.errorModal.set(null);
@@ -226,7 +209,6 @@ export class CorreccionCertificado {
 
   protected cerrarModal(): void {
     if (this.enviando()) return;
-    // Cerrar el formulario sin confirmar descarta lo escrito: vuelve a los datos vigentes.
     if (this.modal() === 'editar') this.restaurarFormulario();
     if (this.modal() === 'anular' || this.modal() === 'confirmarAnulacion') this.formularioAnulacion.reset();
     this.modal.set(null);
@@ -254,7 +236,6 @@ export class CorreccionCertificado {
     );
   }
 
-  /** El texto escrito coincide con el nombre del alumno (sin importar mayúsculas ni espacios de más). */
   protected coincideNombre(): boolean {
     const objetivo = this.normalizarNombre(this.detalle()?.alumno ?? '');
     return objetivo.length > 0 && this.normalizarNombre(this.formularioAnulacion.controls.nombre.value) === objetivo;
@@ -276,7 +257,6 @@ export class CorreccionCertificado {
     );
   }
 
-  /** Si la emisión fue manual ya consta como un cambio del historial: no se repite el hito de emisión. */
   protected hayEmisionManual(d: CertificadoDetalle): boolean {
     return d.historial.some((c) => c.accion === 'EMISION_MANUAL');
   }

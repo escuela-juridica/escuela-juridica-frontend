@@ -14,18 +14,10 @@ import { SesionAlumnoApiService } from '../sesiones/sesion-alumno-api.service';
 import { LeccionReproductorApiService } from './leccion-reproductor-api.service';
 import { MaterialAlumnoRespuesta, ProgresoVideoPeticion } from './material-alumno.model';
 
-/** Cada cuánto, como máximo, se reporta avance de un video en reproducción (además de siempre
- * reportar en pausa/fin). Evita golpear el backend en cada evento `timeupdate`. */
 const INTERVALO_REPORTE_PROGRESO_MS = 5000;
 
 type PestanaLeccion = 'descripcion' | 'materiales' | 'avance';
 
-/**
- * HU-023 / HU-024 — Pantalla de una lección dentro del aula: contenido principal (video, sesión en
- * vivo o material), acciones Anterior / Siguiente, y pestañas con descripción, materiales y avance
- * hacia el certificado. El temario y el panel de contenido son del layout (`AulaShell`): aquí solo
- * se pide lo propio de la lección (sus materiales).
- */
 @Component({
   selector: 'app-leccion-reproductor',
   imports: [RouterLink, AvanceCertificadoBloque],
@@ -60,7 +52,6 @@ export class LeccionReproductor {
   protected readonly actual = this.estado.leccionActual;
   protected readonly leccion = computed(() => this.actual()?.leccion ?? null);
 
-  /** Qué se muestra: depende solo del estado real de la lección que devuelve el backend. */
   protected readonly vista = computed<'noEncontrada' | 'bloqueada' | 'sesion' | 'contenido'>(() => {
     const leccion = this.leccion();
     if (!leccion) return 'noEncontrada';
@@ -71,7 +62,6 @@ export class LeccionReproductor {
 
   protected readonly videoPrincipal = computed(() => this.materiales()?.find((m) => m.tipoRecurso === 'VIDEO') ?? null);
 
-  /** Video de YouTube embebible (solo si la URL trae un identificador válido de 11 caracteres). */
   protected readonly youtubeEmbebido = computed<SafeResourceUrl | null>(() => {
     const video = this.videoPrincipal();
     if (!video || video.origen !== 'YOUTUBE') return null;
@@ -81,7 +71,6 @@ export class LeccionReproductor {
       : null;
   });
 
-  /** Se completa solo (sin botón) si tiene un video SUBIDO: es el único que ESEJUR puede medir. */
   protected readonly esFinalizacionAutomatica = computed(() =>
     (this.materiales() ?? []).some((m) => m.tipoRecurso === 'VIDEO' && m.origen === 'SUBIDO'),
   );
@@ -91,7 +80,6 @@ export class LeccionReproductor {
     return siguiente && siguiente.leccion.estado !== 'BLOQUEADA' ? siguiente : null;
   });
 
-  /** Examen que frena el avance (calificado, de módulo y sin aprobar), para ofrecer rendirlo desde aquí. */
   protected readonly examenBloqueante = computed(
     () => this.estado.aula()?.modulos.flatMap((m) => m.examenes).find((e) => e.bloqueaSiguienteModulo && !e.aprobado) ?? null,
   );
@@ -126,7 +114,6 @@ export class LeccionReproductor {
         window.scrollTo({ top: 0 });
       });
 
-    // Los materiales se piden cuando la lección es consultable (no bloqueada ni sesión pendiente).
     effect(() => {
       const vista = this.vista();
       const id = this.estado.leccionActualId();
@@ -140,7 +127,6 @@ export class LeccionReproductor {
     this.pestanaElegida.set(pestana);
   }
 
-  /** "Siguiente" / "Completar lección" en una lección manual: registra una sola finalización. */
   protected completarYContinuar(): void {
     const leccion = this.leccion();
     if (!leccion || this.completando()) return;
@@ -151,7 +137,6 @@ export class LeccionReproductor {
       .subscribe({
         next: () => {
           this.completando.set(false);
-          // La siguiente lección puede quedar bloqueada (p. ej. por un examen): se decide con el estado real.
           this.estado
             .refrescar$()
             .pipe(takeUntilDestroyed(this.destroyRef))
@@ -187,13 +172,10 @@ export class LeccionReproductor {
       });
   }
 
-  // ------------------------------------------------------------ video propio --
-
   protected onLoadedMetadata(evento: Event, material: MaterialAlumnoRespuesta): void {
     const video = evento.target as HTMLVideoElement;
     if (Number.isFinite(video.duration)) {
       this.duracionPorMaterial.set(material.id, Math.round(video.duration));
-      // Retoma donde se quedó (Udemy-style), salvo que ya casi lo haya terminado.
       const posicion = material.posicionSegundos ?? 0;
       if (posicion > 5 && video.duration - posicion > 5) {
         video.currentTime = posicion;
@@ -229,13 +211,10 @@ export class LeccionReproductor {
       .registrarProgresoVideo(materialId, peticion)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        // Un reporte puntual que falle no debe interrumpir la reproducción: el siguiente lo reintenta.
         next: () => this.estado.refrescar(),
         error: () => undefined,
       });
   }
-
-  // ----------------------------------------------------------- presentación --
 
   protected etiquetaFormato(material: MaterialAlumnoRespuesta): string {
     if (material.origen === 'YOUTUBE') return 'YouTube';

@@ -11,8 +11,6 @@ import { formatearFechaLarga } from '../../cursos/curso-formato.util';
 import { CertificacionApiService } from '../certificacion-api.service';
 import { MiCertificado } from '../certificacion.model';
 
-/** HU-033 — Mis certificados: solo los del alumno autenticado. Uno vigente se descarga; uno anulado
- * sigue listado como no válido y sin descarga. Vencer o cancelar la matrícula no los quita. */
 @Component({
   selector: 'app-mis-certificados',
   imports: [RouterLink, DecimalPipe, DiplomaMiniatura],

@@ -3,7 +3,6 @@ import { describe, expect, it, beforeEach } from 'vitest';
 
 import { TablaPaginacion } from './tabla-paginacion';
 
-/** Pie de tabla con paginación del servidor: resumen de registros y controles de página. */
 describe('TablaPaginacion', () => {
   let fixture: ComponentFixture<TablaPaginacion>;
 

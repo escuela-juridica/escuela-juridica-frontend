@@ -12,11 +12,6 @@ import { VerificacionCertificado } from '../certificacion.model';
 
 type Resultado = 'ninguno' | 'cargando' | 'vigente' | 'anulado' | 'noEncontrado' | 'error';
 
-/**
- * HU-034 — Verificación pública de un certificado, sin sesión: el código llega por el QR (parámetro
- * `codigo`) o se escribe a mano. Solo muestra los datos mínimos que entrega el servidor; un código que no
- * existe dice únicamente «Certificado no encontrado».
- */
 @Component({
   selector: 'app-verificar-certificado',
   imports: [ReactiveFormsModule, DecimalPipe],
@@ -39,7 +34,6 @@ export class VerificarCertificado {
   });
 
   constructor() {
-    // Un enlace con ?codigo=… (el del QR) consulta de inmediato.
     this.ruta.queryParamMap
       .pipe(
         map((p) => (p.get('codigo') ?? '').trim()),
@@ -60,7 +54,6 @@ export class VerificarCertificado {
       this.formulario.markAllAsTouched();
       return;
     }
-    // La consulta queda en la URL: el resultado se puede recargar o compartir (solo contiene el código).
     void this.router.navigate([], { queryParams: { codigo }, queryParamsHandling: 'merge' });
     this.consultar(codigo);
   }

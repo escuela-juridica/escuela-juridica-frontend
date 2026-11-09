@@ -27,7 +27,6 @@ interface DefinicionPestana {
   etiqueta: string;
 }
 
-/** Cuánto tiempo queda visible la alerta de confirmación antes de desaparecer sola. */
 const DURACION_MENSAJE_MS = 5000;
 
 const PESTANAS: DefinicionPestana[] = [
@@ -38,8 +37,6 @@ const PESTANAS: DefinicionPestana[] = [
   { id: 'firmante', etiqueta: 'Firmantes' },
 ];
 
-/** HU-009 — PF-012: valores reutilizables que después se seleccionan al crear o editar un
- * curso. Solo una sección es visible a la vez (ver Figma EP02-PF-012). */
 @Component({
   selector: 'app-informacion-base',
   imports: [ReactiveFormsModule, ImagenSubida],
@@ -60,13 +57,10 @@ export class InformacionBase {
   protected readonly error = signal<string | null>(null);
   protected readonly guardando = signal(false);
   protected readonly errorFormulario = signal<string | null>(null);
-  /** null: formulario cerrado. 'nuevo': creando. número: editando ese id. */
   protected readonly modoFormulario = signal<'nuevo' | number | null>(null);
 
-  /** Confirmación tras guardar o cambiar el estado de un elemento: desaparece sola o con la X. */
   protected readonly mensaje = signal<{ tipo: 'error' | 'exito'; texto: string } | null>(null);
   private mensajeTimeout: ReturnType<typeof setTimeout> | null = null;
-  /** Numera cada carga: si el usuario cambia de pestaña o de filtro mientras otra carga sigue en curso, la respuesta vieja se ignora. */
   private cargaActual = 0;
 
   protected readonly tiposCurso = signal<TipoCursoRespuesta[]>([]);
@@ -75,8 +69,6 @@ export class InformacionBase {
   protected readonly entidades = signal<EntidadRespuesta[]>([]);
   protected readonly firmantes = signal<FirmanteRespuesta[]>([]);
 
-  /** Paginación server-side: como solo una pestaña está visible a la vez, basta un único par de
-   * señales que se reinicia al cambiar de pestaña o de filtro. */
   protected readonly pagina = signal(0);
   protected readonly totalPaginas = signal(0);
   private static readonly TAMANO_PAGINA = 20;
@@ -138,9 +130,6 @@ export class InformacionBase {
     return this.pestanas.find((p) => p.id === this.tabActiva())?.etiqueta ?? '';
   }
 
-  /** El `<form>` solo tiene un `[formGroup]` a la vez, según la pestaña activa: sin esto,
-   * `(ngSubmit)` no se enlaza a ningún control de Angular y el navegador hace un submit nativo
-   * (recarga completa de la página, nada se guarda). */
   protected get formularioActivo(): FormGroup {
     switch (this.tabActiva()) {
       case 'tipoCurso': return this.formTipoCurso;
@@ -236,7 +225,6 @@ export class InformacionBase {
     }
   }
 
-  /** Mensaje de error de un campo del formulario activo, solo si ya se tocó o se intentó guardar. */
   protected mensajeCampo(campo: string): string | null {
     const control = this.formularioActivo.get(campo);
     if (!control || !control.invalid || !control.touched) {
@@ -449,8 +437,6 @@ export class InformacionBase {
     }
   }
 
-  /** Pide al servidor la página actual de la pestaña activa. Siempre carga (también al cambiar de pestaña o de filtro
-   * mientras otra carga sigue en curso) y descarta las respuestas que llegan tarde. */
   private cargarPestanaActiva(): void {
     const tab = this.tabActiva();
     const carga = ++this.cargaActual;
@@ -504,8 +490,6 @@ export class InformacionBase {
     return existe ? lista.map((x) => (idDe(x) === id ? item : x)) : [item, ...lista];
   }
 
-  /** Si la vista actual es "solo activos" (mostrarTodos apagado), un elemento que se acaba de
-   * desactivar debe desaparecer de la lista en vez de quedarse mostrando "Inactivo". */
   private aplicarCambioActivo<T extends { activo: boolean }>(
     lista: T[],
     item: T,

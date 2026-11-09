@@ -14,12 +14,6 @@ import { formatearFechaLarga } from '../../cursos/curso-formato.util';
 import { CertificacionApiService } from '../certificacion-api.service';
 import { Certificacion } from '../certificacion.model';
 
-/**
- * HU-032 — "Tu certificado": dice en qué punto está el certificado del curso (faltan requisitos,
- * programado, faltan datos, listo para generar o ya emitido), muestra la nota y el nivel proyectados,
- * deja confirmar los nombres a imprimir y, cuando corresponde, generarlo o descargarlo. Todo lo que
- * decide (estado, fechas, nivel) viene del servidor.
- */
 @Component({
   selector: 'app-certificacion-bloque',
   imports: [ReactiveFormsModule, DecimalPipe, Modal, RouterLink, DiplomaMiniatura],
@@ -56,7 +50,6 @@ export class CertificacionBloque {
   });
 
   constructor() {
-    // Se vuelve a consultar cada vez que cambia el avance del curso (lección, examen, nota publicada).
     effect(() => {
       const id = this.cursoId();
       this.aula.aula();
@@ -88,7 +81,6 @@ export class CertificacionBloque {
         apellidoMaterno: c.datos.apellidoMaterno ?? '',
       });
     }
-    // Si faltan datos, el formulario se muestra de entrada; si ya están confirmados, queda plegado.
     if (c.estado === 'PENDIENTE_DATOS') this.editandoDatos.set(true);
   }
 
@@ -155,7 +147,6 @@ export class CertificacionBloque {
           this.emitiendo.set(false);
           this.confirmandoEmision.set(false);
           this.mostrar(c);
-          // Emitir cierra los intentos calificados: el estado de los exámenes del aula cambió.
           this.aula.refrescar();
           this.alertas.mostrar('exito', 'Tu certificado fue emitido.');
         },
@@ -166,7 +157,6 @@ export class CertificacionBloque {
       });
   }
 
-  /** Visor privado: abre el PDF en el navegador sin descargarlo. */
   protected ver(): void {
     const url = this.cert()?.certificado?.descargaUrl;
     if (url) window.open(`${resolverUrlApi(url)}?enLinea=true`, '_blank');
@@ -181,7 +171,6 @@ export class CertificacionBloque {
       .subscribe({ error: () => this.alertas.mostrar('error', 'No pudimos descargar tu certificado. Inténtalo nuevamente.') });
   }
 
-  /** Paso actual del recorrido (0..3); con el certificado emitido, todos quedan completos. */
   protected pasoActual(c: Certificacion): number {
     switch (c.estado) {
       case 'PENDIENTE_REQUISITOS': return 0;

@@ -18,7 +18,6 @@ function verificacion(estado: 'VIGENTE' | 'ANULADO'): VerificacionCertificado {
   };
 }
 
-/** EP05 · HU-034 — Verificación pública de un certificado, sin sesión: por el código del QR o escrito a mano. */
 describe('VerificarCertificado', () => {
   let fixture: ComponentFixture<VerificarCertificado>;
   let http: HttpTestingController;

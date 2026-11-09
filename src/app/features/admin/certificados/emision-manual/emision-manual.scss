@@ -5,7 +5,6 @@
   max-width: 1040px;
 }
 
-// Confirmación escribiendo el nombre (alumno que no cumple los requisitos).
 .emision__advertencia {
   margin-bottom: 16px;
 }
@@ -237,8 +236,6 @@
   height: 20px;
   accent-color: var(--marca-900);
 }
-
-// ----------------------------------------------------------------- Modal de emisión --
 
 .emision__modal {
   display: flex;

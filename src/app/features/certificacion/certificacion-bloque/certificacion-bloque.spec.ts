@@ -27,7 +27,6 @@ const EMITIDO = {
   nombresImpresos: 'Ana María Pérez Gómez', entidad: null, descargaUrl: '/api/app/certificados/ESEJUR-2026-ABCD2345/descargar',
 };
 
-/** EP05 · HU-032 — "Tu certificado": estado de la certificación, confirmación de datos y emisión. */
 describe('CertificacionBloque', () => {
   let fixture: ComponentFixture<CertificacionBloque>;
   let http: HttpTestingController;

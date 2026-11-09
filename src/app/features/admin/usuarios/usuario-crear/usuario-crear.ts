@@ -1,4 +1,3 @@
-// usuario-crear.ts
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectorRef, Component, DestroyRef, inject, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -18,9 +17,6 @@ interface ErrorApiAdmin {
   message?: string;
 }
 
-/** HU-008 — Crear usuario administrativamente, como contenido de un modal (ver
- * usuarios-listado). Si el correo ya existe, conserva la cuenta y solo concede el rol faltante;
- * no genera contraseña temporal ni duplica la identidad. */
 @Component({
   selector: 'app-usuario-crear',
   imports: [ReactiveFormsModule],
@@ -80,8 +76,6 @@ export class UsuarioCrear {
     return this.rolesSeleccionados().includes(rol);
   }
 
-  /** No se puede dejar la cuenta sin ningún rol: el último marcado no se puede desmarcar. El rol
-   * principal no se pregunta: si incluye Administrador, ese es el principal; si no, Alumno. */
   protected alternarRol(rol: RolUsuarioAdmin): void {
     const actuales = this.rolesSeleccionados();
     if (actuales.includes(rol)) {

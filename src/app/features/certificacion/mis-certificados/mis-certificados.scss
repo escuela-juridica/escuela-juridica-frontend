@@ -1,6 +1,3 @@
-// HU-033 · Mis certificados: portada de marca y galería de diplomas.
-
-// ------------------------------------------------------------------ Portada --
 .galeria-hero {
   background:
     radial-gradient(circle at 90% 20%, rgba(244, 183, 64, 0.22), transparent 40%),
@@ -17,7 +14,6 @@
   padding-bottom: 40px;
 }
 
-// Mismo tamaño de título de pantalla que Panel y Mi perfil (28/36 px).
 .galeria-hero__titulo {
   font-size: 28px;
   line-height: 36px;
@@ -59,7 +55,6 @@
   color: rgba(255, 255, 255, 0.8);
 }
 
-// El eyebrow de marca (rojo) no se lee sobre azul: versión clara.
 :host ::ng-deep .eyebrow--claro .eyebrow__dash {
   background: var(--acento-500);
 }
@@ -68,7 +63,6 @@
   color: var(--acento-500);
 }
 
-// ------------------------------------------------------------------ Galería --
 .galeria {
   padding-top: 32px;
   padding-bottom: 48px;

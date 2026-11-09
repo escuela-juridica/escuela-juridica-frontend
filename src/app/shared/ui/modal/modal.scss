@@ -39,8 +39,6 @@
   border-bottom: 1px solid var(--neutral-100);
   position: sticky;
   top: 0;
-  // Por encima del contenido que se desplaza: los campos posicionados (ng-select, que sube hasta
-  // z-index 1001 al enfocarse) se pintaban sobre el título al hacer scroll.
   z-index: 1100;
   background: var(--blanco);
   border-radius: var(--radio-lg) var(--radio-lg) 0 0;

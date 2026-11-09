@@ -18,7 +18,6 @@ const ETIQUETAS_INGRESO: Record<string, string> = {
 
 interface CursoActivo {
   id: number;
-  /** El reenvío de la confirmación se pide por matrícula, no por curso. */
   matriculaId: number;
   imagenUrl: string;
   tipo: string;
@@ -32,9 +31,7 @@ interface CursoActivo {
   accesoEfectivo: boolean;
   fechaInicio: string | null;
   estadoNotificacion: string | null;
-  /** HU-047: compra iniciada que Culqi todavía no aprobó. */
   pagoPendiente: boolean;
-  /** HU-038: el curso fue cancelado por la Escuela. */
   cursoCancelado: boolean;
   urlAmigable: string;
 }

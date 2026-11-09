@@ -112,8 +112,6 @@ export class MiPerfil implements OnInit {
         });
     }
 
-    // Los nombres se guardan en mayúsculas (igual que en el registro), para que coincidan
-    // con el formato de los documentos de identidad.
     for (const nombre of ['nombres', 'apellidoPaterno', 'apellidoMaterno'] as const) {
       const control = this.formulario.controls[nombre];
       control.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((valor) => {
@@ -147,8 +145,6 @@ export class MiPerfil implements OnInit {
     this.pestana.set(pestana);
   }
 
-  /** Toda cuenta tiene alguna acción en Seguridad: crear su primera contraseña (Google sin
-   * contraseña) o cambiar la que ya tiene. */
   protected get mostrarPestanaSeguridad(): boolean {
     return this.perfil() !== null;
   }

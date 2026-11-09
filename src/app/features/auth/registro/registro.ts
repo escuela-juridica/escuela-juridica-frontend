@@ -40,8 +40,6 @@ type NombreCampoRegistro = (typeof NOMBRES_CAMPOS)[number];
 
 const CAMPOS_NOMBRE = ['nombres', 'apellidoPaterno', 'apellidoMaterno'] as const;
 
-// Solo letras (con tildes/Ñ), espacios, apóstrofe y guion. Como el valor se
-// fuerza a mayúsculas al tipear, el patrón solo acepta mayúsculas.
 const PATRON_NOMBRE_REQUERIDO = /^[A-ZÁÉÍÓÚÑÜ][A-ZÁÉÍÓÚÑÜ '-]*$/;
 const PATRON_NOMBRE_OPCIONAL = /^([A-ZÁÉÍÓÚÑÜ][A-ZÁÉÍÓÚÑÜ '-]*)?$/;
 
@@ -106,15 +104,10 @@ export class Registro implements OnInit {
       const control: AbstractControl = this.formulario.controls[nombre];
       control.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => {
         this.limpiarErrorCampo(nombre);
-        // Sin Zone.js, Angular no repinta solo al tipear: el checklist de
-        // contraseña y los mensajes de error de campo dependen de esto.
         this.detector.markForCheck();
       });
     }
 
-    // Nombres y apellidos solo aceptan letras: se fuerzan a mayúsculas a
-    // medida que se escribe, para que coincidan con el formato de los
-    // documentos de identidad.
     for (const nombre of CAMPOS_NOMBRE) {
       const control = this.formulario.controls[nombre];
       control.valueChanges.pipe(takeUntilDestroyed()).subscribe((valor) => {
@@ -201,7 +194,6 @@ export class Registro implements OnInit {
   }
 
   reiniciarGoogle(): void {
-    // Volver al formulario no inicia Google ni conserva una referencia fallida.
     this.modoGoogle = false;
     this.contextoGoogleValido = false;
     this.referenciaGoogle = null;

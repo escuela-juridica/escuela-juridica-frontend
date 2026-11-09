@@ -30,7 +30,6 @@ describe('Ayuda por WhatsApp de HU-002', () => {
   });
 
   it('prepara ayuda en otra pestaña sin crear cuenta ni incluir los datos del formulario', () => {
-    // Número ficticio solo para inspeccionar el DOM: la prueba no abre ni envía mensajes.
     TestBed.overrideProvider(WHATSAPP_REGISTRO, { useValue: '51999999999' });
     const fixture = TestBed.createComponent(Registro);
     fixture.detectChanges();

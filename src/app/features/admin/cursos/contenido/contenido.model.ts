@@ -39,7 +39,6 @@ export interface LeccionRespuesta {
   activo: boolean;
   leccionOrigenId: number | null;
   materiales: MaterialRespuesta[];
-  /** HU-027 — estado de la sesión en vivo ("PROGRAMADA"/"REALIZADA"/"CANCELADA", entre otros). */
   estado: string;
   motivoCancelacion: string | null;
 }
@@ -102,8 +101,6 @@ export interface OrdenPeticion {
   ids: number[];
 }
 
-// ---------------------------------------------------------------- HU-027 Cambios en sesiones --
-
 export interface ReprogramarSesionPeticion {
   nuevaFechaHoraInicio: string;
   nuevaFechaHoraFin: string;
@@ -113,7 +110,6 @@ export interface ReprogramarSesionPeticion {
 export interface ReprogramarSesionRespuesta {
   aplicado: boolean;
   requiereAmpliarFinDeCurso: boolean;
-  /** LocalDate "yyyy-MM-dd", presente solo cuando requiereAmpliarFinDeCurso es true. */
   fechaFinCursoSugerida: string | null;
 }
 

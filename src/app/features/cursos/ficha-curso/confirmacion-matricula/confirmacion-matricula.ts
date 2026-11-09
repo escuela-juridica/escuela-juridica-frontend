@@ -3,7 +3,6 @@ import { formatearFecha, formatearPrecio, urlPortadaCurso } from '../../curso-fo
 import { FichaCursoDetalle } from '../../curso.model';
 import { Modal } from '../../../../shared/ui/modal/modal';
 
-/** Resumen previo a la matrícula: el alumno revisa curso, importe y acceso antes de confirmar. */
 @Component({
   selector: 'app-confirmacion-matricula',
   imports: [Modal],

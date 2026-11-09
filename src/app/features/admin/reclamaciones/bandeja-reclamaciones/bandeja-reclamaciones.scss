@@ -79,7 +79,6 @@
   white-space: nowrap;
 }
 
-// El vencimiento solo se resalta: el caso sigue abierto y se puede responder.
 .ban__fila--vencido td:first-child {
   box-shadow: inset 4px 0 0 var(--error);
 }

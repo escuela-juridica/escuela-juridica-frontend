@@ -7,7 +7,6 @@ export interface ConfirmacionOpciones {
   mensaje: string;
   textoConfirmar?: string;
   textoCancelar?: string;
-  /** 'peligro' resalta el botón de confirmar en rojo, para acciones irreversibles o de alto impacto. */
   variante?: VarianteConfirmacion;
 }
 
@@ -20,11 +19,6 @@ interface SolicitudConfirmacion {
   resolver: (confirmado: boolean) => void;
 }
 
-/** Diálogo de confirmación reutilizable en toda la app: en vez de `confirm()` nativo del
- * navegador (sin estilo, bloqueante, no personalizable), cualquier componente inyecta este
- * servicio y hace `await this.confirmacion.preguntar({...})`. El diálogo real se renderiza una
- * sola vez en la raíz de la app ({@link ConfirmacionDialog}), así que no hay que montar nada por
- * cada módulo nuevo. */
 @Injectable({ providedIn: 'root' })
 export class ConfirmacionService {
   readonly solicitud = signal<SolicitudConfirmacion | null>(null);

@@ -6,7 +6,6 @@ import { API_URL } from '../../../../core/api/api.config';
 import { PageResponse } from '../../../../core/api/page-response.model';
 import { FiltrosReporteAcademico, OpcionCursoReporte, ReporteAcademico } from './reporte-academico.model';
 
-/** HU-043 — Reporte académico. Consume `/api/admin/reportes/academico`. */
 @Injectable({ providedIn: 'root' })
 export class ReporteAcademicoApiService {
   private readonly http = inject(HttpClient);
@@ -21,7 +20,6 @@ export class ReporteAcademicoApiService {
     return this.http.get<OpcionCursoReporte[]>(`${this.base}/cursos`);
   }
 
-  /** La exportación usa exactamente los mismos filtros que la consulta en pantalla. */
   urlExportacionExcel(filtros: FiltrosReporteAcademico): string {
     return `${this.base}/exportar-excel?${this.parametros(filtros).toString()}`;
   }

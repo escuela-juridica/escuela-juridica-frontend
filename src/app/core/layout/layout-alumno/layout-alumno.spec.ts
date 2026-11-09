@@ -41,9 +41,6 @@ describe('LayoutAlumno', () => {
       rolPrincipal: 'ALUMNO',
     });
 
-    // cerrarSesion() ahora espera primero la confirmación del diálogo (ver
-    // ConfirmacionService): sin el diálogo real montado en el test, hay que
-    // responderla manualmente para que la promesa avance.
     const cierre = component.cerrarSesion();
     confirmacion.responder(true);
     await cierre;

@@ -1,5 +1,3 @@
-// HU-032 · Bloque "Tu certificado" del resumen del curso.
-
 :host {
   display: block;
 }
@@ -15,7 +13,6 @@
   color: var(--neutral-600);
 }
 
-// ----------------------------------------------------------------- Pasos --
 .cert__pasos {
   list-style: none;
   margin: 0;
@@ -34,7 +31,6 @@
   text-align: center;
 }
 
-// Línea que une cada paso con el siguiente.
 .cert__paso::after {
   content: '';
   position: absolute;
@@ -95,7 +91,6 @@
   color: var(--neutral-950);
 }
 
-// ------------------------------------------------------ Estado sin emitir --
 .cert__estado-tarjeta {
   padding: 16px 20px;
   border: 1px solid var(--neutral-200);
@@ -219,7 +214,6 @@
   color: var(--neutral-800);
 }
 
-// ------------------------------------------------------------ Celebración --
 .cert__celebracion {
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
@@ -298,7 +292,6 @@
   transform: rotate(2deg);
 }
 
-// Botones sobre el degradado: el principal turquesa con texto azul; los secundarios, transparentes.
 .cert__cta {
   background: var(--acento-500);
   border-color: var(--acento-500);

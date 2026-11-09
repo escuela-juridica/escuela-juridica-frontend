@@ -8,12 +8,6 @@ import { formatearDuracion } from '../../cursos/curso-formato.util';
 import { AulaSesionService } from '../aula-sesion.service';
 import { ExamenAulaRespuesta, LeccionAulaRespuesta, ModuloAulaRespuesta } from '../aula.model';
 
-/**
- * Layout del aula (HU-022, guía §25): barra del curso con el avance, el contenido de la lección a la
- * izquierda y, a la derecha, el panel "Contenido del curso" con los módulos en acordeón. En móvil
- * ese panel se abre a pantalla completa. Dentro del layout del alumno, así conserva la navegación
- * principal. Provee el estado compartido del curso a sus pantallas hijas.
- */
 @Component({
   selector: 'app-aula-shell',
   imports: [RouterOutlet, RouterLink, NgTemplateOutlet],
@@ -28,7 +22,6 @@ export class AulaShell {
 
   protected readonly panelAbierto = signal(false);
   protected readonly modulosAbiertos = signal<ReadonlySet<number>>(new Set());
-  /** Examen que se está viendo (la ruta hija `examenes/:examenId`), para resaltarlo en el panel. */
   protected readonly examenActualId = signal<number | null>(null);
 
   constructor() {
@@ -50,7 +43,6 @@ export class AulaShell {
       )
       .subscribe((id) => this.examenActualId.set(id));
 
-    // El módulo de la lección que se está viendo (o donde se continúa) queda desplegado.
     effect(() => {
       const aula = this.estado.aula();
       if (!aula) return;
@@ -83,7 +75,6 @@ export class AulaShell {
     return leccion.duracionSegundos ? `${tipo} · ${formatearDuracion(leccion.duracionSegundos)}` : tipo;
   }
 
-  /** Una línea que dice en qué está el examen para este alumno (estado, nota, intentos o por qué aún no abre). */
   protected detalleExamen(examen: ExamenAulaRespuesta): string {
     const nota = examen.mejorNota !== null ? ` · nota ${examen.mejorNota}` : '';
     switch (examen.estado) {

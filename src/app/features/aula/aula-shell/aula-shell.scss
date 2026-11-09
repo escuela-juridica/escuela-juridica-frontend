@@ -1,5 +1,3 @@
-// HU-022 · Layout del aula — barra del curso + contenido + panel "Contenido del curso" (guía §25).
-
 :host {
   display: block;
   background: var(--neutral-050);
@@ -17,7 +15,6 @@
   margin: 0 auto;
 }
 
-// ------------------------------------------------------------ Barra del curso --
 .aula-barra {
   background: var(--blanco);
   border-bottom: 1px solid var(--neutral-200);
@@ -89,7 +86,6 @@
   gap: 6px;
 }
 
-// Guía §23: barra de 8 px, pista #EAECF0, progreso turquesa, porcentaje visible como texto.
 .aula-barra__pista {
   height: 8px;
   border-radius: var(--radio-completo);
@@ -117,7 +113,6 @@
   gap: 8px;
 }
 
-// ----------------------------------------------------------------- Cuerpo --
 .aula-cuerpo {
   max-width: 1440px;
   margin: 0 auto;
@@ -132,7 +127,6 @@
   min-width: 0;
 }
 
-// ------------------------------------------------------ Panel de contenido --
 .aula-panel {
   position: sticky;
   top: 96px;
@@ -195,7 +189,6 @@
   overscroll-behavior: contain;
 }
 
-// ----------------------------------------------------------------- Módulo --
 .aula-modulo {
   border-bottom: 1px solid var(--neutral-200);
 }
@@ -258,7 +251,6 @@
   padding: 0;
 }
 
-// ---------------------------------------------------------- Lección en lista --
 .aula-item {
   display: flex;
   align-items: flex-start;
@@ -352,7 +344,6 @@ a.aula-item--examen:not(.aula-item--actual):hover {
   background: var(--neutral-100);
 }
 
-// Encabezado de sección que no se despliega (evaluación final).
 .aula-modulo__cabecera--fija {
   cursor: default;
 }
@@ -365,7 +356,6 @@ a.aula-item--examen:not(.aula-item--actual):hover {
   display: none;
 }
 
-// ------------------------------------------------- Tablet y móvil (< 1024 px) --
 @media (max-width: 1023px) {
   .aula-barra__fila {
     padding: 8px 16px;
@@ -392,7 +382,6 @@ a.aula-item--examen:not(.aula-item--actual):hover {
     padding: 16px 16px 48px;
   }
 
-  // El panel pasa a ser un cajón lateral (guía §25.1: en móvil, panel deslizable a pantalla completa).
   .aula-panel {
     position: fixed;
     top: 0;
@@ -440,7 +429,6 @@ a.aula-item--examen:not(.aula-item--actual):hover {
   }
 }
 
-// HU-038: aviso de curso cancelado, entre la barra del curso y el contenido.
 .aula-cancelado {
   margin: 16px 24px 0;
 }

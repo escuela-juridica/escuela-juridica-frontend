@@ -1,8 +1,4 @@
-// PF-001 · Estilos propios de esta pantalla.
-
 .catalogo-ancla {
-  // Respaldo para la cabecera de escritorio, incluido su borde.
-  // Al paginar se ajusta a la altura real del header (tambien en movil).
   scroll-margin-top: 73px;
 }
 
@@ -16,7 +12,6 @@
   overflow: hidden;
 }
 .hero-catalogo__degradado {
-  // El extremo derecho no baja de 0.4 para que las fotos claras (p. ej. la del graduado) no se vean grises y lavadas.
   background:
     linear-gradient(90deg, rgba(8, 18, 33, 0.94) 0%, rgba(8, 18, 33, 0.78) 42%, rgba(8, 18, 33, 0.4) 100%),
     linear-gradient(0deg, rgba(8, 18, 33, 0.55) 0%, rgba(8, 18, 33, 0) 35%);

@@ -1,6 +1,5 @@
 @if (estado.aula(); as aula) {
   <div class="resumen">
-    <!-- ============================================================ Portada == -->
     <section class="hero" [style.--portada]="aula.imagenPortadaUrl ? 'url(' + urlPortada(aula.imagenPortadaUrl) + ')' : 'none'" aria-labelledby="hero-titulo">
       <div class="hero__velo"></div>
       <div class="hero__contenido">
@@ -37,7 +36,6 @@
         </div>
       </div>
 
-      <!-- Siguiente paso: lo único que el alumno necesita decidir al entrar. -->
       <div class="hero__paso">
         @if (continuar(); as destino) {
           <div class="hero__paso-texto">
@@ -71,7 +69,6 @@
       </div>
     </section>
 
-    <!-- ========================================================== Pestañas == -->
     <nav class="pestanas" role="tablist" aria-label="Secciones del curso">
       <button type="button" role="tab" class="pestana" [class.pestana--activa]="pestana() === 'resumen'" [attr.aria-selected]="pestana() === 'resumen'" (click)="pestana.set('resumen')">Resumen</button>
       <button type="button" role="tab" class="pestana" [class.pestana--activa]="pestana() === 'evaluaciones'" [attr.aria-selected]="pestana() === 'evaluaciones'" (click)="pestana.set('evaluaciones')">

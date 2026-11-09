@@ -29,7 +29,6 @@ function aula(porcentaje: number, ultima: number | null): AulaRespuesta {
   };
 }
 
-/** EP04 · HU-022 — Estado compartido del aula: carga del temario, orden de lecciones y "Continuar". */
 describe('AulaSesionService', () => {
   let estado: AulaSesionService;
   let http: HttpTestingController;

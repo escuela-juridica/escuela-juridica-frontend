@@ -132,7 +132,7 @@ describe('Registro', () => {
   });
 
   it('informa rechazo del backend por anti-robot pendiente sin navegar ni perder datos', () => {
-    completarFormularioValido(); // Evidencia simulada solo en esta prueba.
+    completarFormularioValido();
     api.registrarFormulario.mockReturnValue(
       throwError(
         () =>

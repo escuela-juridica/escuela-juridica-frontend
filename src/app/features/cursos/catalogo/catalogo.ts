@@ -28,8 +28,6 @@ import {
   urlPortadaCurso,
 } from '../curso-formato.util';
 
-// `posicion` es el punto de la foto que se mantiene a la vista al recortarla para la portada (panorámica):
-// hero-3 es vertical y, centrada, solo mostraba la toga sin el rostro.
 const HERO_IMGS = [
   { src: 'img/catalogo/hero-1.jpg', posicion: 'center' },
   { src: 'img/catalogo/hero-2.jpg', posicion: 'center' },
@@ -153,8 +151,6 @@ export class Catalogo implements OnInit, AfterViewInit {
     const ancla = this.anclaCatalogo()?.nativeElement;
     if (ancla) {
       const cabecera = ancla.ownerDocument.querySelector('header');
-      // El contenedor comienza justo al terminar el banner. Reservamos solo
-      // la cabecera fija; el padding del contenedor separa los filtros.
       ancla.style.scrollMarginTop = `${cabecera?.getBoundingClientRect().height ?? 0}px`;
       ancla.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }

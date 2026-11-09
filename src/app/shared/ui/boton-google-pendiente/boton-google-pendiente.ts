@@ -1,13 +1,5 @@
 import { Component, input, signal } from '@angular/core';
 
-/**
- * Botón "Continuar con Google" reutilizable. La integración real con Google todavía no existe
- * (no hay credenciales), así que al hacer clic solo muestra un aviso; no navega ni envía nada.
- * Usado en acceso (HU-001) y registro (HU-002) para no duplicar el SVG ni la alerta.
- *
- * TODO: cuando se implemente el acceso/registro real con Google, borrar este componente y sus
- * usos en acceso.html y registro.html, y reemplazarlos por el flujo OAuth real.
- */
 @Component({
   selector: 'app-boton-google-pendiente',
   template: `

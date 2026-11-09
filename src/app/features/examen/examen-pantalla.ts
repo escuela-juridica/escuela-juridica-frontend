@@ -15,7 +15,6 @@ import { ExamenFichaCabecera } from './ficha-cabecera/examen-ficha-cabecera';
 import { EstadoGuardado, ExamenNavegador } from './navegador/examen-navegador';
 import { ExamenFicha, Intento, IntentoResumen, PreguntaIntento } from './examen.model';
 
-/** Lo que el alumno lleva escrito/marcado en una pregunta (se sincroniza con el servidor al vuelo). */
 interface RespuestaLocal {
   opciones: number[];
   texto: string;
@@ -23,12 +22,6 @@ interface RespuestaLocal {
 
 const ESPERA_GUARDADO_TEXTO_MS = 700;
 
-/**
- * HU-028 / HU-029 — Rendir un examen dentro del aula: ficha (reglas, intentos), intento con
- * temporizador y navegación entre preguntas, revisión antes de enviar y resultado. El tiempo y la
- * nota los decide el servidor; el navegador solo muestra la cuenta regresiva y guarda cada
- * respuesta al cambiarla, de modo que cerrar la pestaña o perder conexión no pierde lo respondido.
- */
 @Component({
   selector: 'app-examen-pantalla',
   imports: [RouterLink, DecimalPipe, Modal, AnilloProgreso, ExamenFichaCabecera, ExamenNavegador],
@@ -86,7 +79,6 @@ export class ExamenPantalla {
     () => (this.intento()?.preguntas ?? []).filter((p) => this.estaRespondida(p)).length,
   );
 
-  /** Respuestas abiertas ya calificadas por un revisor (puntaje y observación): el alumno siempre las ve. */
   protected readonly abiertasRevisadas = computed(() =>
     (this.intento()?.preguntas ?? []).filter((p) => p.tipo === 'RESPUESTA_ABIERTA' && p.estadoRevision === 'REVISADA'),
   );
@@ -129,8 +121,6 @@ export class ExamenPantalla {
     });
   }
 
-  // ------------------------------------------------------------------ carga --
-
   private reiniciar(): void {
     this.detenerTemporizador();
     this.intento.set(null);
@@ -166,8 +156,6 @@ export class ExamenPantalla {
     this.cargarFicha();
     window.scrollTo({ top: 0 });
   }
-
-  // ----------------------------------------------------------------- acciones --
 
   protected iniciar(): void {
     if (this.examenId == null || this.iniciando()) return;
@@ -207,7 +195,6 @@ export class ExamenPantalla {
       });
   }
 
-  /** Prepara el estado local de un intento en curso: respuestas guardadas, marcas y cuenta regresiva. */
   private abrirIntento(intento: Intento): void {
     const mapa = new Map<number, RespuestaLocal>();
     for (const p of intento.preguntas) {
@@ -237,7 +224,6 @@ export class ExamenPantalla {
     this.confirmando.set(false);
   }
 
-  /** Confirma el envío: antes sincroniza cualquier respuesta que no se haya podido guardar. */
   protected enviar(): void {
     const intento = this.intento();
     if (!intento || this.enviando()) return;
@@ -250,7 +236,6 @@ export class ExamenPantalla {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => this.enviarYMostrar(intento.id),
-        // Si el tiempo ya venció el servidor lo envió solo: igual se muestra el resultado real.
         error: () => this.enviarYMostrar(intento.id),
       });
   }
@@ -276,12 +261,9 @@ export class ExamenPantalla {
     this.sucias.clear();
     this.intento.set(resultado);
     this.borrarMarcas(resultado.id);
-    // El avance del curso (exámenes, bloqueos del temario) cambió: se refresca el estado compartido.
     this.aula.refrescar();
     window.scrollTo({ top: 0 });
   }
-
-  // ---------------------------------------------------------------- respuestas --
 
   protected estaRespondida(p: PreguntaIntento): boolean {
     const r = this.local().get(p.id);
@@ -363,7 +345,6 @@ export class ExamenPantalla {
         },
         error: (e: HttpErrorResponse) => {
           this.guardado.set('error');
-          // Un 400 significa que el intento ya se cerró (tiempo agotado): se consulta el resultado real.
           if (e.status === 400) this.sincronizarCierre(intento.id);
         },
       });
@@ -374,8 +355,6 @@ export class ExamenPantalla {
     return { opcionesIds: r.opciones, texto: r.texto.trim() ? r.texto : null };
   }
 
-  // -------------------------------------------------------------- temporizador --
-
   private iniciarTemporizador(intento: Intento): void {
     this.detenerTemporizador();
     if (!intento.expiraEn) {
@@ -383,7 +362,6 @@ export class ExamenPantalla {
       return;
     }
     const expiraMs = Date.parse(intento.expiraEn);
-    // El reloj del servidor manda: se corrige la diferencia con el del navegador.
     this.desfaseRelojMs = Date.parse(intento.ahora) - Date.now();
     const tic = () => {
       const restantes = Math.max(0, Math.floor((expiraMs - (Date.now() + this.desfaseRelojMs)) / 1000));
@@ -402,7 +380,6 @@ export class ExamenPantalla {
     this.temporizador = null;
   }
 
-  /** El tiempo se agotó: el servidor ya (o enseguida) envió el intento con lo guardado; se muestra su resultado. */
   private sincronizarCierre(intentoId: number): void {
     this.esperas.forEach((t) => clearTimeout(t));
     this.esperas.clear();
@@ -419,8 +396,6 @@ export class ExamenPantalla {
         error: () => this.guardado.set('error'),
       });
   }
-
-  // ------------------------------------------------------------- presentación --
 
   protected etiquetaTipoPregunta(tipo: PreguntaIntento['tipo']): string {
     switch (tipo) {
@@ -455,8 +430,6 @@ export class ExamenPantalla {
     return p.seleccionadas.includes(opcionId);
   }
 
-  // ------------------------------------------------------------------ helpers --
-
   private fallar(e: HttpErrorResponse, porDefecto: string): void {
     this.error.set(this.mensaje(e) ?? porDefecto);
     this.cargando.set(false);
@@ -480,7 +453,6 @@ export class ExamenPantalla {
     try {
       localStorage.setItem(`esejur.examen.marcadas.${intentoId}`, JSON.stringify([...marcas]));
     } catch {
-      /* las marcas son una comodidad: sin almacenamiento simplemente no persisten */
     }
   }
 
@@ -488,7 +460,6 @@ export class ExamenPantalla {
     try {
       localStorage.removeItem(`esejur.examen.marcadas.${intentoId}`);
     } catch {
-      /* ver guardarMarcas */
     }
   }
 }

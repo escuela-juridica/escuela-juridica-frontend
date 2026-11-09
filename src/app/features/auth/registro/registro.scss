@@ -1,7 +1,3 @@
-// PF-004 · Estilos propios de la pantalla de creación de cuenta.
-
-// Escritorio: panel de marca fijo a la izquierda y formulario (largo) a la derecha, que es el que hace scroll.
-// Bajo 900px el panel pasa a ser una franja compacta arriba.
 .registro-fila {
   display: flex;
   align-items: flex-start;
@@ -58,7 +54,6 @@
   z-index: 3;
 }
 
-// z-index por encima del degradado: sin él, el velo azul se dibujaba sobre el texto y lo dejaba difuso.
 .registro-hero-cita {
   max-width: 440px;
   position: relative;

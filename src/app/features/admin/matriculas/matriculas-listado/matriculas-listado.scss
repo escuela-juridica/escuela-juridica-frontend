@@ -1,6 +1,3 @@
-// Sin padding propio: .admin-contenido (layout-admin) ya da los 32px, igual que en Cursos y
-// Usuarios — ponerlo aquí también duplicaba el espaciado.
-
 .matriculas__titulo {
   font-size: 22px;
   line-height: 30px;
@@ -28,9 +25,6 @@
   margin: 4px 0 0;
   color: var(--neutral-600);
 }
-
-// ------------------------------------------------------------------- Pestañas --
-// Mismo aspecto que las secciones del centro de reportes.
 
 .matriculas__tabs {
   display: flex;
@@ -64,8 +58,6 @@
   border-bottom-color: var(--acento-500);
 }
 
-// ----------------------------------------------------------------- Filtros --
-
 .matriculas__filtros {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -87,7 +79,6 @@
   color: var(--neutral-700);
 }
 
-// Las opciones del desplegable se muestran completas (el nombre no se corta contra el borde).
 .matriculas__opcion {
   display: flex;
   flex-direction: column;
@@ -117,7 +108,6 @@
   line-height: 18px;
 }
 
-// «Limpiar» en gris con X, igual que en el centro de reportes.
 .matriculas__btn-limpiar {
   background: var(--neutral-600);
   color: var(--blanco);
@@ -131,8 +121,6 @@
   color: var(--neutral-600);
   margin: 24px 0;
 }
-
-// ------------------------------------------------------------------- Tabla --
 
 .matriculas__tabla-contenedor {
   overflow: auto;
@@ -181,9 +169,6 @@
   flex-wrap: wrap;
 }
 
-// Botones de la fila: mismo ancho, vayan en una línea o apilados cuando la pantalla es angosta.
-// Los botones van lado a lado si hay espacio y se apilan (con el mismo ancho) si la ventana es angosta;
-// forzarlos a una sola línea hacía que la tabla se saliera del ancho y recortara el de la derecha.
 .matriculas__acciones--fila {
   flex-wrap: wrap;
   min-width: 112px;
@@ -193,12 +178,10 @@
   width: 112px;
 }
 
-// Pie del modal de detalle: botones pegados a la derecha.
 .matriculas__acciones--pie {
   justify-content: flex-end;
 }
 
-// Comprobante opcional de un pago manual.
 .matriculas__opcional {
   color: var(--neutral-500);
   font-weight: 500;
@@ -295,13 +278,11 @@
   gap: 6px;
 }
 
-// Botón de fila solo con ícono (p. ej. «Reemplazar» cuando ya hay comprobante): cuadrado de 32 px.
 .matriculas__btn-icono {
   width: 32px;
   padding: 0;
 }
 
-// Modal de cancelación: resumen de la matrícula y consecuencias.
 .cancelacion__resumen {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -376,7 +357,6 @@
   flex-shrink: 0;
 }
 
-// Botones de fila: el .btn global mide 44px, demasiado para una tabla densa.
 .matriculas__btn-fila {
   height: 32px;
   padding: 0 12px;
@@ -395,8 +375,6 @@
   color: var(--neutral-500);
   padding: 32px 16px;
 }
-
-// ------------------------------------------------------------- Detalle (modal) --
 
 .matriculas__detalle {
   display: grid;
@@ -427,7 +405,6 @@
   font-size: 0.9rem;
 }
 
-// Datos de la matrícula en rejilla etiqueta/valor.
 .matriculas__datos {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -497,8 +474,6 @@
   text-align: center;
 }
 
-// Tablas del detalle (historial económico y de acceso): se ajustan al ancho del modal, sin
-// scroll horizontal salvo en pantallas muy angostas.
 .matriculas__subtabla-contenedor {
   overflow-x: auto;
   border: 1px solid var(--neutral-200);
@@ -559,11 +534,8 @@
   white-space: nowrap;
 }
 
-// ----------------------------------------------------------- Formulario modal --
-
 .formulario-matricula {
   display: grid;
-  // minmax(0, 1fr): sin esto, un valor largo ensancha la columna y los selects se salen del modal.
   grid-template-columns: minmax(0, 1fr);
   gap: 16px;
 }
@@ -634,8 +606,6 @@
   font-size: 0.9rem;
 }
 
-// La tabla se adapta en vez de obligar a hacer scroll horizontal: con poco ancho se ocultan las columnas
-// secundarias (siguen visibles en el detalle de la matrícula).
 @media (max-width: 1320px) {
   .matriculas__col-fecha {
     display: none;

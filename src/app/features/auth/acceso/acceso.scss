@@ -1,7 +1,3 @@
-// PF-003 · Estilos propios de esta pantalla.
-// Escritorio: formulario a la izquierda y panel de marca fijo a la derecha. Bajo 900px el panel pasa a ser una
-// franja compacta arriba. En pantallas poco altas se compacta el espaciado para que el formulario quepa sin scroll.
-
 .acceso-fila {
     background: var(--neutral-050);
     display: flex;
@@ -85,11 +81,9 @@
     font-weight: 600;
 }
 
-// ------------------------------------------------------------------ Panel de marca
 .acceso-hero-col {
     flex: 1 1 50%;
     min-width: 0;
-    // Queda fijo a la vista aunque el formulario sea más alto que la pantalla.
     position: sticky;
     top: 0;
     align-self: flex-start;
@@ -185,7 +179,6 @@
     }
 }
 
-// ------------------------------------------------------------------ Pantallas poco altas (escritorio)
 @media (min-width: 900px) and (max-height: 760px) {
     .acceso-form-col { padding: 20px 24px; }
     .acceso-volver { margin-bottom: 14px; }
@@ -204,7 +197,6 @@
     .acceso-hero-texto { display: none; }
 }
 
-// ------------------------------------------------------------------ Tablet y móvil: panel de marca como franja superior
 @media (max-width: 899px) {
     .acceso-fila {
         flex-direction: column;

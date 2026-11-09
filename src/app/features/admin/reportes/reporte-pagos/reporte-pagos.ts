@@ -11,11 +11,6 @@ import { OpcionCursoReporte } from '../reporte-academico/reporte-academico.model
 import { ReportePagosApiService } from './reporte-pagos-api.service';
 import { EstadoPago, OrigenPago, ReportePago, TotalPagos } from './reporte-pagos.model';
 
-/**
- * HU-042 — Reporte de pagos registrados. El detalle, el total y el Excel comparten los mismos filtros. Solo
- * APROBADO y REGISTRADO_MANUAL con monto mayor que cero suman; el resto se muestra en el detalle sin sumar. No es
- * contabilidad ni un comprobante SUNAT.
- */
 @Component({
   selector: 'app-reporte-pagos',
   imports: [FormsModule, DatePipe, RouterLink, RouterLinkActive],

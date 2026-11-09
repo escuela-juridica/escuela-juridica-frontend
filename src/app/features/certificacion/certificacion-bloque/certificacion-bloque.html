@@ -4,7 +4,6 @@
   <div class="alerta alerta--error" role="alert"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div>
 } @else if (cert(); as c) {
   <div class="cert">
-    <!-- Recorrido: el alumno siempre sabe en qué paso está y qué sigue. -->
     <ol class="cert__pasos" aria-label="Pasos para obtener tu certificado">
       @for (paso of pasos; track paso; let i = $index) {
         <li class="cert__paso" [class.cert__paso--hecho]="i < pasoActual(c)" [class.cert__paso--actual]="i === pasoActual(c)"
@@ -20,7 +19,6 @@
     </ol>
 
     @if (c.certificado; as e) {
-      <!-- ===================================================== Emitido == -->
       <div class="cert__celebracion" [class.cert__celebracion--anulado]="e.estado !== 'VIGENTE'">
         <div class="cert__celebracion-texto">
           <span class="badge cert__badge" [class]="'badge ' + claseEstado(c)">{{ etiquetaEstado(c) }}</span>
@@ -53,7 +51,6 @@
         </div>
       </div>
     } @else {
-      <!-- ================================================ Aún sin emitir == -->
       <div class="cert__estado-tarjeta" [class.cert__estado-tarjeta--listo]="c.estado === 'LISTO_PARA_EMITIR'">
         <div class="cert__estado-texto">
           <span [class]="'badge ' + claseEstado(c)">{{ etiquetaEstado(c) }}</span>

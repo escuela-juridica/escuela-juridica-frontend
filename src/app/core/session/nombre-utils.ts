@@ -1,4 +1,3 @@
-/** Iniciales para el avatar de cuenta: primera letra del nombre + primera letra del apellido. */
 export function obtenerIniciales(nombreCompleto: string | null | undefined): string {
   const palabras = (nombreCompleto ?? '').trim().split(/\s+/).filter(Boolean);
   if (palabras.length === 0) {

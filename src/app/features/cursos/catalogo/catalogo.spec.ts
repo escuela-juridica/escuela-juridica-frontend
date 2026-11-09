@@ -10,7 +10,6 @@ describe('Catalogo', () => {
   let fixture: ComponentFixture<Catalogo>;
 
   beforeEach(async () => {
-    // El carrusel Swiper manipula el DOM de un navegador real y falla en JSDOM: aquí no se inicializa.
     vi.spyOn(Catalogo.prototype, 'ngAfterViewInit').mockResolvedValue(undefined);
 
     await TestBed.configureTestingModule({

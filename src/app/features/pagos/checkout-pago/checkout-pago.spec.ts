@@ -36,7 +36,6 @@ const CHECKOUT: PagoCheckout = {
   montoCentimos: 32000, titulo: 'Escuela Jurídica', correo: 'ana@example.com', nombres: 'Ana', apellidos: 'Pérez',
 };
 
-/** EP06 · HU-047 — Confirmación de compra: precio vigente, confirmación, checkout de Culqi y resultado. */
 describe('CheckoutPago', () => {
   let fixture: ComponentFixture<CheckoutPago>;
   let http: HttpTestingController;

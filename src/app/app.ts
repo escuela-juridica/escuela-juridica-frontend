@@ -7,7 +7,6 @@ import { filter, take } from 'rxjs';
 import { AlertaGlobalComponent } from './shared/ui/alerta-global/alerta-global';
 import { ConfirmacionDialog } from './shared/ui/confirmacion-dialog/confirmacion-dialog';
 
-/** Si la primera ruta tardara más que esto (red muy lenta), se retira igual la pantalla de carga. */
 const ESPERA_MAXIMA_PANTALLA_CARGA_MS = 10_000;
 
 @Component({
@@ -22,8 +21,6 @@ export class App {
   private readonly documento = inject(DOCUMENT);
 
   constructor() {
-    // La pantalla de carga de index.html cubre la descarga de la aplicación, la restauración de la sesión y la carga de
-    // la primera pantalla; se retira cuando termina la primera navegación (con éxito o no).
     const router = inject(Router);
     if (router.navigated) {
       this.retirarPantallaDeCarga();

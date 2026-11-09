@@ -1,6 +1,5 @@
 import { Component, input } from '@angular/core';
 
-/** Vista previa ilustrativa de un certificado (no es el documento real): marco, sello y datos clave. */
 @Component({
   selector: 'app-diploma-miniatura',
   templateUrl: './diploma-miniatura.html',

@@ -45,7 +45,6 @@
   margin-bottom: 24px;
 }
 
-// Las opciones del desplegable se muestran completas (el nombre no se corta contra el borde) y con aire entre líneas.
 .gestion__opcion {
   display: flex;
   flex-direction: column;
@@ -65,7 +64,6 @@
   gap: 8px;
 }
 
-// Botones de filtro compactos; «Limpiar» en gris como en el centro de reportes.
 .gestion__btn-filtro {
   height: 38px;
   padding: 0 16px;
@@ -135,7 +133,6 @@
   white-space: nowrap;
 }
 
-// Botón de fila: el .btn global mide 44 px; aquí 32 px, todos del mismo ancho.
 .gestion__btn-fila {
   width: 168px;
   height: 32px;
@@ -146,7 +143,6 @@
   text-decoration: none;
 }
 
-// Dos acciones en la misma celda (ver + corregir): una debajo de la otra, del mismo ancho.
 .gestion__acciones {
   display: flex;
   flex-direction: column;
@@ -158,7 +154,6 @@
   flex-shrink: 0;
 }
 
-// Avance del alumno en el curso: barra + porcentaje.
 .gestion__col-avance {
   min-width: 140px;
 }
@@ -206,18 +201,14 @@
   color: var(--exito);
 }
 
-// El avance se mueve a «Alumno y curso» cuando ya no cabe su columna.
 .gestion__tabla .gestion__compacto-avance {
   display: none;
 }
 
-// Líneas que solo se ven cuando la columna correspondiente se oculta por falta de ancho.
 .gestion__tabla .gestion__compacto {
   display: none;
 }
 
-// La tabla se adapta en vez de obligar a hacer scroll horizontal: con poco ancho las columnas «Matrícula» y
-// «Código» pasan a una línea dentro de «Alumno y curso» y «Certificado».
 @media (max-width: 1420px) {
   .gestion__col-matricula,
   .gestion__col-fecha,
@@ -251,7 +242,6 @@
 
 }
 
-// Móvil: los botones de fila se ajustan al ancho de la celda en vez de forzar 168 px.
 @media (max-width: 700px) {
   .gestion__filtros {
     grid-template-columns: minmax(0, 1fr);
@@ -267,7 +257,6 @@
   }
 }
 
-// Fecha de matrícula: dato secundario, sin saltos de línea.
 .gestion__tabla td.gestion__col-fecha {
   font-size: 13px;
   white-space: nowrap;

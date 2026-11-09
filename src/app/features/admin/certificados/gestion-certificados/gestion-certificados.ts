@@ -21,7 +21,6 @@ import { CertificadoGestion, FiltrosGestion } from '../certificados-admin.model'
 const TAMANO_PAGINA = 20;
 const TAMANO_BUSQUEDA = 30;
 
-/** HU-035/HU-036 — PF-033: matrículas con la situación de su certificado; desde aquí se emite uno manual. */
 @Component({
   selector: 'app-gestion-certificados',
   imports: [FormsModule, DatePipe, RouterLink, NgSelectComponent, NgOptionTemplateDirective, TablaPaginacion],
@@ -35,8 +34,6 @@ export class GestionCertificados {
   private readonly destroyRef = inject(DestroyRef);
   private peticion?: Subscription;
 
-  // Los selectores de alumno y curso consultan al servidor mientras se escribe (solo para sugerir opciones); la lista
-  // de certificados no cambia hasta pulsar «Buscar».
   protected readonly filtroAlumno = crearSelectorBusqueda(this.destroyRef, (texto) => this.consultarAlumnos(texto), () => this.alumnoId);
   protected readonly filtroCurso = crearSelectorBusqueda(this.destroyRef, (texto) => this.consultarCursos(texto), () => this.cursoId);
 
@@ -51,7 +48,6 @@ export class GestionCertificados {
   protected alumnoId: number | null = null;
   protected cursoId: number | null = null;
   protected estado = '';
-  /** Filtros aplicados con el último «Buscar»; la paginación usa estos y no lo que se esté editando. */
   private aplicados: FiltrosGestion = { usuarioId: null, cursoId: null, estado: '' };
 
   constructor() {
@@ -65,7 +61,6 @@ export class GestionCertificados {
     );
   }
 
-  /** Todos los cursos, también los ya terminados: el certificado de un curso cerrado se sigue consultando. */
   private consultarCursos(texto: string) {
     return this.cursosApi.listar(texto, 0, TAMANO_BUSQUEDA).pipe(
       map((r) => r.items.map((c: CursoResumenRespuesta): OpcionSelect => ({ id: c.id, etiqueta: c.titulo }))),
@@ -73,14 +68,12 @@ export class GestionCertificados {
     );
   }
 
-  /** Aplica los filtros escritos y vuelve a la primera página. */
   protected buscar(): void {
     this.aplicados = { usuarioId: this.alumnoId, cursoId: this.cursoId, estado: this.estado };
     this.pagina.set(0);
     this.cargar();
   }
 
-  /** Abre el PDF vigente en otra pestaña, igual que lo ve el alumno. */
   protected verCertificado(codigo: string): void {
     window.open(`${resolverUrlApi(`/api/app/certificados/${encodeURIComponent(codigo)}/descargar`)}?enLinea=true`, '_blank');
   }
@@ -108,12 +101,10 @@ export class GestionCertificados {
     }
   }
 
-  /** Texto del botón de una matrícula sin certificado: con avance que mirar o solo la situación. */
   protected textoVer(fila: CertificadoGestion): string {
     return fila.estadoMatricula === 'ACTIVA' || fila.estadoMatricula === 'VENCIDA' ? 'Ver avance' : 'Ver situación';
   }
 
-  /** Línea bajo la barra de avance de una matrícula sin certificado. */
   protected notaAvance(fila: CertificadoGestion): string {
     if (fila.cumpleRequisitos) return 'Cumple los requisitos';
     switch (fila.estadoMatricula) {

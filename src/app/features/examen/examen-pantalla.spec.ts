@@ -43,7 +43,6 @@ function intento(extra: Partial<Intento> = {}): Intento {
   };
 }
 
-/** EP05 · HU-028 / HU-029 — Rendir un examen en el aula: ficha, intento, guardado de respuestas, envío y resultado. */
 describe('ExamenPantalla', () => {
   let fixture: ComponentFixture<ExamenPantalla>;
   let http: HttpTestingController;
@@ -70,7 +69,6 @@ describe('ExamenPantalla', () => {
     }
   }
 
-  /** Inicia el intento con las preguntas dadas y deja la pantalla en "rindiendo". */
   function iniciar(resultado: Intento): void {
     accion('iniciar');
     const solicitud = http.expectOne(`${API_URL}/app/examenes/100/intentos`);

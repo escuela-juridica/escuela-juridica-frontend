@@ -13,20 +13,12 @@ import { formatearFecha, formatearHora } from '../cursos/curso-formato.util';
 import { EstadoSesion, SesionCalendarioRespuesta } from '../sesiones/sesion-alumno.model';
 import { SesionAlumnoApiService } from '../sesiones/sesion-alumno-api.service';
 
-/** Un día de la vista Lista con sus sesiones, ya ordenadas. */
 interface GrupoDiaSesiones {
   clave: string;
   etiqueta: string;
   sesiones: SesionCalendarioRespuesta[];
 }
 
-/** HU-026 — Participar en sesiones en vivo.
- *
- * Grilla mensual tipo Google Calendar (FullCalendar) en vez de la lista agrupada por día de la
- * primera ola: navegación prev/hoy/siguiente con los botones propios de ESEJUR (headerToolbar de
- * FullCalendar desactivado) y recarga de datos en cada `datesSet` (se dispara solo al montar y
- * en cada prev/next/today). Vive dentro de <app-layout-alumno>, por lo que no trae su propio
- * header/footer. */
 @Component({
   selector: 'app-calendario',
   imports: [FullCalendarModule, Modal],
@@ -48,8 +40,6 @@ export class Calendario {
   protected readonly etiquetaMes = signal('');
   protected readonly esMesActual = signal(true);
 
-  /** Guía §26: Mes y Lista son vistas alternas (nunca ambas a la vez). La Lista es la alternativa
-   * obligatoria para móvil y accesibilidad, así que arranca así en pantallas angostas. */
   protected readonly vista = signal<'mes' | 'lista'>(
     typeof window !== 'undefined' && window.innerWidth <= 560 ? 'lista' : 'mes',
   );
@@ -80,15 +70,10 @@ export class Calendario {
 
   protected readonly formatearHora = formatearHora;
 
-  /** Pista discreta bajo la grilla: se muestra cada vez que el mes visible no tiene sesiones
-   * (una grilla vacía ya comunica eso visualmente, pero un alumno de primera vez necesita saber
-   * por qué está vacía). */
   protected readonly mostrarPistaVacio = computed(
     () => !this.cargando() && !this.error() && this.sesiones().length === 0,
   );
 
-  /** Último rango pedido por FullCalendar (lo guarda `datesSet`); lo reutiliza "Reintentar" sin
-   * tener que recalcular fechas a mano. */
   private ultimoRango: DatesSetInfo | null = null;
 
   protected readonly calendarOptions = signal<CalendarOptions>({
@@ -104,10 +89,6 @@ export class Calendario {
     events: [],
     datesSet: (arg: DatesSetInfo) => this.alCambiarRango(arg),
     eventClick: (arg: EventClickInfo) => this.alHacerClicEnEvento(arg),
-    // El "today" resaltado y los chips de evento se marcan con clases propias de ESEJUR (ver
-    // nota de diseño en calendario.scss): FullCalendar v7 ya no expone clases estables como
-    // `.fc-day-today`/`.fc-event` para temizar sin un theme, así que usamos los hooks de ciclo de
-    // vida `dayCellDidMount`/`eventDidMount`, que entregan el elemento real del DOM.
     dayCellDidMount: (arg) => {
       if (arg.isToday) arg.el.classList.add('calendario-dia-hoy');
       if (arg.isOther) arg.el.classList.add('calendario-dia-otro-mes');
@@ -125,7 +106,6 @@ export class Calendario {
   });
 
   protected cambiarVista(vista: 'mes' | 'lista'): void {
-    // La grilla se oculta (no se destruye) en la Lista, así que prev/next/hoy siguen cargando datos.
     this.vista.set(vista);
   }
 
@@ -195,7 +175,6 @@ export class Calendario {
     }
   }
 
-  /** Se dispara automáticamente al montar la grilla y en cada prev()/next()/today() de la API. */
   private alCambiarRango(arg: DatesSetInfo): void {
     this.ultimoRango = arg;
     this.rangoMes.set({ inicio: arg.view.currentStart, fin: arg.view.currentEnd });
@@ -230,10 +209,6 @@ export class Calendario {
                 title: sesion.titulo,
                 start: sesion.fechaHoraInicio!,
                 end: sesion.fechaHoraFin ?? undefined,
-                // v7 ya no tiene backgroundColor/borderColor/textColor por evento (ese trío es de
-                // v5/v6): ahora es `color`/`contrastColor`, que FullCalendar expone como las
-                // variables CSS --fc-event-color/--fc-event-contrast-color sobre el elemento del
-                // evento — las consumimos en calendario.scss vía `.calendario-evento`.
                 color: colores.fondo,
                 contrastColor: colores.texto,
                 extendedProps: { sesion },
@@ -261,8 +236,6 @@ export class Calendario {
     }
   }
 
-  /** Día calendario (yyyy-MM-dd) de un instante según la hora de Lima: una sesión cercana a la
-   * medianoche no debe caer en el día equivocado por el huso del navegador. */
   private claveDiaLima(iso: string): string {
     return new Intl.DateTimeFormat('en-CA', {
       timeZone: 'America/Lima',

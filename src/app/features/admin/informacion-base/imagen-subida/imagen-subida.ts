@@ -7,7 +7,6 @@ import { resolverUrlApi } from '../../../../core/api/api.config';
 import { CursoAdminApiService } from '../../cursos/curso-admin-api.service';
 import { InformacionBaseApiService } from '../informacion-base-api.service';
 
-/** HU-009 — Campo para subir la imagen de una firma, el logo de una entidad, la foto de un docente o la portada de un curso, con vista previa. */
 @Component({
   selector: 'app-imagen-subida',
   templateUrl: './imagen-subida.html',
@@ -18,19 +17,15 @@ export class ImagenSubida {
   private readonly cursosApi = inject(CursoAdminApiService);
   private readonly destroyRef = inject(DestroyRef);
 
-  /** Referencia actual: vacía o la de una imagen ya subida ({@code /uploads/...}). */
   readonly valor = input('');
   readonly tipo = input.required<'FIRMA' | 'LOGO' | 'FOTO' | 'PORTADA'>();
-  /** Solo para {@code PORTADA}: el curso al que pertenece la imagen (el servidor la nombra con su id). */
   readonly cursoId = input<number | null>(null);
   readonly cambio = output<string>();
 
   protected readonly subiendo = signal(false);
   protected readonly error = signal<string | null>(null);
 
-  /** Vista previa del archivo recién subido: se muestra de inmediato, sin depender de que el servidor lo devuelva. */
   private readonly vistaLocal = signal<{ referencia: string; url: string } | null>(null);
-  /** Dirección de la vista previa que el navegador no pudo cargar, para mostrar un aviso en vez de una imagen rota. */
   protected readonly urlFallida = signal<string | null>(null);
 
   protected readonly urlVista = computed(() => {
@@ -42,7 +37,6 @@ export class ImagenSubida {
     if (valor.startsWith('/uploads/')) {
       return resolverUrlApi(valor);
     }
-    // Las portadas de los cursos de demostración son archivos del propio sitio ("img/cursos/...") o enlaces completos.
     return this.tipo() === 'PORTADA' && valor ? (/^(https?:)?\/\//.test(valor) || valor.startsWith('/') ? valor : '/' + valor) : null;
   });
 
@@ -92,7 +86,6 @@ export class ImagenSubida {
       this.subir(archivo);
       return;
     }
-    // La firma debe tener la forma del certificado: se avisa de inmediato, antes de subir nada.
     this.subiendo.set(true);
     void this.validarFirma(archivo).then((mensaje) => {
       this.subiendo.set(false);
@@ -104,7 +97,6 @@ export class ImagenSubida {
     });
   }
 
-  /** La portada se recorta en tarjetas y cabeceras anchas: se avisa de inmediato si no es horizontal o es muy pequeña. */
   private async validarPortada(archivo: File): Promise<string | null> {
     if (archivo.size > 5 * 1024 * 1024) {
       return 'La portada supera el tamaño máximo permitido (5 MB).';

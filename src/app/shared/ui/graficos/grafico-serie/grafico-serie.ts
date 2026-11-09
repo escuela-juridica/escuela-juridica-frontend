@@ -8,12 +8,6 @@ const MARGEN = { izquierda: 46, derecha: 14, arriba: 22, abajo: 30 };
 const PLANO_ALTO = ALTO - MARGEN.arriba - MARGEN.abajo;
 const GROSOR_MAXIMO = 24;
 
-/**
- * Serie en el tiempo: área con línea (evolución) o columnas (importes). Marcas finas, cuadrícula discreta, una guía
- * vertical que sigue el puntero con el valor de ese periodo y una sola etiqueta directa (el máximo). Se dibuja a
- * escala 1:1 con el ancho real del contenedor para que el texto conserve su tamaño. Los datos también están
- * disponibles como tabla desde la tarjeta que lo contiene: el hover no es la única vía.
- */
 @Component({
   selector: 'app-grafico-serie',
   templateUrl: './grafico-serie.html',
@@ -24,16 +18,13 @@ export class GraficoSerie {
   readonly tipo = input<'area' | 'columnas'>('area');
   readonly color = input('var(--viz-1, #2a78d6)');
   readonly nombre = input('Valor');
-  /** Conteos: el eje solo marca números enteros (nunca 0,5 matrículas). */
   readonly entero = input(false);
   readonly formato = input<(valor: number) => string>((valor) => String(valor));
-  /** Descripción para lectores de pantalla. */
   readonly descripcion = input('Gráfico de evolución');
 
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly destroyRef = inject(DestroyRef);
 
-  /** Identificador único del degradado de relleno de esta instancia. */
   protected readonly idDegradado = `grafico-serie-${++contadorDegradados}`;
   protected readonly ancho = signal(560);
   protected readonly alto = ALTO;
@@ -59,13 +50,11 @@ export class GraficoSerie {
   });
   protected readonly vacio = computed(() => this.puntos().every((p) => p.valor === 0));
 
-  /** Marcas del eje Y: 0 y cuatro tramos iguales hasta el máximo limpio. */
   protected readonly marcasY = computed(() => {
     const max = this.maximo();
     return [0, 1, 2, 3, 4].map((i) => ({ valor: (max / 4) * i, y: PLANO_ALTO - (PLANO_ALTO * i) / 4 }));
   });
 
-  /** Posición horizontal del periodo i: columnas al centro de su banda; área de borde a borde. */
   protected x(indice: number): number {
     const n = this.puntos().length;
     const ancho = this.planoAncho();
@@ -100,7 +89,6 @@ export class GraficoSerie {
     });
   });
 
-  /** Etiquetas del eje X, raleadas para no superponerse (según el ancho disponible). */
   protected readonly etiquetasX = computed(() => {
     const n = this.puntos().length;
     const maximoEtiquetas = Math.max(2, Math.floor(this.planoAncho() / 70));
@@ -108,7 +96,6 @@ export class GraficoSerie {
     return this.puntos().map((p, i) => ({ i, texto: p.etiqueta, x: this.x(i) })).filter((e) => e.i % paso === 0);
   });
 
-  /** La única etiqueta directa: el máximo de la serie (si hay algo que mostrar). */
   protected readonly pico = computed(() => {
     const puntos = this.puntos();
     let mejor = -1;
@@ -142,7 +129,6 @@ export class GraficoSerie {
   }
 }
 
-/** Columna con 4 px redondeados en el extremo de datos y base recta sobre la línea cero. */
 function trazoColumna(x: number, y: number, ancho: number, alto: number): string {
   if (alto <= 0) return '';
   const r = Math.min(4, alto, ancho / 2);

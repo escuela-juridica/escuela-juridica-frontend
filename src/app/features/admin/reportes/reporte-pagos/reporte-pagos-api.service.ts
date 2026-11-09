@@ -6,7 +6,6 @@ import { API_URL } from '../../../../core/api/api.config';
 import { PageResponse } from '../../../../core/api/page-response.model';
 import { FiltrosReportePagos, ReportePago, TotalPagos } from './reporte-pagos.model';
 
-/** HU-042 — Reporte de pagos. Consume `/api/admin/reportes/pagos`. */
 @Injectable({ providedIn: 'root' })
 export class ReportePagosApiService {
   private readonly http = inject(HttpClient);
@@ -17,7 +16,6 @@ export class ReportePagosApiService {
     return this.http.get<PageResponse<ReportePago>>(this.base, { params });
   }
 
-  /** Total de pagos confirmados con los mismos filtros que el detalle. */
   total(filtros: FiltrosReportePagos): Observable<TotalPagos> {
     return this.http.get<TotalPagos>(`${this.base}/total`, { params: this.parametros(filtros) });
   }
@@ -26,7 +24,6 @@ export class ReportePagosApiService {
     return this.http.get<string[]>(`${this.base}/medios`);
   }
 
-  /** La exportación usa exactamente los mismos filtros que la consulta en pantalla. */
   urlExportacionExcel(filtros: FiltrosReportePagos): string {
     return `${this.base}/exportar-excel?${this.parametros(filtros).toString()}`;
   }

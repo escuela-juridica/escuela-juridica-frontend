@@ -23,7 +23,6 @@ const FORMULARIO_VALIDO = {
   pedido: 'Solicito la activación de mi matrícula.', declaracionJurada: true, autorizaRespuestaCorreo: true,
 };
 
-/** EP06 · HU-039 — Libro de Reclamaciones: validaciones del formulario, adjuntos y presentación del caso. */
 describe('LibroReclamaciones', () => {
   let fixture: ComponentFixture<LibroReclamaciones>;
   let http: HttpTestingController;

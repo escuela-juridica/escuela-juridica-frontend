@@ -1,8 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { NgxSpinnerService } from 'ngx-spinner';
 
-/** Punto único para el indicador de carga de toda la aplicación. Mantiene un contador para que
- * una respuesta rápida no oculte el cargador mientras otra solicitud aún está en curso. */
 @Injectable({ providedIn: 'root' })
 export class CargadorGlobalService {
   private readonly spinner = inject(NgxSpinnerService);

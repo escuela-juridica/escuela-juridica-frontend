@@ -17,9 +17,6 @@ interface FilaAsistencia {
   motivo: string;
 }
 
-/** HU-027 — Corregir una sesión ya realizada: enlace de la grabación, asistencia alumno por
- * alumno (con motivo obligatorio solo para las filas que cambiaron) y el historial de cambios
- * de la sesión (solo lectura). */
 @Component({
   selector: 'app-modal-corregir-sesion',
   imports: [Modal],

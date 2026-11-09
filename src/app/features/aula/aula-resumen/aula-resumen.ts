@@ -11,7 +11,6 @@ import { AvanceCertificadoBloque } from '../avance-certificado/avance-certificad
 import { AulaSesionService, LeccionDelCurso } from '../aula-sesion.service';
 import { ExamenAulaRespuesta } from '../aula.model';
 
-/** Un examen del curso con el módulo al que pertenece (o ninguno si es final). */
 export interface ExamenDelCurso {
   examen: ExamenAulaRespuesta;
   modulo: string | null;
@@ -19,9 +18,6 @@ export interface ExamenDelCurso {
 
 export type PestanaResumen = 'resumen' | 'evaluaciones' | 'certificado';
 
-/** HU-022 / HU-025 — Resumen del curso: portada con el avance y el siguiente paso, y pestañas con lo
- * que sigue (sesiones y requisitos), las evaluaciones y el certificado. Es lo que se ve al entrar al
- * aula, antes de abrir una lección. */
 @Component({
   selector: 'app-aula-resumen',
   imports: [RouterLink, AvanceCertificadoBloque, CertificacionBloque, AnilloProgreso],
@@ -38,19 +34,16 @@ export class AulaResumen {
   protected readonly formatearFechaHora = formatearFechaHora;
   protected readonly urlPortada = urlPortadaCurso;
 
-  /** La lección donde seguir, solo si todavía hay algo por hacer en ella. */
   protected readonly continuar = computed<LeccionDelCurso | null>(() => {
     const destino = this.estado.leccionParaContinuar();
     return destino && destino.leccion.estado !== 'COMPLETADA' ? destino : null;
   });
 
-  /** Primer motivo de bloqueo cuando no queda nada disponible (p. ej. un examen pendiente). */
   protected readonly bloqueo = computed(() => {
     if (this.continuar()) return null;
     return this.estado.lecciones().find((l) => l.leccion.estado === 'BLOQUEADA')?.leccion.motivoBloqueo ?? null;
   });
 
-  /** Todos los exámenes del curso (de módulo y final), en el orden del temario. */
   protected readonly examenes = computed<ExamenDelCurso[]>(() => {
     const aula = this.estado.aula();
     if (!aula) return [];
@@ -60,12 +53,10 @@ export class AulaResumen {
     ];
   });
 
-  /** El examen que frena el avance (calificado, de módulo y sin aprobar), para ofrecer rendirlo ya. */
   protected readonly examenBloqueante = computed(
     () => this.examenes().find((e) => e.examen.bloqueaSiguienteModulo && !e.examen.aprobado)?.examen ?? null,
   );
 
-  /** Cifras del curso para la portada. */
   protected readonly cifras = computed(() => {
     const aula = this.estado.aula();
     const lecciones = this.estado.lecciones();

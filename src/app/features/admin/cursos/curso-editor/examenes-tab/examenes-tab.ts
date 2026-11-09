@@ -24,8 +24,6 @@ interface OpcionForm {
   esCorrecta: boolean;
 }
 
-/** HU-013 — Configurar exámenes: pestaña hija del editor de curso. Recibe el curso ya cargado
- * (modalidad y módulos disponibles) y administra exámenes/preguntas/alternativas por su cuenta. */
 @Component({
   selector: 'app-examenes-tab',
   imports: [Modal],
@@ -52,17 +50,13 @@ export class ExamenesTab implements OnChanges {
   private mensajeTimeout: ReturnType<typeof setTimeout> | null = null;
   protected readonly examenesExpandidos = signal<Set<number>>(new Set());
   protected readonly preguntasExpandidas = signal<Set<number>>(new Set());
-  // Por defecto lo desactivado no aparece (igual que en Información Base); el interruptor lo
-  // trae de vuelta cuando el admin necesita revisarlo o reactivarlo.
   protected readonly verInactivos = signal(false);
   protected readonly examenesVisibles = computed(() =>
     this.verInactivos() ? this.examenes() : this.examenes().filter((e) => e.activo));
 
   protected readonly esVirtual = () => this.modalidad === 'VIRTUAL';
-  // HU-016: el borrado real solo existe mientras el curso sigue en BORRADOR.
   protected readonly puedeEliminar = () => this.estadoCodigo === 'BORRADOR';
 
-  // -- Formulario de examen --
   protected readonly mostrarFormExamen = signal(false);
   protected readonly examenEditId = signal<number | null>(null);
   protected readonly examenTitulo = signal('');
@@ -81,7 +75,6 @@ export class ExamenesTab implements OnChanges {
   protected readonly guardandoExamen = signal(false);
   protected readonly intentoGuardarExamen = signal(false);
 
-  // -- Formulario de pregunta --
   protected readonly preguntaFormExamenId = signal<number | null>(null);
   protected readonly preguntaEditId = signal<number | null>(null);
   protected readonly preguntaTipo = signal<TipoPregunta>('SELECCION_UNICA');
@@ -94,8 +87,6 @@ export class ExamenesTab implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     const cambioCurso = changes['cursoId'];
     if (cambioCurso && cambioCurso.currentValue !== cambioCurso.previousValue) {
-      // La misma instancia puede recibir otro curso al navegar desde el editor.
-      // Nunca se deben mostrar exámenes, preguntas o expansiones del curso anterior.
       this.examenes.set([]);
       this.examenesExpandidos.set(new Set());
       this.preguntasExpandidas.set(new Set());
@@ -185,8 +176,6 @@ export class ExamenesTab implements OnChanges {
       case 'RESPUESTA_ABIERTA': return 'Respuesta abierta';
     }
   }
-
-  // ---------------------------------------------------------------- Examen --
 
   protected abrirCrearExamen(): void {
     this.cerrarMensaje();
@@ -367,8 +356,6 @@ export class ExamenesTab implements OnChanges {
       });
   }
 
-  // La lista que se muestra puede estar filtrada (ocultando inactivos); el orden real que mueven
-  // los botones ↑/↓ y que se envía al backend sigue siendo el del arreglo completo.
   protected preguntasVisibles(examen: ExamenRespuesta): PreguntaRespuesta[] {
     return this.verInactivos() ? examen.preguntas : examen.preguntas.filter((p) => p.activo);
   }
@@ -401,8 +388,6 @@ export class ExamenesTab implements OnChanges {
         },
       });
   }
-
-  // ---------------------------------------------------------------- Pregunta --
 
   protected abrirCrearPregunta(examenId: number): void {
     this.cerrarMensaje();
