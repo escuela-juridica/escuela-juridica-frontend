@@ -62,7 +62,7 @@
             <span class="hero__paso-titulo">Completaste todas las lecciones</span>
             <span class="hero__paso-detalle">{{ aula.avanceCertificado.cumpleTodo ? 'Cumples los requisitos de tu certificado.' : 'Revisa qué te falta para tu certificado.' }}</span>
           </div>
-          <button type="button" class="btn btn--acento btn--grande hero__cta" (click)="pestana.set(aula.avanceCertificado.cumpleTodo ? 'certificado' : 'evaluaciones')">
+          <button type="button" class="btn btn--acento btn--grande hero__cta" (click)="irAPestana(aula.avanceCertificado.cumpleTodo ? 'certificado' : 'evaluaciones')">
             {{ aula.avanceCertificado.cumpleTodo ? 'Ver mi certificado' : 'Ver evaluaciones' }}
           </button>
         }

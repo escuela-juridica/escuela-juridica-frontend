@@ -32,6 +32,13 @@ export class AulaResumen {
   protected readonly ingresando = signal<number | null>(null);
   protected readonly pestana = signal<PestanaResumen>('resumen');
   protected readonly formatearFechaHora = formatearFechaHora;
+
+  protected irAPestana(destino: PestanaResumen): void {
+    this.pestana.set(destino);
+    setTimeout(() => {
+      document.querySelector('.pestanas')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
   protected readonly urlPortada = urlPortadaCurso;
 
   protected readonly continuar = computed<LeccionDelCurso | null>(() => {
