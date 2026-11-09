@@ -34,6 +34,13 @@ export class AulaResumen {
   protected readonly pestana = signal<PestanaResumen>('resumen');
   protected readonly formatearFechaHora = formatearFechaHora;
 
+  protected readonly solicitudCertificado = signal(0);
+
+  protected verCertificado(): void {
+    this.solicitudCertificado.update((n) => n + 1);
+    this.irAPestana('certificado');
+  }
+
   protected irAPestana(destino: PestanaResumen): void {
     this.pestana.set(destino);
     setTimeout(() => {

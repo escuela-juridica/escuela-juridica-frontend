@@ -1,6 +1,6 @@
 import { DecimalPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, DestroyRef, effect, inject, input, signal, untracked } from '@angular/core';
+import { Component, DestroyRef, ElementRef, effect, inject, input, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -22,11 +22,14 @@ import { Certificacion } from '../certificacion.model';
 })
 export class CertificacionBloque {
   readonly cursoId = input.required<number>();
+  readonly solicitud = input(0);
 
   private readonly api = inject(CertificacionApiService);
   private readonly alertas = inject(AlertaGlobalService);
   private readonly aula = inject(AulaSesionService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly anfitrion = inject<ElementRef<HTMLElement>>(ElementRef);
+  private solicitudAtendida = 0;
 
   protected readonly formatearFechaLarga = formatearFechaLarga;
 
@@ -40,13 +43,14 @@ export class CertificacionBloque {
   protected readonly emitiendo = signal(false);
   protected readonly errorEmision = signal<string | null>(null);
   protected readonly enlaceCopiado = signal(false);
+  protected readonly destacarGenerar = signal(false);
 
   protected readonly pasos = ['Cumplir requisitos', 'Confirmar datos', 'Generar certificado', 'Descargar'];
 
   protected readonly formulario = new FormGroup({
     nombres: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(120)] }),
     apellidoPaterno: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(80)] }),
-    apellidoMaterno: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(80)] }),
+    apellidoMaterno: new FormControl('', { nonNullable: true, validators: [Validators.maxLength(80)] }),
   });
 
   constructor() {
@@ -55,6 +59,35 @@ export class CertificacionBloque {
       this.aula.aula();
       untracked(() => this.cargar(id));
     });
+
+    effect(() => {
+      const numero = this.solicitud();
+      const c = this.cert();
+      if (numero === 0 || numero === this.solicitudAtendida || !c) return;
+      untracked(() => {
+        this.solicitudAtendida = numero;
+        this.atenderSolicitud(c);
+      });
+    });
+  }
+
+  private atenderSolicitud(c: Certificacion): void {
+    if (c.puedeConfirmarDatos && !c.datos.confirmados && c.certificado === null) {
+      this.abrirDatos();
+      return;
+    }
+    if (c.estado === 'LISTO_PARA_EMITIR') {
+      this.llevarAlBotonGenerar();
+      return;
+    }
+    setTimeout(() => {
+      const focos = this.anfitrion.nativeElement.querySelectorAll<HTMLElement>('[data-foco]');
+      const objetivo = focos[focos.length - 1];
+      if (!objetivo) return;
+      objetivo.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      objetivo.classList.add('cert__resaltado');
+      setTimeout(() => objetivo.classList.remove('cert__resaltado'), 2200);
+    }, 150);
   }
 
   private cargar(cursoId: number): void {
@@ -70,6 +103,13 @@ export class CertificacionBloque {
       });
   }
 
+  private llevarAlBotonGenerar(): void {
+    this.destacarGenerar.set(true);
+    setTimeout(() => {
+      this.anfitrion.nativeElement.querySelector<HTMLElement>('[data-generar]')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 350);
+  }
+
   private mostrar(c: Certificacion): void {
     this.cert.set(c);
     this.cargando.set(false);
@@ -81,7 +121,6 @@ export class CertificacionBloque {
         apellidoMaterno: c.datos.apellidoMaterno ?? '',
       });
     }
-    if (c.estado === 'PENDIENTE_DATOS') this.editandoDatos.set(true);
   }
 
   protected abrirDatos(): void {
@@ -90,6 +129,7 @@ export class CertificacionBloque {
   }
 
   protected cancelarDatos(): void {
+    if (this.guardando()) return;
     const c = this.cert();
     if (c) {
       this.formulario.reset({
@@ -118,6 +158,7 @@ export class CertificacionBloque {
           this.formulario.markAsPristine();
           this.editandoDatos.set(false);
           this.mostrar(c);
+          if (c.estado === 'LISTO_PARA_EMITIR') this.llevarAlBotonGenerar();
           this.alertas.mostrar('exito', c.certificado ? 'Datos confirmados. Tu certificado fue emitido.' : 'Datos confirmados.');
         },
         error: (e: HttpErrorResponse) => {
@@ -128,6 +169,7 @@ export class CertificacionBloque {
   }
 
   protected pedirEmision(): void {
+    this.destacarGenerar.set(false);
     this.errorEmision.set(null);
     this.confirmandoEmision.set(true);
   }

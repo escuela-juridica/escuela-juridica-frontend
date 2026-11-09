@@ -62,7 +62,7 @@
             <span class="hero__paso-titulo">Completaste todas las lecciones</span>
             <span class="hero__paso-detalle">{{ aula.avanceCertificado.cumpleTodo ? 'Cumples los requisitos de tu certificado.' : 'Revisa qué te falta para tu certificado.' }}</span>
           </div>
-          <button type="button" class="btn btn--acento btn--grande hero__cta" (click)="irAPestana(aula.avanceCertificado.cumpleTodo ? 'certificado' : 'evaluaciones')">
+          <button type="button" class="btn btn--acento btn--grande hero__cta" (click)="aula.avanceCertificado.cumpleTodo ? verCertificado() : irAPestana('evaluaciones')">
             {{ aula.avanceCertificado.cumpleTodo ? 'Ver mi certificado' : 'Ver evaluaciones' }}
           </button>
         }
@@ -70,19 +70,24 @@
     </section>
 
     <nav class="pestanas" role="tablist" aria-label="Secciones del curso">
-      <button type="button" role="tab" class="pestana" [class.pestana--activa]="pestana() === 'resumen'" [attr.aria-selected]="pestana() === 'resumen'" (click)="pestana.set('resumen')">Resumen</button>
+      <button type="button" role="tab" class="pestana" [class.pestana--activa]="pestana() === 'resumen'" [attr.aria-selected]="pestana() === 'resumen'" (click)="pestana.set('resumen')">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="3" width="7" height="7" rx="1.5" /><rect x="3" y="14" width="7" height="7" rx="1.5" /><rect x="14" y="14" width="7" height="7" rx="1.5" /></svg>
+        <span class="pestana__texto">Contenido</span>
+      </button>
       <button type="button" role="tab" class="pestana" [class.pestana--activa]="pestana() === 'evaluaciones'" [attr.aria-selected]="pestana() === 'evaluaciones'" (click)="pestana.set('evaluaciones')">
-        Evaluaciones @if (cifras().evaluaciones > 0) { <span class="pestana__contador">{{ cifras().evaluaciones }}</span> }
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg>
+        <span class="pestana__texto">Evaluaciones @if (cifras().evaluaciones > 0) { <span class="pestana__contador">{{ cifras().evaluaciones }}</span> }</span>
       </button>
       <button type="button" role="tab" class="pestana" [class.pestana--activa]="pestana() === 'certificado'" [attr.aria-selected]="pestana() === 'certificado'" (click)="pestana.set('certificado')">
-        Mi certificado @if (aula.avanceCertificado.cumpleTodo) { <span class="pestana__punto" aria-label="Disponible"></span> }
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="9" r="6" /><path d="m8.5 14.5-1.5 7 5-3 5 3-1.5-7" /></svg>
+        <span class="pestana__texto">Mi certificado @if (aula.avanceCertificado.cumpleTodo) { <span class="pestana__punto" aria-label="Disponible"></span> }</span>
       </button>
     </nav>
 
     @switch (pestana()) {
       @case ('resumen') {
         <section class="card resumen__bloque" aria-labelledby="resumen-modulos">
-          <h2 id="resumen-modulos" class="resumen__subtitulo">Módulos del curso</h2>
+          <h2 id="resumen-modulos" class="resumen__subtitulo resumen__subtitulo--modulos">Módulos del curso</h2>
           <app-aula-modulos-lista [aula]="aula" />
         </section>
 
@@ -165,7 +170,7 @@
 
       @case ('certificado') {
         <section class="card resumen__bloque resumen__bloque--certificado" aria-label="Tu certificado">
-          <app-certificacion-bloque [cursoId]="aula.cursoId" />
+          <app-certificacion-bloque [cursoId]="aula.cursoId" [solicitud]="solicitudCertificado()" />
         </section>
       }
     }

@@ -8,57 +8,121 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
 .modulo {
+  --tono: var(--acento-500);
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 16px;
-  min-height: 88px;
-  padding: 18px 20px;
+  gap: 20px;
+  min-height: 112px;
+  padding: 20px 24px 20px 32px;
   border: 1px solid var(--neutral-200);
-  border-radius: var(--radio-lg);
+  border-radius: var(--radio-xl);
   background: var(--blanco);
+  box-shadow: var(--sombra-xs);
+  overflow: hidden;
   text-decoration: none;
   color: inherit;
-  transition: border-color 150ms ease, background-color 150ms ease, box-shadow 150ms ease;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+}
+
+.modulo::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  background: var(--tono);
 }
 
 .modulo:hover {
-  border-color: var(--acento-500);
-  background: var(--acento-050);
-  box-shadow: var(--sombra-sm);
+  transform: translateY(-2px);
+  box-shadow: var(--sombra-md);
+  border-color: var(--tono);
   text-decoration: none;
 }
 
-.modulo__marca {
-  flex: none;
-  width: 46px;
-  height: 46px;
+.modulo--hecho {
+  --tono: var(--exito);
+}
+
+.modulo--bloqueado {
+  --tono: var(--neutral-300);
+  background: var(--neutral-100);
+}
+
+.modulo--examen {
+  --tono: var(--dorado-500);
+}
+
+.modulo--actual {
+  --tono: var(--acento-500);
+  border-color: transparent;
+  background: linear-gradient(120deg, var(--marca-900) 0%, var(--marca-700) 100%);
+  color: var(--blanco);
+  box-shadow: var(--sombra-md);
+}
+
+.modulo__insignia {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
-  font-weight: 700;
-  background: var(--acento-100);
-  color: var(--acento-700);
+  background: var(--blanco);
+  color: var(--exito);
+  border: 2px solid var(--exito);
 }
 
-.modulo__marca--hecho {
-  background: var(--exito);
+.modulo__marca {
+  position: relative;
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radio-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  line-height: 1;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--marca-900) 0%, var(--marca-700) 100%);
   color: var(--blanco);
+  box-shadow: 0 4px 10px rgba(16, 56, 96, 0.25);
 }
 
-.modulo__marca--bloqueado {
-  background: var(--neutral-100);
+.modulo--hecho .modulo__marca {
+  background: linear-gradient(135deg, #016139 0%, var(--exito) 100%);
+  box-shadow: 0 4px 10px rgba(2, 122, 72, 0.3);
+}
+
+.modulo--bloqueado .modulo__marca {
+  background: var(--neutral-200);
   color: var(--neutral-500);
+  box-shadow: none;
 }
 
-.modulo__marca--examen:not(.modulo__marca--hecho):not(.modulo__marca--bloqueado) {
-  background: var(--violeta-050);
-  color: var(--violeta-700);
+.modulo--examen:not(.modulo--hecho):not(.modulo--bloqueado) .modulo__marca {
+  background: linear-gradient(135deg, #e09b12 0%, var(--dorado-500) 100%);
+  color: var(--marca-900);
+  box-shadow: 0 4px 10px rgba(244, 183, 64, 0.4);
+}
+
+.modulo--actual .modulo__marca {
+  background: var(--acento-500);
+  color: var(--marca-900);
+  box-shadow: 0 0 0 6px rgba(0, 216, 216, 0.25);
 }
 
 .modulo__texto {
@@ -66,14 +130,39 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
+}
+
+.modulo__eyebrow {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--eyebrow-color);
+}
+
+.modulo--actual .modulo__eyebrow {
+  color: var(--acento-500);
+}
+
+.modulo--examen .modulo__eyebrow {
+  color: #b8860b;
+}
+
+.modulo--bloqueado .modulo__eyebrow {
+  color: var(--neutral-500);
 }
 
 .modulo__titulo {
-  font-size: 18px;
-  line-height: 26px;
-  font-weight: 700;
-  color: var(--neutral-950);
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 800;
+  color: var(--marca-900);
+}
+
+.modulo--actual .modulo__titulo {
+  color: var(--blanco);
 }
 
 .modulo--bloqueado .modulo__titulo {
@@ -81,71 +170,202 @@
 }
 
 .modulo__meta {
-  font-size: 15px;
-  line-height: 22px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+}
+
+.modulo__dato {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
   color: var(--neutral-600);
 }
 
-.modulo__meta--aviso {
-  font-weight: 600;
+.modulo__dato svg {
+  flex: none;
+  color: var(--acento-700);
+}
+
+.modulo--actual .modulo__dato {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.modulo--actual .modulo__dato svg {
+  color: var(--acento-500);
+}
+
+.modulo__dato--aviso {
   color: var(--advertencia);
 }
 
+.modulo__avance {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 420px;
+}
+
 .modulo__pista {
+  flex: 1 1 auto;
   display: block;
-  max-width: 360px;
-  height: 8px;
+  height: 10px;
   border-radius: var(--radio-completo);
   background: var(--neutral-200);
   overflow: hidden;
+}
+
+.modulo--actual .modulo__pista {
+  background: rgba(255, 255, 255, 0.22);
 }
 
 .modulo__relleno {
   display: block;
   height: 100%;
   border-radius: var(--radio-completo);
-  background: var(--acento-500);
+  background: linear-gradient(90deg, var(--acento-700), var(--acento-500));
+}
+
+.modulo--hecho .modulo__relleno {
+  background: linear-gradient(90deg, #016139, var(--exito));
+}
+
+.modulo__porcentaje {
+  flex: none;
+  min-width: 44px;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 800;
+  color: var(--marca-900);
+}
+
+.modulo--actual .modulo__porcentaje {
+  color: var(--blanco);
+}
+
+.modulo--bloqueado .modulo__porcentaje {
+  color: var(--neutral-500);
 }
 
 .modulo__estado {
   flex: none;
-  padding: 4px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
   border-radius: var(--radio-completo);
   font-size: 13px;
   line-height: 18px;
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: 0.02em;
   background: var(--acento-100);
   color: var(--acento-700);
 }
 
-.modulo__estado--hecho {
+.modulo--hecho .modulo__estado {
   background: var(--exito-fondo);
   color: var(--exito);
 }
 
-.modulo__estado--bloqueado {
-  background: var(--neutral-100);
+.modulo--bloqueado .modulo__estado {
+  background: var(--neutral-200);
   color: var(--neutral-600);
+}
+
+.modulo--actual .modulo__estado {
+  background: var(--acento-500);
+  color: var(--marca-900);
+}
+
+.modulo__punto {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--marca-900);
+  animation: modulo-punto 1.4s ease-in-out infinite;
+}
+
+@keyframes modulo-punto {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.7);
+  }
 }
 
 .modulo__flecha {
   flex: none;
-  color: var(--neutral-400);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--neutral-100);
+  color: var(--marca-900);
+  transition:
+    background-color 180ms ease,
+    transform 180ms ease;
 }
 
-@media (max-width: 600px) {
+.modulo--actual .modulo__flecha {
+  background: rgba(255, 255, 255, 0.16);
+  color: var(--blanco);
+}
+
+.modulo:hover .modulo__flecha {
+  background: var(--acento-500);
+  color: var(--marca-900);
+  transform: translateX(3px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modulo,
+  .modulo__flecha {
+    transition: none;
+  }
+
+  .modulo:hover,
+  .modulo:hover .modulo__flecha {
+    transform: none;
+  }
+
+  .modulo__punto {
+    animation: none;
+  }
+}
+
+@media (max-width: 700px) {
   .modulo {
     flex-wrap: wrap;
-    gap: 12px;
-    padding: 16px;
+    gap: 14px;
+    padding: 18px 16px 18px 24px;
+  }
+
+  .modulo__marca {
+    width: 46px;
+    height: 46px;
+    font-size: 20px;
   }
 
   .modulo__texto {
-    flex-basis: calc(100% - 100px);
+    flex: 1 1 calc(100% - 70px);
+  }
+
+  .modulo__titulo {
+    font-size: 18px;
+    line-height: 25px;
   }
 
   .modulo__estado {
-    margin-left: 62px;
+    margin-left: 60px;
   }
 
   .modulo__flecha {

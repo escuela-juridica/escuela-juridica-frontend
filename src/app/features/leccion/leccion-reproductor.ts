@@ -1,14 +1,16 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, computed, effect, inject, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { distinctUntilChanged, map } from 'rxjs';
 
 import { resolverUrlApi } from '../../core/api/api.config';
 import { AlertaGlobalService } from '../../core/notificaciones/alerta-global.service';
+import { YoutubeReproductor } from '../../shared/ui/youtube-reproductor/youtube-reproductor';
 import { AvanceCertificadoBloque } from '../aula/avance-certificado/avance-certificado';
+import { examenAgotado } from '../aula/aula-ruta.util';
 import { AulaSesionService } from '../aula/aula-sesion.service';
+import { ExamenAulaRespuesta } from '../aula/aula.model';
 import { formatearDuracion, formatearFechaHora, formatearHora } from '../cursos/curso-formato.util';
 import { SesionAlumnoApiService } from '../sesiones/sesion-alumno-api.service';
 import { LeccionReproductorApiService } from './leccion-reproductor-api.service';
@@ -20,7 +22,7 @@ type PestanaLeccion = 'descripcion' | 'materiales' | 'avance';
 
 @Component({
   selector: 'app-leccion-reproductor',
-  imports: [RouterLink, AvanceCertificadoBloque],
+  imports: [RouterLink, AvanceCertificadoBloque, YoutubeReproductor],
   templateUrl: './leccion-reproductor.html',
   styleUrl: './leccion-reproductor.scss',
 })
@@ -30,7 +32,6 @@ export class LeccionReproductor {
   private readonly api = inject(LeccionReproductorApiService);
   private readonly sesionApi = inject(SesionAlumnoApiService);
   private readonly alertas = inject(AlertaGlobalService);
-  private readonly sanitizer = inject(DomSanitizer);
   private readonly destroyRef = inject(DestroyRef);
   protected readonly estado = inject(AulaSesionService);
 
@@ -62,13 +63,10 @@ export class LeccionReproductor {
 
   protected readonly videoPrincipal = computed(() => this.materiales()?.find((m) => m.tipoRecurso === 'VIDEO') ?? null);
 
-  protected readonly youtubeEmbebido = computed<SafeResourceUrl | null>(() => {
+  protected readonly youtubeId = computed<string | null>(() => {
     const video = this.videoPrincipal();
     if (!video || video.origen !== 'YOUTUBE') return null;
-    const id = LeccionReproductor.idYoutube(video.verUrl);
-    return id
-      ? this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube-nocookie.com/embed/${id}?rel=0&modestbranding=1`)
-      : null;
+    return LeccionReproductor.idYoutube(video.verUrl);
   });
 
   protected readonly esFinalizacionAutomatica = computed(() =>
@@ -85,6 +83,40 @@ export class LeccionReproductor {
   );
 
   protected readonly esUltima = computed(() => this.estado.siguiente() === null);
+
+  protected readonly examenDelModulo = computed(() => {
+    const a = this.actual();
+    if (!a || a.numeroEnModulo !== a.modulo.lecciones.length) return null;
+    if (a.modulo.lecciones.some((l) => l.id !== a.leccion.id && l.estado !== 'COMPLETADA')) return null;
+    const pendiente = (e: ExamenAulaRespuesta) => e.tipo === 'CALIFICADO' && !e.aprobado && !examenAgotado(e);
+    const delModulo = a.modulo.examenes.find(pendiente);
+    if (delModulo) return delModulo;
+    return this.estado.siguiente() === null ? (this.estado.aula()?.examenesFinales.find(pendiente) ?? null) : null;
+  });
+
+  protected readonly examenListo = computed(() => {
+    const examen = this.examenDelModulo();
+    return examen && examen.habilitado && examen.estado !== 'EN_REVISION' ? examen : null;
+  });
+
+  protected readonly presentacion = computed(() => {
+    const a = this.actual();
+    const aula = this.estado.aula();
+    if (!a || !aula || a.numeroEnModulo !== 1) return null;
+    const numero = aula.modulos.findIndex((m) => m.id === a.modulo.id) + 1;
+    const lecciones = a.modulo.lecciones.length;
+    const examenes = a.modulo.examenes.filter((e) => e.tipo === 'CALIFICADO').length;
+    const segundos = a.modulo.lecciones.reduce((suma, l) => suma + (l.duracionSegundos ?? 0), 0);
+    return {
+      numero,
+      total: aula.modulos.length,
+      titulo: a.modulo.titulo,
+      lecciones,
+      examenes,
+      segundos,
+      pasos: aula.modulos.map((_, i) => i + 1),
+    };
+  });
 
   protected readonly pestanas = computed<{ id: PestanaLeccion; etiqueta: string }[]>(() => {
     const lista: { id: PestanaLeccion; etiqueta: string }[] = [];
@@ -224,7 +256,47 @@ export class LeccionReproductor {
     return punto >= 0 ? nombre.slice(punto + 1).toUpperCase() : material.tipoRecurso === 'VIDEO' ? 'Video' : 'Archivo';
   }
 
+  protected tipoVisual(material: MaterialAlumnoRespuesta): 'video' | 'pdf' | 'enlace' | 'archivo' {
+    if (material.tipoRecurso === 'VIDEO') return 'video';
+    if (material.origen === 'EXTERNO') return 'enlace';
+    const nombre = (material.nombreArchivo ?? '').toLowerCase();
+    return material.tipoMime === 'application/pdf' || nombre.endsWith('.pdf') ? 'pdf' : 'archivo';
+  }
+
+  protected nombreTipo(material: MaterialAlumnoRespuesta): string {
+    switch (this.tipoVisual(material)) {
+      case 'video':
+        return 'Video';
+      case 'pdf':
+        return 'Documento PDF';
+      case 'enlace':
+        return 'Lectura en línea';
+      default:
+        return 'Archivo';
+    }
+  }
+
+  protected etiquetaAbrir(material: MaterialAlumnoRespuesta): string {
+    switch (this.tipoVisual(material)) {
+      case 'video':
+        return material.origen === 'YOUTUBE' ? 'Ver en YouTube' : 'Ver video';
+      case 'pdf':
+        return 'Ver PDF';
+      case 'enlace':
+        return 'Leer artículo';
+      default:
+        return 'Abrir';
+    }
+  }
+
   protected metaMaterial(material: MaterialAlumnoRespuesta): string {
+    if (material.origen === 'EXTERNO') {
+      try {
+        return new URL(material.verUrl).hostname.replace(/^www\./, '');
+      } catch {
+        return 'Enlace externo';
+      }
+    }
     const partes = [this.etiquetaFormato(material)];
     if (material.tamanoBytes) partes.push(LeccionReproductor.formatearTamano(material.tamanoBytes));
     if (material.duracionSegundos) partes.push(formatearDuracion(material.duracionSegundos));
@@ -233,6 +305,11 @@ export class LeccionReproductor {
 
   private irAlSiguiente(): void {
     const cursoId = this.estado.cursoId();
+    const examen = this.examenListo();
+    if (examen) {
+      void this.router.navigate(['/aula', cursoId, 'examenes', examen.id]);
+      return;
+    }
     const siguiente = this.siguienteDisponible();
     if (siguiente) {
       void this.router.navigate(['/aula', cursoId, 'lecciones', siguiente.leccion.id]);

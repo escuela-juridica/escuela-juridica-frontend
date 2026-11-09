@@ -19,7 +19,7 @@
     </ol>
 
     @if (c.certificado; as e) {
-      <div class="cert__celebracion" [class.cert__celebracion--anulado]="e.estado !== 'VIGENTE'">
+      <div class="cert__celebracion" data-foco [class.cert__celebracion--anulado]="e.estado !== 'VIGENTE'">
         <div class="cert__celebracion-texto">
           <span class="badge cert__badge" [class]="'badge ' + claseEstado(c)">{{ etiquetaEstado(c) }}</span>
           <h2 class="cert__celebracion-titulo">
@@ -34,10 +34,22 @@
           </dl>
           @if (e.estado === 'VIGENTE') {
             <div class="cert__acciones cert__acciones--izquierda">
-              <button type="button" class="btn btn--acento btn--grande cert__cta" (click)="descargar()">Descargar PDF</button>
-              <button type="button" class="btn cert__ghost" (click)="ver()">Ver certificado</button>
-              <button type="button" class="btn cert__ghost" (click)="copiarEnlace(e.codigo)">{{ enlaceCopiado() ? '✓ Copiado' : 'Copiar enlace' }}</button>
-              <a class="btn cert__ghost" [routerLink]="['/verificar-certificado']" [queryParams]="{ codigo: e.codigo }" target="_blank">Verificar</a>
+              <button type="button" class="btn btn--acento btn--grande cert__cta" (click)="descargar()">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12" /><path d="m7 11 5 5 5-5" /><path d="M5 21h14" /></svg>
+                Descargar PDF
+              </button>
+              <button type="button" class="btn cert__ghost" (click)="ver()">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" /><circle cx="12" cy="12" r="3" /></svg>
+                Ver certificado
+              </button>
+              <button type="button" class="btn cert__ghost" (click)="copiarEnlace(e.codigo)">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7" /><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7" /></svg>
+                {{ enlaceCopiado() ? '✓ Copiado' : 'Copiar enlace' }}
+              </button>
+              <a class="btn cert__ghost" [routerLink]="['/verificar-certificado']" [queryParams]="{ codigo: e.codigo }" target="_blank">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z" /><path d="m9 12 2 2 4-4" /></svg>
+                Verificar
+              </a>
             </div>
           }
           @if (e.estado === 'VIGENTE') {
@@ -51,7 +63,7 @@
         </div>
       </div>
     } @else {
-      <div class="cert__estado-tarjeta" [class.cert__estado-tarjeta--listo]="c.estado === 'LISTO_PARA_EMITIR'">
+      <div class="cert__estado-tarjeta" data-foco [class.cert__estado-tarjeta--listo]="c.estado === 'LISTO_PARA_EMITIR'">
         <div class="cert__estado-texto">
           <span [class]="'badge ' + claseEstado(c)">{{ etiquetaEstado(c) }}</span>
           <p class="cert__mensaje">{{ c.mensaje }}</p>
@@ -83,52 +95,53 @@
       }
 
       @if (c.puedeConfirmarDatos) {
+        <div class="cert__datos-confirmados">
+          @if (c.datos.confirmados) {
+            <span>Datos confirmados: <strong>{{ c.datos.nombres }} {{ c.datos.apellidoPaterno }} {{ c.datos.apellidoMaterno }}</strong></span>
+          } @else {
+            <span>Aún no confirmas los nombres que irán impresos.</span>
+          }
+          <button type="button" class="btn btn--secundario" (click)="abrirDatos()">{{ c.datos.confirmados ? 'Corregir mis datos' : 'Confirmar mis datos' }}</button>
+        </div>
+
         @if (editandoDatos()) {
-          <form class="cert__formulario" [formGroup]="formulario" (ngSubmit)="confirmarDatos()" novalidate>
-            <h3 class="cert__subtitulo">Datos que aparecerán en tu certificado</h3>
-            @if (errorDatos(); as mensaje) {
-              <div class="alerta alerta--error" role="alert"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div>
-            }
-            <div class="cert__campos">
-              <div>
-                <label class="label" for="cert-nombres">Nombres</label>
-                <input id="cert-nombres" class="input" formControlName="nombres" autocomplete="given-name"
-                  [class.input--error]="formulario.controls.nombres.invalid && formulario.controls.nombres.touched" />
-                @if (formulario.controls.nombres.invalid && formulario.controls.nombres.touched) { <p class="campo-error">Indica tus nombres.</p> }
+          <app-modal titulo="Datos que aparecerán en tu certificado" ancho="lg" (cerrar)="cancelarDatos()">
+            <form class="cert__formulario" [formGroup]="formulario" (ngSubmit)="confirmarDatos()" novalidate>
+              @if (errorDatos(); as mensaje) {
+                <div class="alerta alerta--error" role="alert"><span class="alerta__icono">!</span><div class="alerta__titulo">{{ mensaje }}</div></div>
+              }
+              <div class="cert__campos">
+                <div>
+                  <label class="label" for="cert-nombres">Nombres</label>
+                  <input id="cert-nombres" class="input" formControlName="nombres" autocomplete="given-name"
+                    [class.input--error]="formulario.controls.nombres.invalid && formulario.controls.nombres.touched" />
+                  @if (formulario.controls.nombres.invalid && formulario.controls.nombres.touched) { <p class="campo-error">Indica tus nombres.</p> }
+                </div>
+                <div>
+                  <label class="label" for="cert-paterno">Apellido paterno</label>
+                  <input id="cert-paterno" class="input" formControlName="apellidoPaterno" autocomplete="family-name"
+                    [class.input--error]="formulario.controls.apellidoPaterno.invalid && formulario.controls.apellidoPaterno.touched" />
+                  @if (formulario.controls.apellidoPaterno.invalid && formulario.controls.apellidoPaterno.touched) { <p class="campo-error">Indica tu apellido paterno.</p> }
+                </div>
+                <div>
+                  <label class="label cert__label-lineal" for="cert-materno">Apellido materno <span class="cert__opcional">(opcional)</span></label>
+                  <input id="cert-materno" class="input" formControlName="apellidoMaterno"
+                    [class.input--error]="formulario.controls.apellidoMaterno.invalid && formulario.controls.apellidoMaterno.touched" />
+                  @if (formulario.controls.apellidoMaterno.invalid && formulario.controls.apellidoMaterno.touched) { <p class="campo-error">Admite hasta 80 caracteres.</p> }
+                </div>
               </div>
-              <div>
-                <label class="label" for="cert-paterno">Apellido paterno</label>
-                <input id="cert-paterno" class="input" formControlName="apellidoPaterno" autocomplete="family-name"
-                  [class.input--error]="formulario.controls.apellidoPaterno.invalid && formulario.controls.apellidoPaterno.touched" />
-                @if (formulario.controls.apellidoPaterno.invalid && formulario.controls.apellidoPaterno.touched) { <p class="campo-error">Indica tu apellido paterno.</p> }
+              <p class="cert__nota">Revísalos con cuidado: se imprimirán tal como los confirmes. Podrás corregirlos mientras no hayas emitido el certificado.</p>
+              <div class="cert__acciones">
+                <button type="button" class="btn btn--secundario" [disabled]="guardando()" (click)="cancelarDatos()">Cancelar</button>
+                <button type="submit" class="btn btn--acento" [disabled]="guardando()">{{ guardando() ? 'Guardando…' : 'Confirmar mis datos' }}</button>
               </div>
-              <div>
-                <label class="label" for="cert-materno">Apellido materno</label>
-                <input id="cert-materno" class="input" formControlName="apellidoMaterno"
-                  [class.input--error]="formulario.controls.apellidoMaterno.invalid && formulario.controls.apellidoMaterno.touched" />
-                @if (formulario.controls.apellidoMaterno.invalid && formulario.controls.apellidoMaterno.touched) { <p class="campo-error">Indica tu apellido materno.</p> }
-              </div>
-            </div>
-            <p class="cert__nota">Revísalos con cuidado: se imprimirán tal como los confirmes. Podrás corregirlos mientras no hayas emitido el certificado.</p>
-            <div class="cert__acciones">
-              @if (c.datos.confirmados) { <button type="button" class="btn btn--secundario" (click)="cancelarDatos()">Cancelar</button> }
-              <button type="submit" class="btn btn--acento" [disabled]="guardando()">{{ guardando() ? 'Guardando…' : 'Confirmar mis datos' }}</button>
-            </div>
-          </form>
-        } @else {
-          <div class="cert__datos-confirmados">
-            @if (c.datos.confirmados) {
-              <span>Datos confirmados: <strong>{{ c.datos.nombres }} {{ c.datos.apellidoPaterno }} {{ c.datos.apellidoMaterno }}</strong></span>
-            } @else {
-              <span>Aún no confirmas los nombres que irán impresos.</span>
-            }
-            <button type="button" class="btn btn--secundario" (click)="abrirDatos()">{{ c.datos.confirmados ? 'Corregir mis datos' : 'Confirmar mis datos' }}</button>
-          </div>
+            </form>
+          </app-modal>
         }
       }
 
       @if (c.estado === 'LISTO_PARA_EMITIR') {
-        <div class="alerta alerta--advertencia" role="status">
+        <div class="alerta alerta--advertencia" role="status" data-foco>
           <span class="alerta__icono">!</span>
           <div>
             <p class="alerta__titulo">Al generarlo, tu nota y nivel quedan definitivos</p>
@@ -136,7 +149,7 @@
           </div>
         </div>
         <div class="cert__acciones">
-          <button type="button" class="btn btn--acento btn--grande" (click)="pedirEmision()">Generar certificado ahora</button>
+          <button type="button" class="btn btn--acento btn--grande" data-generar [class.cert__pulso]="destacarGenerar()" (click)="pedirEmision()">Generar certificado ahora</button>
         </div>
       }
     }
