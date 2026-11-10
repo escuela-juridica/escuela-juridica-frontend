@@ -63,15 +63,6 @@ export class UsuarioDetalle implements OnChanges {
   });
 
   constructor() {
-    for (const nombre of ['nombres', 'apellidoPaterno', 'apellidoMaterno'] as const) {
-      const control = this.formDatos.controls[nombre];
-      control.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((valor) => {
-        const mayuscula = valor.toLocaleUpperCase('es-PE');
-        if (valor !== mayuscula) {
-          control.setValue(mayuscula, { emitEvent: false });
-        }
-      });
-    }
     this.destroyRef.onDestroy(() => this.limpiarTimeoutMensaje());
   }
 

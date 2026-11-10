@@ -49,18 +49,6 @@ export class UsuarioCrear {
     documentoIdentidad: ['', [Validators.maxLength(30), documentoOpcionalValidator]],
   });
 
-  constructor() {
-    for (const nombre of ['nombres', 'apellidoPaterno', 'apellidoMaterno'] as const) {
-      const control = this.formulario.controls[nombre];
-      control.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((valor) => {
-        const mayuscula = valor.toLocaleUpperCase('es-PE');
-        if (valor !== mayuscula) {
-          control.setValue(mayuscula, { emitEvent: false });
-        }
-      });
-    }
-  }
-
   protected campoInvalido(
     nombre: 'nombres' | 'apellidoPaterno' | 'apellidoMaterno' | 'correo' | 'telefono' | 'documentoIdentidad',
   ): boolean {

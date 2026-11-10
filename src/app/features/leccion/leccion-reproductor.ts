@@ -6,6 +6,7 @@ import { distinctUntilChanged, map } from 'rxjs';
 
 import { resolverUrlApi } from '../../core/api/api.config';
 import { AlertaGlobalService } from '../../core/notificaciones/alerta-global.service';
+import { idYoutube } from '../../core/youtube/youtube-id.util';
 import { YoutubeReproductor } from '../../shared/ui/youtube-reproductor/youtube-reproductor';
 import { AvanceCertificadoBloque } from '../aula/avance-certificado/avance-certificado';
 import { examenAgotado } from '../aula/aula-ruta.util';
@@ -66,7 +67,7 @@ export class LeccionReproductor {
   protected readonly youtubeId = computed<string | null>(() => {
     const video = this.videoPrincipal();
     if (!video || video.origen !== 'YOUTUBE') return null;
-    return LeccionReproductor.idYoutube(video.verUrl);
+    return idYoutube(video.verUrl);
   });
 
   protected readonly esFinalizacionAutomatica = computed(() =>
@@ -340,19 +341,6 @@ export class LeccionReproductor {
   private mensajeError(error: HttpErrorResponse): string | null {
     const cuerpo = typeof error.error === 'object' && error.error !== null ? (error.error as { message?: string }) : null;
     return cuerpo?.message ?? null;
-  }
-
-  private static idYoutube(url: string): string | null {
-    try {
-      const u = new URL(url);
-      let id: string | null = null;
-      if (u.hostname.includes('youtu.be')) id = u.pathname.slice(1);
-      else if (u.searchParams.get('v')) id = u.searchParams.get('v');
-      else id = u.pathname.match(/\/(?:embed|shorts|live)\/([^/?]+)/)?.[1] ?? null;
-      return id && /^[A-Za-z0-9_-]{11}$/.test(id) ? id : null;
-    } catch {
-      return null;
-    }
   }
 
   private static formatearTamano(bytes: number): string {

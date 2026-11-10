@@ -112,16 +112,6 @@ export class MiPerfil implements OnInit {
         });
     }
 
-    for (const nombre of ['nombres', 'apellidoPaterno', 'apellidoMaterno'] as const) {
-      const control = this.formulario.controls[nombre];
-      control.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((valor) => {
-        const mayuscula = valor.toLocaleUpperCase('es-PE');
-        if (valor !== mayuscula) {
-          control.setValue(mayuscula, { emitEvent: false });
-        }
-      });
-    }
-
     for (const nombre of ['contrasena', 'confirmarContrasena'] as const) {
       this.formularioContrasena.controls[nombre].valueChanges
         .pipe(takeUntilDestroyed(this.destroyRef))

@@ -4,7 +4,7 @@
       ><img src="img/logo-esejur.png" alt="Escuela Jurídica" class="header-logo"
     /></a>
     <nav class="header-nav">
-      <a routerLink="/app/panel" routerLinkActive="nav-enlace--activo" class="nav-enlace"
+      <a routerLink="/app/panel" class="nav-enlace" [class.nav-enlace--activo]="cursosActivo()"
         >Mis cursos</a
       >
       <a routerLink="/app/calendario" routerLinkActive="nav-enlace--activo" class="nav-enlace"
@@ -61,8 +61,8 @@
     <nav class="menu-movil" #movilPanel>
       <a
         routerLink="/app/panel"
-        routerLinkActive="menu-movil__item--activo"
         class="menu-movil__item"
+        [class.menu-movil__item--activo]="cursosActivo()"
         (click)="cerrarMenuMovil()"
         >Mis cursos</a
       >

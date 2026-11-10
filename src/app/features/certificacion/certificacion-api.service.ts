@@ -1,8 +1,9 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 
 import { API_URL, resolverUrlApi } from '../../core/api/api.config';
+import { PageResponse } from '../../core/api/page-response.model';
 import { Certificacion, ConfirmarDatos, MiCertificado, VerificacionCertificado } from './certificacion.model';
 
 @Injectable({ providedIn: 'root' })
@@ -22,8 +23,9 @@ export class CertificacionApiService {
     return this.http.post<Certificacion>(`${this.base}/${cursoId}/certificacion/emitir`, {});
   }
 
-  misCertificados(): Observable<MiCertificado[]> {
-    return this.http.get<MiCertificado[]>(`${API_URL}/app/certificados`);
+  misCertificados(pagina: number, tamano: number): Observable<PageResponse<MiCertificado>> {
+    const params = new HttpParams().set('page', pagina).set('size', tamano);
+    return this.http.get<PageResponse<MiCertificado>>(`${API_URL}/app/certificados`, { params });
   }
 
   descargarPdf(descargaUrl: string, codigo: string): Observable<void> {

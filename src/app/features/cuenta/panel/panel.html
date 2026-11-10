@@ -2,16 +2,20 @@
   <div class="contenedor">
     <div class="eyebrow"><span class="eyebrow__dash"></span><span class="eyebrow__texto">Tu panel</span></div>
     <h1 class="tipo-h1 panel-titulo">Hola, {{ primerNombre || 'estudiante' }}</h1>
-    
+
     @if (cargando()) {
       <p class="panel-subtitulo">Cargando tus cursos...</p>
     } @else if (error()) {
       <div class="estado-vacio"><h3 class="estado-vacio__titulo">No pudimos cargar tus cursos</h3><button type="button" class="btn btn--primario" (click)="cargar()">Reintentar</button></div>
-    } @else if (cursosActivos().length > 0) {
-      <p class="panel-subtitulo">Tienes {{ cursosActivos().length }} {{ cursosActivos().length === 1 ? 'curso registrado' : 'cursos registrados' }}.</p>
+    } @else if (hayCursos) {
+      <p class="panel-subtitulo">Tienes {{ enProgreso() + completados() }} {{ enProgreso() + completados() === 1 ? 'curso registrado' : 'cursos registrados' }}.</p>
       <div class="panel-pestanas" role="tablist" aria-label="Mis cursos">
-        <button type="button" role="tab" [class.panel-pestanas__boton--activo]="pestana() === 'EN_PROGRESO'" (click)="seleccionarPestana('EN_PROGRESO')">En progreso</button>
-        <button type="button" role="tab" [class.panel-pestanas__boton--activo]="pestana() === 'COMPLETADOS'" (click)="seleccionarPestana('COMPLETADOS')">Completados</button>
+        <button type="button" role="tab" [class.panel-pestanas__boton--activo]="pestana() === 'EN_PROGRESO'" [attr.aria-selected]="pestana() === 'EN_PROGRESO'" (click)="seleccionarPestana('EN_PROGRESO')">
+          En progreso <span class="panel-pestanas__contador">{{ enProgreso() }}</span>
+        </button>
+        <button type="button" role="tab" [class.panel-pestanas__boton--activo]="pestana() === 'COMPLETADOS'" [attr.aria-selected]="pestana() === 'COMPLETADOS'" (click)="seleccionarPestana('COMPLETADOS')">
+          Completados <span class="panel-pestanas__contador">{{ completados() }}</span>
+        </button>
       </div>
       <div class="panel-seccion-cabecera">
         <h2 class="tipo-h2 panel-seccion-titulo">{{ pestana() === 'EN_PROGRESO' ? 'Cursos en progreso' : 'Cursos completados' }}</h2>
@@ -26,52 +30,120 @@
           </svg>
         </a>
       </div>
-      
-      @for (curso of cursosVisibles(); track curso.id) {
-        <div class="card panel-curso">
-          <div class="panel-curso__acento"></div>
-          <div class="panel-curso__imagen" [class.panel-curso__imagen--vacia]="!curso.imagenUrl" [style.background-image]="curso.imagenUrl ? 'url(' + curso.imagenUrl + ')' : 'none'">
-            @if (!curso.imagenUrl) { <span>Curso ESEJUR</span> }
-          </div>
-          <div class="panel-curso__info">
-            <div class="panel-curso__categoria">{{ curso.tipo }} · {{ curso.categoria }}</div>
-            <h3 class="panel-curso__nombre">{{ curso.nombre }}</h3>
-            <div class="panel-curso__progreso">
-              <div class="panel-curso__progreso-pista">
-                <div class="panel-curso__progreso-relleno" [style.width.%]="curso.porcentajeProgreso"></div>
-              </div>
-              <span class="panel-curso__progreso-porcentaje">{{ curso.porcentajeProgreso }}%</span>
+
+      <div class="panel-busqueda" role="search">
+        <svg class="panel-busqueda__icono" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7" />
+          <path d="m20 20-4-4" />
+        </svg>
+        <input type="search" class="panel-busqueda__campo" placeholder="Buscar un curso por su nombre…" aria-label="Buscar en mis cursos"
+          autocomplete="off" [value]="texto()" (input)="escribir($any($event.target).value)" />
+        @if (texto()) {
+          <button type="button" class="panel-busqueda__limpiar" aria-label="Borrar búsqueda" (click)="limpiarBusqueda()">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12" /></svg>
+          </button>
+        }
+      </div>
+
+      <div class="panel-lista" [class.panel-lista--actualizando]="actualizando()" [attr.aria-busy]="actualizando()">
+        @for (curso of cursosActivos(); track curso.matriculaId) {
+          <div class="card panel-curso">
+            <div class="panel-curso__acento"></div>
+            <div class="panel-curso__imagen" [class.panel-curso__imagen--vacia]="!curso.imagenUrl" [style.background-image]="curso.imagenUrl ? 'url(' + curso.imagenUrl + ')' : 'none'">
+              @if (!curso.imagenUrl) { <span>Curso ESEJUR</span> }
             </div>
-            <div class="panel-curso__leccion">
+            <div class="panel-curso__info">
+              <div class="panel-curso__categoria">{{ curso.tipo }} · {{ curso.categoria }}</div>
+              <h3 class="panel-curso__nombre">{{ curso.nombre }}</h3>
+              <div class="panel-curso__progreso">
+                <div class="panel-curso__progreso-pista">
+                  <div class="panel-curso__progreso-relleno" [style.width.%]="curso.porcentajeProgreso"></div>
+                </div>
+                <span class="panel-curso__progreso-porcentaje">{{ curso.porcentajeProgreso }}%</span>
+              </div>
+              <div class="panel-curso__leccion">
+                @if (curso.pagoPendiente) {
+                  Tu pago aún no está aprobado: no tienes acceso ni cupo reservado hasta que Culqi lo apruebe.
+                } @else if (curso.cursoCancelado) {
+                  <strong>Curso cancelado por la Escuela.</strong>
+                  {{ curso.accesoEfectivo ? 'Solo puedes consultar el contenido que ya tenías.' : 'No había contenido disponible antes de la cancelación.' }}
+                } @else if (curso.fechaInicio && !curso.accesoEfectivo) {
+                  El curso inicia el {{ curso.fechaInicio | date:'dd/MM/yyyy' }}.
+                } @else if (curso.totalLecciones > 0) {
+                  {{ curso.leccionesCompletadas }} de {{ curso.totalLecciones }} lecciones completadas · siguiente: "{{ curso.siguienteLeccionNombre }}"
+                } @else {
+                  {{ curso.siguienteLeccionNombre }}
+                }
+              </div>
+              <div class="panel-curso__certificado">
+                @switch (curso.certificado) {
+                  @case ('EMITIDO') {
+                    <span class="panel-cert panel-cert--emitido">
+                      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="9" r="6" /><path d="m8.5 14.5-1.5 7 5-3 5 3-1.5-7" /></svg>
+                      Certificado emitido
+                    </span>
+                  }
+                  @case ('ANULADO') {
+                    <span class="panel-cert panel-cert--anulado">
+                      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="m5.6 5.6 12.8 12.8" /></svg>
+                      Certificado anulado
+                    </span>
+                  }
+                  @default {
+                    @if (curso.fechaFinalizacion) {
+                      <span class="panel-cert panel-cert--pendiente">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>
+                        Certificado por generar
+                      </span>
+                    } @else {
+                      <span class="panel-cert panel-cert--sin">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="9" r="6" /><path d="m8.5 14.5-1.5 7 5-3 5 3-1.5-7" /></svg>
+                        Sin certificado todavía
+                      </span>
+                    }
+                  }
+                }
+              </div>
+            </div>
+            <div class="panel-curso__acciones">
               @if (curso.pagoPendiente) {
-                Tu pago aún no está aprobado: no tienes acceso ni cupo reservado hasta que Culqi lo apruebe.
-              } @else if (curso.cursoCancelado) {
-                <strong>Curso cancelado por la Escuela.</strong>
-                {{ curso.accesoEfectivo ? 'Solo puedes consultar el contenido que ya tenías.' : 'No había contenido disponible antes de la cancelación.' }}
-              } @else if (curso.fechaInicio && !curso.accesoEfectivo) {
-                El curso inicia el {{ curso.fechaInicio | date:'dd/MM/yyyy' }}.
-              } @else if (curso.totalLecciones > 0) {
-                {{ curso.leccionesCompletadas }} de {{ curso.totalLecciones }} lecciones completadas · siguiente: "{{ curso.siguienteLeccionNombre }}"
+                <a [routerLink]="['/app/pagar', curso.urlAmigable]" class="btn btn--acento panel-curso__boton">Completar pago</a>
               } @else {
-                {{ curso.siguienteLeccionNombre }}
+                <button type="button" [routerLink]="['/aula', curso.id]" [disabled]="!curso.accesoEfectivo" class="btn btn--acento panel-curso__boton">
+                  {{ curso.accesoEfectivo ? 'Continuar curso' : 'Acceso no disponible' }}
+                </button>
+                @if (curso.certificado === 'SIN_EMITIR' && curso.fechaFinalizacion && curso.accesoEfectivo) {
+                  <a [routerLink]="['/aula', curso.id]" [queryParams]="{ pestana: 'certificado' }" class="btn btn--secundario panel-curso__boton">Generar certificado</a>
+                }
+                @if (curso.certificado === 'EMITIDO') {
+                  <a routerLink="/app/certificados" class="btn btn--secundario panel-curso__boton">Ver certificado</a>
+                }
+              }
+              @if (curso.estadoNotificacion === 'ERROR') {
+                <button type="button" class="btn btn--secundario panel-curso__boton" [disabled]="reenviando() === curso.matriculaId" (click)="reenviarConfirmacion(curso.matriculaId)">
+                  {{ reenviando() === curso.matriculaId ? 'Enviando…' : 'Reenviar confirmación' }}
+                </button>
               }
             </div>
           </div>
-          @if (curso.pagoPendiente) {
-            <a [routerLink]="['/app/pagar', curso.urlAmigable]" class="btn btn--acento panel-curso__boton">Completar pago</a>
-          } @else {
-            <button type="button" [routerLink]="['/aula', curso.id]" [disabled]="!curso.accesoEfectivo" class="btn btn--acento panel-curso__boton">
-              {{ curso.accesoEfectivo ? 'Continuar curso' : 'Acceso no disponible' }}
-            </button>
-          }
-          @if (curso.estadoNotificacion === 'ERROR') {
-            <button type="button" class="btn btn--secundario" [disabled]="reenviando() === curso.matriculaId" (click)="reenviarConfirmacion(curso.matriculaId)">
-              {{ reenviando() === curso.matriculaId ? 'Enviando…' : 'Reenviar confirmación' }}
-            </button>
-          }
+        } @empty {
+          <div class="estado-vacio">
+            @if (termino()) {
+              <h3 class="estado-vacio__titulo">No encontramos cursos con «{{ termino() }}»</h3>
+              <p class="estado-vacio__texto">Revisa el nombre o prueba con otra palabra. La búsqueda se aplica solo a la sección actual.</p>
+              <button type="button" class="btn btn--secundario" (click)="limpiarBusqueda()">Borrar búsqueda</button>
+            } @else {
+              <h3 class="estado-vacio__titulo">No tienes cursos en esta sección</h3>
+              <p class="estado-vacio__texto">Tus cursos se mostrarán aquí según su avance académico.</p>
+            }
+          </div>
+        }
+      </div>
+
+      @if (total() > 0) {
+        <div class="panel-paginacion">
+          <app-tabla-paginacion [pagina]="pagina()" [tamano]="tamano" [total]="total()" (cambiar)="irAPagina($event)" />
         </div>
-      } @empty {
-        <div class="estado-vacio"><h3 class="estado-vacio__titulo">No tienes cursos en esta sección</h3><p class="estado-vacio__texto">Tus cursos se mostrarán aquí según su avance académico.</p></div>
       }
     } @else {
       <div class="estado-vacio">

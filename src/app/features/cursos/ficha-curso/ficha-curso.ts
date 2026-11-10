@@ -20,6 +20,8 @@ import {
 import { FichaCursoDetalle, LeccionFicha, VistaPrevia } from '../curso.model';
 import { resolverUrlApi } from '../../../core/api/api.config';
 import { Session } from '../../../core/session/session';
+import { idYoutube } from '../../../core/youtube/youtube-id.util';
+import { YoutubeReproductor } from '../../../shared/ui/youtube-reproductor/youtube-reproductor';
 import { MatriculaApiService } from '../../matriculas/matricula-api.service';
 import { AlertaGlobalService } from '../../../core/notificaciones/alerta-global.service';
 import { ConfirmacionMatricula } from './confirmacion-matricula/confirmacion-matricula';
@@ -31,7 +33,7 @@ type EstadoVistaPrevia = 'inactiva' | 'cargando' | 'lista' | 'error';
 
 @Component({
   selector: 'app-ficha-curso',
-  imports: [RouterLink, NgClass, ConfirmacionMatricula],
+  imports: [RouterLink, NgClass, ConfirmacionMatricula, YoutubeReproductor],
   templateUrl: './ficha-curso.html',
   styleUrl: './ficha-curso.scss',
 })
@@ -53,6 +55,20 @@ export class FichaCurso implements OnInit {
   protected readonly leccionActivaId = signal<number | null>(null);
   protected readonly vistaPrevia = signal<VistaPrevia | null>(null);
   protected readonly vistaPreviaEstado = signal<EstadoVistaPrevia>('inactiva');
+  protected readonly videoPrevia = computed(
+    () => this.vistaPrevia()?.materiales.find((material) => material.tipoRecurso === 'VIDEO') ?? null,
+  );
+  protected readonly youtubePrevia = computed(() => {
+    const video = this.videoPrevia();
+    return video && video.origen === 'YOUTUBE' ? idYoutube(video.referencia) : null;
+  });
+  protected readonly hayReproductorPrevio = computed(
+    () => {
+      const video = this.videoPrevia();
+      if (this.vistaPreviaEstado() !== 'lista' || !video) return false;
+      return video.origen !== 'YOUTUBE' || this.youtubePrevia() !== null;
+    },
+  );
   protected readonly leccionBloqueadaId = signal<number | null>(null);
   protected readonly dialogoMatriculaAbierto = signal(false);
   protected readonly procesandoMatricula = signal(false);
@@ -281,7 +297,10 @@ export class FichaCurso implements OnInit {
     }
     if (curso.estadoComercial.accion === 'ACCESS_FREE') {
       if (this.session.estaAutenticado()) this.abrirConfirmacionMatricula();
-      else void this.router.navigate(['/acceso'], { state: { mensajeInfo: 'Inicia sesión para confirmar tu matrícula gratuita.' } });
+      else void this.router.navigate(['/acceso'], {
+        queryParams: { returnUrl: `/cursos/${curso.urlAmigable}` },
+        state: { mensajeInfo: 'Inicia sesión para confirmar tu matrícula gratuita.' },
+      });
       return;
     }
     if (this.session.estaAutenticado()) {
@@ -289,6 +308,7 @@ export class FichaCurso implements OnInit {
       return;
     }
     void this.router.navigate(['/acceso'], {
+      queryParams: { returnUrl: `/cursos/${curso.urlAmigable}` },
       state: { mensajeInfo: 'Para continuar debes iniciar sesión.' },
     });
   }

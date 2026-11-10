@@ -14,7 +14,9 @@ import { RegistroApiService } from './registro-api.service';
 import { AntiRobot } from './anti-robot';
 import { WHATSAPP_REGISTRO, enlaceAyudaRegistro } from './registro-contacto';
 import { BotonGoogle } from '../../../shared/ui/boton-google/boton-google';
+import { formatearNombrePropio } from '../../../core/session/nombre-utils';
 import { Session } from '../../../core/session/session';
+import { urlRetornoSegura } from '../../../core/session/url-retorno';
 import { AccesoApiService } from '../acceso/acceso-api.service';
 import { correoDeCredencialGoogle } from '../acceso/google-credencial.util';
 import {
@@ -40,7 +42,6 @@ const NOMBRES_CAMPOS = [
 
 type NombreCampoRegistro = (typeof NOMBRES_CAMPOS)[number];
 
-const CAMPOS_NOMBRE = ['nombres', 'apellidoPaterno', 'apellidoMaterno'] as const;
 
 const PATRON_NOMBRE_REQUERIDO = /^[A-ZÁÉÍÓÚÑÜ][A-ZÁÉÍÓÚÑÜ '-]*$/;
 const PATRON_NOMBRE_OPCIONAL = /^([A-ZÁÉÍÓÚÑÜ][A-ZÁÉÍÓÚÑÜ '-]*)?$/;
@@ -56,6 +57,11 @@ export class Registro implements OnInit {
   private readonly fb = inject(NonNullableFormBuilder);
   private readonly destroyRef = inject(DestroyRef);
   private readonly route = inject(ActivatedRoute);
+  private readonly retorno = urlRetornoSegura(this.route.snapshot.queryParamMap.get('returnUrl'));
+
+  get parametrosRetorno(): { returnUrl: string } | null {
+    return this.retorno ? { returnUrl: this.retorno } : null;
+  }
   private readonly router = inject(Router);
   private readonly registroApi = inject(RegistroApiService);
   private readonly accesoApi = inject(AccesoApiService);
@@ -109,16 +115,6 @@ export class Registro implements OnInit {
       control.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => {
         this.limpiarErrorCampo(nombre);
         this.detector.markForCheck();
-      });
-    }
-
-    for (const nombre of CAMPOS_NOMBRE) {
-      const control = this.formulario.controls[nombre];
-      control.valueChanges.pipe(takeUntilDestroyed()).subscribe((valor) => {
-        const mayuscula = valor.toLocaleUpperCase('es-PE');
-        if (valor !== mayuscula) {
-          control.setValue(mayuscula, { emitEvent: false });
-        }
       });
     }
   }
@@ -222,6 +218,10 @@ export class Registro implements OnInit {
           }
           if (respuesta.sesion) {
             this.sesion.iniciarSesion(respuesta.sesion);
+            if (this.retorno) {
+              void this.router.navigateByUrl(this.retorno);
+              return;
+            }
             void this.router.navigate([
               respuesta.sesion.rolPrincipal === 'ADMINISTRADOR' ? '/admin/dashboard' : '/app/panel',
             ]);
@@ -290,15 +290,13 @@ export class Registro implements OnInit {
   }
 
   private aplicarContextoGoogle(contexto: ContextoRegistroGoogle): void {
-    const mayusculas = (valor?: string | null): string =>
-      (valor ?? '').trim().replace(/\s+/g, ' ').toLocaleUpperCase('es-PE');
-    const apellidoPrincipal = mayusculas(contexto.apellidoPaterno) || mayusculas(contexto.apellidos);
+    const apellidoPrincipal = formatearNombrePropio(contexto.apellidoPaterno) || formatearNombrePropio(contexto.apellidos);
 
     this.formulario.patchValue(
       {
-        nombres: mayusculas(contexto.nombres),
+        nombres: formatearNombrePropio(contexto.nombres),
         apellidoPaterno: apellidoPrincipal,
-        apellidoMaterno: mayusculas(contexto.apellidoMaterno),
+        apellidoMaterno: formatearNombrePropio(contexto.apellidoMaterno),
         correo: contexto.correo,
       },
       { emitEvent: false },
@@ -383,6 +381,10 @@ export class Registro implements OnInit {
             correo: usuario.email,
             rolPrincipal: usuario.rol === 'administrador' ? 'ADMINISTRADOR' : 'ALUMNO',
           });
+          if (this.retorno) {
+            void this.router.navigateByUrl(this.retorno);
+            return;
+          }
           void this.router.navigate(['/app/panel']);
         },
         error: (error: HttpErrorResponse) => this.manejarErrorRegistro(error),

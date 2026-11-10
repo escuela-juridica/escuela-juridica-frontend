@@ -1,6 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { AlertaGlobalService } from '../../../core/notificaciones/alerta-global.service';
 import { AnilloProgreso } from '../../../shared/ui/anillo-progreso/anillo-progreso';
@@ -31,10 +31,15 @@ export class AulaResumen {
   private readonly alertas = inject(AlertaGlobalService);
 
   protected readonly ingresando = signal<number | null>(null);
-  protected readonly pestana = signal<PestanaResumen>('resumen');
+  private readonly ruta = inject(ActivatedRoute);
+  protected readonly pestana = signal<PestanaResumen>(AulaResumen.pestanaInicial(this.ruta.snapshot.queryParamMap.get('pestana')));
   protected readonly formatearFechaHora = formatearFechaHora;
 
   protected readonly solicitudCertificado = signal(0);
+
+  private static pestanaInicial(valor: string | null): PestanaResumen {
+    return valor === 'certificado' || valor === 'evaluaciones' ? valor : 'resumen';
+  }
 
   protected verCertificado(): void {
     this.solicitudCertificado.update((n) => n + 1);

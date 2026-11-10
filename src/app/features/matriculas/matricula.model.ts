@@ -1,3 +1,18 @@
+import { PageResponse } from '../../core/api/page-response.model';
+
+export type EstadoCertificadoCurso = 'EMITIDO' | 'ANULADO' | 'SIN_EMITIR';
+
+export interface MiCurso {
+  matricula: Matricula;
+  certificado: EstadoCertificadoCurso;
+}
+
+export interface PanelCursos {
+  cursos: PageResponse<MiCurso>;
+  enProgreso: number;
+  completados: number;
+}
+
 export interface Matricula {
   id: number;
   cursoId: number;

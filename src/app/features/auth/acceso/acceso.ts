@@ -1,11 +1,12 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
 import { BotonGoogle } from '../../../shared/ui/boton-google/boton-google';
 import { Session } from '../../../core/session/session';
+import { urlRetornoSegura } from '../../../core/session/url-retorno';
 import { AccesoApiService } from './acceso-api.service';
 import { correoDeCredencialGoogle } from './google-credencial.util';
 
@@ -24,6 +25,7 @@ export class Acceso {
   private readonly accesoApi = inject(AccesoApiService);
   private readonly session = inject(Session);
   private readonly router = inject(Router);
+  private readonly ruta = inject(ActivatedRoute);
   private readonly detector = inject(ChangeDetectorRef);
 
   credenciales = { correo: '', contrasena: '' };
@@ -31,6 +33,11 @@ export class Acceso {
   cargando = false;
   mensajeError = '';
   mensajeInfo = this.leerMensajeInfo();
+  private readonly retorno = urlRetornoSegura(this.ruta.snapshot.queryParamMap.get('returnUrl'));
+
+  get parametrosRetorno(): { returnUrl: string } | null {
+    return this.retorno ? { returnUrl: this.retorno } : null;
+  }
 
   private leerMensajeInfo(): string {
     const estadoNavegacion = history.state as { mensajeInfo?: unknown } | null;
@@ -83,7 +90,7 @@ export class Acceso {
         next: (respuesta) => {
           if (respuesta.estado === 'REGISTRO' && respuesta.referenciaRegistro) {
             void this.router.navigate(['/registro'], {
-              queryParams: { referenciaGoogle: respuesta.referenciaRegistro },
+              queryParams: { referenciaGoogle: respuesta.referenciaRegistro, ...this.parametrosRetorno },
             });
             return;
           }
@@ -102,6 +109,10 @@ export class Acceso {
   }
 
   private navegarSegunRol(rol: 'ALUMNO' | 'ADMINISTRADOR'): void {
+    if (this.retorno) {
+      void this.router.navigateByUrl(this.retorno);
+      return;
+    }
     void this.router.navigate([rol === 'ADMINISTRADOR' ? '/admin/dashboard' : '/app/panel']);
   }
 

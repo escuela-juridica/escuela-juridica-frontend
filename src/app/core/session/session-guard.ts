@@ -1,8 +1,9 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { Session } from './session';
+import { urlRetornoSegura } from './url-retorno';
 
-export const sessionGuard: CanActivateFn = () => {
+export const sessionGuard: CanActivateFn = (_ruta, estado) => {
   const session = inject(Session);
   const router = inject(Router);
 
@@ -10,5 +11,6 @@ export const sessionGuard: CanActivateFn = () => {
     return true;
   }
 
-  return router.parseUrl('/acceso');
+  const retorno = urlRetornoSegura(estado.url);
+  return router.createUrlTree(['/acceso'], retorno ? { queryParams: { returnUrl: retorno } } : {});
 };
