@@ -158,7 +158,7 @@
                 <div class="examen-tarjeta__nota">
                   @if (item.examen.mejorNota !== null) {
                     <app-anillo-progreso [valor]="item.examen.mejorNota * 5" [texto]="'' + item.examen.mejorNota" [tamano]="64" [grosor]="6"
-                      [estado]="item.examen.aprobado ? 'exito' : 'error'" descripcion="Mejor nota" />
+                      [estado]="item.examen.aprobado ? 'exito' : 'error'" descripcion="Nota del examen" />
                   }
                   <a class="btn btn--secundario" [routerLink]="['/aula', aula.cursoId, 'examenes', item.examen.id]">{{ accionExamen(item.examen) }}</a>
                 </div>

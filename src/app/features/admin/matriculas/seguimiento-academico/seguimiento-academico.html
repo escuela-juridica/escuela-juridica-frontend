@@ -87,7 +87,7 @@
                     <span class="seg__fila-meta">
                       {{ e.modulo ?? 'Evaluación final' }} · {{ e.tipo === 'PRACTICA' ? 'Práctica' : 'Calificado' }}
                       · intentos {{ e.intentosUsados }}{{ e.intentosMaximos === null ? ' (ilimitados)' : ' de ' + e.intentosMaximos }}
-                      @if (e.mejorNota !== null) { · mejor nota {{ e.mejorNota | number:'1.0-2' }} }
+                      @if (e.mejorNota !== null) { · nota {{ e.mejorNota | number:'1.0-2' }} }
                     </span>
                   </div>
                   <span [class]="'badge ' + claseExamen(e.estado)">{{ etiquetaExamen(e.estado) }}</span>

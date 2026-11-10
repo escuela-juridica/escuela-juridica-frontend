@@ -14,10 +14,17 @@
   @if (f.mejorNota !== null) {
     <div class="ficha-hero__nota">
       <app-anillo-progreso [valor]="f.mejorNota * 5" [texto]="'' + (f.mejorNota | number:'1.0-2')" [tamano]="92" [grosor]="9" tono="oscuro"
-        [estado]="f.aprobado ? 'exito' : 'normal'" etiqueta="mejor nota" descripcion="Mejor nota" />
+        [estado]="f.aprobado ? 'exito' : 'normal'" [etiqueta]="f.criterioNota === 'ULTIMA' ? 'última nota' : 'mejor nota'" [descripcion]="f.criterioNota === 'ULTIMA' ? 'Última nota' : 'Mejor nota'" />
     </div>
   }
 </header>
+
+@if (f.tipo === 'CALIFICADO' && f.criterioNota === 'ULTIMA') {
+  <div class="alerta alerta--info" role="note">
+    <span class="alerta__icono">i</span>
+    <div><p class="alerta__titulo">Cuenta tu último intento</p><p class="alerta__texto">Si rindes otro intento, su nota reemplaza a la anterior, aunque sea menor.</p></div>
+  </div>
+}
 
 @if (f.soloLectura) {
   <div class="alerta alerta--info" role="status">
@@ -37,7 +44,7 @@
 } @else if (f.aprobado) {
   <div class="alerta alerta--exito" role="status">
     <span class="alerta__icono">✓</span>
-    <div><p class="alerta__titulo">Aprobaste este examen</p><p class="alerta__texto">Tu mejor nota es {{ f.mejorNota | number:'1.0-2' }}.@if (f.bloqueaSiguienteModulo) { Ya puedes continuar con el siguiente módulo. }</p></div>
+    <div><p class="alerta__titulo">Aprobaste este examen</p><p class="alerta__texto">{{ f.criterioNota === 'ULTIMA' ? 'Tu última nota es' : 'Tu mejor nota es' }} {{ f.mejorNota | number:'1.0-2' }}.@if (f.bloqueaSiguienteModulo) { Ya puedes continuar con el siguiente módulo. }</p></div>
   </div>
 }
 

@@ -12,7 +12,6 @@ export class ExamenNavegador {
   readonly preguntas = input.required<PreguntaIntento[]>();
   readonly indice = input.required<number>();
   readonly respondidas = input.required<ReadonlySet<number>>();
-  readonly marcadas = input.required<ReadonlySet<number>>();
   readonly guardado = input<EstadoGuardado>('idle');
 
   readonly ir = output<number>();

@@ -153,7 +153,7 @@
             }
           </div>
         } @else {
-          <app-examen-navegador [preguntas]="it.preguntas" [indice]="indice()" [respondidas]="respondidas()" [marcadas]="marcadas()"
+          <app-examen-navegador [preguntas]="it.preguntas" [indice]="indice()" [respondidas]="respondidas()"
             [guardado]="guardado()" (ir)="irA($event)" />
 
           @for (p of it.preguntas; track p.id; let i = $index) {
@@ -183,9 +183,6 @@
               </div>
             </div>
             <p class="examen__resumen-detalle">Sin responder: @for (p of sinResponder(); track p.id; let ult = $last) { <button type="button" class="examen__enlace" (click)="cancelarConfirmacion(); irA(p.posicion - 1)">{{ p.posicion }}</button>{{ ult ? '' : ', ' }} }</p>
-          }
-          @if (marcadasLista().length > 0) {
-            <p class="examen__resumen-detalle">Marcadas para revisar: @for (p of marcadasLista(); track p.id; let ult = $last) { <button type="button" class="examen__enlace" (click)="cancelarConfirmacion(); irA(p.posicion - 1)">{{ p.posicion }}</button>{{ ult ? '' : ', ' }} }</p>
           }
           @if (it.tipo === 'CALIFICADO') {
             <p class="examen__resumen-detalle">Es un examen calificado: el intento cuenta aunque no lo apruebes.</p>
@@ -348,16 +345,9 @@
       <p class="examen__faltante" role="alert">Esta pregunta necesita una respuesta.</p>
     }
 
-    @if (!esSecuencial() || (permiteOmitir() && estaRespondida(p))) {
+    @if (permiteOmitir() && estaRespondida(p)) {
       <div class="examen__pregunta-acciones">
-        @if (!esSecuencial()) {
-          <button type="button" class="btn btn--secundario" (click)="alternarMarca(p)" [attr.aria-pressed]="marcadas().has(p.id)">
-            {{ marcadas().has(p.id) ? '🚩 Quitar marca' : '⚑ Marcar para revisar' }}
-          </button>
-        }
-        @if (permiteOmitir() && estaRespondida(p)) {
-          <button type="button" class="btn btn--secundario" (click)="limpiarRespuesta(p)">Borrar respuesta</button>
-        }
+        <button type="button" class="btn btn--secundario" (click)="limpiarRespuesta(p)">Borrar respuesta</button>
       </div>
     }
   </section>
