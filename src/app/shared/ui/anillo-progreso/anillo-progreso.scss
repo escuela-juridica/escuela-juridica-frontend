@@ -42,6 +42,65 @@
   transition: stroke-dashoffset 600ms ease;
 }
 
+.anillo--animado .anillo__arco {
+  transition: none;
+  animation: anillo-trazo 1300ms cubic-bezier(0.22, 0.8, 0.2, 1) 250ms backwards;
+}
+
+.anillo--animado.anillo--exito::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: anillo-destello 1100ms ease-out 1500ms 1 both;
+}
+
+.anillo--animado .anillo__valor {
+  animation: anillo-valor 700ms cubic-bezier(0.2, 1.4, 0.4, 1) 450ms backwards;
+}
+
+.anillo--animado .anillo__etiqueta {
+  animation: anillo-aparecer 500ms ease-out 900ms backwards;
+}
+
+@keyframes anillo-trazo {
+  from {
+    stroke-dashoffset: var(--anillo-circ);
+  }
+}
+
+@keyframes anillo-valor {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+
+@keyframes anillo-aparecer {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes anillo-destello {
+  0% {
+    box-shadow: 0 0 0 0 rgba(2, 122, 72, 0.45);
+  }
+  100% {
+    box-shadow: 0 0 0 26px rgba(2, 122, 72, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anillo--animado .anillo__arco,
+  .anillo--animado .anillo__valor,
+  .anillo--animado .anillo__etiqueta,
+  .anillo--animado.anillo--exito::after {
+    animation: none;
+  }
+}
+
 .anillo__centro {
   position: relative;
   display: flex;

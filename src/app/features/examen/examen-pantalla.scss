@@ -436,6 +436,28 @@
   color: var(--exito);
 }
 
+.examen__nota-estado--anim {
+  animation: examen-nota-subir 600ms ease-out 1100ms backwards;
+}
+
+.examen__nota-estado--anim ~ .examen__nota-ayuda {
+  animation: examen-nota-subir 600ms ease-out 1300ms backwards;
+}
+
+@keyframes examen-nota-subir {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .examen__nota-estado--anim,
+  .examen__nota-estado--anim ~ .examen__nota-ayuda {
+    animation: none;
+  }
+}
+
 .examen__nota--mal .examen__nota-estado {
   color: var(--error);
 }
@@ -625,10 +647,27 @@
 }
 
 .examen__progreso-aviso {
-  margin: 0;
-  font-size: 14px;
-  line-height: 20px;
-  color: var(--neutral-600);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0 0;
+  padding: 12px 16px;
+  border: 1px solid var(--advertencia-borde);
+  border-left: 5px solid var(--advertencia);
+  border-radius: 10px;
+  background: var(--advertencia-fondo);
+  font-size: 15px;
+  line-height: 22px;
+  color: #7a2e0e;
+
+  svg {
+    flex: none;
+    color: var(--advertencia);
+  }
+
+  strong {
+    font-weight: 700;
+  }
 }
 
 .examen__pie-ayuda {

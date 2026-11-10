@@ -1,8 +1,9 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { API_URL } from '../../core/api/api.config';
+import { SIN_CARGA_GLOBAL } from '../../core/interceptors/carga-global.interceptor';
 import { ExamenFicha, GuardarRespuesta, Intento } from './examen.model';
 
 @Injectable({ providedIn: 'root' })
@@ -23,7 +24,9 @@ export class ExamenApiService {
   }
 
   guardarRespuesta(intentoId: number, preguntaId: number, respuesta: GuardarRespuesta): Observable<void> {
-    return this.http.put<void>(`${this.base}/intentos/${intentoId}/respuestas/${preguntaId}`, respuesta);
+    return this.http.put<void>(`${this.base}/intentos/${intentoId}/respuestas/${preguntaId}`, respuesta, {
+      context: new HttpContext().set(SIN_CARGA_GLOBAL, true),
+    });
   }
 
   enviar(intentoId: number): Observable<Intento> {
