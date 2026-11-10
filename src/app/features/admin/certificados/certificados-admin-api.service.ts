@@ -15,7 +15,6 @@ import {
   VistaPreviaCertificado,
 } from './certificados-admin.model';
 
-/** HU-035 — Consume `/api/admin/certificados`. */
 @Injectable({ providedIn: 'root' })
 export class CertificadosAdminApiService {
   private readonly http = inject(HttpClient);
@@ -36,7 +35,6 @@ export class CertificadosAdminApiService {
     return this.http.post<EmisionManualSituacion>(`${this.url}/manual/${matriculaId}`, datos);
   }
 
-  /** HU-036 — Datos, firmantes e historial de un certificado. */
   detalle(certificadoId: number): Observable<CertificadoDetalle> {
     return this.http.get<CertificadoDetalle>(`${this.url}/${certificadoId}`);
   }
@@ -49,7 +47,6 @@ export class CertificadosAdminApiService {
     return this.http.post<CertificadoDetalle>(`${this.url}/${certificadoId}/anular`, datos);
   }
 
-  /** PDF de borrador (con marca de agua) de cómo quedaría la corrección; no guarda nada. */
   vistaPrevia(certificadoId: number, datos: VistaPreviaCertificado): Observable<Blob> {
     return this.http.post(`${this.url}/${certificadoId}/vista-previa`, datos, { responseType: 'blob' });
   }

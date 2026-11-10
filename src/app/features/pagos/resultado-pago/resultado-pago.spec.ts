@@ -26,7 +26,6 @@ const CONSTANCIA: ConstanciaPago = {
   curso: 'Derecho Procesal Penal', cursoId: 7,
 };
 
-/** EP06 · HU-047 — Resultado del pago: aprobado con constancia; pendiente, rechazado y error sin afirmar un pago. */
 describe('ResultadoPago', () => {
   let fixture: ComponentFixture<ResultadoPago>;
   let http: HttpTestingController;
@@ -104,7 +103,6 @@ describe('ResultadoPago', () => {
     http.expectOne(`${API_URL}/app/pagos/${PEDIDO}/constancia`).flush(CONSTANCIA);
 
     expect(leer<PagoDetalle>('pago').estado).toBe('APROBADO');
-    // Con el resultado final deja de consultar.
     vi.advanceTimersByTime(8000);
     http.expectNone(`${API_URL}/app/pagos/${PEDIDO}`);
   });

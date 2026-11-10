@@ -6,17 +6,13 @@ import { switchMap, tap } from 'rxjs';
 
 import { AlertaGlobalService } from '../../../core/notificaciones/alerta-global.service';
 import { CursoApiService } from '../../cursos/curso-api.service';
-import { etiquetaModalidad, formatearPrecio, mediosDePago } from '../../cursos/curso-formato.util';
+import { etiquetaModalidad, formatearPrecio, mediosDePago, urlPortadaCurso } from '../../cursos/curso-formato.util';
 import { FichaCursoDetalle } from '../../cursos/curso.model';
 import { CulqiCheckoutService } from '../culqi-checkout.service';
 import { InstruccionesQr } from '../instrucciones-qr/instrucciones-qr';
 import { InstruccionesPago, PagoCheckout, PagoDetalle, PagosCurso } from '../pago.model';
 import { PagosApiService } from '../pagos-api.service';
 
-/**
- * HU-047 — PF-017: confirmación de compra. El alumno ve el precio vigente, lo confirma y recién entonces se inicia
- * la operación con Culqi. Mientras Culqi no apruebe, no hay acceso ni cupo reservado.
- */
 @Component({
   selector: 'app-checkout-pago',
   imports: [RouterLink, InstruccionesQr],
@@ -33,6 +29,7 @@ export class CheckoutPago {
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly formatearPrecio = formatearPrecio;
+  protected readonly urlPortada = urlPortadaCurso;
   protected readonly etiquetaModalidad = etiquetaModalidad;
 
   protected readonly ficha = signal<FichaCursoDetalle | null>(null);
@@ -42,7 +39,6 @@ export class CheckoutPago {
   protected readonly confirmado = signal(false);
   protected readonly procesando = signal(false);
   protected readonly errorPago = signal<string | null>(null);
-  /** QR de una orden de billetera ya generada y aún pendiente: Culqi no deja volver a generarlo. */
   protected readonly instruccionesPendientes = signal<InstruccionesPago | null>(null);
 
   protected readonly medios = computed(() => {
@@ -50,7 +46,6 @@ export class CheckoutPago {
     return f ? mediosDePago(f.estadoComercial.precioActual) : [];
   });
 
-  /** Hay un intento en proceso que se reanuda en lugar de crear otro. */
   protected readonly enProceso = computed(() => this.intentos()?.pendiente ?? null);
   protected readonly anteriores = computed<PagoDetalle[]>(() =>
     (this.intentos()?.intentos ?? []).filter((i) => i.estado !== 'PENDIENTE').slice(0, 3));
@@ -113,7 +108,6 @@ export class CheckoutPago {
           const cuerpo = typeof e.error === 'object' && e.error !== null ? (e.error as { code?: string; message?: string }) : null;
           this.errorPago.set(cuerpo?.message ?? 'No pudimos iniciar el pago. Inténtalo nuevamente.');
           if (cuerpo?.code === 'PRICE_CHANGED') {
-            // El precio cambió: se muestra el vigente y se exige confirmarlo otra vez.
             this.confirmado.set(false);
             this.recargarFicha(f.urlAmigable);
           }

@@ -13,8 +13,12 @@ import { finalize } from 'rxjs';
 import { RegistroApiService } from './registro-api.service';
 import { AntiRobot } from './anti-robot';
 import { WHATSAPP_REGISTRO, enlaceAyudaRegistro } from './registro-contacto';
-import { BotonGooglePendiente } from '../../../shared/ui/boton-google-pendiente/boton-google-pendiente';
+import { BotonGoogle } from '../../../shared/ui/boton-google/boton-google';
+import { formatearNombrePropio } from '../../../core/session/nombre-utils';
 import { Session } from '../../../core/session/session';
+import { urlRetornoSegura } from '../../../core/session/url-retorno';
+import { AccesoApiService } from '../acceso/acceso-api.service';
+import { correoDeCredencialGoogle } from '../acceso/google-credencial.util';
 import {
   ApiErrorRespuesta,
   ContextoRegistroGoogle,
@@ -38,16 +42,13 @@ const NOMBRES_CAMPOS = [
 
 type NombreCampoRegistro = (typeof NOMBRES_CAMPOS)[number];
 
-const CAMPOS_NOMBRE = ['nombres', 'apellidoPaterno', 'apellidoMaterno'] as const;
 
-// Solo letras (con tildes/Ñ), espacios, apóstrofe y guion. Como el valor se
-// fuerza a mayúsculas al tipear, el patrón solo acepta mayúsculas.
 const PATRON_NOMBRE_REQUERIDO = /^[A-ZÁÉÍÓÚÑÜ][A-ZÁÉÍÓÚÑÜ '-]*$/;
 const PATRON_NOMBRE_OPCIONAL = /^([A-ZÁÉÍÓÚÑÜ][A-ZÁÉÍÓÚÑÜ '-]*)?$/;
 
 @Component({
   selector: 'app-registro',
-  imports: [RouterLink, ReactiveFormsModule, AntiRobot, BotonGooglePendiente],
+  imports: [RouterLink, ReactiveFormsModule, AntiRobot, BotonGoogle],
   templateUrl: './registro.html',
   styleUrl: './registro.scss',
 })
@@ -56,8 +57,14 @@ export class Registro implements OnInit {
   private readonly fb = inject(NonNullableFormBuilder);
   private readonly destroyRef = inject(DestroyRef);
   private readonly route = inject(ActivatedRoute);
+  private readonly retorno = urlRetornoSegura(this.route.snapshot.queryParamMap.get('returnUrl'));
+
+  get parametrosRetorno(): { returnUrl: string } | null {
+    return this.retorno ? { returnUrl: this.retorno } : null;
+  }
   private readonly router = inject(Router);
   private readonly registroApi = inject(RegistroApiService);
+  private readonly accesoApi = inject(AccesoApiService);
   private readonly sesion = inject(Session);
   private readonly detector = inject(ChangeDetectorRef);
   private readonly erroresServidor: Partial<Record<NombreCampoRegistro, string>> = {};
@@ -69,6 +76,7 @@ export class Registro implements OnInit {
   mostrarConfirmacion = false;
   modoGoogle = false;
   cargandoContextoGoogle = false;
+  validandoGoogle = false;
   contextoGoogleValido = false;
   referenciaGoogle: string | null = null;
 
@@ -106,22 +114,7 @@ export class Registro implements OnInit {
       const control: AbstractControl = this.formulario.controls[nombre];
       control.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => {
         this.limpiarErrorCampo(nombre);
-        // Sin Zone.js, Angular no repinta solo al tipear: el checklist de
-        // contraseña y los mensajes de error de campo dependen de esto.
         this.detector.markForCheck();
-      });
-    }
-
-    // Nombres y apellidos solo aceptan letras: se fuerzan a mayúsculas a
-    // medida que se escribe, para que coincidan con el formato de los
-    // documentos de identidad.
-    for (const nombre of CAMPOS_NOMBRE) {
-      const control = this.formulario.controls[nombre];
-      control.valueChanges.pipe(takeUntilDestroyed()).subscribe((valor) => {
-        const mayuscula = valor.toLocaleUpperCase('es-PE');
-        if (valor !== mayuscula) {
-          control.setValue(mayuscula, { emitEvent: false });
-        }
       });
     }
   }
@@ -200,8 +193,45 @@ export class Registro implements OnInit {
     this.detector.markForCheck();
   }
 
+  continuarConGoogle(credencial: string): void {
+    if (this.validandoGoogle || this.enviando || this.cargandoContextoGoogle || this.cuentaCreada) {
+      return;
+    }
+
+    this.validandoGoogle = true;
+    this.errorGeneral = '';
+
+    this.accesoApi
+      .accederConGoogle(credencial)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => {
+          this.validandoGoogle = false;
+          this.detector.markForCheck();
+        }),
+      )
+      .subscribe({
+        next: (respuesta) => {
+          if (respuesta.estado === 'REGISTRO' && respuesta.referenciaRegistro) {
+            this.cargarContextoGoogle(respuesta.referenciaRegistro);
+            return;
+          }
+          if (respuesta.sesion) {
+            this.sesion.iniciarSesion(respuesta.sesion);
+            if (this.retorno) {
+              void this.router.navigateByUrl(this.retorno);
+              return;
+            }
+            void this.router.navigate([
+              respuesta.sesion.rolPrincipal === 'ADMINISTRADOR' ? '/admin/dashboard' : '/app/panel',
+            ]);
+          }
+        },
+        error: (error: HttpErrorResponse) => this.manejarErrorAccesoGoogle(error, credencial),
+      });
+  }
+
   reiniciarGoogle(): void {
-    // Volver al formulario no inicia Google ni conserva una referencia fallida.
     this.modoGoogle = false;
     this.contextoGoogleValido = false;
     this.referenciaGoogle = null;
@@ -260,13 +290,13 @@ export class Registro implements OnInit {
   }
 
   private aplicarContextoGoogle(contexto: ContextoRegistroGoogle): void {
-    const apellidoPrincipal = contexto.apellidoPaterno?.trim() || contexto.apellidos?.trim() || '';
+    const apellidoPrincipal = formatearNombrePropio(contexto.apellidoPaterno) || formatearNombrePropio(contexto.apellidos);
 
     this.formulario.patchValue(
       {
-        nombres: contexto.nombres?.trim() ?? '',
+        nombres: formatearNombrePropio(contexto.nombres),
         apellidoPaterno: apellidoPrincipal,
-        apellidoMaterno: contexto.apellidoMaterno?.trim() ?? '',
+        apellidoMaterno: formatearNombrePropio(contexto.apellidoMaterno),
         correo: contexto.correo,
       },
       { emitEvent: false },
@@ -351,6 +381,10 @@ export class Registro implements OnInit {
             correo: usuario.email,
             rolPrincipal: usuario.rol === 'administrador' ? 'ADMINISTRADOR' : 'ALUMNO',
           });
+          if (this.retorno) {
+            void this.router.navigateByUrl(this.retorno);
+            return;
+          }
           void this.router.navigate(['/app/panel']);
         },
         error: (error: HttpErrorResponse) => this.manejarErrorRegistro(error),
@@ -392,6 +426,18 @@ export class Registro implements OnInit {
     }
 
     this.errorGeneral = respuesta?.message ?? 'No pudimos crear tu cuenta. Inténtalo nuevamente.';
+  }
+
+  private manejarErrorAccesoGoogle(error: HttpErrorResponse, credencial: string): void {
+    const respuesta = this.obtenerErrorApi(error);
+    if (respuesta?.code === 'PENDING_EMAIL_VERIFICATION') {
+      void this.router.navigate(['/verificar-correo'], {
+        state: { correo: correoDeCredencialGoogle(credencial) },
+      });
+      return;
+    }
+    this.errorGeneral =
+      respuesta?.message ?? 'No pudimos iniciar sesión con Google. Inténtalo nuevamente.';
   }
 
   private manejarErrorContextoGoogle(error: HttpErrorResponse): void {

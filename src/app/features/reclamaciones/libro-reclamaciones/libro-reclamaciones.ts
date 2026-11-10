@@ -13,7 +13,6 @@ const MAXIMO_IMAGEN_BYTES = 5 * 1024 * 1024;
 const MAXIMO_IMAGENES = 10;
 const TIPOS_IMAGEN = ['image/png', 'image/jpeg', 'image/webp'];
 
-/** Cuánto debe medir cada tipo de documento (el servidor repite esta validación). */
 const FORMATO_DOCUMENTO: Record<TipoDocumento, { patron: RegExp; ayuda: string }> = {
   DNI: { patron: /^\d{8}$/, ayuda: 'El DNI tiene 8 dígitos.' },
   CE: { patron: /^[A-Za-z0-9]{9,12}$/, ayuda: 'El carné de extranjería tiene entre 9 y 12 caracteres.' },
@@ -21,10 +20,6 @@ const FORMATO_DOCUMENTO: Record<TipoDocumento, { patron: RegExp; ayuda: string }
   RUC: { patron: /^\d{11}$/, ayuda: 'El RUC tiene 11 dígitos.' },
 };
 
-/**
- * HU-039 — Libro de Reclamaciones: página pública, con o sin sesión. Con sesión prellena los datos
- * conocidos (se pueden corregir). Al enviar muestra la constancia con número y fecha máxima de respuesta.
- */
 @Component({
   selector: 'app-libro-reclamaciones',
   imports: [ReactiveFormsModule, RouterLink, ReclamacionConstanciaVista],
@@ -82,7 +77,7 @@ export class LibroReclamaciones {
             });
             this.prellenado.set(true);
           },
-          error: () => undefined, // Sin prellenado el formulario sigue siendo utilizable.
+          error: () => undefined,
         });
     }
   }

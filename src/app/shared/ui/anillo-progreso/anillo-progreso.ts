@@ -1,9 +1,5 @@
 import { Component, computed, input } from '@angular/core';
 
-/**
- * Anillo de progreso (0–100) con el valor al centro. `tono="oscuro"` es para usarlo sobre un fondo
- * oscuro (hero del curso); `estado` pinta el arco según el resultado (p. ej. una nota aprobada).
- */
 @Component({
   selector: 'app-anillo-progreso',
   templateUrl: './anillo-progreso.html',
@@ -11,7 +7,6 @@ import { Component, computed, input } from '@angular/core';
 })
 export class AnilloProgreso {
   readonly valor = input.required<number>();
-  /** Texto grande al centro; por defecto el porcentaje. */
   readonly texto = input<string | null>(null);
   readonly etiqueta = input<string>('');
   readonly tamano = input(120);

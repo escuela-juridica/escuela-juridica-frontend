@@ -17,7 +17,6 @@ import { Dashboard } from './dashboard.model';
 type Rango = 'ANIO' | 'ANIO_ANTERIOR' | 'ULTIMOS_90' | 'MES' | 'PERSONALIZADO';
 type IdGrafico = 'evolucion' | 'cursos' | 'ingreso' | 'pagos';
 
-/** Colores de la forma de ingreso: cada una conserva el suyo aunque otra quede en cero (paleta validada). */
 const COLOR_INGRESO: Record<string, string> = {
   PAGO_EN_LINEA: 'var(--viz-1)',
   REGISTRADO_MANUAL: 'var(--viz-2)',
@@ -39,14 +38,8 @@ const MODALIDADES = [
   { id: 'HIBRIDO', etiqueta: 'Híbrido' },
 ];
 
-/** Rampa secuencial azul (pasos 250 → 600 de la paleta validada). */
 const RAMPA_AZUL = ['#86b6ef', '#5598e7', '#2a78d6', '#1c5cab', '#184f95'];
 
-/**
- * HU-046 — PF-040: dashboard administrativo. Exactamente cuatro gráficos (matrículas activadas, matrículas por curso,
- * forma de ingreso y pagos confirmados) bajo un mismo rango, curso y modalidad; sin indicadores extra, tareas ni
- * alertas. Cada gráfico puede verse también como tabla. Al abrir usa el año calendario actual.
- */
 @Component({
   selector: 'app-dashboard',
   imports: [FormsModule, NgSelectComponent, GraficoSerie, GraficoBarras],
@@ -75,12 +68,10 @@ export class DashboardPantalla {
   protected desde = '';
   protected hasta = '';
   protected cursoId: number | null = null;
-  /** `null` = todas (un texto vacío se vería como un valor elegido en el selector). */
   protected modalidad: string | null = null;
 
   protected readonly evolucion = computed<PuntoGrafico[]>(() =>
     (this.datos()?.matriculasPorPeriodo ?? []).map((p) => ({ etiqueta: p.etiqueta, valor: p.valor })));
-  /** Un solo tono azul de claro a oscuro según el valor: más matrículas, más intenso (nunca más claro que el paso 250). */
   protected readonly porCurso = computed<BarraGrafico[]>(() => {
     const barras = this.datos()?.matriculasPorCurso ?? [];
     const mayor = Math.max(1, ...barras.map((b) => b.valor));
@@ -99,7 +90,6 @@ export class DashboardPantalla {
 
   constructor() {
     this.cursosApi.cursos().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({ next: (c) => this.cursos.set(c) });
-    // Los filtros viajan en la URL: recargar o compartir el enlace conserva la misma vista.
     const q = this.ruta.snapshot.queryParamMap;
     const curso = Number(q.get('curso'));
     this.cursoId = Number.isInteger(curso) && curso > 0 ? curso : null;
@@ -120,7 +110,6 @@ export class DashboardPantalla {
     if (rango !== 'PERSONALIZADO') this.aplicarRango(rango);
   }
 
-  /** Cambiar una fecha a mano pasa a un rango personalizado. */
   protected editarFechas(): void {
     this.rango = 'PERSONALIZADO';
     if (this.desde && this.hasta && this.hasta < this.desde) {
@@ -141,7 +130,7 @@ export class DashboardPantalla {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (d) => {
-          if (peticion !== this.ultimaPeticion) return; // Llegó tarde: ya hay una consulta más nueva.
+          if (peticion !== this.ultimaPeticion) return;
           this.datos.set(d);
           this.cargando.set(false);
         },
@@ -218,7 +207,6 @@ function esFecha(valor: string | null): boolean {
   return !!valor && /^\d{4}-\d{2}-\d{2}$/.test(valor) && !Number.isNaN(Date.parse(valor));
 }
 
-/** Fecha local en formato ISO (sin pasar por UTC, que podría correrla un día). */
 function fechaIso(fecha: Date): string {
   const mes = String(fecha.getMonth() + 1).padStart(2, '0');
   const dia = String(fecha.getDate()).padStart(2, '0');

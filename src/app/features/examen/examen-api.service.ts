@@ -5,7 +5,6 @@ import { Observable } from 'rxjs';
 import { API_URL } from '../../core/api/api.config';
 import { ExamenFicha, GuardarRespuesta, Intento } from './examen.model';
 
-/** HU-028 / HU-029 — Rendir exámenes. Consume `/api/app/examenes/...` y `/api/app/intentos/...`. */
 @Injectable({ providedIn: 'root' })
 export class ExamenApiService {
   private readonly http = inject(HttpClient);
@@ -15,7 +14,6 @@ export class ExamenApiService {
     return this.http.get<ExamenFicha>(`${this.base}/examenes/${examenId}`);
   }
 
-  /** Inicia un intento nuevo o retoma el que ya está en curso. */
   iniciar(examenId: number): Observable<Intento> {
     return this.http.post<Intento>(`${this.base}/examenes/${examenId}/intentos`, {});
   }

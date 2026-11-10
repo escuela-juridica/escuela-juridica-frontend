@@ -13,10 +13,6 @@ import { EstadoRespuesta, ReclamacionBandeja } from '../reclamaciones-admin.mode
 
 const TAMANO_PAGINA = 20;
 
-/**
- * HU-040 — PF-037: bandeja de quejas y reclamos. Los pendientes aparecen primero, del vencimiento más próximo al más
- * lejano; los próximos a vencer y los vencidos se resaltan pero siguen abiertos.
- */
 @Component({
   selector: 'app-bandeja-reclamaciones',
   imports: [FormsModule, DatePipe, RouterLink],
@@ -28,7 +24,6 @@ export class BandejaReclamaciones {
   private readonly destroyRef = inject(DestroyRef);
   private peticion?: Subscription;
 
-  /** Búsqueda al escribir: consulta al servidor cuando el usuario hace una pausa. */
   protected readonly alEscribir = crearBusquedaDinamica(this.destroyRef, () => this.buscar());
 
   protected readonly filas = signal<ReclamacionBandeja[]>([]);

@@ -1,6 +1,5 @@
 :host {
   display: block;
-  // El listado se acomoda al ancho de SU tarjeta (no al de la pantalla): así no se amontona en columnas angostas.
   container-type: inline-size;
 }
 
@@ -60,7 +59,6 @@
   text-align: right;
 }
 
-// El estado también va en texto (no solo en color), según la guía §2 regla 7.
 .avance__estado {
   font-size: 12px;
   line-height: 16px;

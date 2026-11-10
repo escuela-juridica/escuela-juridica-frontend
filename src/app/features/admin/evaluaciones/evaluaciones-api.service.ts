@@ -12,7 +12,6 @@ import {
   RevisionIntento,
 } from './evaluaciones.model';
 
-/** HU-030 — Consume `/api/admin/evaluaciones`. */
 @Injectable({ providedIn: 'root' })
 export class EvaluacionesApiService {
   private readonly http = inject(HttpClient);

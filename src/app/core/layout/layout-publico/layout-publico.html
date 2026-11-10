@@ -1,6 +1,3 @@
-<!-- Encabezado y pie del portal público (EP01). Muestra "Iniciar sesión"/"Crear cuenta" a un
-     visitante; con sesión activa (p. ej. un alumno que vuelve al catálogo) muestra su cuenta,
-     igual que hace <app-layout-alumno> bajo /app. -->
 <header>
   <div class="header-fila">
     <a routerLink="/catalogo"><img src="img/logo-esejur.png" alt="Escuela Jurídica" class="header-logo" /></a>
@@ -59,8 +56,14 @@
       </div>
     } @else {
       <div class="header-acciones">
-        <button type="button" class="btn btn--secundario" routerLink="/acceso">Iniciar sesión</button>
-        <button type="button" class="btn btn--primario" routerLink="/registro">Crear cuenta</button>
+        <button type="button" class="btn btn--secundario header-btn header-btn--ingresar" routerLink="/acceso">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" /><polyline points="10 17 15 12 10 7" /><line x1="15" y1="12" x2="3" y2="12" /></svg>
+          Iniciar sesión
+        </button>
+        <button type="button" class="btn btn--acento header-btn header-btn--crear" routerLink="/registro">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><line x1="19" y1="8" x2="19" y2="14" /><line x1="22" y1="11" x2="16" y2="11" /></svg>
+          Crear cuenta
+        </button>
       </div>
     }
   </div>

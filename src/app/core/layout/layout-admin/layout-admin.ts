@@ -4,13 +4,6 @@ import { obtenerIniciales } from '../../session/nombre-utils';
 import { Session } from '../../session/session';
 import { ConfirmacionService } from '../../dialogo/confirmacion.service';
 
-/**
- * Navbar + riel según el prototipo real de HU-008 (Figma: EP02-PF-010-HU-008-Gestión de
- * usuarios), adaptado a navbar superior + riel de íconos. ⚠️ Solo "Usuarios" está construido;
- * el resto de secciones del mockup se listan deshabilitadas porque pertenecen a otras historias
- * todavía no implementadas. El botón "Salir" del navbar no aparece en el mockup — se agregó
- * porque hace falta alguna forma de cerrar sesión.
- */
 @Component({
   selector: 'app-layout-admin',
   imports: [RouterOutlet, RouterLink, RouterLinkActive],

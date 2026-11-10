@@ -6,7 +6,6 @@ import { API_URL } from '../../../../core/api/api.config';
 import { PageResponse } from '../../../../core/api/page-response.model';
 import { FiltrosReporteCertificados, OpcionEntidad, ReporteCertificado } from './reporte-certificados.model';
 
-/** HU-044 — Reporte de certificados. Consume `/api/admin/reportes/certificados`. */
 @Injectable({ providedIn: 'root' })
 export class ReporteCertificadosApiService {
   private readonly http = inject(HttpClient);
@@ -21,7 +20,6 @@ export class ReporteCertificadosApiService {
     return this.http.get<OpcionEntidad[]>(`${this.base}/entidades`);
   }
 
-  /** La exportación usa exactamente los mismos filtros que la consulta en pantalla. */
   urlExportacionExcel(filtros: FiltrosReporteCertificados): string {
     return `${this.base}/exportar-excel?${this.parametros(filtros).toString()}`;
   }

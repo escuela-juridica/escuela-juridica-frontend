@@ -5,7 +5,6 @@ import { TestBed } from '@angular/core/testing';
 import { API_URL } from '../../core/api/api.config';
 import { PagosApiService } from './pagos-api.service';
 
-/** EP06 · HU-047 — Matrícula pagada con Culqi: inicio del pago, token, consulta de resultado y constancia. */
 describe('PagosApiService', () => {
   let servicio: PagosApiService;
   let http: HttpTestingController;

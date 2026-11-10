@@ -19,7 +19,6 @@ import {
   TipoMaterialRespuesta,
 } from './informacion-base.model';
 
-/** HU-009 — Administrar información base: datos maestros reutilizados al crear o editar un curso. */
 @Injectable({ providedIn: 'root' })
 export class InformacionBaseApiService {
   private readonly http = inject(HttpClient);
@@ -32,7 +31,6 @@ export class InformacionBaseApiService {
       .set('size', size);
   }
 
-  // Tipos de curso
   listarTiposCurso(incluirInactivos: boolean, page: number, size: number): Observable<PageResponse<TipoCursoRespuesta>> {
     return this.http.get<PageResponse<TipoCursoRespuesta>>(`${this.url}/tipos-curso`, {
       params: this.params(incluirInactivos, page, size),
@@ -48,7 +46,6 @@ export class InformacionBaseApiService {
     return this.http.patch<TipoCursoRespuesta>(`${this.url}/tipos-curso/${id}/activo`, { activo });
   }
 
-  // Categorías
   listarCategorias(incluirInactivos: boolean, page: number, size: number): Observable<PageResponse<CategoriaRespuesta>> {
     return this.http.get<PageResponse<CategoriaRespuesta>>(`${this.url}/categorias`, {
       params: this.params(incluirInactivos, page, size),
@@ -64,7 +61,6 @@ export class InformacionBaseApiService {
     return this.http.patch<CategoriaRespuesta>(`${this.url}/categorias/${id}/activo`, { activo });
   }
 
-  // Docentes
   listarDocentes(incluirInactivos: boolean, page: number, size: number): Observable<PageResponse<DocenteRespuesta>> {
     return this.http.get<PageResponse<DocenteRespuesta>>(`${this.url}/docentes`, {
       params: this.params(incluirInactivos, page, size),
@@ -80,7 +76,6 @@ export class InformacionBaseApiService {
     return this.http.patch<DocenteRespuesta>(`${this.url}/docentes/${id}/activo`, { activo });
   }
 
-  // Entidades certificadoras
   listarEntidades(incluirInactivos: boolean, page: number, size: number): Observable<PageResponse<EntidadRespuesta>> {
     return this.http.get<PageResponse<EntidadRespuesta>>(`${this.url}/entidades`, {
       params: this.params(incluirInactivos, page, size),
@@ -96,7 +91,6 @@ export class InformacionBaseApiService {
     return this.http.patch<EntidadRespuesta>(`${this.url}/entidades/${id}/activo`, { activo });
   }
 
-  /** Sube la imagen de una firma, el logo de una entidad o la foto de un docente y devuelve la referencia que se guarda en el formulario. */
   subirImagenCertificado(tipo: 'FIRMA' | 'LOGO' | 'FOTO', archivo: File): Observable<{ referencia: string }> {
     const datos = new FormData();
     datos.append('tipo', tipo);
@@ -104,7 +98,6 @@ export class InformacionBaseApiService {
     return this.http.post<{ referencia: string }>(`${this.url}/imagenes-certificado`, datos);
   }
 
-  // Firmantes
   listarFirmantes(incluirInactivos: boolean, page: number, size: number): Observable<PageResponse<FirmanteRespuesta>> {
     return this.http.get<PageResponse<FirmanteRespuesta>>(`${this.url}/firmantes`, {
       params: this.params(incluirInactivos, page, size),
@@ -120,7 +113,6 @@ export class InformacionBaseApiService {
     return this.http.patch<FirmanteRespuesta>(`${this.url}/firmantes/${id}/activo`, { activo });
   }
 
-  // Tipos de material
   listarTiposMaterial(
     incluirInactivos: boolean,
     page: number,

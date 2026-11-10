@@ -15,8 +15,6 @@ import {
   UsuarioAdminRespuesta,
 } from './usuario-admin.model';
 
-/** HU-008 — Gestionar usuarios administrativamente. Consume `/api/admin/usuarios`, respaldado por
- * base de datos real y protegido por sesión + rol ADMINISTRADOR. */
 @Injectable({ providedIn: 'root' })
 export class AdminUsuariosApiService {
   private readonly http = inject(HttpClient);
@@ -61,7 +59,6 @@ export class AdminUsuariosApiService {
     return this.http.post<UsuarioAdminRespuesta>(`${this.url}/${usuarioId}/roles`, peticion);
   }
 
-  /** Desviación deliberada de HU-008 (que dice que un rol no se retira), pedida explícitamente. */
   revocarRol(usuarioId: number, rol: RolUsuarioAdmin): Observable<UsuarioAdminRespuesta> {
     return this.http.delete<UsuarioAdminRespuesta>(`${this.url}/${usuarioId}/roles/${rol}`);
   }

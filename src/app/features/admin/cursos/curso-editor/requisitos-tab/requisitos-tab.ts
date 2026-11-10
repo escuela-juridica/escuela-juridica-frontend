@@ -6,7 +6,6 @@ import { CursoAdminApiService } from '../../curso-admin-api.service';
 import { ModalidadCurso, ReglasCursoRespuesta } from '../../curso-admin.model';
 import { AlertaGlobalService } from '../../../../../core/notificaciones/alerta-global.service';
 
-/** HU-014 — Configura las condiciones académicas que se usarán posteriormente para certificar. */
 @Component({
   selector: 'app-requisitos-tab',
   templateUrl: './requisitos-tab.html',
@@ -37,8 +36,6 @@ export class RequisitosTab implements OnChanges {
   protected readonly secuenciaObligatoria = signal(true);
   protected readonly diasEspera = signal('0');
   protected readonly fechaCierre = signal('');
-  // Última fecha realmente confirmada por el servidor; evita que una propuesta client-side
-  // descartada (asistencia activada y luego desactivada sin guardar) se envíe como si fuera dato.
   private fechaCierreConfirmada = '';
 
   protected readonly requiereAsistenciaDisponible = () => this.modalidad !== 'VIRTUAL';
@@ -77,8 +74,6 @@ export class RequisitosTab implements OnChanges {
     });
   }
 
-  // Igual que en Información: sin esto, la confirmación queda arriba fuera de vista si guardaste
-  // con la página desplazada hacia abajo (esta pestaña puede tener varias tarjetas).
   private scrollArriba(): void {
     if (typeof window !== 'undefined') {
       window.scrollTo({ top: 0, behavior: 'smooth' });

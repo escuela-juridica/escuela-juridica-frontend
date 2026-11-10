@@ -102,7 +102,12 @@
             </div>
             <div>
               <label class="label"><span>Portada</span><span class="nota-pill">Opcional</span></label>
-              <input class="input" formControlName="imagenPortadaUrl" placeholder="img/cursos/..." />
+              <app-imagen-subida
+                tipo="PORTADA"
+                [cursoId]="cursoId"
+                [valor]="formInformacion.controls.imagenPortadaUrl.value"
+                (cambio)="cambiarPortada($event)"
+              />
             </div>
             <div class="editor-campo--ancho">
               <label class="label"><span>Descripción</span><span class="nota-pill">Opcional</span></label>

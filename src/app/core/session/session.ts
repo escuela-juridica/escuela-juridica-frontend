@@ -13,11 +13,6 @@ export interface UsuarioSesion {
 
 type EstadoSesion = 'cargando' | 'autenticado' | 'visitante';
 
-/**
- * Estado de la sesion actual. HU-001: login con correo o Google.
- * Datos de presentación recibidos desde el servidor. La credencial vive en una
- * cookie HttpOnly; no se guarda el JWT en localStorage ni en este servicio.
- */
 @Injectable({
   providedIn: 'root',
 })
@@ -37,7 +32,6 @@ export class Session {
     this._estado.set('autenticado');
   }
 
-  /** HU-005: refleja en el encabezado el nombre que el usuario acaba de guardar en su perfil. */
   actualizarNombre(nombreCompleto: string): void {
     const actual = this._usuario();
     if (actual) {
@@ -45,7 +39,6 @@ export class Session {
     }
   }
 
-  /** Llamado una sola vez al arrancar la app, antes de decidir rutas protegidas. */
   restaurar(): Observable<void> {
     return this.accesoApi.sesion().pipe(
       tap((usuario) => this.iniciarSesion(usuario)),
@@ -65,9 +58,6 @@ export class Session {
     );
   }
 
-  /** Limpia el estado sin llamar al backend: lo usa sesionVencidaInterceptor cuando una
-   * petición ya devolvió 401 (la cookie venció o es inválida), así que cerrar sesión en el
-   * servidor no tiene sentido — ya no hay nada que invalidar ahí. */
   limpiarLocal(): void {
     this._usuario.set(null);
     this._estado.set('visitante');

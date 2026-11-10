@@ -5,7 +5,6 @@ import { TestBed } from '@angular/core/testing';
 import { API_URL } from '../../core/api/api.config';
 import { SesionAlumnoApiService } from './sesion-alumno-api.service';
 
-/** EP04 · HU-026 — Calendario de sesiones en vivo e ingreso del alumno. */
 describe('SesionAlumnoApiService', () => {
   let servicio: SesionAlumnoApiService;
   let http: HttpTestingController;

@@ -14,8 +14,6 @@ import {
   ReporteAsistencia,
 } from './reporte-asistencia.model';
 
-/** HU-045 — Reporte de asistencia a sesiones en vivo. Solo cursos EN_VIVO/HIBRIDO (el selector de
- * cursos nunca ofrece uno virtual). Tabla, porcentaje y Excel comparten la misma consulta. */
 @Component({
   selector: 'app-reporte-asistencia',
   imports: [FormsModule, DatePipe, LowerCasePipe, RouterLink, RouterLinkActive],
@@ -35,7 +33,6 @@ export class ReporteAsistenciaPantalla {
   protected readonly totalPaginas = signal(0);
   protected readonly totalFilas = signal(0);
 
-  /** Guía §32: en la primera línea solo rango, curso y búsqueda; el resto va en "Más filtros". */
   protected readonly masFiltros = signal(false);
 
   protected texto = '';
@@ -80,7 +77,6 @@ export class ReporteAsistenciaPantalla {
     this.buscar();
   }
 
-  /** Las sesiones del filtro dependen del curso elegido; al cambiarlo se recarga la lista. */
   protected cambiarCurso(): void {
     this.sesionId = null;
     this.sesiones.set([]);

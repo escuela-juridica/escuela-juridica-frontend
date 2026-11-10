@@ -1,13 +1,6 @@
 import { Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
-/**
- * Cabecera de las pantallas de detalle del panel: tarjeta con un ícono, una etiqueta (qué se está viendo), el título
- * y, a la derecha, el estado. Los datos propios de cada pantalla se proyectan en tres huecos:
- *  - `cd-icono`: el SVG del avatar,
- *  - `cd-meta`: líneas de contexto bajo el título (correo, curso, fechas…),
- *  - `cd-lado`: estados y chips (badge, código…).
- */
 @Component({
   selector: 'app-cabecera-detalle',
   templateUrl: './cabecera-detalle.html',
@@ -18,7 +11,6 @@ export class CabeceraDetalle {
   readonly titulo = input.required<string>();
 }
 
-/** Enlace «← Sección» para volver al listado desde una pantalla de detalle. */
 @Component({
   selector: 'app-enlace-volver',
   imports: [RouterLink],

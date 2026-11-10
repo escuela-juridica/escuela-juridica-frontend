@@ -1,8 +1,7 @@
-/** HU-028 / HU-029 — Modelos de la rendición de exámenes (espejo de los DTO del backend). */
-
 export type TipoExamen = 'CALIFICADO' | 'PRACTICA';
 export type TipoPregunta = 'SELECCION_UNICA' | 'SELECCION_MULTIPLE' | 'VERDADERO_FALSO' | 'RESPUESTA_ABIERTA';
 export type EstadoIntento = 'EN_PROGRESO' | 'PENDIENTE_REVISION' | 'CALIFICADO' | 'VENCIDO';
+export type ModoNavegacion = 'LIBRE' | 'SECUENCIAL';
 
 export interface IntentoResumen {
   id: number;
@@ -27,7 +26,6 @@ export interface ExamenFicha {
   puntajeTotal: number;
   tieneRespuestaAbierta: boolean;
   tiempoLimiteMinutos: number | null;
-  /** null = intentos ilimitados. */
   intentosMaximos: number | null;
   intentosUsados: number;
   intentosRestantes: number | null;
@@ -43,13 +41,14 @@ export interface ExamenFicha {
   intentoEnCursoId: number | null;
   aprobado: boolean;
   mejorNota: number | null;
+  modoNavegacion: ModoNavegacion;
+  permiteOmitirPreguntas: boolean;
   intentos: IntentoResumen[];
 }
 
 export interface OpcionIntento {
   id: number;
   texto: string;
-  /** Solo se informa cuando las respuestas ya pueden mostrarse. */
   esCorrecta: boolean | null;
 }
 
@@ -66,7 +65,6 @@ export interface PreguntaIntento {
   puntajeObtenido: number | null;
   correcta: boolean | null;
   estadoRevision: 'NO_APLICA' | 'PENDIENTE' | 'REVISADA' | null;
-  /** Retroalimentación del revisor en una respuesta abierta ya calificada. */
   observacion: string | null;
 }
 
@@ -81,7 +79,6 @@ export interface Intento {
   iniciadoEn: string;
   expiraEn: string | null;
   segundosRestantes: number | null;
-  /** Hora del servidor al responder: permite corregir diferencias de reloj. */
   ahora: string;
   puntajeTotal: number;
   puntajeObtenido: number | null;
@@ -93,6 +90,8 @@ export interface Intento {
   fechaLimiteRevision: string | null;
   respuestasVisibles: boolean;
   afectaCertificacion: boolean;
+  modoNavegacion: ModoNavegacion;
+  permiteOmitirPreguntas: boolean;
   preguntas: PreguntaIntento[];
 }
 

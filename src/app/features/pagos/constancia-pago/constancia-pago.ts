@@ -4,7 +4,6 @@ import { Component, input } from '@angular/core';
 import { formatearFechaHoraCorta } from '../../cursos/curso-formato.util';
 import { ConstanciaPago } from '../pago.model';
 
-/** HU-047 — Constancia imprimible de un pago APROBADO. No es un comprobante tributario SUNAT. */
 @Component({
   selector: 'app-constancia-pago',
   imports: [DecimalPipe],

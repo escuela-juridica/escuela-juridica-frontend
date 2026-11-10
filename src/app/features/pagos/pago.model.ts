@@ -1,5 +1,3 @@
-/** HU-047 — Matrícula pagada con Culqi. */
-
 export type EstadoPago = 'PENDIENTE' | 'APROBADO' | 'RECHAZADO' | 'ERROR' | 'EXPIRADO';
 
 export interface PagoCheckout {
@@ -16,7 +14,6 @@ export interface PagoCheckout {
   apellidos: string;
 }
 
-/** QR y código de una orden de billetera aún pendiente (Culqi/PagoEfectivo). */
 export interface InstruccionesPago {
   qrUrl: string | null;
   enlace: string | null;

@@ -10,8 +10,6 @@ import { OpcionCursoReporte } from '../reporte-academico/reporte-academico.model
 import { ReporteCertificadosApiService } from './reporte-certificados-api.service';
 import { FormaEmision, OpcionEntidad, ReporteCertificado } from './reporte-certificados.model';
 
-/** HU-044 — Reporte de certificados emitidos. Muestra la versión vigente de cada certificado y nunca el
- * PDF ni datos privados. Tabla y Excel comparten la misma consulta y los mismos filtros. */
 @Component({
   selector: 'app-reporte-certificados',
   imports: [FormsModule, DatePipe, RouterLink, RouterLinkActive],
@@ -32,7 +30,6 @@ export class ReporteCertificadosPantalla {
   protected readonly totalPaginas = signal(0);
   protected readonly totalFilas = signal(0);
 
-  /** Guía §32: en la primera línea solo rango, curso y búsqueda; el resto va en "Más filtros". */
   protected readonly masFiltros = signal(false);
 
   protected texto = '';

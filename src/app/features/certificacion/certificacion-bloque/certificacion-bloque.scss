@@ -1,5 +1,3 @@
-// HU-032 · Bloque "Tu certificado" del resumen del curso.
-
 :host {
   display: block;
 }
@@ -15,7 +13,6 @@
   color: var(--neutral-600);
 }
 
-// ----------------------------------------------------------------- Pasos --
 .cert__pasos {
   list-style: none;
   margin: 0;
@@ -34,7 +31,6 @@
   text-align: center;
 }
 
-// Línea que une cada paso con el siguiente.
 .cert__paso::after {
   content: '';
   position: absolute;
@@ -95,7 +91,6 @@
   color: var(--neutral-950);
 }
 
-// ------------------------------------------------------ Estado sin emitir --
 .cert__estado-tarjeta {
   padding: 16px 20px;
   border: 1px solid var(--neutral-200);
@@ -185,10 +180,68 @@
 .cert__formulario {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 18px;
-  border: 1px solid var(--neutral-200);
-  border-radius: var(--radio-lg);
+  gap: 20px;
+}
+
+.cert__formulario .cert__acciones {
+  margin-top: 4px;
+}
+
+.cert__label-lineal {
+  display: block;
+}
+
+.cert__pulso {
+  animation: cert-pulso 1.4s ease-out infinite;
+}
+
+@keyframes cert-pulso {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(0, 216, 216, 0.75);
+  }
+  40% {
+    transform: scale(1.05);
+  }
+  75%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 18px rgba(0, 216, 216, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cert__pulso {
+    animation: none;
+    outline: 4px solid var(--acento-500);
+    outline-offset: 3px;
+  }
+}
+
+.cert__resaltado {
+  animation: cert-resaltado 2.2s ease-out;
+}
+
+@keyframes cert-resaltado {
+  0%,
+  60% {
+    box-shadow: 0 0 0 6px rgba(0, 216, 216, 0.55);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 216, 216, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cert__resaltado {
+    animation: none;
+    outline: 3px solid var(--acento-500);
+  }
+}
+
+.cert__opcional {
+  font-weight: 400;
+  color: var(--neutral-600);
 }
 
 .cert__campos {
@@ -219,13 +272,12 @@
   color: var(--neutral-800);
 }
 
-// ------------------------------------------------------------ Celebración --
 .cert__celebracion {
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
   align-items: center;
-  gap: 32px;
-  padding: 28px 32px;
+  gap: 40px;
+  padding: 36px 40px;
   border-radius: var(--radio-xl);
   color: #fff;
   background:
@@ -244,11 +296,11 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 8px;
+  gap: 12px;
 }
 
 .cert__celebracion-titulo {
-  margin: 4px 0 0;
+  margin: 6px 0 0;
   font-size: 26px;
   line-height: 34px;
   font-weight: 700;
@@ -263,10 +315,19 @@
 }
 
 .cert__celebracion-datos {
-  margin: 8px 0 4px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px 28px;
+  width: 100%;
+  margin: 10px 0 6px;
+  padding: 16px 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 16px 28px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--radio-lg);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.cert__celebracion-datos > div:first-child {
+  grid-column: 1 / -1;
 }
 
 .cert__celebracion-datos dt {
@@ -279,18 +340,18 @@
 }
 
 .cert__celebracion-datos dd {
-  margin: 2px 0 0;
-  font-size: 15px;
-  line-height: 20px;
+  margin: 4px 0 0;
+  font-size: 16px;
+  line-height: 22px;
   font-weight: 700;
   color: #fff;
   overflow-wrap: anywhere;
 }
 
 .cert__celebracion-nota {
-  margin: 4px 0 0;
-  font-size: 13px;
-  line-height: 18px;
+  margin: 10px 0 0;
+  font-size: 14px;
+  line-height: 20px;
   color: rgba(255, 255, 255, 0.78);
 }
 
@@ -298,8 +359,28 @@
   transform: rotate(2deg);
 }
 
-// Botones sobre el degradado: el principal turquesa con texto azul; los secundarios, transparentes.
+.cert__celebracion .cert__acciones--izquierda {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.cert__celebracion .cert__acciones--izquierda .cert__cta {
+  grid-column: 1 / -1;
+}
+
+.cert__celebracion .cert__acciones--izquierda .btn {
+  width: 100%;
+}
+
+.cert__celebracion .cert__acciones--izquierda .btn:not(.cert__cta) {
+  margin-top: 6px;
+}
+
 .cert__cta {
+  font-weight: 700;
   background: var(--acento-500);
   border-color: var(--acento-500);
   color: var(--marca-900);
@@ -336,8 +417,8 @@
 @media (max-width: 900px) {
   .cert__celebracion {
     grid-template-columns: minmax(0, 1fr);
-    gap: 20px;
-    padding: 22px 20px;
+    gap: 24px;
+    padding: 24px 20px;
   }
 
   .cert__celebracion-vista {
@@ -365,5 +446,13 @@
   .cert__celebracion-titulo {
     font-size: 22px;
     line-height: 30px;
+  }
+
+  .cert__celebracion .cert__acciones--izquierda {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cert__celebracion .cert__acciones--izquierda .btn:not(.cert__cta) {
+    margin-top: 0;
   }
 }

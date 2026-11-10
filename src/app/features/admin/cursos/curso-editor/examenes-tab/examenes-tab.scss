@@ -78,9 +78,6 @@
   box-shadow: 0 3px 7px rgba(16, 24, 40, 0.12);
 }
 
-// Dentro de un modal los textos de ayuda van inmediatamente después de su campo.
-// La utilidad global usa margen negativo porque sirve para listas compactas; aquí provocaba que
-// el texto invadiera el input anterior.
 .examenes-tab__ayuda-campo {
   margin: 6px 0 0;
 }

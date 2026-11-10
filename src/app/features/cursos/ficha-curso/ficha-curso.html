@@ -36,7 +36,7 @@
     @if (ficha(); as curso) {
       <div class="ficha-hero">
         <div class="hero-media">
-          <div class="hero-media__imagen" [style.background-image]="'url(\'' + (curso.imagenPortadaUrl ?? '') + '\')'"></div>
+          <div class="hero-media__imagen" [style.background-image]="'url(\'' + urlPortada(curso.imagenPortadaUrl) + '\')'"></div>
         </div>
         <div class="hero-overlay ficha-hero__degradado"></div>
         <div class="ficha-hero__blob"></div>
@@ -131,28 +131,22 @@
           <div>
             <div class="eyebrow"><span class="eyebrow__dash"></span><span class="eyebrow__texto">Pruébalo tú mismo</span></div>
             <h2 class="tipo-h2 ficha-seccion-titulo">Vista previa gratuita</h2>
-            <div class="ficha-preview">
+            <div class="ficha-preview" [class.ficha-preview--reproductor]="hayReproductorPrevio()">
               @switch (vistaPreviaEstado()) {
                 @case ('cargando') {
                   <div class="ficha-preview__play">▶</div>
                 }
                 @case ('lista') {
-                  @if (vistaPrevia(); as previa) {
-                    @for (material of previa.materiales; track material.materialLeccionId) {
-                      @if (material.tipoRecurso === 'VIDEO') {
-                        @if (material.origen === 'YOUTUBE') {
-                          <a class="btn btn--secundario" [href]="material.referencia" target="_blank" rel="noopener">
-                            Ver video en YouTube
-                          </a>
-                        } @else {
-                          <video class="ficha-preview__video" controls [src]="material.referencia"></video>
-                        }
-                      } @else {
-                        <a class="btn btn--secundario" [href]="material.referencia" target="_blank" rel="noopener">
-                          Ver {{ material.titulo }}
-                        </a>
-                      }
+                  @if (videoPrevia(); as video) {
+                    @if (video.origen !== 'YOUTUBE') {
+                      <video class="ficha-preview__video" controls [src]="video.referencia"></video>
+                    } @else if (youtubePrevia(); as idVideo) {
+                      <app-youtube-reproductor class="ficha-preview__reproductor" [videoId]="idVideo" [titulo]="video.titulo" />
+                    } @else {
+                      <a class="btn btn--secundario" [href]="video.referencia" target="_blank" rel="noopener">Ver video en YouTube</a>
                     }
+                  } @else {
+                    <p class="ficha-preview__nota ficha-preview__nota--oscura">Esta lección de vista previa no incluye un video.</p>
                   }
                 }
                 @case ('error') {
@@ -188,7 +182,7 @@
                 <p class="ficha-preview__nota">Aún no hay temario publicado para este curso.</p>
               }
               @for (modulo of curso.modulos; track modulo.moduloId; let indice = $index) {
-                <div class="card ficha-modulo">
+                <div class="card ficha-modulo" [class.ficha-modulo--abierto]="moduloExpandidoId() === modulo.moduloId">
                   <button
                     type="button"
                     class="ficha-modulo__cabecera"
@@ -196,9 +190,15 @@
                     (click)="alternarModulo(modulo.moduloId)"
                   >
                     <span class="ficha-modulo__numero">{{ indice + 1 }}</span>
-                    <span class="ficha-modulo__nombre">{{ modulo.titulo }}</span>
-                    <span class="ficha-modulo__conteo">{{ modulo.lecciones.length }} lecciones</span>
-                    <span class="ficha-modulo__flecha">{{ moduloExpandidoId() === modulo.moduloId ? '⌄' : '›' }}</span>
+                    <span class="ficha-modulo__texto">
+                      <span class="ficha-modulo__eyebrow">Módulo {{ indice + 1 }}</span>
+                      <span class="ficha-modulo__nombre">{{ modulo.titulo }}</span>
+                    </span>
+                    <span class="ficha-modulo__conteo">
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>
+                      {{ modulo.lecciones.length }} {{ modulo.lecciones.length === 1 ? 'lección' : 'lecciones' }}
+                    </span>
+                    <span class="ficha-modulo__boton"><svg class="ficha-modulo__flecha" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg></span>
                   </button>
                   @if (moduloExpandidoId() === modulo.moduloId) {
                     <div class="ficha-modulo__lecciones">
@@ -209,17 +209,17 @@
                           [class.ficha-leccion--clicable]="leccion.esVistaPrevia"
                           (click)="seleccionarVistaPrevia(leccion)"
                         >
-                          <span
-                            class="badge ficha-leccion__tipo"
-                            [ngClass]="leccion.tipo === 'EN_VIVO' ? 'badge--vivo-suave' : 'badge--grabada-suave'"
-                          >
-                            {{ etiquetaTipoLeccion(leccion.tipo) }}
+                          <span class="ficha-leccion__icono" [class.ficha-leccion__icono--vivo]="leccion.tipo === 'EN_VIVO'" [attr.title]="etiquetaTipoLeccion(leccion.tipo)">
+                            @if (leccion.tipo === 'EN_VIVO') { <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="2.5" /><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4" /></svg> } @else { <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg> }
                           </span>
                           <span class="ficha-leccion__nombre">{{ leccion.titulo }}</span>
+                          @if (leccion.tipo === 'EN_VIVO') {
+                            <span class="badge badge--vivo-suave ficha-leccion__tipo">{{ etiquetaTipoLeccion(leccion.tipo) }}</span>
+                          }
                           @if (leccion.esVistaPrevia) {
                             <span class="badge badge--vista-previa">Vista previa</span>
                           } @else if (leccionBloqueadaId() === leccion.leccionId) {
-                            <span class="ficha-leccion__bloqueada">Requiere matrícula vigente</span>
+                            <span class="ficha-leccion__bloqueada" role="alert"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg> Requiere matrícula vigente</span>
                           }
                           @if (leccion.tipo === 'EN_VIVO' && leccion.fechaHoraInicio) {
                             <span class="ficha-leccion__duracion">{{ formatearFechaHora(leccion.fechaHoraInicio) }}</span>

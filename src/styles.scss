@@ -1,10 +1,3 @@
-/* Estilos globales.
- * Los tokens de color/espaciado/tipografia viven en styles/_tokens.scss.
- * Las reglas base de aqui abajo son las mismas que trae el <style> del prototipo
- * (detalles/04-DISENO-UX-UI/PROTOTIPO HTML/Prototipo ESEJUR.dc.html), solo que usando
- * los tokens en vez de hex sueltos. No inventar colores nuevos: si falta uno, revisar
- * primero 01-SISTEMA-DE-DISENO-Y-COMPONENTES.md.
- */
 @use "styles/tokens";
 @use "styles/componentes";
 @use "styles/ng-select";
@@ -31,9 +24,6 @@ a {
   text-decoration: none;
 }
 
-// Los enlaces con aspecto de botón (<a class="btn …">) quedan fuera: su color y su hover los define `.btn`.
-// Sin esta exclusión, `a:hover` (más específico que la clase de la variante) les pintaba el texto del mismo
-// azul del fondo y los subrayaba al pasar el cursor.
 a:not(.btn):hover {
   color: var(--marca-800);
   text-decoration: underline;
@@ -60,7 +50,6 @@ textarea {
   background: var(--acento-100);
 }
 
-/* Ayuda de campo que aparece solo con el input enfocado (registro, cambio de contraseña, etc.) */
 .field-hint {
   max-height: 0;
   opacity: 0;
@@ -76,7 +65,6 @@ input:focus + .field-hint {
   margin-top: 8px;
 }
 
-/* Placeholder de pantallas aun no maquetadas. Se retira cuando se porta el HTML real. */
 .pantalla-pendiente {
   max-width: 720px;
   margin: var(--esp-10) auto;

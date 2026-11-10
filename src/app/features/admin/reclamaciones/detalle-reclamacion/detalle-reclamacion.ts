@@ -12,11 +12,6 @@ import { formatearPrecio } from '../../../cursos/curso-formato.util';
 import { ReclamacionesAdminApiService } from '../reclamaciones-admin-api.service';
 import { ReclamacionDetalle } from '../reclamaciones-admin.model';
 
-/**
- * HU-040 — PF-038: expediente de una queja o reclamo y su respuesta. La respuesta se conserva antes de enviarse y no se
- * edita; solo un correo enviado correctamente pasa el caso a RESPONDIDO. Si el envío falla, el caso sigue pendiente y
- * se puede reenviar la misma respuesta (con el correo corregido si hace falta) sin duplicar nada.
- */
 @Component({
   selector: 'app-detalle-reclamacion',
   imports: [ReactiveFormsModule, DatePipe, Modal, CabeceraDetalle, EnlaceVolver],

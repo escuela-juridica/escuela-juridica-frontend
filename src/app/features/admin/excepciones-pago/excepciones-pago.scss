@@ -2,8 +2,6 @@
   margin-bottom: 24px;
 }
 
-// Texto explicativo: tamaño de lectura cómodo y recuadro suave con barra de acento, en vez de un
-// párrafo grande y gris suelto sobre los filtros.
 .exc__cabecera p {
   margin: 4px 0 0;
   max-width: 860px;
@@ -17,7 +15,6 @@
   border-radius: 0 var(--radio-md) var(--radio-md) 0;
 }
 
-// Botón de fila: el .btn global mide 44 px, demasiado para una tabla.
 .exc__btn-fila {
   height: 32px;
   padding: 0 12px;
@@ -39,7 +36,6 @@
   gap: 8px;
 }
 
-// Botones de filtro compactos y centrados con los campos; «Limpiar» en gris como en el centro de reportes.
 .exc__btn-filtro {
   align-self: center;
   height: 38px;
@@ -162,8 +158,6 @@
   gap: 4px;
 }
 
-// La tabla se adapta en vez de obligar a hacer scroll horizontal: con poco ancho la columna «Pago» pasa
-// a una línea dentro de «Alumno y curso» y se reduce el relleno.
 .exc__tabla .exc__pago-compacto {
   display: none;
 }

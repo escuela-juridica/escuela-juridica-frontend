@@ -11,7 +11,6 @@ import {
   PreguntaRespuesta,
 } from './examen.model';
 
-/** HU-013 — Configurar exámenes. Consume `/api/admin/.../examenes|preguntas`. */
 @Injectable({ providedIn: 'root' })
 export class ExamenApiService {
   private readonly http = inject(HttpClient);

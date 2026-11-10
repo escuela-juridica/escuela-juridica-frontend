@@ -68,14 +68,14 @@ describe('Registro: llamadas HTTP reales del componente', () => {
     });
     const component = fixture.componentInstance;
     expect(component.formulario.controls.correo.disabled).toBe(true);
-    expect(component.formulario.controls.apellidoPaterno.value).toBe('PÉREZ GARCÍA');
+    expect(component.formulario.controls.apellidoPaterno.value).toBe('Pérez García');
     component.formulario.controls.aceptaTerminos.setValue(true);
     component.registrar();
     const solicitud = http.expectOne(`${API_URL}/auth/registro/google`);
     expect(solicitud.request.body).toEqual({
       referencia: 'contexto-hu001',
-      nombres: 'ANA',
-      apellidoPaterno: 'PÉREZ GARCÍA',
+      nombres: 'Ana',
+      apellidoPaterno: 'Pérez García',
       apellidoMaterno: null,
       telefono: null,
       documentoIdentidad: null,

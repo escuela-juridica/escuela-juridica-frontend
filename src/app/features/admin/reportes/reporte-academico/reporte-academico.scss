@@ -1,5 +1,3 @@
-// HU-045 — Reporte de asistencia (misma base visual que el reporte de matrículas).
-
 .reporte__titulo {
     font-size: 22px;
     line-height: 30px;
@@ -153,7 +151,6 @@
         grid-template-columns: minmax(0, 1fr);
     }
 }
-// Pestañas del centro de reportes (Matrículas | Asistencia).
 .reporte__secciones {
     display: flex;
     gap: 4px;
@@ -161,7 +158,6 @@
     border-bottom: 1px solid var(--neutral-200);
 }
 
-// Guía §13.1: alto 44 px, texto 14/20 peso 600, activa con línea turquesa de 3 px.
 .reporte__seccion {
     display: inline-flex;
     align-items: center;
@@ -196,7 +192,6 @@
     font-size: 13px;
 }
 
-// Primera línea: búsqueda, curso y rango; los demás filtros viven en "Más filtros".
 .reporte__filtros {
     grid-template-columns: repeat(4, minmax(0, 1fr));
     margin-bottom: 12px;
@@ -229,7 +224,6 @@
     line-height: 16px;
 }
 
-// La tabla debe caber junto al menú lateral: las celdas pueden partir línea.
 .reporte__tabla th,
 .reporte__tabla td {
     padding: 12px 14px;
@@ -259,12 +253,10 @@
     }
 }
 
-// Los campos con etiqueta (fechas) y sin ella (búsqueda, curso) comparten línea base inferior.
 .reporte__filtros {
     align-items: end;
 }
 
-// HU-043 — enlace al seguimiento del alumno y condiciones pendientes (valor y meta visibles).
 .reporte__enlace {
   color: var(--neutral-950);
   text-decoration: none;
@@ -283,7 +275,6 @@
   display: block;
 }
 
-// Columnas con contenido largo: la lista de pendientes (valor y meta) necesita aire para no apilarse.
 .reporte__tabla th:nth-child(1) {
   min-width: 230px;
 }

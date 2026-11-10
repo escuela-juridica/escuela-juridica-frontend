@@ -5,7 +5,6 @@ import { Observable } from 'rxjs';
 import { API_URL } from '../../core/api/api.config';
 import { ConstanciaPago, PagoCheckout, PagoDetalle, PagosCurso } from './pago.model';
 
-/** HU-047 — Consume `/api/app/pagos` y `/api/app/cursos/{id}/pagos`. */
 @Injectable({ providedIn: 'root' })
 export class PagosApiService {
   private readonly http = inject(HttpClient);

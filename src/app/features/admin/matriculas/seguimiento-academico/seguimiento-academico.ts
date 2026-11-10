@@ -20,12 +20,6 @@ type Pestana = 'lecciones' | 'examenes' | 'asistencia' | 'historial';
 
 const MOTIVO_MINIMO = 10;
 
-/**
- * HU-031 — Seguimiento académico de un alumno en un curso (administración): vista de solo lectura
- * que explica por qué no finaliza y dos acciones justificadas: corregir la asistencia de una sesión
- * y conceder UN intento adicional. Nada borra ni sobrescribe el historial: el intento fallido se
- * conserva y cada corrección guarda el valor anterior, el motivo, el responsable y la fecha.
- */
 @Component({
   selector: 'app-seguimiento-academico',
   imports: [DatePipe, DecimalPipe, LowerCasePipe, FormsModule, Modal, AvanceCertificadoBloque],
@@ -37,7 +31,6 @@ export class SeguimientoAcademico {
   private readonly alertas = inject(AlertaGlobalService);
   private readonly destroyRef = inject(DestroyRef);
 
-  /** Se muestra dentro de un modal de Matrículas y pagos: el id de la matrícula llega por aquí. */
   readonly matriculaIdEntrada = input.required<number>({ alias: 'matriculaId' });
 
   protected readonly formatearFechaHoraCorta = formatearFechaHoraCorta;
@@ -46,7 +39,6 @@ export class SeguimientoAcademico {
   protected readonly error = signal<string | null>(null);
   protected readonly pestana = signal<Pestana>('lecciones');
 
-  // Acción en curso (modal): intento adicional o corrección de asistencia.
   protected readonly examenAConceder = signal<ExamenSeguimiento | null>(null);
   protected readonly sesionACorregir = signal<SesionSeguimiento | null>(null);
   protected readonly guardando = signal(false);
@@ -78,8 +70,6 @@ export class SeguimientoAcademico {
   constructor() {
     effect(() => {
       this.matriculaId = this.matriculaIdEntrada();
-      // cargar() lee y escribe señales: sin untracked el effect se re-ejecutaba con cada respuesta
-      // y volvía a pedir el seguimiento en bucle.
       untracked(() => this.cargar());
     });
   }
@@ -101,8 +91,6 @@ export class SeguimientoAcademico {
         },
       });
   }
-
-  // ------------------------------------------------------------------- modales --
 
   protected abrirIntento(examen: ExamenSeguimiento): void {
     this.errorModal.set(null);
@@ -166,8 +154,6 @@ export class SeguimientoAcademico {
     this.guardando.set(false);
     this.errorModal.set(this.mensaje(e) ?? porDefecto);
   }
-
-  // ------------------------------------------------------------- presentación --
 
   protected etiquetaModalidad(m: string): string {
     return m === 'HIBRIDO' ? 'Híbrido' : m === 'EN_VIVO' ? 'En vivo' : 'Virtual';

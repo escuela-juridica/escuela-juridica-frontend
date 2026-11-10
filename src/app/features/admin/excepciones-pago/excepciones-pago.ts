@@ -16,11 +16,6 @@ import { Excepcion, TipoExcepcion } from './excepciones-pago.model';
 
 const TAMANO_PAGINA = 20;
 
-/**
- * HU-037 — PF-035: excepciones de matrículas y pagos (sobrecupo y pagos aprobados tarde o tras una cancelación).
- * La Escuela consulta pago, matrícula, acceso y cupo por separado y registra la atención que brindó fuera de ESEJUR;
- * aquí nunca se modifica el resultado de Culqi, la matrícula ni el acceso, ni se devuelve dinero.
- */
 @Component({
   selector: 'app-excepciones-pago',
   imports: [FormsModule, ReactiveFormsModule, DatePipe, Modal, TablaPaginacion],
@@ -33,7 +28,6 @@ export class ExcepcionesPago {
   private readonly destroyRef = inject(DestroyRef);
   private peticion?: Subscription;
 
-  /** Búsqueda al escribir: consulta al servidor cuando el usuario hace una pausa. */
   protected readonly alEscribir = crearBusquedaDinamica(this.destroyRef, () => this.buscar());
 
   protected readonly formatearPrecio = formatearPrecio;

@@ -5,7 +5,6 @@ import { Observable } from 'rxjs';
 import { API_URL } from '../../../../core/api/api.config';
 import { SeguimientoAcademicoDetalle } from './seguimiento-academico.model';
 
-/** HU-031 — Consume `/api/admin/matriculas/{id}/academico`. */
 @Injectable({ providedIn: 'root' })
 export class SeguimientoAcademicoApiService {
   private readonly http = inject(HttpClient);

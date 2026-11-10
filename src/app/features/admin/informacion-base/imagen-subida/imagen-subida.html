@@ -1,12 +1,16 @@
 <div class="imagen-subida">
-  <div class="imagen-subida__vista" [class.imagen-subida__vista--vacia]="!valor()">
+  <div
+    class="imagen-subida__vista"
+    [class.imagen-subida__vista--vacia]="!valor()"
+    [class.imagen-subida__vista--portada]="tipo() === 'PORTADA'"
+  >
     @if (urlVista(); as url) {
       @if (url !== urlFallida()) {
         <img [src]="url" [alt]="textoAlterno()" (error)="urlFallida.set(url)" />
       } @else {
         <span>No se pudo cargar la vista previa</span>
       }
-    } @else if (valor() && tipo() !== 'FOTO') {
+    } @else if (valor() && tipo() !== 'FOTO' && tipo() !== 'PORTADA') {
       <span>Referencia no válida: sube la imagen de nuevo</span>
     } @else {
       <span>Sin imagen</span>

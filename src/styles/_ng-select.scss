@@ -1,13 +1,8 @@
-// ng-select (select con búsqueda): tema por defecto de la librería ajustado a los campos del proyecto,
-// con la misma altura, borde, radio y anillo de foco que `.input`. El panel desplegable se anexa al <body>
-// (appendTo="body"), por eso estas reglas son globales.
-
 .ng-select {
   width: 100%;
   font-size: 16px;
   color: var(--input-texto);
 
-  // La variante «single» del tema fija 36 px de alto: se iguala a la de `.input` (48 px) con la misma especificidad.
   .ng-select-container,
   &.ng-select-single .ng-select-container {
     min-height: var(--input-alto);
@@ -53,12 +48,10 @@
     background: var(--input-fondo);
   }
 
-  // Campo obligatorio sin completar (mismo criterio que `.input--error`).
   &.input--error:not(.ng-select-opened) > .ng-select-container {
     border-color: var(--error);
   }
 
-  // El área de escritura ocupa todo el alto: los botones de quitar y abrir deben quedar por encima para recibir el clic.
   .ng-clear-wrapper,
   .ng-arrow-wrapper {
     position: relative;
@@ -78,8 +71,6 @@
   }
 }
 
-// Panel de opciones. Con `appendTo="body"` cuelga del <body>; sin él queda dentro de `.ng-select` y el tema de la
-// librería (más específico) lo pisaría, por eso se declaran los dos casos.
 .ng-dropdown-panel,
 .ng-select .ng-dropdown-panel {
   margin-top: 4px;
@@ -95,7 +86,6 @@
     font-size: 15px;
     line-height: 22px;
     color: var(--neutral-800);
-    // Los nombres largos pasan a la línea siguiente en vez de cortarse con «…».
     white-space: normal;
     text-overflow: clip;
   }

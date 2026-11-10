@@ -10,7 +10,6 @@
     </div>
   }
 
-  <!-- ============================================================ FICHA == -->
   @case ('ficha') {
     @if (ficha(); as f) {
       <article class="examen">
@@ -30,6 +29,17 @@
             @if (f.tieneRespuestaAbierta) {
               <li>Incluye preguntas de respuesta abierta: las califica un administrador, por eso tu nota quedará pendiente de revisión.</li>
             }
+            @if (f.modoNavegacion === 'SECUENCIAL') {
+              <li>Verás una pregunta a la vez. Al pasar a la siguiente no podrás volver atrás.</li>
+            } @else {
+              <li>Verás todas las preguntas juntas y podrás responderlas en el orden que prefieras.</li>
+            }
+            @if (!f.permiteOmitirPreguntas) {
+              <li>Debes responder todas las preguntas para poder enviar el examen.</li>
+            }
+            @if (!f.tiempoLimiteMinutos) {
+              <li>Si sales del examen, tu intento queda abierto y podrás continuarlo después.</li>
+            }
             <li>Respuestas correctas: {{ etiquetaMostrar(f.mostrarRespuestas).toLowerCase() }}.</li>
           </ul>
         </section>
@@ -46,6 +56,12 @@
             </button>
             @if (f.intentosRestantes !== null) {
               <p class="examen__cta-nota">Te {{ f.intentosRestantes === 1 ? 'queda 1 intento' : 'quedan ' + f.intentosRestantes + ' intentos' }}.</p>
+            }
+          } @else if (!f.habilitado && aula.leccionParaContinuar(); as pendiente) {
+            <a class="btn btn--acento" [routerLink]="['/aula', f.cursoId, 'lecciones', pendiente.leccion.id]">Ir a mi siguiente lección →</a>
+            @let faltan = aula.lecciones().length - aula.totalCompletadas();
+            @if (faltan > 0) {
+              <p class="examen__cta-nota">{{ faltan === 1 ? 'Te falta 1 lección' : 'Te faltan ' + faltan + ' lecciones' }} para poder rendir este examen.</p>
             }
           }
           <a class="btn btn--secundario" [routerLink]="['/aula', f.cursoId]">Volver al curso</a>
@@ -80,7 +96,6 @@
     }
   }
 
-  <!-- ====================================================== RINDIENDO == -->
   @case ('rindiendo') {
     @if (intento(); as it) {
       <article class="examen examen--rindiendo">
@@ -105,55 +120,55 @@
           </div>
         }
 
-        <app-examen-navegador [preguntas]="it.preguntas" [indice]="indice()" [respondidas]="respondidas()" [marcadas]="marcadas()"
-          [guardado]="guardado()" (ir)="irA($event)" />
-
-        @if (preguntaActual(); as p) {
-          <section class="card examen__pregunta" [attr.aria-labelledby]="'pregunta-' + p.id">
-            <div class="examen__pregunta-cab">
-              <span class="examen__pregunta-numero">Pregunta {{ indice() + 1 }} de {{ it.preguntas.length }}</span>
-              <span class="examen__pregunta-puntos">{{ p.puntaje | number:'1.0-2' }} {{ p.puntaje === 1 ? 'punto' : 'puntos' }}</span>
-            </div>
-            <h2 class="examen__enunciado" [id]="'pregunta-' + p.id">{{ p.enunciado }}</h2>
-            <p class="examen__indicacion">{{ etiquetaTipoPregunta(p.tipo) }}</p>
-
-            @if (p.tipo === 'RESPUESTA_ABIERTA') {
-              <textarea class="input examen__texto" rows="8" maxlength="8000" [value]="textoDe(p)"
-                (input)="escribir(p, $any($event.target).value)" placeholder="Escribe tu respuesta aquí"
-                [attr.aria-label]="'Respuesta a la pregunta ' + (indice() + 1)"></textarea>
-              <p class="examen__contador">{{ textoDe(p).length }} / 8000</p>
-            } @else {
-              <ul class="examen__opciones" [attr.role]="p.tipo === 'SELECCION_MULTIPLE' ? 'group' : 'radiogroup'" [attr.aria-labelledby]="'pregunta-' + p.id">
-                @for (o of p.opciones; track o.id) {
-                  <li>
-                    <label class="examen__opcion" [class.examen__opcion--elegida]="opcionMarcada(p, o.id)">
-                      <input [type]="p.tipo === 'SELECCION_MULTIPLE' ? 'checkbox' : 'radio'" [name]="'p' + p.id"
-                        [checked]="opcionMarcada(p, o.id)" (change)="elegirOpcion(p, o.id)" />
-                      <span>{{ o.texto }}</span>
-                    </label>
-                  </li>
+        @if (esSecuencial()) {
+          <section class="card examen__progreso" aria-label="Avance del examen">
+            <div class="examen__progreso-texto">
+              <span>Pregunta {{ indice() + 1 }} de {{ it.preguntas.length }}</span>
+              <span class="examen__guardado" [attr.data-estado]="guardado()" aria-live="polite">
+                @switch (guardado()) {
+                  @case ('guardando') { Guardando… }
+                  @case ('ok') { ✓ Guardado }
+                  @case ('error') { No se pudo guardar; reintentaremos al enviar }
                 }
-              </ul>
-            }
-
-            <div class="examen__pregunta-acciones">
-              <button type="button" class="btn btn--secundario" (click)="alternarMarca(p)" [attr.aria-pressed]="marcadas().has(p.id)">
-                {{ marcadas().has(p.id) ? '🚩 Quitar marca' : '⚑ Marcar para revisar' }}
-              </button>
-              @if (estaRespondida(p)) {
-                <button type="button" class="btn btn--secundario" (click)="limpiarRespuesta(p)">Borrar respuesta</button>
-              }
+              </span>
             </div>
+            <div class="examen__progreso-pista" role="progressbar" aria-label="Avance del examen" [attr.aria-valuenow]="indice() + 1" aria-valuemin="1" [attr.aria-valuemax]="it.preguntas.length">
+              <div class="examen__progreso-relleno" [style.width.%]="((indice() + 1) / it.preguntas.length) * 100"></div>
+            </div>
+            <p class="examen__progreso-aviso">Avanza con «Siguiente». No podrás volver a las preguntas anteriores.</p>
           </section>
-        }
 
-        <div class="card examen__pie">
-          <button type="button" class="btn btn--secundario" [disabled]="indice() === 0" (click)="irA(indice() - 1)">← Anterior</button>
-          @if (indice() < it.preguntas.length - 1) {
-            <button type="button" class="btn btn--secundario" (click)="irA(indice() + 1)">Siguiente →</button>
+          @if (preguntaActual(); as p) {
+            <ng-container [ngTemplateOutlet]="tarjetaPregunta" [ngTemplateOutletContext]="{ $implicit: p, i: indice() }" />
           }
-          <button type="button" class="btn btn--acento examen__enviar" (click)="abrirConfirmacion()">Revisar y enviar</button>
-        </div>
+
+          <div class="card examen__pie">
+            @if (!puedeAvanzar()) {
+              <p class="examen__pie-ayuda" [class.examen__pie-ayuda--error]="mostrarFaltantes()" role="status">Elige una respuesta para continuar.</p>
+            }
+            @if (indice() < it.preguntas.length - 1) {
+              <button type="button" class="btn btn--acento examen__enviar" [disabled]="!puedeAvanzar()" (click)="siguiente()">Siguiente →</button>
+            } @else {
+              <button type="button" class="btn btn--acento examen__enviar" [disabled]="!puedeAvanzar()" (click)="revisarYEnviar()">Revisar y enviar</button>
+            }
+          </div>
+        } @else {
+          <app-examen-navegador [preguntas]="it.preguntas" [indice]="indice()" [respondidas]="respondidas()" [marcadas]="marcadas()"
+            [guardado]="guardado()" (ir)="irA($event)" />
+
+          @for (p of it.preguntas; track p.id; let i = $index) {
+            <ng-container [ngTemplateOutlet]="tarjetaPregunta" [ngTemplateOutletContext]="{ $implicit: p, i: i }" />
+          }
+
+          <div class="card examen__pie">
+            @if (!permiteOmitir() && sinResponder().length > 0) {
+              <p class="examen__pie-ayuda" [class.examen__pie-ayuda--error]="mostrarFaltantes()" role="status">
+                {{ sinResponder().length === 1 ? 'Te falta responder 1 pregunta' : 'Te faltan por responder ' + sinResponder().length + ' preguntas' }} antes de poder enviar.
+              </p>
+            }
+            <button type="button" class="btn btn--acento examen__enviar" (click)="revisarYEnviar()">Revisar y enviar</button>
+          </div>
+        }
       </article>
 
       @if (confirmando()) {
@@ -186,7 +201,6 @@
     }
   }
 
-  <!-- ======================================================= RESULTADO == -->
   @case ('resultado') {
     @if (intento(); as it) {
       <article class="examen">
@@ -301,3 +315,50 @@
     }
   }
 }
+
+<ng-template #tarjetaPregunta let-p let-i="i">
+  <section class="card examen__pregunta" [class.examen__pregunta--faltante]="esFaltante(p)" [id]="'pregunta-card-' + p.id" [attr.aria-labelledby]="'pregunta-' + p.id">
+    <div class="examen__pregunta-cab">
+      <span class="examen__pregunta-numero">Pregunta {{ i + 1 }} de {{ intento()?.preguntas?.length }}</span>
+      <span class="examen__pregunta-puntos">{{ p.puntaje | number:'1.0-2' }} {{ p.puntaje === 1 ? 'punto' : 'puntos' }}</span>
+    </div>
+    <h2 class="examen__enunciado" [id]="'pregunta-' + p.id">{{ p.enunciado }}</h2>
+    <p class="examen__indicacion">{{ etiquetaTipoPregunta(p.tipo) }}</p>
+
+    @if (p.tipo === 'RESPUESTA_ABIERTA') {
+      <textarea class="input examen__texto" rows="8" maxlength="8000" [value]="textoDe(p)"
+        (input)="escribir(p, $any($event.target).value)" placeholder="Escribe tu respuesta aquí"
+        [attr.aria-label]="'Respuesta a la pregunta ' + (i + 1)"></textarea>
+      <p class="examen__contador">{{ textoDe(p).length }} / 8000</p>
+    } @else {
+      <ul class="examen__opciones" [attr.role]="p.tipo === 'SELECCION_MULTIPLE' ? 'group' : 'radiogroup'" [attr.aria-labelledby]="'pregunta-' + p.id">
+        @for (o of p.opciones; track o.id) {
+          <li>
+            <label class="examen__opcion" [class.examen__opcion--elegida]="opcionMarcada(p, o.id)">
+              <input [type]="p.tipo === 'SELECCION_MULTIPLE' ? 'checkbox' : 'radio'" [name]="'p' + p.id"
+                [checked]="opcionMarcada(p, o.id)" (change)="elegirOpcion(p, o.id)" />
+              <span>{{ o.texto }}</span>
+            </label>
+          </li>
+        }
+      </ul>
+    }
+
+    @if (esFaltante(p)) {
+      <p class="examen__faltante" role="alert">Esta pregunta necesita una respuesta.</p>
+    }
+
+    @if (!esSecuencial() || (permiteOmitir() && estaRespondida(p))) {
+      <div class="examen__pregunta-acciones">
+        @if (!esSecuencial()) {
+          <button type="button" class="btn btn--secundario" (click)="alternarMarca(p)" [attr.aria-pressed]="marcadas().has(p.id)">
+            {{ marcadas().has(p.id) ? '🚩 Quitar marca' : '⚑ Marcar para revisar' }}
+          </button>
+        }
+        @if (permiteOmitir() && estaRespondida(p)) {
+          <button type="button" class="btn btn--secundario" (click)="limpiarRespuesta(p)">Borrar respuesta</button>
+        }
+      </div>
+    }
+  </section>
+</ng-template>

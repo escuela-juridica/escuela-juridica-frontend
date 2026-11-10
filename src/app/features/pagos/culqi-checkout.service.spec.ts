@@ -24,7 +24,6 @@ interface FalsoCulqi {
   close: () => void;
 }
 
-/** EP06 · HU-047 — Culqi Checkout: configuración del modal, medios de pago y qué hace cada resultado. */
 describe('CulqiCheckoutService', () => {
   let servicio: CulqiCheckoutService;
   let instancia: FalsoCulqi;

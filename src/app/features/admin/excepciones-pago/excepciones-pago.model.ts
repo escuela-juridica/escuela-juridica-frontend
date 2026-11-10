@@ -1,4 +1,3 @@
-/** HU-037 — Excepciones de matrículas y pagos (administrador). Espejo de los DTO del backend. */
 export type TipoExcepcion = 'PAGO_TARDIO' | 'CURSO_CANCELADO' | 'MATRICULA_CANCELADA' | 'SOBRECUPO';
 export type EstadoExcepcion = 'PENDIENTE' | 'ATENDIDO';
 
@@ -51,7 +50,6 @@ export interface Excepcion {
   cursoId: number;
   curso: string;
   pago: PagoExcepcion | null;
-  /** Solo en el detalle. */
   matricula: MatriculaExcepcion | null;
   cursoDetalle: CursoExcepcion | null;
   relacionados: PagoRelacionado[];

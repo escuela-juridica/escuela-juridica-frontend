@@ -6,7 +6,6 @@ import { API_URL } from '../../../../core/api/api.config';
 import { PageResponse } from '../../../../core/api/page-response.model';
 import { FiltrosReporteAsistencia, OpcionAsistencia, ReporteAsistencia } from './reporte-asistencia.model';
 
-/** HU-045 — Reporte de asistencia. Consume `/api/admin/reportes/asistencia`. */
 @Injectable({ providedIn: 'root' })
 export class ReporteAsistenciaApiService {
   private readonly http = inject(HttpClient);
@@ -25,7 +24,6 @@ export class ReporteAsistenciaApiService {
     return this.http.get<OpcionAsistencia[]>(`${this.base}/cursos/${cursoId}/sesiones`);
   }
 
-  /** La exportación usa exactamente los mismos filtros que la consulta en pantalla. */
   urlExportacionExcel(filtros: FiltrosReporteAsistencia): string {
     return `${this.base}/exportar-excel?${this.parametros(filtros).toString()}`;
   }

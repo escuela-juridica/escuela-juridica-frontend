@@ -16,11 +16,6 @@ interface Captura {
   observacion: string;
 }
 
-/**
- * HU-030 — Revisar un intento: respuestas abiertas completas, un puntaje entre 0 y el máximo de cada
- * pregunta (ambos válidos) y una observación opcional visible para el alumno. Publicar califica el
- * intento de una vez (con confirmación) y avisa al alumno; un intento ya calificado queda en solo lectura.
- */
 @Component({
   selector: 'app-revision-intento',
   imports: [DatePipe, DecimalPipe, LowerCasePipe, RouterLink, Modal, CabeceraDetalle, EnlaceVolver],
@@ -46,7 +41,6 @@ export class RevisionIntentoPantalla {
 
   protected readonly soloLectura = computed(() => this.intento()?.estado === 'CALIFICADO');
 
-  /** Respuestas que el revisor debe puntuar (las demás ya tienen su puntaje). */
   protected readonly porRevisar = computed(() =>
     (this.intento()?.preguntas ?? []).filter((p) => p.estadoRevision === 'PENDIENTE'),
   );
@@ -59,7 +53,6 @@ export class RevisionIntentoPantalla {
 
   protected readonly completo = computed(() => this.porRevisar().every((p) => this.errores()[p.respuestaId] === null));
 
-  /** Nota que resultaría de publicar con lo escrito (misma fórmula del servidor). */
   protected readonly notaResultante = computed<number | null>(() => {
     const it = this.intento();
     if (!it || !this.completo() || it.puntajeTotal <= 0) return null;
@@ -112,7 +105,6 @@ export class RevisionIntentoPantalla {
     this.capturas.update((c) => ({ ...c, [p.respuestaId]: { ...this.captura(p), observacion: valor } }));
   }
 
-  /** `null` si el puntaje es válido: número entre 0 y el máximo (ambos incluidos), hasta 2 decimales. */
   private validar(p: PreguntaRevision): string | null {
     const crudo = this.captura(p).puntaje.trim().replace(',', '.');
     if (crudo === '') return 'Indica un puntaje.';

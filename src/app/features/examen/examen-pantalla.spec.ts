@@ -16,7 +16,8 @@ function ficha(extra: Partial<ExamenFicha> = {}): ExamenFicha {
     totalPreguntas: 2, puntajeTotal: 20, tieneRespuestaAbierta: false, tiempoLimiteMinutos: null, intentosMaximos: 2,
     intentosUsados: 0, intentosRestantes: 2, mostrarRespuestas: 'AL_APROBAR', notaMinima: 12, afectaCertificacion: true,
     bloqueaSiguienteModulo: false, habilitado: true, puedeIniciar: true, motivoNoPuedeIniciar: null,
-    agotadoSinAprobar: false, soloLectura: false, intentoEnCursoId: null, aprobado: false, mejorNota: null, intentos: [],
+    agotadoSinAprobar: false, soloLectura: false, intentoEnCursoId: null, aprobado: false, mejorNota: null,
+    modoNavegacion: 'LIBRE', permiteOmitirPreguntas: false, intentos: [],
     ...extra,
   };
 }
@@ -39,11 +40,11 @@ function intento(extra: Partial<Intento> = {}): Intento {
     id: 900, examenId: 100, cursoId: 7, examenTitulo: 'Examen final', tipo: 'CALIFICADO', numero: 1, estado: 'EN_PROGRESO',
     iniciadoEn: ahora, expiraEn: null, segundosRestantes: null, ahora, puntajeTotal: 20, puntajeObtenido: null, nota: null,
     aprobado: null, notaMinima: 12, enviadoEn: null, cerradoPorTiempo: false, fechaLimiteRevision: null,
-    respuestasVisibles: false, afectaCertificacion: true, preguntas: [pregunta(1), pregunta(2)], ...extra,
+    respuestasVisibles: false, afectaCertificacion: true, modoNavegacion: 'LIBRE', permiteOmitirPreguntas: false,
+    preguntas: [pregunta(1), pregunta(2)], ...extra,
   };
 }
 
-/** EP05 · HU-028 / HU-029 — Rendir un examen en el aula: ficha, intento, guardado de respuestas, envío y resultado. */
 describe('ExamenPantalla', () => {
   let fixture: ComponentFixture<ExamenPantalla>;
   let http: HttpTestingController;
@@ -70,7 +71,6 @@ describe('ExamenPantalla', () => {
     }
   }
 
-  /** Inicia el intento con las preguntas dadas y deja la pantalla en "rindiendo". */
   function iniciar(resultado: Intento): void {
     accion('iniciar');
     const solicitud = http.expectOne(`${API_URL}/app/examenes/100/intentos`);

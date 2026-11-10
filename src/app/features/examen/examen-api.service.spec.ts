@@ -5,7 +5,6 @@ import { TestBed } from '@angular/core/testing';
 import { API_URL } from '../../core/api/api.config';
 import { ExamenApiService } from './examen-api.service';
 
-/** EP05 · HU-028 / HU-029 — Rendir un examen: ficha, intento, guardado de respuestas y envío. */
 describe('ExamenApiService', () => {
   let servicio: ExamenApiService;
   let http: HttpTestingController;

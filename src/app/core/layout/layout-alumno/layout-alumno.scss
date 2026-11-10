@@ -1,7 +1,3 @@
-// Header/footer del área del alumno (EP01: PF-008 y PF-009). Estilos propios de este layout.
-
-// Pie pegado abajo: el layout ocupa al menos toda la altura de la ventana y el contenido absorbe el espacio sobrante,
-// de modo que en páginas cortas o en pantallas altas el pie no queda flotando a mitad de página.
 :host {
   display: flex;
   flex-direction: column;
@@ -13,8 +9,6 @@ main {
   flex: 1 0 auto;
 }
 
-// Fondo --neutral-950 (grafito), igual que el navbar del admin (layout-admin.scss):
-// mismo tratamiento para que ambas áreas (admin y alumno) se vean consistentes.
 header {
   background: var(--neutral-950);
   position: sticky;
@@ -43,7 +37,7 @@ header {
 }
 
 .header-logo {
-  height: 36px;
+  height: 44px;
   width: auto;
   cursor: pointer;
 }
@@ -76,10 +70,6 @@ header {
   gap: 12px;
 }
 
-// Cuenta siempre visible en la barra (nombre + correo + avatar + Salir), igual
-// que el navbar del admin (.admin-navbar__cuenta en layout-admin.scss) en vez
-// de un menú desplegable: "Mi perfil" ya está en el nav principal, así que no
-// hace falta duplicarlo aquí.
 .header-cuenta {
   display: flex;
   align-items: center;
@@ -104,6 +94,7 @@ header {
 .header-cuenta-nombre {
   font-size: 13px;
   font-weight: 600;
+  text-transform: uppercase;
   color: var(--blanco);
   white-space: nowrap;
   overflow: hidden;
@@ -187,10 +178,6 @@ header {
   color: var(--neutral-500);
 }
 
-// Bajo 1024px el nav (4 ítems) ya no cabe junto al logo y el avatar: en vez de
-// dejar que se apriete y envuelva en 2 líneas desparejas al costado (el avatar
-// terminaba cayendo suelto en una tercera línea), se fuerza a su propia fila
-// completa, con el logo y el avatar juntos arriba.
 @media (max-width: 1023px) {
   .header-fila {
     justify-content: space-between;
@@ -202,9 +189,6 @@ header {
   }
 }
 
-// Bajo 768px ni una fila completa alcanza para los 4 ítems sin volver a
-// envolver: se reemplaza el nav horizontal por un botón de hamburguesa que
-// despliega los mismos enlaces en una lista vertical.
 .header-hamburguesa {
   display: none;
   align-items: center;
@@ -271,7 +255,6 @@ header {
     display: inline-flex;
   }
 
-  // Sin nombre/correo ni texto "Salir": solo caben el avatar y el ícono.
   .header-cuenta-info {
     display: none;
   }

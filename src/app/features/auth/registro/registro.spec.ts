@@ -132,7 +132,7 @@ describe('Registro', () => {
   });
 
   it('informa rechazo del backend por anti-robot pendiente sin navegar ni perder datos', () => {
-    completarFormularioValido(); // Evidencia simulada solo en esta prueba.
+    completarFormularioValido();
     api.registrarFormulario.mockReturnValue(
       throwError(
         () =>
@@ -287,7 +287,7 @@ describe('Registro', () => {
     expect(component.contextoGoogleValido).toBe(true);
     expect(component.formulario.controls.correo.disabled).toBe(true);
     expect(component.formulario.controls.correo.value).toBe('google@example.com');
-    expect(component.formulario.controls.apellidoPaterno.value).toBe('CAMINOS QUIROZ');
+    expect(component.formulario.controls.apellidoPaterno.value).toBe('Caminos Quiroz');
     expect(component.formulario.controls.contrasena.hasError('required')).toBe(false);
     expect(component.formulario.controls.evidenciaAntiRobot.hasError('required')).toBe(false);
   });
@@ -317,8 +317,8 @@ describe('Registro', () => {
 
     expect(api.completarRegistroGoogle).toHaveBeenCalledWith({
       referencia: 'google-1',
-      nombres: 'LUCÍA',
-      apellidoPaterno: 'CAMINOS QUIROZ',
+      nombres: 'Lucía',
+      apellidoPaterno: 'Caminos Quiroz',
       apellidoMaterno: null,
       telefono: null,
       documentoIdentidad: null,

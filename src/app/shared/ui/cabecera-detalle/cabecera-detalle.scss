@@ -53,7 +53,6 @@
   overflow-wrap: anywhere;
 }
 
-// Líneas de contexto proyectadas: cada una es un <p> con su ícono opcional.
 .cd__meta {
   margin-top: 4px;
 }
@@ -86,7 +85,6 @@
   gap: 10px;
 }
 
-// Código u otro identificador destacado, siempre completo (nunca se corta).
 .cd__lado ::ng-deep .cd-chip {
   padding: 5px 12px;
   border: 1px solid var(--neutral-200);

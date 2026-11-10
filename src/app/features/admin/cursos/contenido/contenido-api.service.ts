@@ -23,7 +23,6 @@ import {
   ReprogramarSesionRespuesta,
 } from './contenido.model';
 
-/** HU-011 — Organizar el contenido de un curso. Consume `/api/admin/.../modulos|lecciones|materiales`. */
 @Injectable({ providedIn: 'root' })
 export class ContenidoApiService {
   private readonly http = inject(HttpClient);
@@ -120,8 +119,6 @@ export class ContenidoApiService {
   eliminarMaterial(materialId: number): Observable<void> {
     return this.http.delete<void>(`${this.base}/materiales/${materialId}`);
   }
-
-  // ---------------------------------------------------------------- HU-027 Cambios en sesiones --
 
   reprogramarSesion(leccionId: number, p: ReprogramarSesionPeticion): Observable<ReprogramarSesionRespuesta> {
     return this.http.patch<ReprogramarSesionRespuesta>(`${this.base}/lecciones/${leccionId}/sesion/reprogramar`, p);

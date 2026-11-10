@@ -8,9 +8,6 @@ import { AlertaGlobalService } from '../../../../../core/notificaciones/alerta-g
 import { ContenidoApiService } from '../../contenido/contenido-api.service';
 import { LeccionRespuesta } from '../../contenido/contenido.model';
 
-/** HU-027 — Cancelar una sesión en vivo futura. Acción definitiva e irreversible; solo pide el
- * motivo. Siempre se usa dentro de un @if en curso-editor, así que no necesita su propio
- * interruptor de visibilidad: mientras está montado, el modal está abierto. */
 @Component({
   selector: 'app-modal-cancelar-sesion',
   imports: [Modal],

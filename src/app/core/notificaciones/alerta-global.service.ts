@@ -7,7 +7,6 @@ export interface AlertaGlobal {
   texto: string;
 }
 
-/** Canal reutilizable para avisos de operaciones que afectan una lista o pestaña completa. */
 @Injectable({ providedIn: 'root' })
 export class AlertaGlobalService {
   readonly alerta = signal<AlertaGlobal | null>(null);

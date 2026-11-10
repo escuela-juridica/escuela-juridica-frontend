@@ -25,9 +25,17 @@ import {
   etiquetaModalidad,
   formatearFecha,
   formatearPrecio,
+  urlPortadaCurso,
 } from '../curso-formato.util';
 
-const HERO_IMGS = ['img/catalogo/hero-1.jpg', 'img/catalogo/hero-2.jpg', 'img/catalogo/hero-3.jpg'];
+const HERO_IMGS = [
+  { src: 'img/catalogo/hero-1.jpg', posicion: 'center' },
+  { src: 'img/catalogo/hero-2.jpg', posicion: 'center' },
+  { src: 'img/catalogo/hero-3.jpg', posicion: 'center 24%' },
+  { src: 'img/catalogo/hero-4.jpg', posicion: 'center 35%' },
+  { src: 'img/catalogo/hero-5.jpg', posicion: 'center 40%' },
+  { src: 'img/catalogo/hero-6.jpg', posicion: 'center 45%' },
+];
 
 const TAMANO_PAGINA = 9;
 
@@ -143,8 +151,6 @@ export class Catalogo implements OnInit, AfterViewInit {
     const ancla = this.anclaCatalogo()?.nativeElement;
     if (ancla) {
       const cabecera = ancla.ownerDocument.querySelector('header');
-      // El contenedor comienza justo al terminar el banner. Reservamos solo
-      // la cabecera fija; el padding del contenedor separa los filtros.
       ancla.style.scrollMarginTop = `${cabecera?.getBoundingClientRect().height ?? 0}px`;
       ancla.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -198,7 +204,7 @@ export class Catalogo implements OnInit, AfterViewInit {
   protected fondoTarjeta(imagen: string | null): string {
     const degradado =
       'linear-gradient(180deg, rgba(16, 24, 40, 0.45) 0%, rgba(16, 24, 40, 0) 55%)';
-    return imagen ? `${degradado}, url('${imagen}')` : degradado;
+    return imagen ? `${degradado}, url('${urlPortadaCurso(imagen)}')` : degradado;
   }
 
   protected nombresDocentes(curso: CursoTarjeta): string {

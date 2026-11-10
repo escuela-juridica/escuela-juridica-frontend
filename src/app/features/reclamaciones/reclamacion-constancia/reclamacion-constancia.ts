@@ -5,7 +5,6 @@ import { RouterLink } from '@angular/router';
 import { formatearFecha, formatearFechaHoraCorta } from '../../cursos/curso-formato.util';
 import { ReclamacionConstancia } from '../reclamacion.model';
 
-/** HU-039 — Constancia de una queja o reclamo recién presentado: número, plazo y copia de los datos. */
 @Component({
   selector: 'app-reclamacion-constancia',
   imports: [DecimalPipe, RouterLink],
