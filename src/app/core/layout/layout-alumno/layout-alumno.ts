@@ -1,5 +1,7 @@
 import { Component, ElementRef, HostListener, inject, signal, viewChild } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { filter, map, startWith } from 'rxjs';
 import { obtenerIniciales } from '../../session/nombre-utils';
 import { Session } from '../../session/session';
 import { ConfirmacionService } from '../../dialogo/confirmacion.service';
@@ -17,9 +19,21 @@ export class LayoutAlumno {
 
   protected readonly usuario = this.session.usuario;
   protected readonly menuMovilAbierto = signal(false);
+  protected readonly cursosActivo = toSignal(
+    this.router.events.pipe(
+      filter((evento): evento is NavigationEnd => evento instanceof NavigationEnd),
+      map((evento) => LayoutAlumno.esSeccionCursos(evento.urlAfterRedirects)),
+      startWith(LayoutAlumno.esSeccionCursos(this.router.url)),
+    ),
+    { initialValue: false },
+  );
 
   private readonly movilBotonRef = viewChild<ElementRef<HTMLElement>>('movilBoton');
   private readonly movilPanelRef = viewChild<ElementRef<HTMLElement>>('movilPanel');
+
+  private static esSeccionCursos(url: string): boolean {
+    return url.startsWith('/app/panel') || url.startsWith('/aula');
+  }
 
   protected get iniciales(): string {
     return obtenerIniciales(this.usuario()?.nombreCompleto) || 'LC';

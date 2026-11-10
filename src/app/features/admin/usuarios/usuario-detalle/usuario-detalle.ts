@@ -1,4 +1,3 @@
-// usuario-detalle.ts
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectorRef, Component, DestroyRef, Input, OnChanges, inject, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -19,12 +18,8 @@ interface ErrorApiAdmin {
   message?: string;
 }
 
-/** Cuánto tiempo queda visible una alerta antes de desaparecer sola. */
 const DURACION_MENSAJE_MS = 5000;
 
-/** HU-008 — Detalle administrativo de un usuario, mostrado dentro de un modal (ver
- * usuarios-listado). Habilitar/deshabilitar, conceder o retirar roles vía checkboxes, editar los
- * datos personales y reenviar el código de verificación mientras la cuenta siga pendiente. */
 @Component({
   selector: 'app-usuario-detalle',
   imports: [ReactiveFormsModule],
@@ -34,7 +29,6 @@ const DURACION_MENSAJE_MS = 5000;
 export class UsuarioDetalle implements OnChanges {
   @Input({ required: true }) usuarioId!: number;
   readonly cerrar = output<void>();
-  /** Avisa al listado para refrescar esa fila sin recargar todo. */
   readonly actualizado = output<UsuarioAdminRespuesta>();
 
   private readonly api = inject(AdminUsuariosApiService);
@@ -47,12 +41,8 @@ export class UsuarioDetalle implements OnChanges {
   protected readonly concediendoRol = signal<RolUsuarioAdmin | null>(null);
   protected readonly reenviando = signal(false);
   protected readonly reseteandoContrasena = signal(false);
-  /** Se muestra hasta que el admin la cierra a propósito: a diferencia de `mensaje`, no
-   * desaparece sola, porque hay que poder copiarla. */
   protected readonly contrasenaTemporal = signal<string | null>(null);
 
-  /** Un único slot de alerta: evita que un error de una acción quede "pegado" en pantalla
-   * mientras otra acción distinta se completa con éxito. */
   protected readonly mensaje = signal<{ tipo: 'error' | 'exito'; texto: string } | null>(null);
   private mensajeTimeout: ReturnType<typeof setTimeout> | null = null;
 
@@ -73,15 +63,6 @@ export class UsuarioDetalle implements OnChanges {
   });
 
   constructor() {
-    for (const nombre of ['nombres', 'apellidoPaterno', 'apellidoMaterno'] as const) {
-      const control = this.formDatos.controls[nombre];
-      control.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((valor) => {
-        const mayuscula = valor.toLocaleUpperCase('es-PE');
-        if (valor !== mayuscula) {
-          control.setValue(mayuscula, { emitEvent: false });
-        }
-      });
-    }
     this.destroyRef.onDestroy(() => this.limpiarTimeoutMensaje());
   }
 

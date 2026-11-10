@@ -27,7 +27,6 @@ const EMITIDO = {
   nombresImpresos: 'Ana María Pérez Gómez', entidad: null, descargaUrl: '/api/app/certificados/ESEJUR-2026-ABCD2345/descargar',
 };
 
-/** EP05 · HU-032 — "Tu certificado": estado de la certificación, confirmación de datos y emisión. */
 describe('CertificacionBloque', () => {
   let fixture: ComponentFixture<CertificacionBloque>;
   let http: HttpTestingController;
@@ -86,11 +85,21 @@ describe('CertificacionBloque', () => {
     expect(leer<boolean>('cargando')).toBe(false);
   });
 
-  it('cuando faltan los datos abre el formulario precargado con los nombres de la cuenta', async () => {
+  it('cuando faltan los datos no abre el modal solo y lo abre precargado al pedirlo', async () => {
     await abrir(certificacion({ estado: 'PENDIENTE_DATOS', puedeConfirmarDatos: true, fechaFinalizacion: '2026-09-18T12:00:00Z' }));
 
+    expect(leer<boolean>('editandoDatos')).toBe(false);
+    accion('abrirDatos');
     expect(leer<boolean>('editandoDatos')).toBe(true);
     expect(formulario().getRawValue()).toEqual({ nombres: 'Ana', apellidoPaterno: 'Pérez', apellidoMaterno: '' });
+  });
+
+  it('al solicitar ver el certificado con datos sin confirmar abre el modal', async () => {
+    await abrir(certificacion({ estado: 'PENDIENTE_DATOS', puedeConfirmarDatos: true, fechaFinalizacion: '2026-09-18T12:00:00Z' }));
+    fixture.componentRef.setInput('solicitud', 1);
+    fixture.detectChanges();
+
+    expect(leer<boolean>('editandoDatos')).toBe(true);
   });
 
   it('no envía los datos si el formulario está incompleto', async () => {

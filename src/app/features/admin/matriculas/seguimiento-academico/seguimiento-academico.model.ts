@@ -1,4 +1,3 @@
-/** HU-031 — Seguimiento académico y excepciones (administrador). Espejo de los DTO del backend. */
 import { IntentoResumen } from '../../../examen/examen.model';
 
 export interface CondicionSeguimiento {
@@ -34,7 +33,6 @@ export interface ExamenSeguimiento {
   modulo: string | null;
   estado: 'PENDIENTE' | 'EN_CURSO' | 'EN_REVISION' | 'APROBADO' | 'NO_APROBADO';
   intentosUsados: number;
-  /** null = ilimitados. */
   intentosMaximos: number | null;
   mejorNota: number | null;
   aprobado: boolean;

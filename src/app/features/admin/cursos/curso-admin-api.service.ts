@@ -22,7 +22,6 @@ import {
   ValidacionPublicacionRespuesta,
 } from './curso-admin.model';
 
-/** HU-010 — Crear y configurar un curso. Consume `/api/admin/cursos`. */
 @Injectable({ providedIn: 'root' })
 export class CursoAdminApiService {
   private readonly http = inject(HttpClient);
@@ -42,6 +41,12 @@ export class CursoAdminApiService {
 
   obtener(cursoId: number): Observable<CursoEditorRespuesta> {
     return this.http.get<CursoEditorRespuesta>(`${this.url}/${cursoId}`);
+  }
+
+  subirPortada(cursoId: number, archivo: File): Observable<{ referencia: string }> {
+    const datos = new FormData();
+    datos.append('archivo', archivo);
+    return this.http.post<{ referencia: string }>(`${this.url}/${cursoId}/portada`, datos);
   }
 
   actualizarInformacion(
@@ -103,8 +108,6 @@ export class CursoAdminApiService {
   eliminar(cursoId: number): Observable<void> {
     return this.http.delete<void>(`${this.url}/${cursoId}`);
   }
-
-  // ---------------------------------------------------------------- HU-038 --
 
   impactoCancelacion(cursoId: number): Observable<CancelacionCurso> {
     return this.http.get<CancelacionCurso>(`${this.url}/${cursoId}/cancelacion`);

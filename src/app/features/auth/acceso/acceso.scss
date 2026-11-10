@@ -1,21 +1,19 @@
-// PF-003 · Estilos propios de esta pantalla.
-// PENDIENTE — pegar acá las clases .acceso-* del bloque <style> de
-// maquetacion-html/HU-001-PF-003-acceso.html
-
 .acceso-fila {
     background: var(--neutral-050);
     display: flex;
-    align-items: stretch;
+    align-items: flex-start;
     min-height: 100vh;
-    flex-wrap: wrap;
+    min-height: 100dvh;
 }
 
 .acceso-form-col {
-    flex: 1 1 440px;
-    min-width: 300px;
+    flex: 1 1 50%;
+    min-width: 0;
+    min-height: 100vh;
+    min-height: 100dvh;
     display: grid;
     place-items: center;
-    padding: 48px 24px;
+    padding: 40px 24px;
 }
 
 .acceso-form-ancho {
@@ -31,7 +29,14 @@
     line-height: 20px;
     font-weight: 600;
     color: var(--neutral-600);
-    margin-bottom: 28px;
+    margin-bottom: 36px;
+    transition: color 150ms ease;
+
+    &:hover { color: var(--neutral-950); }
+}
+
+.acceso-form-ancho .eyebrow {
+    margin-bottom: 14px;
 }
 
 .acceso-titulo {
@@ -39,25 +44,26 @@
     line-height: 40px;
     font-weight: 700;
     color: var(--neutral-950);
-    margin: 0 0 8px;
+    margin: 0 0 14px;
 }
 
 .acceso-subtitulo {
     font-size: 16px;
     line-height: 24px;
     color: var(--neutral-600);
-    margin: 0 0 28px;
+    margin: 0 0 32px;
 }
 
 .acceso-formulario {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 18px;
 }
 
 .acceso-olvide {
     display: flex;
     justify-content: flex-end;
+    margin-top: -6px;
 }
 
 .acceso-olvide a {
@@ -71,6 +77,8 @@
     line-height: 20px;
     color: var(--neutral-600);
     text-align: center;
+    padding-top: 18px;
+    border-top: 1px solid var(--neutral-200);
 }
 
 .acceso-crear-cuenta a {
@@ -78,15 +86,19 @@
 }
 
 .acceso-hero-col {
-    flex: 1 1 380px;
-    min-width: 260px;
+    flex: 1 1 50%;
+    min-width: 0;
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    height: 100vh;
+    height: 100dvh;
     color: #ffffff;
-    padding: 48px;
+    padding: 48px 56px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     gap: 20px;
-    position: relative;
     overflow: hidden;
 }
 
@@ -109,11 +121,11 @@
 }
 
 .acceso-hero-logo {
-    height: 44px;
+    height: 56px;
     width: auto;
     background: #ffffff;
-    border-radius: var(--radio-md);
-    padding: 8px 12px;
+    border-radius: var(--radio-lg);
+    padding: 8px 14px;
     align-self: flex-start;
     position: relative;
     z-index: 3;
@@ -126,13 +138,14 @@
 
 .acceso-hero-titulo {
     font-family: var(--fuente-editorial);
-    font-size: 36px;
-    line-height: 46px;
+    font-size: clamp(30px, 3.2vw, 40px);
+    line-height: 1.2;
     font-weight: 700;
     margin: 0;
-    max-width: 380px;
+    max-width: 440px;
     position: relative;
     z-index: 3;
+    text-wrap: balance;
 }
 
 .acceso-hero-texto {
@@ -140,7 +153,88 @@
     line-height: 26px;
     color: var(--acento-100);
     margin: 0;
-    max-width: 380px;
+    max-width: 420px;
     position: relative;
     z-index: 3;
+}
+
+.acceso-hero-ventajas {
+    list-style: none;
+    margin: 4px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: relative;
+    z-index: 3;
+
+    li {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 15px;
+        line-height: 22px;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    svg {
+        flex: none;
+        color: var(--acento-500);
+    }
+}
+
+@media (min-width: 900px) and (max-height: 760px) {
+    .acceso-form-col { padding: 20px 24px; }
+    .acceso-volver { margin-bottom: 24px; }
+    .acceso-form-ancho .eyebrow { margin-bottom: 10px; }
+    .acceso-titulo { font-size: 28px; line-height: 34px; margin-bottom: 10px; }
+    .acceso-subtitulo { font-size: 15px; line-height: 22px; margin-bottom: 22px; }
+    .acceso-formulario { gap: 12px; }
+    .acceso-olvide { margin-top: -4px; }
+    .acceso-crear-cuenta { padding-top: 12px; }
+
+    .acceso-hero-col { padding: 32px 48px; gap: 14px; }
+    .acceso-hero-logo { height: 48px; }
+    .acceso-hero-ventajas { display: none; }
+}
+
+@media (min-width: 900px) and (max-height: 600px) {
+    .acceso-hero-texto { display: none; }
+}
+
+@media (max-width: 899px) {
+    .acceso-fila {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .acceso-hero-col {
+        order: -1;
+        flex: 0 0 auto;
+        align-self: stretch;
+        position: relative;
+        height: auto;
+        padding: 20px 24px;
+        gap: 0;
+    }
+
+    .acceso-hero-logo { height: 44px; padding: 6px 12px; }
+
+    .acceso-hero-eyebrow,
+    .acceso-hero-titulo,
+    .acceso-hero-texto,
+    .acceso-hero-ventajas,
+    .acceso-hero-blob { display: none; }
+
+    .acceso-form-col {
+        flex: 1 0 auto;
+        min-height: 0;
+        padding: 28px 24px 32px;
+        place-items: start center;
+    }
+}
+
+@media (max-width: 480px) {
+    .acceso-form-col { padding: 24px 20px 28px; }
+    .acceso-titulo { font-size: 28px; line-height: 34px; }
 }

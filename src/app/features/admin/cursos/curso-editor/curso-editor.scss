@@ -94,8 +94,6 @@
   padding: 24px;
 }
 
-/* Los módulos son filas operativas, no tarjetas de formulario: la cabecera
-   controla su propio espaciado para mantener el listado compacto. */
 .editor-card.editor-modulo {
   padding: 0;
 }
@@ -323,8 +321,6 @@
   padding: 24px 0;
 }
 
-// Móvil: la fila de sesión se apila (texto arriba, acciones debajo a ancho completo) para que las
-// tres acciones (Editar programación / Reprogramar / Cancelar) no desborden la pantalla.
 @media (max-width: 767px) {
   .editor-sesion {
     flex-wrap: wrap;
@@ -347,7 +343,6 @@
   }
 }
 
-// Código de registro del curso (NN-SIGLA_AAAA): solo lectura, lo asigna el sistema al publicar.
 .editor-nota-registro {
   margin: -4px 0 16px;
   font-size: 14px;

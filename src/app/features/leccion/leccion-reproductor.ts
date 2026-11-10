@@ -1,34 +1,29 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, computed, effect, inject, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { distinctUntilChanged, map } from 'rxjs';
 
 import { resolverUrlApi } from '../../core/api/api.config';
 import { AlertaGlobalService } from '../../core/notificaciones/alerta-global.service';
+import { idYoutube } from '../../core/youtube/youtube-id.util';
+import { YoutubeReproductor } from '../../shared/ui/youtube-reproductor/youtube-reproductor';
 import { AvanceCertificadoBloque } from '../aula/avance-certificado/avance-certificado';
+import { examenAgotado } from '../aula/aula-ruta.util';
 import { AulaSesionService } from '../aula/aula-sesion.service';
+import { ExamenAulaRespuesta } from '../aula/aula.model';
 import { formatearDuracion, formatearFechaHora, formatearHora } from '../cursos/curso-formato.util';
 import { SesionAlumnoApiService } from '../sesiones/sesion-alumno-api.service';
 import { LeccionReproductorApiService } from './leccion-reproductor-api.service';
 import { MaterialAlumnoRespuesta, ProgresoVideoPeticion } from './material-alumno.model';
 
-/** Cada cuánto, como máximo, se reporta avance de un video en reproducción (además de siempre
- * reportar en pausa/fin). Evita golpear el backend en cada evento `timeupdate`. */
 const INTERVALO_REPORTE_PROGRESO_MS = 5000;
 
 type PestanaLeccion = 'descripcion' | 'materiales' | 'avance';
 
-/**
- * HU-023 / HU-024 — Pantalla de una lección dentro del aula: contenido principal (video, sesión en
- * vivo o material), acciones Anterior / Siguiente, y pestañas con descripción, materiales y avance
- * hacia el certificado. El temario y el panel de contenido son del layout (`AulaShell`): aquí solo
- * se pide lo propio de la lección (sus materiales).
- */
 @Component({
   selector: 'app-leccion-reproductor',
-  imports: [RouterLink, AvanceCertificadoBloque],
+  imports: [RouterLink, AvanceCertificadoBloque, YoutubeReproductor],
   templateUrl: './leccion-reproductor.html',
   styleUrl: './leccion-reproductor.scss',
 })
@@ -38,7 +33,6 @@ export class LeccionReproductor {
   private readonly api = inject(LeccionReproductorApiService);
   private readonly sesionApi = inject(SesionAlumnoApiService);
   private readonly alertas = inject(AlertaGlobalService);
-  private readonly sanitizer = inject(DomSanitizer);
   private readonly destroyRef = inject(DestroyRef);
   protected readonly estado = inject(AulaSesionService);
 
@@ -60,7 +54,6 @@ export class LeccionReproductor {
   protected readonly actual = this.estado.leccionActual;
   protected readonly leccion = computed(() => this.actual()?.leccion ?? null);
 
-  /** Qué se muestra: depende solo del estado real de la lección que devuelve el backend. */
   protected readonly vista = computed<'noEncontrada' | 'bloqueada' | 'sesion' | 'contenido'>(() => {
     const leccion = this.leccion();
     if (!leccion) return 'noEncontrada';
@@ -71,17 +64,12 @@ export class LeccionReproductor {
 
   protected readonly videoPrincipal = computed(() => this.materiales()?.find((m) => m.tipoRecurso === 'VIDEO') ?? null);
 
-  /** Video de YouTube embebible (solo si la URL trae un identificador válido de 11 caracteres). */
-  protected readonly youtubeEmbebido = computed<SafeResourceUrl | null>(() => {
+  protected readonly youtubeId = computed<string | null>(() => {
     const video = this.videoPrincipal();
     if (!video || video.origen !== 'YOUTUBE') return null;
-    const id = LeccionReproductor.idYoutube(video.verUrl);
-    return id
-      ? this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube-nocookie.com/embed/${id}?rel=0&modestbranding=1`)
-      : null;
+    return idYoutube(video.verUrl);
   });
 
-  /** Se completa solo (sin botón) si tiene un video SUBIDO: es el único que ESEJUR puede medir. */
   protected readonly esFinalizacionAutomatica = computed(() =>
     (this.materiales() ?? []).some((m) => m.tipoRecurso === 'VIDEO' && m.origen === 'SUBIDO'),
   );
@@ -91,12 +79,45 @@ export class LeccionReproductor {
     return siguiente && siguiente.leccion.estado !== 'BLOQUEADA' ? siguiente : null;
   });
 
-  /** Examen que frena el avance (calificado, de módulo y sin aprobar), para ofrecer rendirlo desde aquí. */
   protected readonly examenBloqueante = computed(
     () => this.estado.aula()?.modulos.flatMap((m) => m.examenes).find((e) => e.bloqueaSiguienteModulo && !e.aprobado) ?? null,
   );
 
   protected readonly esUltima = computed(() => this.estado.siguiente() === null);
+
+  protected readonly examenDelModulo = computed(() => {
+    const a = this.actual();
+    if (!a || a.numeroEnModulo !== a.modulo.lecciones.length) return null;
+    if (a.modulo.lecciones.some((l) => l.id !== a.leccion.id && l.estado !== 'COMPLETADA')) return null;
+    const pendiente = (e: ExamenAulaRespuesta) => e.tipo === 'CALIFICADO' && !e.aprobado && !examenAgotado(e);
+    const delModulo = a.modulo.examenes.find(pendiente);
+    if (delModulo) return delModulo;
+    return this.estado.siguiente() === null ? (this.estado.aula()?.examenesFinales.find(pendiente) ?? null) : null;
+  });
+
+  protected readonly examenListo = computed(() => {
+    const examen = this.examenDelModulo();
+    return examen && examen.habilitado && examen.estado !== 'EN_REVISION' ? examen : null;
+  });
+
+  protected readonly presentacion = computed(() => {
+    const a = this.actual();
+    const aula = this.estado.aula();
+    if (!a || !aula || a.numeroEnModulo !== 1) return null;
+    const numero = aula.modulos.findIndex((m) => m.id === a.modulo.id) + 1;
+    const lecciones = a.modulo.lecciones.length;
+    const examenes = a.modulo.examenes.filter((e) => e.tipo === 'CALIFICADO').length;
+    const segundos = a.modulo.lecciones.reduce((suma, l) => suma + (l.duracionSegundos ?? 0), 0);
+    return {
+      numero,
+      total: aula.modulos.length,
+      titulo: a.modulo.titulo,
+      lecciones,
+      examenes,
+      segundos,
+      pasos: aula.modulos.map((_, i) => i + 1),
+    };
+  });
 
   protected readonly pestanas = computed<{ id: PestanaLeccion; etiqueta: string }[]>(() => {
     const lista: { id: PestanaLeccion; etiqueta: string }[] = [];
@@ -126,7 +147,6 @@ export class LeccionReproductor {
         window.scrollTo({ top: 0 });
       });
 
-    // Los materiales se piden cuando la lección es consultable (no bloqueada ni sesión pendiente).
     effect(() => {
       const vista = this.vista();
       const id = this.estado.leccionActualId();
@@ -140,7 +160,6 @@ export class LeccionReproductor {
     this.pestanaElegida.set(pestana);
   }
 
-  /** "Siguiente" / "Completar lección" en una lección manual: registra una sola finalización. */
   protected completarYContinuar(): void {
     const leccion = this.leccion();
     if (!leccion || this.completando()) return;
@@ -151,7 +170,6 @@ export class LeccionReproductor {
       .subscribe({
         next: () => {
           this.completando.set(false);
-          // La siguiente lección puede quedar bloqueada (p. ej. por un examen): se decide con el estado real.
           this.estado
             .refrescar$()
             .pipe(takeUntilDestroyed(this.destroyRef))
@@ -187,13 +205,10 @@ export class LeccionReproductor {
       });
   }
 
-  // ------------------------------------------------------------ video propio --
-
   protected onLoadedMetadata(evento: Event, material: MaterialAlumnoRespuesta): void {
     const video = evento.target as HTMLVideoElement;
     if (Number.isFinite(video.duration)) {
       this.duracionPorMaterial.set(material.id, Math.round(video.duration));
-      // Retoma donde se quedó (Udemy-style), salvo que ya casi lo haya terminado.
       const posicion = material.posicionSegundos ?? 0;
       if (posicion > 5 && video.duration - posicion > 5) {
         video.currentTime = posicion;
@@ -229,13 +244,10 @@ export class LeccionReproductor {
       .registrarProgresoVideo(materialId, peticion)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        // Un reporte puntual que falle no debe interrumpir la reproducción: el siguiente lo reintenta.
         next: () => this.estado.refrescar(),
         error: () => undefined,
       });
   }
-
-  // ----------------------------------------------------------- presentación --
 
   protected etiquetaFormato(material: MaterialAlumnoRespuesta): string {
     if (material.origen === 'YOUTUBE') return 'YouTube';
@@ -245,7 +257,47 @@ export class LeccionReproductor {
     return punto >= 0 ? nombre.slice(punto + 1).toUpperCase() : material.tipoRecurso === 'VIDEO' ? 'Video' : 'Archivo';
   }
 
+  protected tipoVisual(material: MaterialAlumnoRespuesta): 'video' | 'pdf' | 'enlace' | 'archivo' {
+    if (material.tipoRecurso === 'VIDEO') return 'video';
+    if (material.origen === 'EXTERNO') return 'enlace';
+    const nombre = (material.nombreArchivo ?? '').toLowerCase();
+    return material.tipoMime === 'application/pdf' || nombre.endsWith('.pdf') ? 'pdf' : 'archivo';
+  }
+
+  protected nombreTipo(material: MaterialAlumnoRespuesta): string {
+    switch (this.tipoVisual(material)) {
+      case 'video':
+        return 'Video';
+      case 'pdf':
+        return 'Documento PDF';
+      case 'enlace':
+        return 'Lectura en línea';
+      default:
+        return 'Archivo';
+    }
+  }
+
+  protected etiquetaAbrir(material: MaterialAlumnoRespuesta): string {
+    switch (this.tipoVisual(material)) {
+      case 'video':
+        return material.origen === 'YOUTUBE' ? 'Ver en YouTube' : 'Ver video';
+      case 'pdf':
+        return 'Ver PDF';
+      case 'enlace':
+        return 'Leer artículo';
+      default:
+        return 'Abrir';
+    }
+  }
+
   protected metaMaterial(material: MaterialAlumnoRespuesta): string {
+    if (material.origen === 'EXTERNO') {
+      try {
+        return new URL(material.verUrl).hostname.replace(/^www\./, '');
+      } catch {
+        return 'Enlace externo';
+      }
+    }
     const partes = [this.etiquetaFormato(material)];
     if (material.tamanoBytes) partes.push(LeccionReproductor.formatearTamano(material.tamanoBytes));
     if (material.duracionSegundos) partes.push(formatearDuracion(material.duracionSegundos));
@@ -254,6 +306,11 @@ export class LeccionReproductor {
 
   private irAlSiguiente(): void {
     const cursoId = this.estado.cursoId();
+    const examen = this.examenListo();
+    if (examen) {
+      void this.router.navigate(['/aula', cursoId, 'examenes', examen.id]);
+      return;
+    }
     const siguiente = this.siguienteDisponible();
     if (siguiente) {
       void this.router.navigate(['/aula', cursoId, 'lecciones', siguiente.leccion.id]);
@@ -284,19 +341,6 @@ export class LeccionReproductor {
   private mensajeError(error: HttpErrorResponse): string | null {
     const cuerpo = typeof error.error === 'object' && error.error !== null ? (error.error as { message?: string }) : null;
     return cuerpo?.message ?? null;
-  }
-
-  private static idYoutube(url: string): string | null {
-    try {
-      const u = new URL(url);
-      let id: string | null = null;
-      if (u.hostname.includes('youtu.be')) id = u.pathname.slice(1);
-      else if (u.searchParams.get('v')) id = u.searchParams.get('v');
-      else id = u.pathname.match(/\/(?:embed|shorts|live)\/([^/?]+)/)?.[1] ?? null;
-      return id && /^[A-Za-z0-9_-]{11}$/.test(id) ? id : null;
-    } catch {
-      return null;
-    }
   }
 
   private static formatearTamano(bytes: number): string {

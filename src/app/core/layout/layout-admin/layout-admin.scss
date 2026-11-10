@@ -1,17 +1,8 @@
-// Layout administrativo: navbar superior + riel de navegación angosto (HU-008). Ancho colapsado,
-// texto blanco, activo con línea turquesa y panel móvil superpuesto parten del sistema de diseño
-// (detalles/04-DISENO-UX-UI/01-SISTEMA-DE-DISENO-Y-COMPONENTES.md, §12.3), adaptado a un navbar +
-// riel en vez de un sidebar ancho fijo. El fondo es --neutral-950 (grafito), no el #103860 del
-// documento: decisión pedida explícitamente para dar un look más neutro/tecnológico; el turquesa
-// de acento sigue siendo el mismo.
-
 $alto-navbar: 60px;
 $ancho-riel: 232px;
 $ancho-drawer-movil: 248px;
 $punto-quiebre-movil: 767px;
 
-// height (no min-height) + overflow hidden: el documento nunca se desplaza como un todo; solo
-// .admin-contenido se desplaza, así el navbar y el riel quedan siempre a la vista.
 .admin-shell {
   display: flex;
   flex-direction: column;
@@ -19,8 +10,6 @@ $punto-quiebre-movil: 767px;
   overflow: hidden;
   background: var(--neutral-050);
 }
-
-// ------------------------------------------------------------------- Navbar --
 
 .admin-navbar {
   position: sticky;
@@ -56,7 +45,7 @@ $punto-quiebre-movil: 767px;
 
 .admin-navbar__logo {
   display: block;
-  height: 26px;
+  height: 34px;
   width: auto;
 }
 
@@ -149,8 +138,6 @@ $punto-quiebre-movil: 767px;
   max-width: 100%;
 }
 
-// -------------------------------------------------------------- Riel + contenido --
-
 .admin-body {
   display: flex;
   flex: 1;
@@ -232,8 +219,6 @@ $punto-quiebre-movil: 767px;
   overflow-y: auto;
 }
 
-// ------------------------------------------------------------------- Móvil --
-
 @media (max-width: $punto-quiebre-movil) {
   .admin-navbar {
     gap: 8px;
@@ -251,7 +236,6 @@ $punto-quiebre-movil: 767px;
     padding: 6px 10px;
   }
 
-  // Solo el ícono: con tantos elementos, el texto no cabe en pantallas angostas.
   .admin-navbar__sitio span {
     display: none;
   }
@@ -268,7 +252,6 @@ $punto-quiebre-movil: 767px;
     display: none;
   }
 
-  // Solo el ícono: con el nombre oculto, el texto "Salir" ya no cabe en pantallas angostas.
   .admin-navbar__salir span {
     display: none;
   }

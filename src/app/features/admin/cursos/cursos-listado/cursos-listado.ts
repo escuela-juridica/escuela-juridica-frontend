@@ -9,8 +9,6 @@ import { Modal } from '../../../../shared/ui/modal/modal';
 import { CursoAdminApiService } from '../curso-admin-api.service';
 import { CursoResumenRespuesta } from '../curso-admin.model';
 
-/** HU-010 — Listado administrativo de cursos: paginado server-side, con botón para crear un
- * borrador y entrar directo al editor. */
 @Component({
   selector: 'app-cursos-listado',
   imports: [FormsModule, Modal],

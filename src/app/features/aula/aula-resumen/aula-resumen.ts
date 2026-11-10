@@ -1,17 +1,17 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { AlertaGlobalService } from '../../../core/notificaciones/alerta-global.service';
 import { AnilloProgreso } from '../../../shared/ui/anillo-progreso/anillo-progreso';
-import { formatearFechaHora } from '../../cursos/curso-formato.util';
+import { formatearFechaHora, urlPortadaCurso } from '../../cursos/curso-formato.util';
 import { SesionAlumnoApiService } from '../../sesiones/sesion-alumno-api.service';
 import { CertificacionBloque } from '../../certificacion/certificacion-bloque/certificacion-bloque';
+import { AulaModulosLista } from '../aula-modulos-lista/aula-modulos-lista';
 import { AvanceCertificadoBloque } from '../avance-certificado/avance-certificado';
 import { AulaSesionService, LeccionDelCurso } from '../aula-sesion.service';
 import { ExamenAulaRespuesta } from '../aula.model';
 
-/** Un examen del curso con el módulo al que pertenece (o ninguno si es final). */
 export interface ExamenDelCurso {
   examen: ExamenAulaRespuesta;
   modulo: string | null;
@@ -19,12 +19,9 @@ export interface ExamenDelCurso {
 
 export type PestanaResumen = 'resumen' | 'evaluaciones' | 'certificado';
 
-/** HU-022 / HU-025 — Resumen del curso: portada con el avance y el siguiente paso, y pestañas con lo
- * que sigue (sesiones y requisitos), las evaluaciones y el certificado. Es lo que se ve al entrar al
- * aula, antes de abrir una lección. */
 @Component({
   selector: 'app-aula-resumen',
-  imports: [RouterLink, AvanceCertificadoBloque, CertificacionBloque, AnilloProgreso],
+  imports: [RouterLink, AulaModulosLista, AvanceCertificadoBloque, CertificacionBloque, AnilloProgreso],
   templateUrl: './aula-resumen.html',
   styleUrl: './aula-resumen.scss',
 })
@@ -34,22 +31,39 @@ export class AulaResumen {
   private readonly alertas = inject(AlertaGlobalService);
 
   protected readonly ingresando = signal<number | null>(null);
-  protected readonly pestana = signal<PestanaResumen>('resumen');
+  private readonly ruta = inject(ActivatedRoute);
+  protected readonly pestana = signal<PestanaResumen>(AulaResumen.pestanaInicial(this.ruta.snapshot.queryParamMap.get('pestana')));
   protected readonly formatearFechaHora = formatearFechaHora;
 
-  /** La lección donde seguir, solo si todavía hay algo por hacer en ella. */
+  protected readonly solicitudCertificado = signal(0);
+
+  private static pestanaInicial(valor: string | null): PestanaResumen {
+    return valor === 'certificado' || valor === 'evaluaciones' ? valor : 'resumen';
+  }
+
+  protected verCertificado(): void {
+    this.solicitudCertificado.update((n) => n + 1);
+    this.irAPestana('certificado');
+  }
+
+  protected irAPestana(destino: PestanaResumen): void {
+    this.pestana.set(destino);
+    setTimeout(() => {
+      document.querySelector('.pestanas')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+  protected readonly urlPortada = urlPortadaCurso;
+
   protected readonly continuar = computed<LeccionDelCurso | null>(() => {
     const destino = this.estado.leccionParaContinuar();
     return destino && destino.leccion.estado !== 'COMPLETADA' ? destino : null;
   });
 
-  /** Primer motivo de bloqueo cuando no queda nada disponible (p. ej. un examen pendiente). */
   protected readonly bloqueo = computed(() => {
     if (this.continuar()) return null;
     return this.estado.lecciones().find((l) => l.leccion.estado === 'BLOQUEADA')?.leccion.motivoBloqueo ?? null;
   });
 
-  /** Todos los exámenes del curso (de módulo y final), en el orden del temario. */
   protected readonly examenes = computed<ExamenDelCurso[]>(() => {
     const aula = this.estado.aula();
     if (!aula) return [];
@@ -59,12 +73,10 @@ export class AulaResumen {
     ];
   });
 
-  /** El examen que frena el avance (calificado, de módulo y sin aprobar), para ofrecer rendirlo ya. */
   protected readonly examenBloqueante = computed(
     () => this.examenes().find((e) => e.examen.bloqueaSiguienteModulo && !e.examen.aprobado)?.examen ?? null,
   );
 
-  /** Cifras del curso para la portada. */
   protected readonly cifras = computed(() => {
     const aula = this.estado.aula();
     const lecciones = this.estado.lecciones();

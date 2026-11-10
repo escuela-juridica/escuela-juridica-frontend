@@ -1,4 +1,3 @@
-/** HU-040 — Atención de quejas y reclamos (administrador). Espejo de los DTO del backend. */
 export type EstadoReclamacion = 'PENDIENTE_RESPUESTA' | 'RESPONDIDO';
 export type PlazoReclamacion = 'EN_PLAZO' | 'POR_VENCER' | 'VENCIDO';
 export type EstadoRespuesta = 'SIN_RESPUESTA' | 'PENDIENTE' | 'ENVIADO' | 'ERROR';
@@ -13,7 +12,6 @@ export interface ReclamacionBandeja {
   correo: string;
   registradoEn: string;
   fechaLimite: string;
-  /** Solo para los pendientes. */
   plazo: PlazoReclamacion | null;
   diasHabilesRestantes: number;
   imagenes: number;

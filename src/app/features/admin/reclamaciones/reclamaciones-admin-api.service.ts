@@ -6,7 +6,6 @@ import { API_URL } from '../../../core/api/api.config';
 import { PageResponse } from '../../../core/api/page-response.model';
 import { ReclamacionBandeja, ReclamacionDetalle } from './reclamaciones-admin.model';
 
-/** HU-040 — Consume `/api/admin/reclamaciones`. */
 @Injectable({ providedIn: 'root' })
 export class ReclamacionesAdminApiService {
   private readonly http = inject(HttpClient);
@@ -21,7 +20,6 @@ export class ReclamacionesAdminApiService {
     return this.http.get<ReclamacionDetalle>(`${this.url}/${id}`);
   }
 
-  /** La imagen es privada: se pide con la sesión y se muestra desde un blob. */
   adjunto(id: number, adjuntoId: number): Observable<Blob> {
     return this.http.get(`${this.url}/${id}/adjuntos/${adjuntoId}`, { responseType: 'blob' });
   }

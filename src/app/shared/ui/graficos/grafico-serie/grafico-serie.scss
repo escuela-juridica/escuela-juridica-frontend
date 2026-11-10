@@ -60,14 +60,12 @@
   pointer-events: none;
 }
 
-// El aviso lleva fondo propio para no cruzarse con la cuadrícula.
 .serie__vacio span {
   padding: 4px 12px;
   border-radius: 999px;
   background: var(--blanco, #fff);
 }
 
-// Una sola lectura con el valor primero y el periodo después.
 .serie__tip {
   position: absolute;
   top: 6px;

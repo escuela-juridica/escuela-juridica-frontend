@@ -5,8 +5,6 @@ import { TestBed } from '@angular/core/testing';
 import { API_URL } from '../../core/api/api.config';
 import { CertificacionApiService } from './certificacion-api.service';
 
-/** EP05 · HU-032 a HU-034 — Estado de la certificación, confirmación de datos, emisión, mis certificados,
- * descarga y verificación pública. */
 describe('CertificacionApiService', () => {
   let servicio: CertificacionApiService;
   let http: HttpTestingController;
@@ -68,11 +66,13 @@ describe('CertificacionApiService', () => {
 
   it('lista solo los certificados del alumno autenticado', () => {
     let cantidad = -1;
-    servicio.misCertificados().subscribe((lista) => (cantidad = lista.length));
+    servicio.misCertificados(0, 10).subscribe((pagina) => (cantidad = pagina.items.length));
 
-    const solicitud = http.expectOne(`${API_URL}/app/certificados`);
+    const solicitud = http.expectOne((r) => r.url === `${API_URL}/app/certificados`);
     expect(solicitud.request.method).toBe('GET');
-    solicitud.flush([{ codigo: 'ESEJUR-2026-ABCD2345', estado: 'VIGENTE' }]);
+    expect(solicitud.request.params.get('page')).toBe('0');
+    expect(solicitud.request.params.get('size')).toBe('10');
+    solicitud.flush({ items: [{ codigo: 'ESEJUR-2026-ABCD2345', estado: 'VIGENTE' }], page: 0, size: 10, totalElements: 1, totalPages: 1, first: true, last: true });
 
     expect(cantidad).toBe(1);
   });

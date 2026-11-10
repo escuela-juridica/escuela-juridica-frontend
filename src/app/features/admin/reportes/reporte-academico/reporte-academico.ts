@@ -14,8 +14,6 @@ import {
   SituacionAcademica,
 } from './reporte-academico.model';
 
-/** HU-043 — Reporte de seguimiento académico. Una fila por matrícula, con solo las condiciones que
- * el curso exige (valor real y meta). Tabla y Excel comparten la misma consulta y los mismos filtros. */
 @Component({
   selector: 'app-reporte-academico',
   imports: [FormsModule, DatePipe, RouterLink, RouterLinkActive],
@@ -34,7 +32,6 @@ export class ReporteAcademicoPantalla {
   protected readonly totalPaginas = signal(0);
   protected readonly totalFilas = signal(0);
 
-  /** Guía §32: en la primera línea solo rango, curso y búsqueda; el resto va en "Más filtros". */
   protected readonly masFiltros = signal(false);
 
   protected texto = '';

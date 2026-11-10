@@ -1,10 +1,8 @@
-/** HU-042 — Reporte de pagos registrados (administrador). Espejo de los DTO del backend. */
 export type EstadoPago = 'PENDIENTE' | 'APROBADO' | 'RECHAZADO' | 'ERROR' | 'EXPIRADO' | 'REGISTRADO_MANUAL' | 'EXONERADO';
 export type OrigenPago = 'EN_LINEA' | 'MANUAL' | 'EXONERADO';
 
 export interface ReportePago {
   pagoId: number;
-  /** Fecha del resultado (Culqi o registro administrativo); mientras sigue PENDIENTE, la del inicio. */
   fecha: string;
   alumno: string;
   correo: string;
@@ -17,7 +15,6 @@ export interface ReportePago {
   referencia: string | null;
   origen: OrigenPago;
   motivo: string | null;
-  /** `true` solo para APROBADO y REGISTRADO_MANUAL con monto mayor que cero. */
   suma: boolean;
 }
 

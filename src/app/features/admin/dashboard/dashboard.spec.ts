@@ -26,7 +26,6 @@ function dashboard(extra: Partial<Dashboard> = {}): Dashboard {
   };
 }
 
-/** EP06 · HU-046 — Dashboard administrativo: cuatro gráficos bajo los mismos filtros, con rango, curso y modalidad. */
 describe('DashboardPantalla', () => {
   let fixture: ComponentFixture<DashboardPantalla>;
   let http: HttpTestingController;
@@ -166,7 +165,6 @@ describe('DashboardPantalla', () => {
   }
 });
 
-/** EP06 · HU-046 — Consulta del dashboard con filtros opcionales. */
 describe('DashboardApiService', () => {
   let servicio: DashboardApiService;
   let http: HttpTestingController;

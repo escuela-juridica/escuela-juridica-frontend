@@ -35,14 +35,12 @@ function aula(lecciones: LeccionAulaRespuesta[], ultima: number | null, examenes
   };
 }
 
-/** EP04 · HU-022 / HU-026 — Resumen del aula: "Continuar", bloqueos, próximas sesiones e ingreso a una sesión en vivo. */
 describe('AulaResumen', () => {
   let fixture: ComponentFixture<AulaResumen>;
   let componente: AulaResumen;
   let estado: AulaSesionService;
   let http: HttpTestingController;
 
-  /** Los miembros protegidos son parte de lo que ve la plantilla: se consultan por nombre. */
   const leer = <T>(nombre: string): T => (componente as unknown as Record<string, () => T>)[nombre]();
 
   function cargar(respuesta: AulaRespuesta): void {
@@ -158,7 +156,6 @@ describe('AulaResumen', () => {
     ingresar(sesion);
     ingresar(sesion);
 
-    // expectOne falla si el segundo clic hubiera generado otra petición.
     http.expectOne(`${API_URL}/app/lecciones/21/sesion/ingresar`).flush({ enlaceReunion: 'https://meet.example.com/x' });
     expect(abrir).toHaveBeenCalledTimes(1);
     http.expectOne(`${API_URL}/aula/cursos/7`).flush(aula([leccion(21, 'DISPONIBLE')], 21));

@@ -5,7 +5,6 @@ import { Observable } from 'rxjs';
 import { API_URL } from '../../core/api/api.config';
 import { PresentarReclamacion, ReclamacionConstancia, ReclamacionPrecarga } from './reclamacion.model';
 
-/** HU-039 — Consume el Libro de Reclamaciones: con sesión el caso queda ligado a la cuenta. */
 @Injectable({ providedIn: 'root' })
 export class ReclamacionesApiService {
   private readonly http = inject(HttpClient);

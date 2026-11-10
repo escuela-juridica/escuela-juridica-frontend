@@ -28,7 +28,6 @@ const ETIQUETAS_SECCION: Record<string, string> = {
   DOCENTES: 'Docentes',
 };
 
-// A qué pestaña del editor pertenece cada hallazgo, para el botón "Ir a corregir".
 const PESTANA_POR_SECCION: Record<string, string> = {
   INFORMACION: 'informacion',
   FECHAS: 'informacion',
@@ -41,11 +40,6 @@ const PESTANA_POR_SECCION: Record<string, string> = {
   REGLAS: 'certificacion',
 };
 
-/** HU-015 — Valida un borrador y, si no hay bloqueos, lo publica (o lo pasa directamente a
- * EN_CURSO cuando es virtual sin fecha de inicio). HU-016 — Una vez publicado, administra el resto
- * del ciclo de vida: adelantar/retrasar el inicio, cerrar anticipadamente, destacar y duplicar
- * como una nueva convocatoria. HU-038 — La cancelación completa (y el seguimiento de afectados) vive en
- * {@link CancelacionCursoPanel}. */
 @Component({
   selector: 'app-publicacion-tab',
   imports: [CancelacionCursoPanel],
@@ -62,8 +56,6 @@ export class PublicacionTab implements OnChanges {
   @Input() fechaFin: string | null = null;
   @Output() irAPestana = new EventEmitter<string>();
   @Output() publicado = new EventEmitter<void>();
-  // HU-016: cualquier acción de ciclo de vida que cambie el curso (adelantar, retrasar, cerrar,
-  // destacar) — el editor debe refrescar estadoCodigo/fechas igual que tras publicar.
   @Output() actualizado = new EventEmitter<void>();
 
   private readonly api = inject(CursoAdminApiService);
@@ -155,7 +147,6 @@ export class PublicacionTab implements OnChanges {
     this.irAPestana.emit(pestana);
   }
 
-  // Mismo mapeo que CursosListado.claseEstado, para que el badge se vea igual en todo el admin.
   protected claseEstado(estadoCodigo: string): string {
     switch (estadoCodigo) {
       case 'BORRADOR': return 'badge--disp-proximo';
@@ -167,8 +158,6 @@ export class PublicacionTab implements OnChanges {
     }
   }
 
-  // El backend exige una fecha estrictamente posterior a la actual; el mínimo del selector debe
-  // ser el día siguiente, no el mismo día (que el backend rechazaría con un 400 confuso).
   protected minFechaRetraso(): string {
     if (!this.fechaInicio) {
       return '';

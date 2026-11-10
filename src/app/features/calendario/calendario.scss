@@ -1,7 +1,3 @@
-// HU-026 · Calendario de sesiones en vivo del alumno — grilla mensual tipo Google Calendar
-// (FullCalendar v7, sin theme: ver nota abajo sobre por qué se estiliza con ::ng-deep).
-
-// Mismo tamaño de título de pantalla que Panel y Mi perfil (28/36 px), en escritorio y móvil.
 .calendario-titulo {
   font-size: 28px;
   line-height: 36px;
@@ -55,10 +51,6 @@
   font-size: 13px;
 }
 
-// FullCalendar v7 pinta su grilla con <div> y clases hasheadas por build (no hay <table>/<th>/<td>
-// ni clases estables tipo .fc-day-today), y fuera del motor de templates de Angular, así que se
-// estiliza con ::ng-deep apoyándose en los atributos ARIA role (estables por accesibilidad) y en
-// las clases propias que calendario.ts inyecta vía dayCellDidMount/eventDidMount.
 .calendario-grilla {
   border: 1px solid var(--neutral-200);
   border-radius: var(--radio-lg);
@@ -71,9 +63,7 @@
     font-family: var(--fuente-interfaz);
   }
 
-  // Encabezado de días de la semana.
   ::ng-deep [role='columnheader'] {
-    // FullCalendar fija padding/border en 0 con más fuerza que una regla normal: !important.
     padding: 10px 4px !important;
     align-items: center !important;
     justify-content: center !important;
@@ -91,7 +81,6 @@
     border-right: 0 !important;
   }
 
-  // Celdas de día.
   ::ng-deep [role='cell'] {
     min-height: 112px;
     padding: 2px 4px 6px !important;
@@ -108,7 +97,6 @@
     border-bottom: 0 !important;
   }
 
-  // Número del día: centrado arriba, como Google Calendar.
   ::ng-deep [role='cell'] > [role='presentation']:first-child > div:last-child {
     width: 26px;
     height: 26px;
@@ -127,7 +115,6 @@
     color: var(--neutral-400);
   }
 
-  // Hoy: círculo de color de marca sobre el número, y un leve fondo en la celda.
   ::ng-deep .calendario-dia-hoy {
     background: var(--acento-050);
     color: var(--neutral-800);
@@ -139,7 +126,6 @@
     font-weight: 700;
   }
 
-  // Chips de sesión: hora + título en una línea, colores por estado vía --fc-event-*.
   ::ng-deep .calendario-evento {
     display: block;
     border: none !important;
@@ -211,7 +197,6 @@
   color: var(--neutral-500);
 }
 
-// Contenido del modal de detalle de sesión (abierto al hacer click en un evento de la grilla).
 .modal-sesion__titulo {
   font-size: 18px;
   line-height: 26px;
@@ -254,8 +239,6 @@
     padding: 8px 0;
   }
 
-  // En pantallas angostas la sesión no cabe como texto: se muestra como un punto del color de
-  // su estado (tocarlo abre el detalle), igual que en la app móvil de Google Calendar.
   .calendario-grilla ::ng-deep .calendario-evento {
     width: 9px;
     height: 9px;
@@ -273,7 +256,6 @@
   }
 }
 
-// Guía §26 — alternar entre Mes y Lista (vistas alternas, nunca ambas a la vez).
 .calendario-vistas {
   display: flex;
   width: fit-content;
@@ -314,7 +296,6 @@
   display: none;
 }
 
-// Vista Lista: sesiones del mes agrupadas por día.
 .calendario-lista {
   display: flex;
   flex-direction: column;

@@ -1,11 +1,11 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 
 import { API_URL, resolverUrlApi } from '../../core/api/api.config';
+import { PageResponse } from '../../core/api/page-response.model';
 import { Certificacion, ConfirmarDatos, MiCertificado, VerificacionCertificado } from './certificacion.model';
 
-/** HU-032 — Consume `/api/app/cursos/{cursoId}/certificacion`. */
 @Injectable({ providedIn: 'root' })
 export class CertificacionApiService {
   private readonly http = inject(HttpClient);
@@ -23,15 +23,11 @@ export class CertificacionApiService {
     return this.http.post<Certificacion>(`${this.base}/${cursoId}/certificacion/emitir`, {});
   }
 
-  /** HU-033: los certificados del alumno autenticado. */
-  misCertificados(): Observable<MiCertificado[]> {
-    return this.http.get<MiCertificado[]>(`${API_URL}/app/certificados`);
+  misCertificados(pagina: number, tamano: number): Observable<PageResponse<MiCertificado>> {
+    const params = new HttpParams().set('page', pagina).set('size', tamano);
+    return this.http.get<PageResponse<MiCertificado>>(`${API_URL}/app/certificados`, { params });
   }
 
-  /**
-   * Descarga el PDF privado y lo guarda como {@code certificado-CODIGO.pdf}. El nombre y la extensión
-   * los fija la aplicación, para que no dependan de cómo cada navegador nombre una descarga.
-   */
   descargarPdf(descargaUrl: string, codigo: string): Observable<void> {
     return this.http.get(resolverUrlApi(descargaUrl), { responseType: 'blob' }).pipe(
       map((contenido) => {
@@ -47,7 +43,6 @@ export class CertificacionApiService {
     );
   }
 
-  /** HU-034: consulta pública (sin sesión) por código. Un código inexistente responde 404. */
   verificar(codigo: string): Observable<VerificacionCertificado> {
     return this.http.get<VerificacionCertificado>(`${API_URL}/publico/certificados/${encodeURIComponent(codigo.trim())}`);
   }

@@ -1,0 +1,86 @@
+<ol class="modulos">
+  @for (modulo of aula().modulos; track modulo.id; let i = $index) {
+    @let estadoDelModulo = estadoDe(modulo);
+    <li>
+      <a class="modulo"
+        [class.modulo--hecho]="estadoDelModulo === 'COMPLETADO'"
+        [class.modulo--actual]="estadoDelModulo === 'EN_CURSO'"
+        [class.modulo--bloqueado]="estadoDelModulo === 'BLOQUEADO'"
+        [routerLink]="['/aula', aula().cursoId, 'modulos', modulo.id]">
+        <span class="modulo__marca" aria-hidden="true">
+          @switch (estadoDelModulo) {
+            @case ('COMPLETADO') {
+              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" /></svg>
+              <span class="modulo__insignia"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5" /></svg></span>
+            }
+            @case ('BLOQUEADO') {
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>
+            }
+            @default {
+              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" /></svg>
+            }
+          }
+        </span>
+
+        <span class="modulo__texto">
+          <span class="modulo__eyebrow">Módulo {{ i + 1 }}</span>
+          <span class="modulo__titulo">{{ modulo.titulo }}</span>
+          <span class="modulo__meta">
+            <span class="modulo__dato">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>
+              {{ completadas(modulo) }} de {{ modulo.lecciones.length }} {{ modulo.lecciones.length === 1 ? 'lección' : 'lecciones' }}
+            </span>
+            @if (modulo.examenes.length > 0) {
+              <span class="modulo__dato">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg>
+                Con evaluación
+              </span>
+            }
+          </span>
+          <span class="modulo__avance">
+            <span class="modulo__pista" aria-hidden="true"><span class="modulo__relleno" [style.width.%]="porcentaje(modulo)"></span></span>
+            <span class="modulo__porcentaje">{{ porcentaje(modulo) }} %</span>
+          </span>
+        </span>
+
+        <span class="modulo__estado">
+          @if (estadoDelModulo === 'EN_CURSO') { <span class="modulo__punto" aria-hidden="true"></span> }
+          {{ etiqueta(estadoDelModulo) }}
+        </span>
+        <span class="modulo__flecha" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6" /></svg>
+        </span>
+      </a>
+    </li>
+  }
+
+  @for (examen of aula().examenesFinales; track examen.id) {
+    <li>
+      <a class="modulo modulo--examen"
+        [class.modulo--hecho]="examen.aprobado"
+        [class.modulo--bloqueado]="!examen.habilitado && !examen.aprobado"
+        [routerLink]="['/aula', aula().cursoId, 'examenes', examen.id]">
+        <span class="modulo__marca" aria-hidden="true">
+          @if (!examen.habilitado && !examen.aprobado) {
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>
+          } @else {
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4" /><path d="M7 4h10v5a5 5 0 0 1-10 0z" /><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3" /></svg>
+            @if (examen.aprobado) {
+              <span class="modulo__insignia"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5" /></svg></span>
+            }
+          }
+        </span>
+        <span class="modulo__texto">
+          <span class="modulo__eyebrow">Evaluación final</span>
+          <span class="modulo__titulo">{{ examen.titulo }}</span>
+          <span class="modulo__meta">
+            <span class="modulo__dato" [class.modulo__dato--aviso]="!examen.habilitado && !examen.aprobado">{{ textoExamen(examen) }}</span>
+          </span>
+        </span>
+        <span class="modulo__flecha" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6" /></svg>
+        </span>
+      </a>
+    </li>
+  }
+</ol>

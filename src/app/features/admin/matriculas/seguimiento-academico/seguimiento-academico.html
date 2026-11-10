@@ -53,7 +53,6 @@
 
       <div class="seg__panel" role="tabpanel">
         @switch (pestana()) {
-          <!-- ------------------------------------------------ Lecciones -->
           @case ('lecciones') {
             @for (m of d.modulos; track m.id) {
               <h3 class="seg__modulo">{{ m.titulo }}</h3>
@@ -79,7 +78,6 @@
             }
           }
 
-          <!-- ------------------------------------------------ Exámenes -->
           @case ('examenes') {
             @for (e of d.examenes; track e.id) {
               <article class="seg__examen">
@@ -124,7 +122,6 @@
             }
           }
 
-          <!-- ------------------------------------------------ Asistencia -->
           @case ('asistencia') {
             <ul class="seg__filas">
               @for (s of d.sesiones; track s.leccionId) {
@@ -149,7 +146,6 @@
             </ul>
           }
 
-          <!-- ------------------------------------------------ Excepciones -->
           @case ('historial') {
             <ul class="seg__filas">
               @for (x of d.excepciones; track x.id) {
@@ -172,7 +168,6 @@
       </div>
     </section>
 
-    <!-- ===================================== Modal: intento adicional -->
     @if (examenAConceder(); as e) {
       <app-modal titulo="Conceder un intento adicional" (cerrar)="cerrarModal()">
         @if (errorModal(); as mensaje) {
@@ -191,7 +186,6 @@
       </app-modal>
     }
 
-    <!-- ===================================== Modal: corregir asistencia -->
     @if (sesionACorregir(); as s) {
       <app-modal titulo="Corregir asistencia" (cerrar)="cerrarModal()">
         @if (errorModal(); as mensaje) {

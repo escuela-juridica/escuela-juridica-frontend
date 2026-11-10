@@ -1,4 +1,3 @@
-/** HU-030 — Calificar respuestas abiertas (administrador). Espejo de los DTO del backend. */
 export type PlazoRevision = 'VENCIDO' | 'PROXIMO' | 'EN_PLAZO';
 
 export interface IntentoPendiente {
@@ -14,7 +13,6 @@ export interface IntentoPendiente {
   enviadoEn: string;
   fechaLimite: string;
   plazo: PlazoRevision;
-  /** Negativo cuando ya está vencido. */
   minutosRestantes: number;
   respuestasPendientes: number;
 }
@@ -32,7 +30,6 @@ export interface PreguntaRevision {
   puntajeMaximo: number;
   texto: string | null;
   estadoRevision: 'PENDIENTE' | 'REVISADA' | 'NO_APLICA';
-  /** Solo existe si la respuesta ya fue revisada. */
   puntajeAsignado: number | null;
   observacion: string | null;
   revisadoEn: string | null;
@@ -54,7 +51,6 @@ export interface RevisionIntento {
   fechaLimite: string | null;
   plazo: PlazoRevision | null;
   puntajeTotal: number;
-  /** Lo que ya sumaron las preguntas objetivas. */
   puntajeObjetivo: number;
   notaMinima: number;
   nota: number | null;

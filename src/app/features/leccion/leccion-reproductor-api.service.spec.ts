@@ -5,7 +5,6 @@ import { TestBed } from '@angular/core/testing';
 import { API_URL } from '../../core/api/api.config';
 import { LeccionReproductorApiService } from './leccion-reproductor-api.service';
 
-/** EP04 · HU-023 / HU-024 — Materiales protegidos y registro de progreso de la lección. */
 describe('LeccionReproductorApiService', () => {
   let servicio: LeccionReproductorApiService;
   let http: HttpTestingController;

@@ -1,9 +1,4 @@
-// Tokens del sistema de diseño ESEJUR.
-// Fuente: detalles/04-DISENO-UX-UI/01-SISTEMA-DE-DISENO-Y-COMPONENTES.md
-// No inventar valores nuevos aqui: si falta un token, revisar ese documento primero.
-
 :root {
-  // Marca
   --marca-900: #103860;
   --marca-800: #164a73;
   --marca-700: #1f5f8b;
@@ -15,7 +10,6 @@
   --rojo-marca-050: #fff1f3;
   --blanco: #ffffff;
 
-  // Complementarios
   --violeta-700: #6941c6;
   --violeta-050: #f4f3ff;
   --celeste-700: #026aa2;
@@ -25,7 +19,6 @@
   --dorado-500: #f4b740;
   --dorado-050: #fff8e1;
 
-  // Neutrales
   --neutral-950: #101828;
   --neutral-800: #344054;
   --neutral-600: #475467;
@@ -36,7 +29,6 @@
   --neutral-100: #f2f4f7;
   --neutral-050: #f8fafc;
 
-  // Semanticos
   --exito: #027a48;
   --exito-fondo: #ecfdf3;
   --exito-borde: #abefc6;
@@ -50,10 +42,8 @@
   --informacion-fondo: #eff8ff;
   --informacion-borde: #b2ddff;
 
-  // Foco de teclado (igual al prototipo: :focus-visible)
   --foco: #a6f4f4;
 
-  // Espaciado (base 8px)
   --esp-01: 4px;
   --esp-02: 8px;
   --esp-03: 12px;
@@ -67,7 +57,6 @@
   --esp-20: 80px;
   --esp-24: 96px;
 
-  // Radios
   --radio-xs: 4px;
   --radio-sm: 6px;
   --radio-md: 8px;
@@ -75,19 +64,15 @@
   --radio-xl: 16px;
   --radio-completo: 999px;
 
-  // Sombras
   --sombra-xs: 0 1px 2px rgba(16, 24, 40, 0.06);
   --sombra-sm: 0 2px 8px rgba(16, 24, 40, 0.08);
   --sombra-md: 0 8px 24px rgba(16, 24, 40, 0.12);
   --sombra-lg: 0 20px 40px rgba(16, 24, 40, 0.18);
 
-  // Tipografia
   --fuente-interfaz: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     Helvetica, Arial, sans-serif;
   --fuente-editorial: "Merriweather", Georgia, serif;
 
-  // ---- Tokens de componente (mas especificos, se apoyan en la paleta de arriba) ----
-  // Botones
   --boton-primario-bg: var(--marca-900);
   --boton-primario-bg-hover: var(--marca-800);
   --boton-primario-fg: var(--blanco);
@@ -103,7 +88,6 @@
   --boton-neutro-borde: var(--neutral-300);
   --boton-neutro-fg: var(--neutral-800);
 
-  // Campos de entrada
   --input-alto: 48px;
   --input-borde: var(--neutral-300);
   --input-borde-error: var(--error);
@@ -116,13 +100,11 @@
   --input-etiqueta: var(--neutral-800);
   --input-ayuda-dorado: #b8860b;
 
-  // Tarjetas
   --tarjeta-fondo: var(--blanco);
   --tarjeta-borde: var(--neutral-200);
   --tarjeta-sombra: var(--sombra-xs);
   --tarjeta-acento-superior: linear-gradient(90deg, var(--marca-900) 0%, var(--acento-700) 100%);
 
-  // Eyebrow (guion + texto en mayusculas antes de un titulo)
   --eyebrow-color: var(--rojo-marca-600);
 
 }

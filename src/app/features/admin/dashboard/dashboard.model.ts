@@ -1,4 +1,3 @@
-/** HU-046 — Datos de los cuatro gráficos del dashboard administrativo. Espejo del DTO del backend. */
 export interface PuntoDashboard {
   periodo: string;
   etiqueta: string;

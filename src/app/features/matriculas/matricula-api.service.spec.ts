@@ -5,7 +5,6 @@ import { TestBed } from '@angular/core/testing';
 import { API_URL } from '../../core/api/api.config';
 import { MatriculaApiService } from './matricula-api.service';
 
-/** EP06 · HU-017 / HU-019 / HU-020 / HU-041 — Matrículas: mis cursos, gratuita, administrativa, cancelación y reporte. */
 describe('MatriculaApiService', () => {
   let servicio: MatriculaApiService;
   let http: HttpTestingController;

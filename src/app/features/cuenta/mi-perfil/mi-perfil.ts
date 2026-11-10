@@ -112,18 +112,6 @@ export class MiPerfil implements OnInit {
         });
     }
 
-    // Los nombres se guardan en mayúsculas (igual que en el registro), para que coincidan
-    // con el formato de los documentos de identidad.
-    for (const nombre of ['nombres', 'apellidoPaterno', 'apellidoMaterno'] as const) {
-      const control = this.formulario.controls[nombre];
-      control.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((valor) => {
-        const mayuscula = valor.toLocaleUpperCase('es-PE');
-        if (valor !== mayuscula) {
-          control.setValue(mayuscula, { emitEvent: false });
-        }
-      });
-    }
-
     for (const nombre of ['contrasena', 'confirmarContrasena'] as const) {
       this.formularioContrasena.controls[nombre].valueChanges
         .pipe(takeUntilDestroyed(this.destroyRef))
@@ -147,8 +135,6 @@ export class MiPerfil implements OnInit {
     this.pestana.set(pestana);
   }
 
-  /** Toda cuenta tiene alguna acción en Seguridad: crear su primera contraseña (Google sin
-   * contraseña) o cambiar la que ya tiene. */
   protected get mostrarPestanaSeguridad(): boolean {
     return this.perfil() !== null;
   }

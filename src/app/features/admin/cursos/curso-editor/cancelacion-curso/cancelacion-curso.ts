@@ -12,11 +12,6 @@ import { CancelacionAfectado, CancelacionCurso } from '../../curso-admin.model';
 
 const TAMANO_PAGINA = 10;
 
-/**
- * HU-038 — Cancelación completa de un curso (zona de riesgo de la pestaña Publicación). Antes de confirmar muestra el
- * impacto (alumnos, pagos en proceso, sesiones futuras); después de cancelar muestra a los afectados y el estado de
- * su aviso, con reintento de los fallidos. ESEJUR no devuelve dinero: los pagos se atienden en Excepciones de pago.
- */
 @Component({
   selector: 'app-cancelacion-curso',
   imports: [ReactiveFormsModule, DatePipe, RouterLink, Modal],
@@ -26,7 +21,6 @@ const TAMANO_PAGINA = 10;
 export class CancelacionCursoPanel implements OnChanges {
   @Input({ required: true }) cursoId!: number;
   @Input({ required: true }) estadoCodigo!: string;
-  /** El editor debe refrescar el estado del curso tras cancelarlo. */
   @Output() actualizado = new EventEmitter<void>();
 
   private readonly api = inject(CursoAdminApiService);

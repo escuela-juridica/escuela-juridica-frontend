@@ -6,7 +6,6 @@ import { API_URL } from '../../../core/api/api.config';
 import { PageResponse } from '../../../core/api/page-response.model';
 import { Excepcion } from './excepciones-pago.model';
 
-/** HU-037 — Consume `/api/admin/atenciones-pago`. */
 @Injectable({ providedIn: 'root' })
 export class ExcepcionesPagoApiService {
   private readonly http = inject(HttpClient);

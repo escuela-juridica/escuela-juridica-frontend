@@ -13,9 +13,6 @@ export function etiquetaCondicion(condicion: CondicionCuentaAdmin): string {
   }
 }
 
-/** Un solo rótulo por fila: "Habilitada" / "Deshabilitada" / "Contraseña temporal" /
- * "Correo sin verificar". Si faltan las dos, prioriza la contraseña porque es lo primero que la
- * persona debe resolver al entrar con la clave temporal. */
 export function etiquetaEstadoCuenta(usuario: Pick<UsuarioAdminRespuesta, 'activo' | 'condicion'>): string {
   if (!usuario.activo) {
     return 'Deshabilitada';
@@ -29,7 +26,6 @@ export function etiquetaEstadoCuenta(usuario: Pick<UsuarioAdminRespuesta, 'activ
   return 'Habilitada';
 }
 
-/** Clase de color para acompañar `etiquetaEstadoCuenta`. */
 export function claseEstadoCuenta(usuario: Pick<UsuarioAdminRespuesta, 'activo' | 'condicion'>): string {
   if (!usuario.activo) {
     return 'badge--disp-cerrado';

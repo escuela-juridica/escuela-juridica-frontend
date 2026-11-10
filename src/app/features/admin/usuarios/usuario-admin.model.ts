@@ -1,7 +1,5 @@
 export type RolUsuarioAdmin = 'ALUMNO' | 'ADMINISTRADOR';
 
-/** CAMBIO_PENDIENTE: falta reemplazar la contraseña temporal. PENDIENTE_VERIFICACION: falta
- * verificar el correo. AMBAS_PENDIENTES: recién creada, faltan las dos. NINGUNA: cuenta operativa. */
 export type CondicionCuentaAdmin =
   | 'NINGUNA'
   | 'PENDIENTE_VERIFICACION'
@@ -23,7 +21,6 @@ export interface UsuarioAdminRespuesta {
   rolPrincipal: RolUsuarioAdmin | null;
   roles: RolUsuarioAdmin[];
   creadoEn: string;
-  /** Nombre de quién concedió el rol ADMINISTRADOR; null si no tiene ese rol o se desconoce. */
   concedidoPorNombre: string | null;
 }
 
@@ -44,14 +41,11 @@ export interface CrearUsuarioAdminPeticion {
   correo: string;
   telefono: string | null;
   documentoIdentidad: string | null;
-  /** El rol principal no se elige: con un único rol, ese es el principal; con ambos,
-   * Administrador siempre gana. */
   roles: RolUsuarioAdmin[];
 }
 
 export interface CrearUsuarioAdminRespuesta {
   usuario: UsuarioAdminRespuesta;
-  /** true si el correo ya existía: se conservó la cuenta y no se generó contraseña temporal. */
   reutilizada: boolean;
   contrasenaTemporal: string | null;
 }
@@ -67,7 +61,6 @@ export interface CambiarActivoPeticion {
 
 export interface ResetearContrasenaRespuesta {
   usuario: UsuarioAdminRespuesta;
-  /** Solo viene en esta respuesta puntual; no se puede volver a consultar después. */
   contrasenaTemporal: string;
 }
 

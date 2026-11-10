@@ -14,9 +14,6 @@ interface DatosReprogramacion {
   motivo: string;
 }
 
-/** HU-027 — Reprogramar una sesión en vivo futura. Si la nueva fecha supera el fin del curso, el
- * backend no guarda nada y devuelve `requiereAmpliarFinDeCurso`: se le pide al admin confirmar la
- * nueva fecha de fin del curso sin perder lo que ya escribió, y se reintenta automáticamente. */
 @Component({
   selector: 'app-modal-reprogramar-sesion',
   imports: [Modal],
@@ -39,7 +36,6 @@ export class ModalReprogramarSesion implements OnInit {
   protected readonly guardando = signal(false);
   protected readonly error = signal<string | null>(null);
 
-  // Se completa solo cuando el backend responde requiereAmpliarFinDeCurso = true.
   protected readonly fechaFinCursoSugerida = signal<string | null>(null);
   protected readonly nuevaFechaFinCurso = signal('');
   private datosPendientes: DatosReprogramacion | null = null;

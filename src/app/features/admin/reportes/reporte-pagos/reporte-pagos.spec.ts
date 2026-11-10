@@ -24,7 +24,6 @@ function pagina(items: ReportePago[], totalPages = 1, page = 0): PageResponse<Re
   return { items, page, size: 20, totalElements: items.length, totalPages, first: page === 0, last: page === totalPages - 1 };
 }
 
-/** EP06 · HU-042 — Reporte de pagos: detalle, total confirmado y exportación comparten los mismos filtros. */
 describe('ReportePagosPantalla', () => {
   let fixture: ComponentFixture<ReportePagosPantalla>;
   let http: HttpTestingController;
@@ -36,7 +35,6 @@ describe('ReportePagosPantalla', () => {
     (fixture.componentInstance as unknown as Record<string, unknown>)[campo] = valor;
   };
 
-  /** La pantalla pide cursos, medios, total y detalle al abrir. */
   function responderCarga(items: ReportePago[] = [fila(1, 'APROBADO', 320), fila(2, 'RECHAZADO', 320)], totalPages = 1): void {
     http.expectOne(URL_CURSOS).flush([{ id: 7, etiqueta: 'Derecho Procesal Penal', detalle: 'Virtual', fecha: null }]);
     http.expectOne(`${BASE}/medios`).flush(['tarjeta', 'yape']);
@@ -163,7 +161,6 @@ describe('ReportePagosPantalla', () => {
   });
 });
 
-/** EP06 · HU-042 — Parámetros del reporte de pagos. */
 describe('ReportePagosApiService', () => {
   let servicio: ReportePagosApiService;
   let http: HttpTestingController;

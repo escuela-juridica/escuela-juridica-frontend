@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { API_URL } from '../../core/api/api.config';
 import { PageResponse } from '../../core/api/page-response.model';
-import { AdvertenciaMatricula, Matricula, MatriculaAdministrativa, MatriculaDetalleAdministrativa } from './matricula.model';
+import { AdvertenciaMatricula, Matricula, MatriculaAdministrativa, MatriculaDetalleAdministrativa, PanelCursos } from './matricula.model';
 
 export interface CrearMatriculaAdministrativa {
   usuarioId: number; cursoId: number; condicionEconomica: 'REGISTRADO_MANUAL' | 'EXONERADO';
@@ -19,6 +19,12 @@ export class MatriculaApiService {
 
   misCursos(): Observable<Matricula[]> {
     return this.http.get<Matricula[]>(`${API_URL}/app/matriculas`);
+  }
+
+  panelCursos(estado: 'EN_PROGRESO' | 'COMPLETADOS', texto: string, page: number, size: number): Observable<PanelCursos> {
+    let params = new HttpParams().set('estado', estado).set('page', page).set('size', size);
+    if (texto) params = params.set('q', texto);
+    return this.http.get<PanelCursos>(`${API_URL}/app/panel/cursos`, { params });
   }
 
   matricularGratis(cursoId: number): Observable<Matricula> {
@@ -51,12 +57,10 @@ export class MatriculaApiService {
     return this.http.get<MatriculaDetalleAdministrativa>(`${API_URL}/admin/matriculas/${matriculaId}`);
   }
 
-  /** Devuelve a «Activa» una matrícula cancelada; el motivo queda en el historial. */
   reactivarAdministrativa(matriculaId: number, motivo: string): Observable<Matricula> {
     return this.http.patch<Matricula>(`${API_URL}/admin/matriculas/${matriculaId}/reactivacion`, { motivo });
   }
 
-  /** Boleta o captura (PNG, JPG, WEBP o PDF) que respalda un pago manual; reemplaza la anterior si existe. */
   adjuntarComprobante(matriculaId: number, archivo: File): Observable<void> {
     const datos = new FormData();
     datos.append('archivo', archivo);

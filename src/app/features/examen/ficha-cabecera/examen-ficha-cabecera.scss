@@ -1,12 +1,9 @@
-// Portada de la ficha de un examen: identidad de marca, mejor nota, aviso de estado e indicadores.
-
 :host {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-// ---- Portada de la ficha: identidad de marca y la mejor nota a la vista.
 .ficha-hero {
   display: flex;
   align-items: center;
@@ -83,7 +80,6 @@
   flex: none;
 }
 
-// ---- Indicadores con icono.
 .indicadores {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));

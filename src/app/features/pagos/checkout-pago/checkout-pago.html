@@ -14,7 +14,7 @@
 
         <div class="checkout__rejilla">
           <section class="card checkout__curso" aria-label="Curso">
-            <div class="checkout__portada" [style.background-image]="f.imagenPortadaUrl ? 'url(' + f.imagenPortadaUrl + ')' : 'none'"></div>
+            <div class="checkout__portada" [style.background-image]="f.imagenPortadaUrl ? 'url(' + urlPortada(f.imagenPortadaUrl) + ')' : 'none'"></div>
             <div class="checkout__curso-cuerpo">
               <span class="checkout__etiqueta">{{ etiquetaModalidad(f.modalidad) }}@if (f.tipoCursoNombre) { · {{ f.tipoCursoNombre }} }</span>
               <h2 class="checkout__curso-titulo">{{ f.titulo }}</h2>

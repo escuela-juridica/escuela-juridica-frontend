@@ -1,14 +1,3 @@
-// Clases globales reutilizables de ESEJUR (mockup EP01).
-// Reflejan exactamente los patrones repetidos del prototipo
-// (detalles/04-DISENO-UX-UI/PROTOTIPO HTML/Prototipo ESEJUR.dc.html).
-// Un componente de pantalla NO deberia reescribir estos estilos: los usa tal cual.
-//
-// Quiebres (00-GUIA-DISENO-UX-UI.md §12):
-//   >= 1280px escritorio amplio · 1024-1279 escritorio compacto
-//   768-1023 tableta · < 768 movil · < 480 movil estrecho
-
-// -------------------------------------------------------------- Interruptor --
-// Switch on/off reutilizable (HU-008 detalle de usuario, HU-009 informacion base).
 .interruptor {
   display: inline-flex;
   align-items: center;
@@ -63,7 +52,6 @@
   outline-offset: 2px;
 }
 
-// -------------------------------------------------------------- Contenedor --
 .contenedor {
   max-width: 1200px;
   margin: 0 auto;
@@ -76,14 +64,11 @@
   }
 }
 
-// Formularios centrados (acceso, recuperar/nueva contraseña, verificar correo).
-// El max-width puntual (440/480/560px) se agrega inline en cada pantalla.
 .contenedor-centrado {
   margin: 0 auto;
   padding: 56px 24px 80px;
 }
 
-// Documentos de lectura larga (privacidad, terminos).
 .contenedor-lectura {
   max-width: 800px;
   margin: 0 auto;
@@ -100,9 +85,6 @@
   }
 }
 
-// ------------------------------------------------------- Tipografia fluida --
-// Escala del sistema de diseño: desktop -> movil (< 768px), sin romper diseños
-// que ya fijan su propio font-size puntual mas abajo en cada pantalla.
 .tipo-display {
   font-family: var(--fuente-editorial);
   font-size: 48px;
@@ -150,8 +132,6 @@
   }
 }
 
-// ---------------------------------------------------------------- Eyebrow --
-// Guion rojo + texto en mayusculas antes de un titulo (aparece en casi toda pantalla).
 .eyebrow {
   display: flex;
   align-items: center;
@@ -184,7 +164,6 @@
   color: var(--rojo-marca-050);
 }
 
-// ------------------------------------------------------------------ Botones --
 .btn {
   display: inline-flex;
   align-items: center;
@@ -208,9 +187,6 @@
     transform 0.18s ease;
 }
 
-// Hover común a todas las variantes: el botón se eleva un poco y proyecta una sombra del color de
-// su variante. Los deshabilitados no reaccionan. Las reglas por variante repiten .btn. para pesar más que la
-// genérica y que la sombra teñida sí se aplique.
 .btn:not(:disabled):not(.btn--deshabilitado):hover {
   transform: translateY(-1px);
   box-shadow: 0 6px 14px -4px rgba(16, 24, 40, 0.28);
@@ -351,7 +327,6 @@
   cursor: not-allowed;
 }
 
-// -------------------------------------------------------------- Campos ------
 .label {
   display: flex;
   align-items: baseline;
@@ -484,7 +459,6 @@ textarea.input {
   background: var(--neutral-200);
 }
 
-// --------------------------------------------------------------- Tarjetas --
 .card {
   background: var(--tarjeta-fondo);
   border: 1px solid var(--tarjeta-borde);
@@ -508,7 +482,6 @@ textarea.input {
   background: var(--tarjeta-acento-superior);
 }
 
-// ----------------------------------------------------------------- Avatar --
 .avatar {
   border-radius: var(--radio-completo);
   display: grid;
@@ -544,8 +517,6 @@ textarea.input {
   color: var(--blanco);
 }
 
-// Disparador del menú de cuenta en el header del alumno: mismo degradado de marca
-// que .tarjeta-acento-superior, con leve elevación al pasar el cursor.
 .avatar--cuenta {
   background: linear-gradient(135deg, var(--marca-700) 0%, var(--acento-700) 100%);
   color: var(--blanco);
@@ -562,7 +533,6 @@ textarea.input {
   box-shadow: 0 4px 10px rgba(16, 24, 40, 0.3);
 }
 
-// ----------------------------------------------------------------- Badges --
 .badge {
   min-height: 24px;
   flex-shrink: 0;
@@ -584,7 +554,6 @@ textarea.input {
   background: currentColor;
 }
 
-// Modalidad "sobre foto" (tarjeta de catalogo, hero de ficha): color vivido, texto blanco.
 .badge--modalidad-virtual {
   background: var(--acento-700);
   color: var(--blanco);
@@ -600,7 +569,6 @@ textarea.input {
   color: var(--blanco);
 }
 
-// Modalidad en contexto neutral (tablas, listas administrativas): version suave.
 .badge--virtual-suave {
   background: var(--acento-100);
   color: var(--marca-900);
@@ -616,7 +584,6 @@ textarea.input {
   color: var(--violeta-700);
 }
 
-// Disponibilidad comercial (tarjeta de catalogo: "Inicio inmediato" / "Próximo inicio" / "Sin cupos").
 .badge--disp-inmediato {
   background: var(--exito-fondo);
   color: var(--exito);
@@ -637,8 +604,6 @@ textarea.input {
   color: var(--error);
 }
 
-// Forma de ingreso a una matrícula (HU administrativas de EP03): distinto significado de
-// "disponibilidad", así que usa su propia pareja de clases aunque comparta colores con otros usos.
 .badge--ingreso-gratuito {
   background: var(--celeste-050);
   color: var(--celeste-700);
@@ -654,7 +619,6 @@ textarea.input {
   color: var(--exito);
 }
 
-// Estados administrativos genéricos (HU-008: estado de cuenta y similares).
 .badge--advertencia-suave {
   background: var(--advertencia-fondo);
   color: var(--advertencia);
@@ -677,7 +641,6 @@ textarea.input {
     inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
-// ----------------------------------------------------------------- Alertas --
 .alerta {
   border-radius: var(--radio-md);
   padding: var(--esp-04);
@@ -698,8 +661,6 @@ textarea.input {
   margin-top: 1px;
 }
 
-// margin: 0 porque son <p>: sin resetear el margen por defecto del navegador se
-// acumulaba un salto grande entre el título y el texto dentro de la misma alerta.
 .alerta__titulo {
   font-size: 14px;
   line-height: 20px;
@@ -790,9 +751,6 @@ textarea.input {
   color: var(--advertencia);
 }
 
-// -------------------------------------------------------- Icono de estado --
-// Circulo de 64px con un icono/texto centrado. Se repite igual en verificar
-// correo, recuperar contraseña y nueva contraseña (pendiente/confirmado).
 .icono-estado {
   width: 64px;
   height: 64px;
@@ -819,9 +777,6 @@ textarea.input {
   color: var(--error);
 }
 
-// ------------------------------------------------- Requisitos de contraseña --
-// Checklist "○ Al menos 8 caracteres" que se repite igual en nueva-password,
-// registro y mi-perfil (pestaña Seguridad).
 .requisitos-pass-lista {
   display: flex;
   flex-direction: column;
@@ -870,14 +825,10 @@ textarea.input {
   color: var(--exito);
 }
 
-// -------------------------------------------------------------- Hero media --
-// Fondo con imagen + degradado, usado en heros y paneles laterales de auth.
 .hero-media {
   position: absolute;
   inset: 0;
   overflow: hidden;
-  // z-index explícito: swiper-container trae su propio z-index interno que,
-  // sin esto, termina tapando el degradado y el contenido del hero.
   z-index: 0;
 }
 
@@ -897,7 +848,6 @@ textarea.input {
   z-index: 1;
 }
 
-// ------------------------------------------------------------- Estado vacio --
 .estado-vacio {
   background: var(--blanco);
   border: 1px dashed var(--neutral-400);
@@ -963,9 +913,6 @@ textarea.input {
   line-height: 19px;
 }
 
-// ---------------------------------------------------- Panel comercial ficha --
-// PF-002: el panel de precio "flota" pegado al hero en escritorio; en pantallas
-// angostas (donde la ficha ya se apilo a una columna) vuelve a su posicion normal.
 .ficha-price {
   margin-top: -300px;
 }
@@ -991,12 +938,6 @@ textarea.input {
     background-position: 0 50%;
   }
 }
-
-// --------------------------------------------------- Editor en árbol (admin) --
-// Patrón compartido por las pestañas "Contenido" (HU-011/HU-012) y "Exámenes" (HU-013) del
-// editor de curso: tarjetas anidadas expandibles con cabecera, acciones de orden y formularios
-// en modal. Vive aquí (no en curso-editor.scss) porque ExamenesTab es un componente propio y
-// necesita las mismas clases sin duplicarlas.
 
 .editor-estado {
   text-align: center;
@@ -1032,8 +973,6 @@ textarea.input {
   margin-bottom: 20px;
 }
 
-/* Dentro de un modal, las acciones finales no deben quedar adheridas al
-   ultimo control del formulario. Se aplica a todos los modales reutilizables. */
 .modal-cuerpo .editor-form__acciones {
   margin-top: 24px;
   margin-bottom: 0;
@@ -1261,8 +1200,6 @@ textarea.input {
   color: var(--neutral-500);
 }
 
-/* Ayuda contextual inmediatamente debajo de un campo. A diferencia de la ayuda de listas o
-   materiales, conserva una separación positiva para no invadir el input anterior. */
 .campo-ayuda {
   margin: 8px 0 0;
   font-size: 12px;
@@ -1536,9 +1473,6 @@ textarea.input {
   }
 }
 
-// ------------------------------------------------------------- Responsivo ---
-// Reglas transversales para que ningun bloque copiado del prototipo desborde
-// un viewport angosto (320-375px), sin tener que reescribir cada pantalla.
 @media (max-width: 480px) {
   .btn {
     height: 48px;

@@ -15,6 +15,7 @@ import {
   switchMap,
 } from 'rxjs';
 
+import { ImagenSubida } from '../../informacion-base/imagen-subida/imagen-subida';
 import { InformacionBaseApiService } from '../../informacion-base/informacion-base-api.service';
 import {
   CategoriaRespuesta,
@@ -57,16 +58,13 @@ interface SesionEnVivoEditor {
   leccion: LeccionRespuesta;
 }
 
-/** HU-010 — Editor del curso (ADM-PF-014). Solo la pestaña "Información" está implementada; el
- * resto (Contenido HU-011, Sesiones HU-012, Exámenes HU-013, Certificación HU-014, Publicación
- * HU-015) se completa en sus propias historias. Información, docentes y firmantes se guardan
- * juntos con un único botón, aunque internamente llamen a tres endpoints distintos. */
 @Component({
   selector: 'app-curso-editor',
   imports: [
     ReactiveFormsModule,
     RouterLink,
     Modal,
+    ImagenSubida,
     ExamenesTab,
     RequisitosTab,
     PublicacionTab,
@@ -129,7 +127,6 @@ export class CursoEditor implements OnInit {
   protected readonly beneficiosMaximo = 10;
   protected readonly beneficioLongitudMaxima = 150;
 
-  // ---------------------------------------------------------------- HU-011 Contenido --
   protected readonly tiposMaterial = signal<TipoMaterialRespuesta[]>([]);
   protected readonly modulos = signal<ModuloRespuesta[]>([]);
   protected readonly cargandoContenido = signal(false);
@@ -137,13 +134,9 @@ export class CursoEditor implements OnInit {
   protected readonly erroContenido = signal<string | null>(null);
   protected readonly modulosExpandidos = signal<Set<number>>(new Set());
   protected readonly leccionesExpandidas = signal<Set<number>>(new Set());
-  // Por defecto lo desactivado no aparece (igual que en Información Base); el interruptor lo
-  // trae de vuelta cuando el admin necesita revisarlo o reactivarlo.
   protected readonly verInactivosContenido = signal(false);
   protected readonly modulosVisibles = computed(() =>
     this.verInactivosContenido() ? this.modulos() : this.modulos().filter((m) => m.activo));
-  // HU-016: el borrado real de contenido solo existe mientras el curso sigue en BORRADOR; una
-  // vez publicado (incluso sin iniciar, ya admite matrícula) solo queda activar/desactivar.
   protected readonly puedeEliminarContenido = computed(() => this.curso()?.estadoCodigo === 'BORRADOR');
   protected readonly sesionesEnVivo = computed<SesionEnVivoEditor[]>(() => this.modulos()
     .filter((modulo) => modulo.activo)
@@ -178,7 +171,6 @@ export class CursoEditor implements OnInit {
   protected readonly sesionEnlace = signal('');
   protected readonly guardandoSesion = signal(false);
 
-  // -- HU-027: reprogramar / cancelar / corregir una sesión en vivo --
   protected readonly reprogramarLeccion = signal<LeccionRespuesta | null>(null);
   protected readonly cancelarLeccion = signal<LeccionRespuesta | null>(null);
   protected readonly corregirLeccion = signal<LeccionRespuesta | null>(null);
@@ -197,6 +189,11 @@ export class CursoEditor implements OnInit {
   protected readonly materialOrigenActual = signal('');
   protected readonly materialOrigenCodigo = signal('');
   protected readonly materialTipoNombreActual = signal('');
+
+  protected cambiarPortada(referencia: string): void {
+    this.formInformacion.controls.imagenPortadaUrl.setValue(referencia);
+    this.formInformacion.controls.imagenPortadaUrl.markAsDirty();
+  }
 
   protected readonly formInformacion = this.fb.group({
     titulo: ['', [Validators.required, Validators.maxLength(220)]],
@@ -267,7 +264,6 @@ export class CursoEditor implements OnInit {
     this.cargarTodo();
   }
 
-  /** Las validaciones y fallos de guardado pertenecen al formulario que sigue abierto. */
   protected get hayModalContenidoAbierto(): boolean {
     return this.modalModuloExistenteAbierto()
       || this.mostrarFormModulo()
@@ -282,24 +278,19 @@ export class CursoEditor implements OnInit {
       return;
     }
     this.tabActiva.set(id);
-    // Los exámenes de módulo necesitan conocer los módulos ya creados. La estructura debe
-    // cargarse también al entrar directamente a esta pestaña, no solo si antes se visitó Contenido.
     if ((id === 'contenido' || id === 'sesiones' || id === 'examenes') && !this.contenidoCargado()) {
       this.cargarContenido();
     }
   }
 
-  /** Actualiza la fecha de cierre que HU-014 puede haber confirmado. */
   protected recargarDespuesDeReglas(): void {
     this.cargarTodo();
   }
 
-  /** HU-015 — tras publicar, refresca estadoCodigo/publicado para reflejar la transición. */
   protected recargarDespuesDePublicar(): void {
     this.cargarTodo();
   }
 
-  // El tab de publicación no conoce PestanaEditor (vive fuera del editor); se castea aquí.
   protected irAPestanaDesdePublicacion(pestana: string): void {
     this.cambiarPestana(pestana as PestanaEditor);
   }
@@ -416,8 +407,6 @@ export class CursoEditor implements OnInit {
     this.firmantesSeleccionados.update((lista) => this.mover(lista, indice, direccion));
   }
 
-  // ---------------------------------------------------------------- HU-011 Contenido --
-
   protected cargarContenido(): void {
     this.cargandoContenido.set(true);
     this.erroContenido.set(null);
@@ -506,8 +495,6 @@ export class CursoEditor implements OnInit {
     }
     return `${Math.max(1, Math.round(bytes / 1024))} KB`;
   }
-
-  // -- Módulos --
 
   protected abrirCrearModulo(): void {
     this.cerrarMensaje();
@@ -601,8 +588,6 @@ export class CursoEditor implements OnInit {
       });
   }
 
-  // Las listas que se muestran pueden estar filtradas (ocultando inactivos); el orden real que
-  // mueven los botones ↑/↓ y que se envía al backend sigue siendo el del arreglo completo.
   protected leccionesVisibles(modulo: ModuloRespuesta): LeccionRespuesta[] {
     return this.verInactivosContenido() ? modulo.lecciones : modulo.lecciones.filter((l) => l.activo);
   }
@@ -676,8 +661,6 @@ export class CursoEditor implements OnInit {
         },
       });
   }
-
-  // -- Lecciones --
 
   protected abrirCrearLeccion(moduloId: number): void {
     this.cerrarMensaje();
@@ -846,8 +829,6 @@ export class CursoEditor implements OnInit {
       });
   }
 
-  // HU-027: una sesión futura (fechaHoraFin nula o posterior a ahora) admite Reprogramar/Cancelar;
-  // una realizada (ya pasó, y no está cancelada) solo admite Corregir; una cancelada no admite nada.
   protected esSesionFutura(leccion: LeccionRespuesta): boolean {
     if (leccion.estado === 'CANCELADA') {
       return false;
@@ -893,9 +874,6 @@ export class CursoEditor implements OnInit {
     this.corregirLeccion.set(null);
   }
 
-  /** Reprogramar/cancelar/corregir no devuelven la lección completa (algunas respuestas son
-   * void), así que en vez de actualizar el signal `modulos` a mano, simplemente se recarga el
-   * contenido — igual de válido que la actualización en el sitio que usa guardarSesion(). */
   protected sesionActualizada(): void {
     this.reprogramarLeccion.set(null);
     this.cancelarLeccion.set(null);
@@ -943,8 +921,6 @@ export class CursoEditor implements OnInit {
       }),
     );
   }
-
-  // -- Materiales --
 
   protected abrirCrearMaterial(leccionId: number): void {
     this.cerrarMensaje();
@@ -1210,8 +1186,6 @@ export class CursoEditor implements OnInit {
     this.router.navigate(['/admin/cursos']);
   }
 
-  /** Un único botón guarda información, docentes y firmantes a la vez, aunque por detrás sean
-   * tres llamadas distintas: desde la perspectiva de quien administra, es una sola pestaña. */
   protected guardarTodo(): void {
     if (this.guardando()) {
       return;
@@ -1253,8 +1227,6 @@ export class CursoEditor implements OnInit {
       }),
       firmantes: this.api.actualizarFirmantes(this.cursoId, { firmanteIds: this.firmantesSeleccionados() }),
     };
-    // El backend exige al menos un docente en esta llamada; si todavía no se eligió ninguno,
-    // se omite en vez de fallar con un error confuso sobre un campo que ni siquiera se tocó.
     if (this.docentesSeleccionados().length > 0) {
       llamadas['docentes'] = this.api.actualizarDocentes(this.cursoId, { personaIds: this.docentesSeleccionados() });
     }
@@ -1273,8 +1245,6 @@ export class CursoEditor implements OnInit {
           this.curso.set(curso);
           this.intentoGuardar.set(false);
           this.alertasGlobales.mostrar('exito', 'Cambios guardados.');
-          // Información es el único formulario largo cuyo mensaje de éxito está al inicio
-          // de la página; en las demás pestañas se conserva la posición de trabajo.
           this.scrollArriba();
         },
         error: (error: HttpErrorResponse) => {
@@ -1393,8 +1363,6 @@ export class CursoEditor implements OnInit {
   private mostrarMensaje(tipo: 'error' | 'exito', texto: string): void {
     this.limpiarTimeoutMensaje();
     this.mensaje.set({ tipo, texto });
-    // Los mensajes locales de Contenido/Sesiones viven normalmente dentro de un modal.
-    // No desplazar la página evita que el usuario pierda el contexto de la fila que editaba.
     if (this.tabActiva() === 'informacion') {
       this.scrollArriba();
     }
@@ -1405,8 +1373,6 @@ export class CursoEditor implements OnInit {
     }, 5000);
   }
 
-  /** Información puede contener varias tarjetas; tras guardarla, su confirmación global queda
-   * al inicio. Las demás pestañas no invocan este desplazamiento por una operación exitosa. */
   private scrollArriba(): void {
     if (typeof window !== 'undefined') {
       window.scrollTo({ top: 0, behavior: 'smooth' });

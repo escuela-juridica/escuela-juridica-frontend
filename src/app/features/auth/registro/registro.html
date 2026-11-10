@@ -1,4 +1,3 @@
-<!-- PF-004 · Creación de cuenta (HU-002): formulario y Google. -->
 <div class="registro-fila">
   <div class="registro-hero-col">
     <div class="hero-media">
@@ -10,6 +9,7 @@
     <div class="hero-overlay registro-hero-overlay"></div>
     <div class="registro-hero-blob"></div>
 
+    <img src="img/logo-esejur.png" alt="Escuela Jurídica" class="registro-hero-logo" />
     <div class="registro-hero-cita">
       <div class="registro-hero-comillas">&ldquo;</div>
       <p class="registro-hero-texto">
@@ -43,7 +43,7 @@
       </p>
 
       @if (!modoGoogle) {
-        <app-boton-google-pendiente mensaje="El registro con Google todavía no está disponible." />
+        <app-boton-google texto="signup_with" (credencial)="continuarConGoogle($event)" />
         <div class="divisor-con-texto registro-divisor">
           <span class="divisor-con-texto__linea"></span>o completa el formulario<span
             class="divisor-con-texto__linea"
@@ -508,7 +508,7 @@
           </button>
         }
         <div class="registro-inicia-sesion">
-          ¿Ya tienes cuenta? <a routerLink="/acceso">Inicia sesión</a>
+          ¿Ya tienes cuenta? <a routerLink="/acceso" [queryParams]="parametrosRetorno">Inicia sesión</a>
         </div>
 
         <div class="registro-whatsapp">

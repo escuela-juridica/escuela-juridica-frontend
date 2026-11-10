@@ -7,15 +7,16 @@ import { RouterLink } from '@angular/router';
 import { resolverUrlApi } from '../../../core/api/api.config';
 import { AlertaGlobalService } from '../../../core/notificaciones/alerta-global.service';
 import { DiplomaMiniatura } from '../../../shared/ui/diploma-miniatura/diploma-miniatura';
+import { TablaPaginacion } from '../../../shared/ui/tabla-paginacion/tabla-paginacion';
 import { formatearFechaLarga } from '../../cursos/curso-formato.util';
 import { CertificacionApiService } from '../certificacion-api.service';
 import { MiCertificado } from '../certificacion.model';
 
-/** HU-033 — Mis certificados: solo los del alumno autenticado. Uno vigente se descarga; uno anulado
- * sigue listado como no válido y sin descarga. Vencer o cancelar la matrícula no los quita. */
+const TAMANO_PAGINA = 10;
+
 @Component({
   selector: 'app-mis-certificados',
-  imports: [RouterLink, DecimalPipe, DiplomaMiniatura],
+  imports: [RouterLink, DecimalPipe, DiplomaMiniatura, TablaPaginacion],
   templateUrl: './mis-certificados.html',
   styleUrl: './mis-certificados.scss',
 })
@@ -28,14 +29,29 @@ export class MisCertificados {
   protected readonly certificados = signal<MiCertificado[]>([]);
   protected readonly cargando = signal(true);
   protected readonly error = signal<string | null>(null);
+  protected readonly tamano = TAMANO_PAGINA;
+  protected readonly pagina = signal(0);
+  protected readonly total = signal(0);
 
   constructor() {
+    this.cargar();
+  }
+
+  protected irAPagina(pagina: number): void {
+    if (pagina < 0 || pagina === this.pagina()) return;
+    this.pagina.set(pagina);
+    this.cargar();
+    document.querySelector('.tabla-marco')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  private cargar(): void {
     this.api
-      .misCertificados()
+      .misCertificados(this.pagina(), TAMANO_PAGINA)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (lista) => {
-          this.certificados.set(lista);
+        next: (respuesta) => {
+          this.certificados.set(respuesta.items);
+          this.total.set(respuesta.totalElements);
           this.cargando.set(false);
         },
         error: (e: HttpErrorResponse) => {

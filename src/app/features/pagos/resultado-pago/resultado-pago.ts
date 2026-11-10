@@ -13,11 +13,6 @@ import { PagosApiService } from '../pagos-api.service';
 const INTERVALO_CONSULTA_MS = 4000;
 const MAXIMO_CONSULTAS = 150;
 
-/**
- * HU-047 — PF-018: resultado del pago. Solo un pago APROBADO muestra constancia; PENDIENTE, RECHAZADO, ERROR y
- * EXPIRADO explican su resultado sin afirmar que se realizó un pago. Mientras sigue PENDIENTE se consulta cada pocos
- * segundos porque Culqi puede tardar en comunicar el resultado.
- */
 @Component({
   selector: 'app-resultado-pago',
   imports: [RouterLink, ConstanciaPagoVista, InstruccionesQr],

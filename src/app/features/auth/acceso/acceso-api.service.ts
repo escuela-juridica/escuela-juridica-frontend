@@ -10,6 +10,12 @@ export interface AccesoPeticion {
   contrasena: string;
 }
 
+export interface AccesoGoogleRespuesta {
+  estado: 'SESION' | 'REGISTRO';
+  sesion: UsuarioSesion | null;
+  referenciaRegistro: string | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AccesoApiService {
   private readonly http = inject(HttpClient);
@@ -17,6 +23,10 @@ export class AccesoApiService {
 
   acceder(peticion: AccesoPeticion): Observable<UsuarioSesion> {
     return this.http.post<UsuarioSesion>(`${this.urlAuth}/acceso`, peticion);
+  }
+
+  accederConGoogle(credencial: string): Observable<AccesoGoogleRespuesta> {
+    return this.http.post<AccesoGoogleRespuesta>(`${this.urlAuth}/acceso/google`, { credencial });
   }
 
   sesion(): Observable<UsuarioSesion> {

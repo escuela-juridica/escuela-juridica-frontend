@@ -13,6 +13,7 @@ import {
   CrearPreguntaPeticion,
   ExamenRespuesta,
   FinalidadExamen,
+  ModoNavegacionExamen,
   MostrarRespuestas,
   PreguntaRespuesta,
   TipoExamen,
@@ -24,8 +25,6 @@ interface OpcionForm {
   esCorrecta: boolean;
 }
 
-/** HU-013 — Configurar exámenes: pestaña hija del editor de curso. Recibe el curso ya cargado
- * (modalidad y módulos disponibles) y administra exámenes/preguntas/alternativas por su cuenta. */
 @Component({
   selector: 'app-examenes-tab',
   imports: [Modal],
@@ -52,17 +51,13 @@ export class ExamenesTab implements OnChanges {
   private mensajeTimeout: ReturnType<typeof setTimeout> | null = null;
   protected readonly examenesExpandidos = signal<Set<number>>(new Set());
   protected readonly preguntasExpandidas = signal<Set<number>>(new Set());
-  // Por defecto lo desactivado no aparece (igual que en Información Base); el interruptor lo
-  // trae de vuelta cuando el admin necesita revisarlo o reactivarlo.
   protected readonly verInactivos = signal(false);
   protected readonly examenesVisibles = computed(() =>
     this.verInactivos() ? this.examenes() : this.examenes().filter((e) => e.activo));
 
   protected readonly esVirtual = () => this.modalidad === 'VIRTUAL';
-  // HU-016: el borrado real solo existe mientras el curso sigue en BORRADOR.
   protected readonly puedeEliminar = () => this.estadoCodigo === 'BORRADOR';
 
-  // -- Formulario de examen --
   protected readonly mostrarFormExamen = signal(false);
   protected readonly examenEditId = signal<number | null>(null);
   protected readonly examenTitulo = signal('');
@@ -77,11 +72,12 @@ export class ExamenesTab implements OnChanges {
   protected readonly examenMostrarRespuestas = signal<MostrarRespuestas>('AL_APROBAR');
   protected readonly examenFechaHabilitacion = signal('');
   protected readonly examenBloquea = signal(false);
+  protected readonly examenModoNavegacion = signal<ModoNavegacionExamen>('LIBRE');
+  protected readonly examenPermiteOmitir = signal(false);
   protected readonly examenDiasRevision = signal('3');
   protected readonly guardandoExamen = signal(false);
   protected readonly intentoGuardarExamen = signal(false);
 
-  // -- Formulario de pregunta --
   protected readonly preguntaFormExamenId = signal<number | null>(null);
   protected readonly preguntaEditId = signal<number | null>(null);
   protected readonly preguntaTipo = signal<TipoPregunta>('SELECCION_UNICA');
@@ -94,8 +90,6 @@ export class ExamenesTab implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     const cambioCurso = changes['cursoId'];
     if (cambioCurso && cambioCurso.currentValue !== cambioCurso.previousValue) {
-      // La misma instancia puede recibir otro curso al navegar desde el editor.
-      // Nunca se deben mostrar exámenes, preguntas o expansiones del curso anterior.
       this.examenes.set([]);
       this.examenesExpandidos.set(new Set());
       this.preguntasExpandidas.set(new Set());
@@ -186,8 +180,6 @@ export class ExamenesTab implements OnChanges {
     }
   }
 
-  // ---------------------------------------------------------------- Examen --
-
   protected abrirCrearExamen(): void {
     this.cerrarMensaje();
     this.intentoGuardarExamen.set(false);
@@ -204,6 +196,8 @@ export class ExamenesTab implements OnChanges {
     this.examenMostrarRespuestas.set('AL_APROBAR');
     this.examenFechaHabilitacion.set('');
     this.examenBloquea.set(false);
+    this.examenModoNavegacion.set('LIBRE');
+    this.examenPermiteOmitir.set(false);
     this.examenDiasRevision.set('3');
     this.mostrarFormExamen.set(true);
   }
@@ -224,6 +218,8 @@ export class ExamenesTab implements OnChanges {
     this.examenMostrarRespuestas.set(examen.mostrarRespuestas);
     this.examenFechaHabilitacion.set(this.aDatetimeLocal(examen.fechaHabilitacion) ?? '');
     this.examenBloquea.set(examen.bloqueaSiguienteModulo);
+    this.examenModoNavegacion.set(examen.modoNavegacion ?? 'LIBRE');
+    this.examenPermiteOmitir.set(examen.permiteOmitirPreguntas ?? false);
     this.examenDiasRevision.set(String(examen.diasRevision));
     this.mostrarFormExamen.set(true);
   }
@@ -302,6 +298,8 @@ export class ExamenesTab implements OnChanges {
       fechaHabilitacion: this.esVirtual() ? null : this.aInstante(this.examenFechaHabilitacion() || null),
       bloqueaSiguienteModulo: this.examenFinalidad() === 'MODULO' && this.examenTipo() === 'CALIFICADO' && this.examenBloquea(),
       diasRevision: diasRevision ?? 3,
+      modoNavegacion: this.examenModoNavegacion(),
+      permiteOmitirPreguntas: this.examenPermiteOmitir(),
     };
     const editId = this.examenEditId();
     const llamada = editId
@@ -367,8 +365,6 @@ export class ExamenesTab implements OnChanges {
       });
   }
 
-  // La lista que se muestra puede estar filtrada (ocultando inactivos); el orden real que mueven
-  // los botones ↑/↓ y que se envía al backend sigue siendo el del arreglo completo.
   protected preguntasVisibles(examen: ExamenRespuesta): PreguntaRespuesta[] {
     return this.verInactivos() ? examen.preguntas : examen.preguntas.filter((p) => p.activo);
   }
@@ -401,8 +397,6 @@ export class ExamenesTab implements OnChanges {
         },
       });
   }
-
-  // ---------------------------------------------------------------- Pregunta --
 
   protected abrirCrearPregunta(examenId: number): void {
     this.cerrarMensaje();

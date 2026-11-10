@@ -5,7 +5,6 @@ import { Observable } from 'rxjs';
 import { API_URL } from '../../core/api/api.config';
 import { AulaRespuesta } from './aula.model';
 
-/** HU-022 — Ingresar y continuar un curso. Consume `GET /api/aula/cursos/{cursoId}`. */
 @Injectable({ providedIn: 'root' })
 export class AulaApiService {
   private readonly http = inject(HttpClient);

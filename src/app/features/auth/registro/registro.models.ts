@@ -1,4 +1,3 @@
-/** Datos que el formulario tradicional envía al backend. */
 export interface RegistroFormularioPeticion {
   nombres: string;
   apellidoPaterno: string;
@@ -10,11 +9,9 @@ export interface RegistroFormularioPeticion {
   confirmarContrasena: string;
   aceptaTerminos: boolean;
 
-  /** Evidencia del proveedor que acuerde el equipo; debe validarse en el servidor. */
   evidenciaAntiRobot: string;
 }
 
-/** Respuesta esperada después de crear una cuenta con correo pendiente. */
 export interface RegistroFormularioRespuesta {
   usuarioId: number;
   correo: string;
@@ -22,7 +19,6 @@ export interface RegistroFormularioRespuesta {
   referenciaVerificacion: string;
 }
 
-/** Datos autorizados que el backend recupera desde una referencia Google. */
 export interface ContextoRegistroGoogle {
   correo: string;
   nombres?: string | null;
@@ -33,10 +29,6 @@ export interface ContextoRegistroGoogle {
   venceEn?: string;
 }
 
-/**
- * El correo no se envía al completar Google: el backend debe recuperarlo desde
- * la referencia temporal que representa la identidad previamente verificada.
- */
 export interface RegistroGooglePeticion {
   referencia: string;
   nombres: string;
@@ -47,7 +39,6 @@ export interface RegistroGooglePeticion {
   aceptaTerminos: boolean;
 }
 
-/** Forma actual de HU-002 al completar Google; no coincide con el perfil de sesión de HU-001. */
 export interface GoogleRegistroSesion {
   nombre: string;
   email: string;
@@ -59,7 +50,6 @@ export interface ErrorCampoApi {
   message: string;
 }
 
-/** Forma de error que ya utiliza GlobalExceptionHandler en el backend. */
 export interface ApiErrorRespuesta {
   timestamp: string;
   status: number;

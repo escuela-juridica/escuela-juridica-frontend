@@ -1,5 +1,3 @@
-/** HU-039 — Libro de Reclamaciones. */
-
 export type TipoReclamacion = 'QUEJA' | 'RECLAMO';
 export type TipoDocumento = 'DNI' | 'CE' | 'PASAPORTE' | 'RUC';
 

@@ -1,0 +1,160 @@
+@if (vista(); as v) {
+  <article class="modulo">
+    <header class="card modulo__cabecera">
+      <p class="modulo__etiqueta">Módulo {{ v.numero }} de {{ v.totalModulos }}</p>
+      <h1 class="modulo__titulo">{{ v.modulo.titulo }}</h1>
+      <div class="modulo__progreso">
+        <div class="modulo__pista" role="progressbar" aria-label="Avance del módulo" [attr.aria-valuenow]="v.porcentaje" aria-valuemin="0" aria-valuemax="100">
+          <div class="modulo__relleno" [style.width.%]="v.porcentaje"></div>
+        </div>
+        <span class="modulo__progreso-texto">{{ v.hechas }} de {{ v.total }} {{ v.total === 1 ? 'lección completada' : 'lecciones completadas' }}</span>
+      </div>
+    </header>
+
+    @if (v.paso; as paso) {
+      <section class="card siguiente" aria-label="Tu siguiente paso">
+        <div class="siguiente__texto">
+          <span class="siguiente__etiqueta">Tu siguiente paso</span>
+          <strong class="siguiente__titulo">{{ paso.tipo === 'leccion' ? paso.leccion.titulo : paso.examen.titulo }}</strong>
+        </div>
+        @if (paso.tipo === 'leccion') {
+          <a class="btn btn--acento btn--grande" [routerLink]="['/aula', v.aula.cursoId, 'lecciones', paso.leccion.id]">{{ accionLeccion(paso.leccion) }} →</a>
+        } @else {
+          <a class="btn btn--acento btn--grande" [routerLink]="['/aula', v.aula.cursoId, 'examenes', paso.examen.id]">{{ accionExamen(paso.examen) }} →</a>
+        }
+      </section>
+    } @else if (v.bloqueo; as motivo) {
+      <section class="card siguiente siguiente--aviso" role="status">
+        <span class="siguiente__icono" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>
+        </span>
+        <div class="siguiente__texto">
+          <span class="siguiente__etiqueta">Todavía no puedes avanzar</span>
+          <strong class="siguiente__titulo siguiente__titulo--normal">{{ motivo }}</strong>
+        </div>
+        @if (v.destino; as destino) {
+          @if (destino.tipo === 'leccion') {
+            <a class="btn btn--acento" [routerLink]="['/aula', v.aula.cursoId, 'lecciones', destino.leccion.id]">Ir a mi siguiente paso →</a>
+          } @else {
+            <a class="btn btn--acento" [routerLink]="['/aula', v.aula.cursoId, 'examenes', destino.examen.id]">Ir a mi siguiente paso →</a>
+          }
+        } @else if (v.examenPendiente; as examen) {
+          <a class="btn btn--secundario" [routerLink]="['/aula', v.aula.cursoId, 'examenes', examen.id]">Ver el examen</a>
+        }
+      </section>
+    } @else {
+      <section class="card siguiente siguiente--listo" role="status">
+        <span class="siguiente__icono" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
+        </span>
+        <div class="siguiente__texto">
+          <span class="siguiente__etiqueta">¡Buen trabajo!</span>
+          <strong class="siguiente__titulo siguiente__titulo--normal">Completaste este módulo.</strong>
+        </div>
+        @if (v.siguiente; as proximo) {
+          <a class="btn btn--acento btn--grande" [routerLink]="['/aula', v.aula.cursoId, 'modulos', proximo.id]">Ir al siguiente módulo →</a>
+        }
+      </section>
+    }
+
+    <section class="card modulo__seccion" aria-labelledby="modulo-lecciones">
+      <h2 id="modulo-lecciones" class="modulo__subtitulo">Lecciones de este módulo</h2>
+      <ol class="pasos">
+        @for (leccion of v.modulo.lecciones; track leccion.id; let i = $index) {
+          <li class="paso" [class.paso--hecha]="leccion.estado === 'COMPLETADA'" [class.paso--bloqueada]="leccion.estado === 'BLOQUEADA'" [class.paso--siguiente]="esSiguiente(leccion)">
+            <span class="paso__marca" aria-hidden="true">
+              @switch (leccion.estado) {
+                @case ('COMPLETADA') {
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
+                }
+                @case ('BLOQUEADA') {
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>
+                }
+                @default {
+                  {{ i + 1 }}
+                }
+              }
+            </span>
+            <div class="paso__texto">
+              <span class="paso__titulo">{{ leccion.titulo }}</span>
+              @if (leccion.estado === 'BLOQUEADA') {
+                <span class="paso__motivo">{{ leccion.motivoBloqueo ?? 'Todavía no está disponible.' }}</span>
+              } @else {
+                <span class="paso__detalle">{{ detalleLeccion(leccion) }}</span>
+                @if (leccion.descripcion) {
+                  <span class="paso__descripcion">{{ leccion.descripcion }}</span>
+                }
+              }
+            </div>
+            @if (leccion.estado === 'BLOQUEADA') {
+              <span class="badge badge--disp-cerrado paso__chip">Bloqueada</span>
+            } @else {
+              <a class="btn paso__accion" [class.btn--acento]="esSiguiente(leccion)" [class.btn--secundario]="!esSiguiente(leccion)"
+                [routerLink]="['/aula', v.aula.cursoId, 'lecciones', leccion.id]">{{ accionLeccion(leccion) }}</a>
+            }
+          </li>
+        }
+      </ol>
+    </section>
+
+    @if (v.modulo.examenes.length > 0) {
+      <section class="card modulo__seccion" aria-labelledby="modulo-examenes">
+        <h2 id="modulo-examenes" class="modulo__subtitulo">Evaluación del módulo</h2>
+        <ul class="pasos">
+          @for (examen of v.modulo.examenes; track examen.id) {
+            <li class="paso paso--examen" [class.paso--hecha]="examen.aprobado" [class.paso--bloqueada]="!examenSePuedeAbrir(examen)">
+              <span class="paso__marca paso__marca--examen" aria-hidden="true">
+                @if (examen.aprobado) {
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
+                } @else if (!examenSePuedeAbrir(examen)) {
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>
+                } @else {
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg>
+                }
+              </span>
+              <div class="paso__texto">
+                <span class="paso__titulo">{{ examen.titulo }}</span>
+                <span [class]="examenSePuedeAbrir(examen) ? 'paso__detalle' : 'paso__motivo'">{{ textoExamen(examen) }}</span>
+              </div>
+              @if (examenSePuedeAbrir(examen)) {
+                <a class="btn paso__accion" [class.btn--acento]="examenEsPrincipal(examen)" [class.btn--secundario]="!examenEsPrincipal(examen)"
+                  [routerLink]="['/aula', v.aula.cursoId, 'examenes', examen.id]">{{ accionExamen(examen) }}</a>
+              } @else {
+                <span class="badge badge--disp-cerrado paso__chip">Bloqueado</span>
+              }
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+    <nav class="modulo__navegacion" aria-label="Moverse entre módulos">
+      <div class="modulo__navegacion-lado">
+        @if (v.anterior; as previo) {
+          <a class="btn btn--secundario" [routerLink]="['/aula', v.aula.cursoId, 'modulos', previo.id]">← Módulo anterior</a>
+        }
+      </div>
+      <div class="modulo__navegacion-lado modulo__navegacion-lado--der">
+        @if (v.siguiente; as proximo) {
+          <a class="btn" [class.btn--acento]="v.completado" [class.btn--secundario]="!v.completado"
+            [routerLink]="['/aula', v.aula.cursoId, 'modulos', proximo.id]">Siguiente módulo →</a>
+          @if (v.siguienteBloqueado) {
+            <p class="modulo__nota">Se desbloquea cuando termines este módulo.</p>
+          }
+        } @else if (v.examenFinal; as final) {
+          <a class="btn" [class.btn--acento]="v.completado" [class.btn--secundario]="!v.completado"
+            [routerLink]="['/aula', v.aula.cursoId, 'examenes', final.id]">Ir al examen final →</a>
+          @if (!final.habilitado && !final.aprobado) {
+            <p class="modulo__nota">{{ final.motivoNoHabilitado ?? 'Se habilita cuando termines todos los módulos.' }}</p>
+          }
+        }
+      </div>
+    </nav>
+  </article>
+} @else if (estado.aula()) {
+  <div class="estado-vacio">
+    <h3 class="estado-vacio__titulo">No encontramos ese módulo</h3>
+    <p class="estado-vacio__texto">Puede que ya no exista. Vuelve al curso para ver todos los módulos.</p>
+    <a class="btn btn--primario" [routerLink]="['/aula', estado.cursoId()]">Volver al curso</a>
+  </div>
+}
