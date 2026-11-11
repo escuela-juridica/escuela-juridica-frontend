@@ -17,7 +17,7 @@ function ficha(extra: Partial<ExamenFicha> = {}): ExamenFicha {
     intentosUsados: 0, intentosRestantes: 2, mostrarRespuestas: 'AL_APROBAR', notaMinima: 12, afectaCertificacion: true,
     bloqueaSiguienteModulo: false, habilitado: true, puedeIniciar: true, motivoNoPuedeIniciar: null,
     agotadoSinAprobar: false, soloLectura: false, intentoEnCursoId: null, aprobado: false, mejorNota: null,
-    modoNavegacion: 'LIBRE', permiteOmitirPreguntas: false, intentos: [],
+    modoNavegacion: 'LIBRE', permiteOmitirPreguntas: false, criterioNota: 'MEJOR', intentos: [],
     ...extra,
   };
 }

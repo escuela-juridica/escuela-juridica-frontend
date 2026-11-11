@@ -105,6 +105,8 @@ export interface AsignarFirmantesPeticion {
   firmanteIds: number[];
 }
 
+export type CriterioNota = 'MEJOR' | 'ULTIMA';
+
 export interface ReglasCursoRespuesta {
   requiereExamenes: boolean;
   requiereProgreso: boolean;
@@ -116,6 +118,7 @@ export interface ReglasCursoRespuesta {
   asistenciaMinima: number;
   secuenciaObligatoria: boolean;
   diasEsperaCertificado: number;
+  criterioNota: CriterioNota;
   fechaCierreMatricula: string | null;
   bloqueada: boolean;
 }
