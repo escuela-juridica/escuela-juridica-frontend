@@ -64,10 +64,6 @@
   color: var(--acento-700);
 }
 
-.examen__numero--marcada {
-  box-shadow: inset 0 -4px 0 var(--advertencia);
-}
-
 .examen__numero--actual {
   background: var(--marca-900);
   border-color: var(--marca-900);
@@ -101,8 +97,4 @@
 .examen__muestra--respondida {
   background: var(--acento-050);
   border-color: var(--acento-500);
-}
-
-.examen__muestra--marcada {
-  box-shadow: inset 0 -4px 0 var(--advertencia);
 }

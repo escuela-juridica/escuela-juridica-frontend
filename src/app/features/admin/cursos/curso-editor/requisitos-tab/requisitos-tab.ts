@@ -3,7 +3,7 @@ import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, injec
 import { finalize } from 'rxjs';
 
 import { CursoAdminApiService } from '../../curso-admin-api.service';
-import { ModalidadCurso, ReglasCursoRespuesta } from '../../curso-admin.model';
+import { CriterioNota, ModalidadCurso, ReglasCursoRespuesta } from '../../curso-admin.model';
 import { AlertaGlobalService } from '../../../../../core/notificaciones/alerta-global.service';
 
 @Component({
@@ -35,6 +35,7 @@ export class RequisitosTab implements OnChanges {
   protected readonly asistenciaMinima = signal('80');
   protected readonly secuenciaObligatoria = signal(true);
   protected readonly diasEspera = signal('0');
+  protected readonly criterioNota = signal<CriterioNota>('MEJOR');
   protected readonly fechaCierre = signal('');
   private fechaCierreConfirmada = '';
 
@@ -58,6 +59,7 @@ export class RequisitosTab implements OnChanges {
       progresoMinimo: Number(this.progresoMinimo()), umbralVideo: Number(this.umbralVideo()),
       asistenciaMinima: Number(this.asistenciaMinima()), secuenciaObligatoria: this.secuenciaObligatoria(),
       diasEsperaCertificado: Number(this.diasEspera()),
+      criterioNota: this.criterioNota(),
       fechaCierreMatricula: this.requiereAsistenciaDisponible() && this.requiereAsistencia()
         ? (this.fechaCierre() || null)
         : (this.fechaCierreConfirmada || null),
@@ -95,6 +97,7 @@ export class RequisitosTab implements OnChanges {
     this.notaMinima.set(String(r.notaMinima)); this.notaRefrendado.set(String(r.notaRefrendado));
     this.progresoMinimo.set(String(r.progresoMinimo)); this.umbralVideo.set(String(r.umbralVideo));
     this.asistenciaMinima.set(String(r.asistenciaMinima)); this.secuenciaObligatoria.set(r.secuenciaObligatoria);
+    this.criterioNota.set(r.criterioNota ?? 'MEJOR');
     this.diasEspera.set(String(r.diasEsperaCertificado)); this.fechaCierre.set(r.fechaCierreMatricula ?? ''); this.bloqueada.set(r.bloqueada);
     this.fechaCierreConfirmada = r.fechaCierreMatricula ?? '';
     this.proponerCierre();

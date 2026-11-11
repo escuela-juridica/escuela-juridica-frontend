@@ -43,6 +43,7 @@ export interface ExamenFicha {
   mejorNota: number | null;
   modoNavegacion: ModoNavegacion;
   permiteOmitirPreguntas: boolean;
+  criterioNota: 'MEJOR' | 'ULTIMA';
   intentos: IntentoResumen[];
 }
 

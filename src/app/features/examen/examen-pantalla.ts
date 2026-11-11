@@ -22,6 +22,8 @@ interface RespuestaLocal {
 }
 
 const ESPERA_GUARDADO_TEXTO_MS = 700;
+const REINTENTOS_CIERRE = 6;
+const ESPERA_REINTENTO_CIERRE_MS = 1000;
 
 @Component({
   selector: 'app-examen-pantalla',
@@ -52,13 +54,13 @@ export class ExamenPantalla {
   protected readonly indice = signal(0);
   protected readonly guardado = signal<EstadoGuardado>('idle');
   protected readonly segundos = signal<number | null>(null);
-  protected readonly marcadas = signal<ReadonlySet<number>>(new Set());
   protected readonly mostrarFaltantes = signal(false);
   private readonly local = signal<ReadonlyMap<number, RespuestaLocal>>(new Map());
 
   private examenId: number | null = null;
   private desfaseRelojMs = 0;
   private temporizador: ReturnType<typeof setInterval> | null = null;
+  private reintentoCierre: ReturnType<typeof setTimeout> | null = null;
   private readonly sucias = new Set<number>();
   private readonly esperas = new Map<number, ReturnType<typeof setTimeout>>();
 
@@ -97,7 +99,6 @@ export class ExamenPantalla {
 
   protected readonly sinResponder = computed(() => (this.intento()?.preguntas ?? []).filter((p) => !this.estaRespondida(p)));
 
-  protected readonly marcadasLista = computed(() => (this.intento()?.preguntas ?? []).filter((p) => this.marcadas().has(p.id)));
 
   protected readonly poco = computed(() => {
     const s = this.segundos();
@@ -214,7 +215,6 @@ export class ExamenPantalla {
       mapa.set(p.id, { opciones: [...p.seleccionadas], texto: p.texto ?? '' });
     }
     this.local.set(mapa);
-    this.marcadas.set(this.leerMarcas(intento.id));
     this.indice.set(this.indiceInicial(intento));
     this.mostrarFaltantes.set(false);
     this.guardado.set('idle');
@@ -323,7 +323,6 @@ export class ExamenPantalla {
     this.confirmando.set(false);
     this.sucias.clear();
     this.intento.set(resultado);
-    this.borrarMarcas(resultado.id);
     try {
       localStorage.removeItem(`esejur.examen.indice.${resultado.id}`);
     } catch {
@@ -369,16 +368,6 @@ export class ExamenPantalla {
   protected limpiarRespuesta(p: PreguntaIntento): void {
     this.actualizarLocal(p.id, { opciones: [], texto: '' });
     this.guardarYa(p.id);
-  }
-
-  protected alternarMarca(p: PreguntaIntento): void {
-    const intento = this.intento();
-    if (!intento) return;
-    const siguiente = new Set(this.marcadas());
-    if (siguiente.has(p.id)) siguiente.delete(p.id);
-    else siguiente.add(p.id);
-    this.marcadas.set(siguiente);
-    this.guardarMarcas(intento.id, siguiente);
   }
 
   private actualizarLocal(preguntaId: number, valor: RespuestaLocal): void {
@@ -445,9 +434,11 @@ export class ExamenPantalla {
   private detenerTemporizador(): void {
     if (this.temporizador) clearInterval(this.temporizador);
     this.temporizador = null;
+    if (this.reintentoCierre) clearTimeout(this.reintentoCierre);
+    this.reintentoCierre = null;
   }
 
-  private sincronizarCierre(intentoId: number): void {
+  private sincronizarCierre(intentoId: number, intentosRestantes = REINTENTOS_CIERRE): void {
     this.esperas.forEach((t) => clearTimeout(t));
     this.esperas.clear();
     this.confirmando.set(false);
@@ -456,12 +447,27 @@ export class ExamenPantalla {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (resultado) => {
-          if (resultado.estado === 'EN_PROGRESO') return;
+          if (resultado.estado === 'EN_PROGRESO') {
+            this.reintentarCierre(intentoId, intentosRestantes);
+            return;
+          }
           this.cerradoPorTiempoAviso.set(true);
           this.mostrarResultado(resultado);
         },
-        error: () => this.guardado.set('error'),
+        error: () => {
+          this.guardado.set('error');
+          this.reintentarCierre(intentoId, intentosRestantes);
+        },
       });
+  }
+
+  private reintentarCierre(intentoId: number, intentosRestantes: number): void {
+    if (intentosRestantes <= 0) {
+      this.cerradoPorTiempoAviso.set(true);
+      this.enviar();
+      return;
+    }
+    this.reintentoCierre = setTimeout(() => this.sincronizarCierre(intentoId, intentosRestantes - 1), ESPERA_REINTENTO_CIERRE_MS);
   }
 
   protected etiquetaTipoPregunta(tipo: PreguntaIntento['tipo']): string {
@@ -528,29 +534,6 @@ export class ExamenPantalla {
   private guardarIndice(intentoId: number, indice: number): void {
     try {
       localStorage.setItem(`esejur.examen.indice.${intentoId}`, String(indice));
-    } catch {
-    }
-  }
-
-  private leerMarcas(intentoId: number): Set<number> {
-    try {
-      const crudo = localStorage.getItem(`esejur.examen.marcadas.${intentoId}`);
-      return new Set<number>(crudo ? (JSON.parse(crudo) as number[]) : []);
-    } catch {
-      return new Set<number>();
-    }
-  }
-
-  private guardarMarcas(intentoId: number, marcas: ReadonlySet<number>): void {
-    try {
-      localStorage.setItem(`esejur.examen.marcadas.${intentoId}`, JSON.stringify([...marcas]));
-    } catch {
-    }
-  }
-
-  private borrarMarcas(intentoId: number): void {
-    try {
-      localStorage.removeItem(`esejur.examen.marcadas.${intentoId}`);
     } catch {
     }
   }

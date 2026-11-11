@@ -14,6 +14,7 @@ export class AnilloProgreso {
   readonly tono = input<'claro' | 'oscuro'>('claro');
   readonly estado = input<'normal' | 'exito' | 'error'>('normal');
   readonly descripcion = input('Progreso');
+  readonly animado = input(false);
 
   protected readonly radio = computed(() => (this.tamano() - this.grosor()) / 2);
   protected readonly circunferencia = computed(() => 2 * Math.PI * this.radio());
