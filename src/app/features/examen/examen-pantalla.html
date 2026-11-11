@@ -232,7 +232,7 @@
               [estado]="it.aprobado ? 'exito' : 'error'" etiqueta="de 20" descripcion="Tu nota" [animado]="true" />
             <p class="examen__nota-estado examen__nota-estado--anim">{{ it.aprobado ? 'Aprobado' : 'No aprobado' }}</p>
             <p class="examen__nota-ayuda">
-              Obtuviste {{ it.puntajeObtenido | number:'1.0-2' }} de {{ it.puntajeTotal | number:'1.0-2' }} puntos. @if (it.tipo === 'CALIFICADO') { La nota mínima es {{ it.notaMinima | number:'1.0-2' }}. }
+              Obtuviste {{ it.puntajeObtenido | number:'1.0-2' }} de {{ it.puntajeTotal | number:'1.0-2' }} puntos@if (it.puntajeTotal !== 20) { (equivalen a {{ it.nota | number:'1.0-2' }} sobre 20)}. @if (it.tipo === 'CALIFICADO') { La nota mínima es {{ it.notaMinima | number:'1.0-2' }}. }
             </p>
             @if (it.tipo === 'PRACTICA') { <p class="examen__nota-ayuda">Es una práctica: no afecta tu certificación.</p> }
           </section>
