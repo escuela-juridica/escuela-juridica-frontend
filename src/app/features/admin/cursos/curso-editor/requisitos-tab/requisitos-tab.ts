@@ -55,7 +55,7 @@ export class RequisitosTab implements OnChanges {
       requiereExamenes: this.requiereExamenes(),
       requiereProgreso: this.requiereProgreso(),
       requiereAsistencia: this.requiereAsistenciaDisponible() ? this.requiereAsistencia() : false,
-      notaMinima: Number(this.notaMinima()), notaRefrendado: Number(this.notaRefrendado()),
+      notaMinima: Number(this.notaMinima()), notaRefrendado: this.notaRefrendadoVigente(),
       progresoMinimo: Number(this.progresoMinimo()), umbralVideo: Number(this.umbralVideo()),
       asistenciaMinima: Number(this.asistenciaMinima()), secuenciaObligatoria: this.secuenciaObligatoria(),
       diasEsperaCertificado: Number(this.diasEspera()),
@@ -74,6 +74,12 @@ export class RequisitosTab implements OnChanges {
       },
       error: (e: HttpErrorResponse) => this.error.set(e.error?.message ?? 'No pudimos guardar los requisitos.'),
     });
+  }
+
+  private notaRefrendadoVigente(): number {
+    const minima = Number(this.notaMinima());
+    const refrendado = Number(this.notaRefrendado());
+    return refrendado > minima ? refrendado : Math.min(20, Math.round((minima + 0.01) * 100) / 100);
   }
 
   private scrollArriba(): void {

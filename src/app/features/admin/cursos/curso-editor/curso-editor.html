@@ -92,15 +92,6 @@
               </select>
             </div>
             <div>
-              <label class="label">Entidad certificadora</label>
-              <select class="input" formControlName="entidadCertificadoraId">
-                <option [ngValue]="null">Sin entidad</option>
-                @for (entidad of entidades(); track entidad.id) {
-                  <option [ngValue]="entidad.id">{{ entidad.nombre }}</option>
-                }
-              </select>
-            </div>
-            <div>
               <label class="label"><span>Portada</span><span class="nota-pill">Opcional</span></label>
               <app-imagen-subida
                 tipo="PORTADA"
