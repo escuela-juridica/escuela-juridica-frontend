@@ -147,7 +147,7 @@ describe('Registro', () => {
     );
     component.registrar();
     expect(component.errorGeneral).toContain('todavía no está integrado');
-    expect(component.formulario.controls.nombres.value).toBe('LUCÍA');
+    expect(component.formulario.controls.nombres.value).toBe('Lucía');
     expect(component.formulario.controls.evidenciaAntiRobot.value).toBe('');
     expect(router.navigate).not.toHaveBeenCalled();
     expect(component.cuentaCreada).toBe(false);
@@ -202,8 +202,8 @@ describe('Registro', () => {
     component.registrar();
 
     expect(api.registrarFormulario).toHaveBeenCalledWith({
-      nombres: 'LUCÍA',
-      apellidoPaterno: 'CAMINOS',
+      nombres: 'Lucía',
+      apellidoPaterno: 'Caminos',
       apellidoMaterno: null,
       correo: 'lucia@example.com',
       telefono: null,
@@ -264,7 +264,7 @@ describe('Registro', () => {
 
     expect(component.formulario.controls.correo.hasError('servidor')).toBe(true);
     expect(component.mensajeErrorServidor('correo')).toBe('El correo ya se encuentra registrado');
-    expect(component.formulario.controls.nombres.value).toBe('LUCÍA');
+    expect(component.formulario.controls.nombres.value).toBe('Lucía');
   });
 
   it('carga el contexto Google, bloquea el correo y oculta requisitos propios', () => {

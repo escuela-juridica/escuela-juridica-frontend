@@ -104,6 +104,7 @@ describe('CertificacionBloque', () => {
 
   it('no envía los datos si el formulario está incompleto', async () => {
     await abrir(certificacion({ estado: 'PENDIENTE_DATOS', puedeConfirmarDatos: true, fechaFinalizacion: '2026-09-18T12:00:00Z' }));
+    formulario().patchValue({ nombres: '', apellidoPaterno: '' });
 
     accion('confirmarDatos');
 

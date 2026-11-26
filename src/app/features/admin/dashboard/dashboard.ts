@@ -152,9 +152,9 @@ export class DashboardPantalla {
     }
     if (this.cursoId) deseados['curso'] = String(this.cursoId);
     if (this.modalidad) deseados['modalidad'] = this.modalidad;
-    const actuales = this.ruta.snapshot.queryParams;
+    const actuales = this.ruta.snapshot.queryParamMap;
     const claves = Object.keys(deseados);
-    if (claves.length === Object.keys(actuales).length && claves.every((k) => actuales[k] === deseados[k])) return;
+    if (claves.length === actuales.keys.length && claves.every((k) => actuales.get(k) === deseados[k])) return;
     void this.router.navigate([], {
       relativeTo: this.ruta,
       replaceUrl: true,

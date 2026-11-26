@@ -43,8 +43,8 @@ const NOMBRES_CAMPOS = [
 type NombreCampoRegistro = (typeof NOMBRES_CAMPOS)[number];
 
 
-const PATRON_NOMBRE_REQUERIDO = /^[A-ZÁÉÍÓÚÑÜ][A-ZÁÉÍÓÚÑÜ '-]*$/;
-const PATRON_NOMBRE_OPCIONAL = /^([A-ZÁÉÍÓÚÑÜ][A-ZÁÉÍÓÚÑÜ '-]*)?$/;
+const PATRON_NOMBRE_REQUERIDO = /^[A-ZÁÉÍÓÚÑÜ][A-ZÁÉÍÓÚÑÜ '-]*$/i;
+const PATRON_NOMBRE_OPCIONAL = /^([A-ZÁÉÍÓÚÑÜ][A-ZÁÉÍÓÚÑÜ '-]*)?$/i;
 
 @Component({
   selector: 'app-registro',
@@ -503,11 +503,11 @@ export class Registro implements OnInit {
   private normalizarCamposAntesDeValidar(): void {
     const controles = this.formulario.controls;
 
-    controles.nombres.setValue(controles.nombres.value.trim(), { emitEvent: false });
-    controles.apellidoPaterno.setValue(controles.apellidoPaterno.value.trim(), {
+    controles.nombres.setValue(formatearNombrePropio(controles.nombres.value.trim()), { emitEvent: false });
+    controles.apellidoPaterno.setValue(formatearNombrePropio(controles.apellidoPaterno.value.trim()), {
       emitEvent: false,
     });
-    controles.apellidoMaterno.setValue(controles.apellidoMaterno.value.trim(), {
+    controles.apellidoMaterno.setValue(formatearNombrePropio(controles.apellidoMaterno.value.trim()), {
       emitEvent: false,
     });
     controles.correo.setValue(controles.correo.value.trim().toLowerCase(), { emitEvent: false });
