@@ -38,6 +38,12 @@ jobs:
           chmod 600 ~/.ssh/id_deploy
           ssh-keyscan -p ${{ secrets.VPS_PORT }} ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
 
+      - name: Preparar permisos en el VPS
+        run: |
+          ssh -i ~/.ssh/id_deploy -p ${{ secrets.VPS_PORT }} \
+            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
+            "sudo -n /usr/local/bin/fix-front-perms.sh"
+
       - name: Subir archivos
         run: |
           rsync -rlz --delete --chmod=D755,F644 \
