@@ -144,6 +144,17 @@ export class DashboardPantalla {
   }
 
   private guardarEnUrl(): void {
+    const deseados: Record<string, string> = {};
+    if (this.rango !== 'ANIO') deseados['rango'] = this.rango;
+    if (this.rango === 'PERSONALIZADO') {
+      deseados['desde'] = this.desde;
+      deseados['hasta'] = this.hasta;
+    }
+    if (this.cursoId) deseados['curso'] = String(this.cursoId);
+    if (this.modalidad) deseados['modalidad'] = this.modalidad;
+    const actuales = this.ruta.snapshot.queryParams;
+    const claves = Object.keys(deseados);
+    if (claves.length === Object.keys(actuales).length && claves.every((k) => actuales[k] === deseados[k])) return;
     void this.router.navigate([], {
       relativeTo: this.ruta,
       replaceUrl: true,

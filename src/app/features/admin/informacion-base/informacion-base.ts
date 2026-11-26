@@ -33,7 +33,6 @@ const PESTANAS: DefinicionPestana[] = [
   { id: 'tipoCurso', etiqueta: 'Tipos de curso' },
   { id: 'categoria', etiqueta: 'Categorías' },
   { id: 'docente', etiqueta: 'Docentes públicos' },
-  { id: 'entidad', etiqueta: 'Entidades' },
   { id: 'firmante', etiqueta: 'Firmantes' },
 ];
 
