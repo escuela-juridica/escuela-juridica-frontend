@@ -107,11 +107,7 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/certificacion/mis-certificados/mis-certificados').then((m) => m.MisCertificados),
       },
-      {
-        path: 'calendario',
-        loadComponent: () =>
-          import('./features/calendario/calendario').then((m) => m.Calendario),
-      },
+      { path: 'calendario', redirectTo: 'panel' },
     ],
   },
   {
